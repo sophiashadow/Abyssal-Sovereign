@@ -51,8 +51,9 @@ Spec: `docs/M7_SPEC.md`. Owner authorized a push after each task (2026-11-26); n
   - Bot fix: bots crossed every Sphere Gate By Name, which the contract The Taken Name forbids. They now use the Serpent's Key under that contract (c1: broken 12 to 0, fulfilled 2 to 11).
   - Not instrumented, left to human playtest: per-Sphere mechanical identity; ending preference.
   - `tools/test.sh` after this batch: 146 tests, 146 passed, 4023 checks, 107.9s (commit `c4cb219`, pushed).
-- **Next:** M7.7 assist and QoL (advisory under-level descent warning, safe auto-explore, Atlas travel, inventory compare, sort, filter and search, log filters, confirmations, pacing), M7.8 profiles and onboarding (SAVE_VERSION 12), M7.9 `docs/PLAYTEST.md`, M7.10 final gate.
-- **NOT_RUN:** UI smoke, exports, validation soak (all M7.10).
+- **M7.7 Player agency and QoL: implemented, tested locally (commit `ca418cd`, pushed).** `src/sim/assist.gd` (Node-free): safe auto-explore, interruptible rest, travel between visited floors, quest/Atlas navigation, advisory descent warnings, equipment compare, inventory sort/filter/search, log filters, enemy inspection. Automation stops for hostiles, dangerous statuses, low or falling HP, hazards and revealed traps; it never uses features, signs contracts or crosses a new Sphere Gate. UI: Auto button (key O), configurable shortcuts, log filter, compare tooltips, confirmations for Transmute, dropping relics/rare gear and abandoning a thread, Atlas and Threads travel buttons, status details, options in Settings. The old Threads (J) and Codex (K) keys were shadowed by movement keys and never worked; defaults are now T and Z. `tools/test.sh`: 173 tests, 173 passed, 4187 checks (new: `test_m7_assist` 24, `test_m7_settings` 3). UI smoke: 39 steps, 0 failures. Limits: auto-explore cannot see hidden traps; the recommended-level hint is evidence-based for depth 2 only; touch layout and pacing feel need a human on a device.
+- **Next:** M7.8 profiles and onboarding (SAVE_VERSION 12), M7.9 `docs/PLAYTEST.md`, M7.10 final gate.
+- **NOT_RUN:** exports, validation soak (both M7.10).
 
 ## Known-Defect & Observation Register (for M7)
 
