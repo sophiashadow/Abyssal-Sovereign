@@ -72,7 +72,7 @@ func step() -> bool:
 		if world.can_rest():
 			return world.player_rest(200) > 0
 		if world.needs_gate_to_descend():
-			return world.player_descend_gate("given_back" if world.apotheosis >= World.APOTHEOSIS_THRESHOLD - 2 else "by_name")
+			return world.player_descend_gate(_gate_method())
 		return world.player_stairs()
 	if p.hp * 100 < p.stat("max_hp") * rest_below_pct and world.can_rest():
 		return world.player_rest(50) > 0
@@ -330,3 +330,12 @@ func _try_ranged_talent(foe: Actor) -> bool:
 		if _can_use_talent(tid) and dist <= int(world.db.get_def("talents", tid).get("range", 0)):
 			return world.player_use_talent(tid, foe.pos)
 	return false
+
+
+## Sphere Gate method. With no contract this is the M6.10 rule; an active
+## contract changes it only to keep that contract's oath (The Taken Name forbids
+## By Name and Given Back, so cross with the Serpent's Key).
+func _gate_method() -> String:
+	if world.contract == "the_taken_name":
+		return "serpents_key"
+	return "given_back" if world.apotheosis >= World.APOTHEOSIS_THRESHOLD - 2 else "by_name"

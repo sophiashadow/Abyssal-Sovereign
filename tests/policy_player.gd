@@ -565,7 +565,7 @@ func _narrative_goal() -> int:
 		if p.pos == tpos:
 			world._tel("narrative", "travel:" + String(hop.get("kind", "")))
 			if world.needs_gate_to_descend():
-				return 1 if world.player_descend_gate("by_name") else 0
+				return 1 if world.player_descend_gate(_gate_method()) else 0
 			return 1 if world.player_stairs() else 0
 		var r := _walk_to(tpos, false)
 		if r >= 0:
