@@ -65,6 +65,10 @@ static func _actor(v: Variant, db: ContentDB, where: String, out: PackedStringAr
 	if typeof(v["base"]) != TYPE_DICTIONARY or typeof(v["flags"]) != TYPE_DICTIONARY or typeof(v["eq"]) != TYPE_DICTIONARY:
 		out.append("%s has malformed stats, flags or equipment" % where)
 		return
+	if not Masks.is_valid(String(v["mask"])):
+		out.append("%s has unknown mask '%s'" % [where, str(v["mask"])])
+	if int(v["mask_risk"]) < 0:
+		out.append("%s has negative mask risk" % where)
 	if bool(v["player"]):
 		if not db.has("species", String(v["species"])) or not db.has("classes", String(v["class"])):
 			out.append("%s has unknown species or class" % where)

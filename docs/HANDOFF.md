@@ -4,21 +4,23 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 
 ## State as of 2026-11-26
 
-- **Branch:** `ccr-c6f8b898-fu2jtp` on `origin` (github.com/sophiashadow/Abyssal-Sovereign). Not merged; no default branch exists yet. Creating `main` or a PR is an owner decision.
-- **Milestones:** M0 (foundations), M1 (vertical slice), M2 (Masks, Eight Chains, Relics, Named losses), M3 (export presets + Linux/Windows/Web/Android-debug builds), and M4 (Seven Spheres, Sphere Gates, Two Ways, Apotheosis Guard / "By Decree") are implemented.
+- **Branch:** `main` (default branch on `origin`, github.com/sophiashadow/Abyssal-Sovereign), preserving full commit history from `ccr-c6f8b898-fu2jtp`.
+- **Milestones:** M0 (foundations), M1 (vertical slice), M2 (Masks, Eight Chains, Relics, Named losses), M3 (export presets + Linux/Windows/Web/Android-debug builds), and M4 (Seven Spheres, Sphere Gates, Two Ways, Apotheosis Guard / "By Decree") are implemented and hardened.
 - **Last verified (local, Linux):**
-  - `tools/test.sh`: 75 tests, 75 passed, 0 failed, 1434 checks.
-  - `tools/ui_smoke.gd` (`1280×720`): 21 steps, 0 failures.
-  - `tools/soak.gd --salt=heldout`: bot wins 40% (72/180 runs, mean 866 turns).
-  - `tools/export.sh all` (ran at M3 prior to M4; re-run `tools/export.sh` to refresh `build/` with M4): built Linux, Windows, Web, and Android debug APK.
-- **NOT_RUN:** M4 re-export, Windows runtime, Web browser `user://` persistence test, physical Android device test, release-signed Android APK, any human playtest. There is no CI.
+  - `tools/verify.sh --exports`:
+    - `tools/test.sh`: 76 tests, 76 passed, 0 failed, 1443 checks (0 engine errors).
+    - `tools/ui_smoke.gd` at `1280×720` and `2340×1080`: 21 steps, 0 failures each.
+    - `tools/export.sh all`: refreshed `build/linux/abyssal-sovereign.x86_64` (71M, smoke-tested `--audio-driver Dummy --quit-after 30`), `build/windows/abyssal-sovereign.exe` (105M), `build/web/index.html` (`index.pck` 134K, `index.wasm` 38M), and `build/android/abyssal-sovereign-debug.apk` (56M).
+    - Android debug APK: `apksigner verify` passed (v2/v3, SHA-256 `a0000912831e593cdea65be68bda40f99f0d0e4d779332fff711199eb578a279`); all 6 `assets/content/core/*.json` files verified inside APK.
+  - `tools/soak.gd --salt=heldout` (prior M4 balance pass): bot wins 40% (72/180 runs, mean 866 turns).
+- **NOT_RUN:** Windows runtime, Web browser `user://` persistence test, physical Android device install/test (no device attached to `adb`), release-signed Android APK, any human playtest. There is no CI.
 
 ## Setup
 
 1. Install Godot **4.7.2** (standard build, not .NET).
 2. Make it reachable as `$GODOT`, as `godot` on `PATH`, or as a `./.tools/godot` symlink (gitignored).
-3. Run `tools/test.sh`; it must exit 0 before you change anything.
-4. The UI smoke needs a display: `xvfb-run -a godot --path . --audio-driver Dummy --script res://tools/ui_smoke.gd -- --shots=test-results/shots`. Screenshots go to the gitignored `test-results/`.
+3. Run `tools/verify.sh` (or `tools/test.sh`); it must exit 0 before you change anything.
+4. Android physical-device install (once USB debugging is enabled and `adb devices` shows your device): `adb install -r build/android/abyssal-sovereign-debug.apk`.
 
 ## Where things are
 
@@ -35,11 +37,10 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 3. ~~**Relics, worked or transmuted**~~ (`kind: "relic"` schema + `Confessor's Glass`, `Ophite Key`, `Broken Halo` in `items.json` / `floors.json`, `player_work_relic` / `player_transmute_relic` in `World`, UI buttons in `main.gd`, tests in `tests/test_items.gd`).
 4. ~~**Named losses**~~ (`World.named_loss()` classifying `Gilded`, `Fluent`, and `Catalogued` on the death screen, tests in `tests/test_turns.gd`).
 
-## Next assignment: Milestone 3 remaining verification & release polish
+## Next assignment: Physical-device & runtime verification, release signing, and balance polish
 
-- **Refresh exports with M4:** Run `tools/export.sh all` to update `build/` with the 7-sphere M4 build.
-- **Milestone 3 remaining:** Test Windows binary on Windows, verify Web `user://` IndexedDB persistence in a browser, test the Android debug APK on a physical device (touch, back button, autosave on kill), and configure release signing with an owner-created keystore outside the repo.
-- **Human playtest & polish:** Playtest Masks, Sphere Gates, Relics, and the Apotheosis Guard; review Occultist balance and remaining items in `ROADMAP.md` (ranged play, monospace glyph font, colour-blind palette).
+- **Milestone 3 remaining:** Install `build/android/abyssal-sovereign-debug.apk` on a physical Android device (`adb install -r build/android/abyssal-sovereign-debug.apk`) and test touch, back button, and autosave on kill; test Windows binary on Windows; verify Web `user://` IndexedDB persistence in a browser; configure release signing with an owner-created keystore outside the repo.
+- **Human playtest & polish:** Playtest Masks, Sphere Gates, Relics, and the Apotheosis Guard; review Occultist/Assassin balance and remaining items in `ROADMAP.md` (ranged play, monospace glyph font, colour-blind palette).
 
 Smaller known defects (fixed 2026-11-26):
 

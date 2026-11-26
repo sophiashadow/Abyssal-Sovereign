@@ -24,6 +24,7 @@ func test_v1_save_migrates_to_v2() -> void:
 	d["save_version"] = 1
 	d["player"].erase("mask")
 	d["player"].erase("mask_risk")
+	d["player"]["traits"].erase("mask_stances")
 	for k in d["floors"]:
 		for a in d["floors"][k]["actors"]:
 			a.erase("mask")
@@ -35,6 +36,7 @@ func test_v1_save_migrates_to_v2() -> void:
 	if w2 != null:
 		eq(w2.player.mask, "bare_face", "default mask applied")
 		eq(w2.player.mask_risk, 0, "default mask_risk applied")
+		ok(w2.player.has_trait("mask_stances"), "v1 occultist receives mask_stances trait")
 		eq(w2.apotheosis, 0, "default apotheosis applied")
 		eq(w2.way_serpent, 0, "default way_serpent applied")
 		eq(w2.way_return, 0, "default way_return applied")
@@ -122,6 +124,9 @@ func test_corrupt_saves_are_rejected_not_crashed() -> void:
 		"unknown species": func(d: Dictionary) -> void: d["player"]["species"] = "angel",
 		"bad slot": func(d: Dictionary) -> void: d["player"]["eq"]["crown"] = d["player"]["eq"]["weapon"],
 		"current floor missing": func(d: Dictionary) -> void: d["depth"] = 3,
+		"out-of-range depth": func(d: Dictionary) -> void: d["depth"] = 99,
+		"invalid mask": func(d: Dictionary) -> void: d["player"]["mask"] = "bogus",
+		"string save_version": func(d: Dictionary) -> void: d["save_version"] = "3",
 	}
 	for what in cases:
 		var d: Dictionary = base.duplicate(true)

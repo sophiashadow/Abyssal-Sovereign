@@ -153,10 +153,16 @@ func _menu_column(max_width: float = 720.0) -> VBoxContainer:
 	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.add_child(center)
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_top", 16)
+	margin.add_theme_constant_override("margin_bottom", 16)
+	margin.add_theme_constant_override("margin_left", 16)
+	margin.add_theme_constant_override("margin_right", 16)
+	center.add_child(margin)
 	var col := VBoxContainer.new()
 	col.custom_minimum_size = Vector2(minf(max_width * settings.text_scale(), get_viewport_rect().size.x - 32.0), 0)
 	col.add_theme_constant_override("separation", int(12 * settings.text_scale()))
-	center.add_child(col)
+	margin.add_child(col)
 	return col
 
 
@@ -184,7 +190,7 @@ func _show_title() -> void:
 	col.add_child(_btn("Settings", func() -> void: _show_settings(_show_title)))
 	if not OS.has_feature("web"):
 		col.add_child(_btn("Quit", func() -> void: get_tree().quit()))
-	var foot := _label("Set in the world of FALSE LIGHT. v0.1 (Milestone 1)", Palette.TEXT_DIM, 0.75)
+	var foot := _label("Set in the world of FALSE LIGHT. v0.4 (Seven Spheres)", Palette.TEXT_DIM, 0.75)
 	foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(foot)
 
@@ -257,7 +263,7 @@ func _show_create() -> void:
 		_start_game(World.new_run(db, seed_value, _pick_species, _pick_class, name_edit.text)))
 	begin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(begin)
-	row.add_child(_btn("Back", _show_title, 140.0))
+	row.add_child(_btn("Back", _show_title, 140.0 * settings.text_scale()))
 	col.add_child(row)
 	begin.call_deferred("grab_focus")
 
@@ -549,7 +555,8 @@ func _on_tile_tapped(p: Vector2i) -> void:
 		if not world.current_floor().items_at(me).is_empty():
 			world.player_pickup()
 		elif world.current_floor().get_tile(me) in [Tiles.STAIRS_DOWN, Tiles.STAIRS_UP]:
-			world.player_stairs()
+			_act_stairs()
+			return
 		else:
 			world.player_wait()
 		_after_action()
@@ -722,9 +729,15 @@ func _open_overlay(title: String, title_color: Color = Palette.LUX) -> VBoxConta
 	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.add_child(center)
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_top", 16)
+	margin.add_theme_constant_override("margin_bottom", 16)
+	margin.add_theme_constant_override("margin_left", 16)
+	margin.add_theme_constant_override("margin_right", 16)
+	center.add_child(margin)
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size.x = minf(640.0 * settings.text_scale(), get_viewport_rect().size.x - 32.0)
-	center.add_child(panel)
+	margin.add_child(panel)
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", int(10 * settings.text_scale()))
 	panel.add_child(col)

@@ -61,3 +61,18 @@ func test_bare_face_cools_risk_and_eris_halts_regen() -> void:
 	for _i in 6:
 		w.player_wait()
 	ok(w.player.hp > 5, "regeneration resumes in bare_face")
+
+
+func test_active_mask_switching_does_not_reset_risk() -> void:
+	var w := TestHelpers.ascii_world([
+		"#######",
+		"#@....#",
+		"#######",
+	], {}, "human", "occultist")
+	w.player_switch_mask("eris")
+	for _i in 4:
+		w.player_wait()
+	var r := w.player.mask_risk
+	ok(r >= 4, "risk accumulated in eris (%d)" % r)
+	w.player_switch_mask("nyx")
+	ok(w.player.mask_risk >= r, "switching active->active does not cool risk (%d -> %d)" % [r, w.player.mask_risk])

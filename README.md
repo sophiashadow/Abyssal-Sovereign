@@ -2,17 +2,19 @@
 
 An original turn-based traditional roguelike set beneath Terra Tenebrae, in the cosmology of FALSE LIGHT. It is built with Godot 4 and typed GDScript, and plays fully offline.
 
-**Status: Milestone 2 complete; Milestone 3 export presets & builds ready on Linux.** It has a title screen and character creation (3 origins × 3 callings) and a seeded three-floor descent. Gameplay covers:
+**Status: v0.4 (Milestones 0–4 implemented, export presets & builds ready on Linux).** It has a title screen, character creation (3 origins × 3 callings), and a seeded seven-sphere descent (Moon through Saturn). Gameplay covers:
 
 - Field of view with exploration memory.
 - Melee combat, XP and levels.
-- Equipment and consumables.
-- The False Light status: relief, then the Reckoning.
-- A guardian.
-- A victory through the Unwritten Door.
-- Permadeath with save and resume.
+- Equipment, consumables, and Relics (Work for temporary power with a cost, or Transmute for permanent stats).
+- **Masks as stances** (`m` key / Mask button for Occultists: Bare Face, Nyx, Eris, Lilith) with risk accrual and seizures.
+- The **False Light** status: relief, then the Reckoning.
+- **Eight Chains** enemy abilities (Isolation and Monopolized Sight fog).
+- **Sphere Gates** between Spheres (`Stormed`, `Serpent's Key`, `Given Back`, `By Name`) and the **Apotheosis Guard**.
+- The Preliator Sentinel guardian, **Named losses** (Catalogued, Fluent, Gilded), and four victory outcomes (Unwritten Door, The Serpent's Way, The Way of Return, and Victory: By Decree).
+- Permadeath with atomic save/resume (`save_version` 3, migrating v1/v2 saves).
 
-Android, Windows and Web builds can be exported via `tools/export.sh` (see [ROADMAP.md](ROADMAP.md); Windows, Web browser `user://` persistence, and physical Android device runtime tests have not run yet). Any distributed export must ship Godot's license notices.
+Android, Windows and Web builds can be exported via `tools/export.sh` (see [ROADMAP.md](ROADMAP.md); Windows runtime, Web browser `user://` persistence, and physical Android device runtime tests have not run yet). Any distributed export must ship Godot's license notices.
 
 ## Run it
 
@@ -22,6 +24,8 @@ The game requires Godot **4.7.2** (standard build, not .NET).
 godot --path .                 # play
 tools/test.sh                  # headless test suite (exit 0 = all passed)
 tools/test.sh test_save        # one test file
+tools/verify.sh                # full local regression gate (tests + desktop/phone UI smoke)
+tools/verify.sh --exports      # also refresh all 4 platform exports and verify outputs
 tools/export.sh                # export Linux, Windows, and Web builds into build/
 tools/export.sh all            # also export Android debug APK into build/android/
 godot --headless --path . --script res://tools/soak.gd -- --seeds=20            # balance soak
@@ -41,6 +45,7 @@ xvfb-run -a godot --path . --audio-driver Dummy --script res://tools/ui_smoke.gd
 | Stairs | Enter `>` `<` | Stairs, or tap yourself on stairs |
 | Rest | `r` | Rest |
 | Inventory | `i` | Bag |
+| Masks (Occultist) | `m` | Mask |
 | Inspect | `x`, then tap | Look, long-press or right-click |
 | Menu | Esc | Menu, Android back |
 

@@ -8,22 +8,24 @@
 4. **Ambiguity is preserved.** Mechanics never settle what the sources leave open. See [docs/LORE.md](docs/LORE.md).
 5. **Phone-first, keyboard-complete.** Every action is reachable by tap and by key. Nothing depends on hover. Text and tiles scale.
 
-## Milestone 1 rules (implemented)
+## Implemented rules (Milestones 1–4)
 
 - **Turns.** Time-based. A normal action costs 100. Speed scales the cost (`cost × 100 / speed`). The lowest `(next_time, id)` acts next, and the player wins ties. Statuses tick at the start of the bearer's turn.
 - **Combat.**
   - Hit chance: `70 + 5 × (accuracy − evasion)`, clamped to 5–95%.
   - Crit chance: 5% plus weapon and modifiers. A crit rolls the damage dice twice.
   - Damage: `dice + might + damage mods − defense`, minimum 1.
-- **Awareness.** An unaware monster that can see you notices with 60% chance per turn. Monsters that are awake pursue you along a shared distance map.
-- **Progression.** The XP needed to reach level *L* is `15 · n(n+1)/2`, where *n* = *L* − 1. Each level adds class plus species HP. Odd levels add +1 accuracy.
-- **Recovery.** 1 HP every 6 turns (Revenants every 12). Rest waits until full or until an enemy is in view.
-- **Inventory.** 16 slots; stackables share a slot. Equipment slots are weapon, armor and amulet.
-- **Floors.**
-  - Three floors: the Ossuary Warrens, the Tithe Vaults and the Sealed Stair, with rising monster mix and density.
-  - The last floor has the Preliator Sentinel guarding the Unwritten Door. Killing it opens the door, and stepping through wins.
-  - Floors persist, and the stairs go both ways.
-- **Saves.** One slot, written atomically. It is deleted on death or victory.
+- **Awareness & Pursuit.** An unaware monster that can see you notices with 60% chance per turn (30% while wearing Nyx, +2 perception range while wearing Lilith). Awake monsters pursue your last-known position and lose pursuit if you are no longer visible when they arrive.
+- **Progression.** The XP needed to reach level *L* is `15 · n(n+1)/2`, where *n* = *L* − 1. Each level adds class plus species HP. Odd levels add +1 accuracy. If `apotheosis >= 8` (the **Apotheosis Guard**), XP gain stops.
+- **Recovery.** 1 HP every 6 turns (Revenants every 12), paused while wearing Eris or afflicted by `isolation`. Rest waits until full, isolated, or an enemy comes into view.
+- **Inventory & Relics.** 16 slots; stackables share a slot. Equipment slots are weapon, armor and amulet. **Relics** (*Confessor's Glass*, *Ophite Key*, *Broken Halo*) can be **Worked** for temporary status buffs at an HP cost or **Transmuted** (consumed) for permanent stats.
+- **Masks as stances.** Occultists (`mask_stances`) switch between **Bare Face**, **Nyx**, **Eris**, and **Lilith** for 1 turn. Active Masks build `mask_risk` toward `12`, triggering **Dissolution**, **Isolation**, or **Exposure**; only Bare Face cools risk.
+- **Eight Chains.** Dominion cultists and cantors can inflict `isolation` on hit; the Preliator Sentinel and Inquisition Cantors can cast `perception_fog` (`sight -4`).
+- **Seven Spheres & Sphere Gates.** Seven persisted floors (`Moon` through `Saturn`), with bidirectional stairs and a **Sphere Gate** choice (`Stormed`, `Serpent's Key`, `Given Back`, `By Name`) on first descent into each deeper Sphere.
+- **Endings.**
+  - **Victories:** Killing the Preliator Sentinel on depth 7 opens the Unwritten Door; stepping through yields **Victory: By Decree** (if `apotheosis >= 8`), **The Serpent's Way**, **The Way of Return**, or the balanced **Unwritten Door** escape.
+  - **Named losses:** Deaths classify as **Gilded** (under False Light / Reckoning), **Fluent** (under Mask seizure or Eight Chains status), or **Catalogued**.
+- **Saves.** One slot (`save_version` 3, with `v1 → v2 → v3` migration), written atomically. It is deleted on death or victory.
 
 ### Origins and callings
 
@@ -53,8 +55,8 @@ A vial gives 20 turns of +2 accuracy, +2 damage and +2 HP per turn. It is then f
 | 2026-11-26 | M2.3–M2.4 Relics (Work or Transmute) and Named losses (Catalogued, Fluent, Gilded) | n/a | **39% (180 runs)** |
 | 2026-11-26 | M4 Seven Spheres (depths 1–7), Sphere Gates, Two Ways, Apotheosis Guard, Cantor & Inquisitor | 18% (135 runs, pre-tune) | **40% (180 runs, post-tune)** |
 
-Known imbalance: the Occultist improved from 8/60 to 15/60 held-out wins with Masks as stances (against 37/60 for the Knight), and the bot only uses Eris/Bare Face. Further M2/M4 kits (rites, relics) will round out the gap.
+Known imbalance: in the 7-sphere soak (`180 runs`, `72 wins / 40%`), Fallen Knight still leads (`49/60`) over Assassin (`17/60`) and Occultist (`6/60`), because the simple bot does not kite, exploit Nyx/Lilith stealth/sight, or work relics tactically.
 
 ## Where the mythology goes next
 
-See the candidates table in [docs/LORE.md](docs/LORE.md): Masks as stances, the Seven Spheres as depth bands with gates, the two Ways as alternative victories, the Eight Chains as an enemy ability grammar, the Apotheosis guard, and relics that can be worked or transmuted. None of these are built. Each needs owner review first.
+Milestones 1–4 implemented Masks as stances, the Seven Spheres with Sphere Gates, the two Ways as victory families, the first two Eight Chains abilities, the Apotheosis guard ("By Decree"), Relics (Work or Transmute), and Named losses. Remaining mythology candidates for future depth include the remaining six Eight Chains abilities, rites/covenants between Spheres, and item identification. Each needs owner review before shipping.

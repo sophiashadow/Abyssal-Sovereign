@@ -384,7 +384,7 @@ func player_descend_gate(method: String) -> bool:
 	if current_floor().get_tile(player.pos) != Tiles.STAIRS_DOWN:
 		log_msg("There are no stairs here.")
 		return false
-	if not GATE_METHODS.has(method):
+	if not GATE_METHODS.has(method) or depth >= db.max_depth():
 		return false
 	var first_visit := not floors.has(depth + 1)
 	if first_visit:
@@ -468,7 +468,6 @@ func player_switch_mask(mask_id: String) -> bool:
 		player.mask_risk = maxi(0, player.mask_risk - 2)
 		log_msg("You drop the Mask and wear your Bare Face.", "info")
 	else:
-		player.mask_risk = maxi(0, player.mask_risk - 3)
 		log_msg("You put on %s." % Masks.label(mask_id), "good")
 	update_fov()
 	return _finish_player_action(COST_WAIT)
@@ -942,6 +941,9 @@ static func _migrate(d: Dictionary) -> Dictionary:
 		if typeof(out.get("player")) == TYPE_DICTIONARY:
 			out["player"]["mask"] = out["player"].get("mask", "bare_face")
 			out["player"]["mask_risk"] = int(out["player"].get("mask_risk", 0))
+			if String(out["player"].get("class", "")) == "occultist" and typeof(out["player"].get("traits")) == TYPE_ARRAY:
+				if not out["player"]["traits"].has("mask_stances"):
+					out["player"]["traits"].append("mask_stances")
 		if typeof(out.get("floors")) == TYPE_DICTIONARY:
 			for k in out["floors"]:
 				var fl = out["floors"][k]
@@ -965,9 +967,13 @@ static func from_dict(content: ContentDB, d: Dictionary, errors: PackedStringArr
 	if typeof(d) != TYPE_DICTIONARY:
 		errors.append("save is not an object")
 		return null
-	var raw_ver := int(d.get("save_version", -1))
+	var sv: Variant = d.get("save_version")
+	if not (typeof(sv) in [TYPE_INT, TYPE_FLOAT]) or not is_equal_approx(float(sv), roundf(float(sv))):
+		errors.append("save version %s is not supported (expected %d)" % [str(Actor._ints(sv)), SAVE_VERSION])
+		return null
+	var raw_ver := int(sv)
 	if raw_ver < 1 or raw_ver > SAVE_VERSION:
-		errors.append("save version %s is not supported (expected %d)" % [str(Actor._ints(d.get("save_version"))), SAVE_VERSION])
+		errors.append("save version %s is not supported (expected %d)" % [str(Actor._ints(sv)), SAVE_VERSION])
 		return null
 	d = _migrate(d)
 	for key in ["seed", "depth", "time", "turns", "state", "next_id", "rng", "player", "floors", "log"]:
@@ -982,6 +988,9 @@ static func from_dict(content: ContentDB, d: Dictionary, errors: PackedStringArr
 	w.db = content
 	w.run_seed = String(d["seed"]).to_int()
 	w.depth = int(d["depth"])
+	if w.depth < 1 or w.depth > content.max_depth():
+		errors.append("save has out-of-range depth %d" % w.depth)
+		return null
 	w.time = int(d["time"])
 	w.turns = int(d["turns"])
 	w.state = int(d["state"]) as State

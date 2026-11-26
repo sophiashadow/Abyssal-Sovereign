@@ -7,16 +7,16 @@ content/core/*.json        data: species, classes, items, monsters, statuses, fl
 src/core/                  Rng (seeded, saveable), Dice, Grid helpers
 src/content/               ContentSchema (field rules), ContentDB (load, validate, look up)
 src/gen/                   DungeonGen: pure function (floor def, seed) -> FloorMap + spawn plan
-src/sim/                   World, Actor, Item, FloorMap, Tiles, Traits, Fov, Pathing, Combat
+src/sim/                   World, Actor, Item, FloorMap, Tiles, Traits, Masks, Fov, Pathing, Combat
 src/persistence/           SaveIO (atomic file), SaveCheck (structural validation)
 src/ui/                    main.gd (screens, input, autosave), MapView, Palette, GameSettings
 tests/                     headless suite, helpers, AutoPlayer bot
-tools/                     test.sh, soak.gd (balance), ui_smoke.gd (drives the real UI)
+tools/                     test.sh, verify.sh, export.sh, soak.gd (balance), ui_smoke.gd (drives the real UI)
 ```
 
 Dependencies point one way, down the list. Nothing in `src/sim`, `src/gen`, `src/content` or `src/core` touches a Node, input or rendering. All of it is `RefCounted`. This is why the whole game runs headless in tests and the bot uses the same `World` API as the UI.
 
-**World is the only API the UI calls.** `player_move`, `player_wait`, `player_pickup`, `player_drop`, `player_use`, `player_unequip`, `player_stairs`, `player_rest`, plus read-only queries (`describe_at`, `visible_hostiles`, `current_floor`). An action returns `true` when it spent time. The world then runs monsters until the player's turn comes round again.
+**World is the only API the UI calls.** `player_move`, `player_wait`, `player_pickup`, `player_drop`, `player_use`, `player_unequip`, `player_work_relic`, `player_transmute_relic`, `player_switch_mask`, `player_stairs`, `player_descend_gate`, `player_rest`, plus read-only queries (`describe_at`, `visible_hostiles`, `current_floor`, `needs_gate_to_descend`, `named_loss`, `victory_kind`). An action returns `true` when it spent time. The world then runs monsters until the player's turn comes round again.
 
 ## Determinism
 

@@ -10,11 +10,10 @@ Everything in the M1 brief is implemented. The automated evidence is the headles
 
 ### Known defects and limits
 
-- **Occultist balance:** weakest calling. Held-out bot win rate is 13%, against 60% for the Knight. Fix it with a kit (see M2), not stats.
+- **Occultist & Assassin balance (7 Spheres):** Fallen Knight leads in bot soak runs (`49/60` vs. `17/60` Assassin and `6/60` Occultist on 7 floors), as the soak bot does not kite, exploit Nyx/Lilith tactics, or work relics.
 - **Ranged play:** there are no ranged attacks, spells or doors (other than the sealed one), and there is no item identification.
-- **Saves:** no save migration code yet. Only v1 exists.
-- **Platforms:** no export presets and no builds for any platform. Android, Windows and Web are untested.
 - **Typography and accessibility:** the glyph font is the engine default (proportional, centred per cell). A dedicated monospace font needs a license check first. There is no colour-blind palette option and no screen-reader support.
+- **Unverified runtimes:** Windows runtime, Web browser `user://` persistence, physical Android device install/touch/kill-save test, and Android release signing are `NOT_RUN`.
 
 ## Milestone 2: the mythology as mechanics (done 2026-11-26)
 
