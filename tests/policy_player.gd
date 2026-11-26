@@ -32,6 +32,7 @@ const DEFENSIVE_EFFECTS: Array[String] = ["shield_brace", "unyielding_march", "t
 		"sanctify_ground", "break_the_chain", "philosophers_loan", "summon_ward_sigil", "fade_to_ash", "backstep", "veil_step"]
 
 var policy := "baseline"
+var mask_play := false ## wear a Mask only while fighting and cool in Bare Face between fights
 var floor_budget := 500 ## actions one floor may consume before the explorer gives up on it
 var _rng: Rng
 var _fs: Dictionary = {} ## floor_id -> {actions, done, blacklist, handled, searched}
@@ -62,14 +63,17 @@ func _init(w: World, policy_name: String = "baseline") -> void:
 			approach_unaware = false
 		"explorer":
 			rest_below_pct = 80
+			mask_play = true
 		"preserver":
 			heal_mul = 4
 			rest_below_pct = 90
 			false_light_vs_unique = false
 		"specialist":
 			projectile_all = true
+			mask_play = true
 		"narrative":
 			rest_below_pct = 80
+			mask_play = true
 
 
 func step() -> bool:
@@ -99,6 +103,10 @@ func _may_descend() -> bool:
 
 
 func _policy_pre() -> int:
+	if mask_play:
+		var mk := _mask_pre()
+		if mk >= 0:
+			return mk
 	match policy:
 		"defensive":
 			return _defensive_pre()
@@ -185,6 +193,32 @@ func _try_ranged_talent(foe: Actor) -> bool:
 	if policy != "specialist":
 		return super._try_ranged_talent(foe)
 	return _kit_talent(foe, false)
+
+
+# ------------------------------------------------------------------ masks
+
+## Occultist Mask discipline: Bare Face between fights (it cools risk and keeps
+## natural regeneration), Eris when healthy and fighting, Nyx when hurt, and back
+## to Bare Face before a seizure would land.
+func _mask_pre() -> int:
+	var p := world.player
+	if not p.has_trait("mask_stances"):
+		return -1
+	var near := world.nearest_visible_hostile(7)
+	var risk_max := World.MASK_RISK_MAX + 2 * p.talent_rank("crowned_frequency")
+	if near == null or not near.awake:
+		if p.mask != "bare_face" and (p.mask == "eris" or p.mask_risk > 2 or p.hp < p.stat("max_hp")):
+			world._tel("mask", "cool")
+			return 1 if world.player_switch_mask("bare_face") else 0
+		return -1
+	if p.mask != "bare_face" and p.mask_risk >= risk_max - 2:
+		world._tel("mask", "pre_seizure_drop")
+		return 1 if world.player_switch_mask("bare_face") else 0
+	if p.mask == "bare_face" and p.mask_risk <= 2 and Grid.chebyshev(p.pos, near.pos) <= 6:
+		var want := "nyx" if p.hp * 2 < p.stat("max_hp") else "eris"
+		world._tel("mask", "don:" + want)
+		return 1 if world.player_switch_mask(want) else 0
+	return -1
 
 
 # ------------------------------------------------------------------ defensive / preserver
