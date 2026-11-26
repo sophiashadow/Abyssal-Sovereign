@@ -11,6 +11,7 @@ var step := 0
 var wait := 0
 var shots := ""
 var failures: PackedStringArray = []
+var _assist_turns := 0
 
 
 func _initialize() -> void:
@@ -50,6 +51,16 @@ func _find_button(node: Node, text: String) -> Button:
 		var b := _find_button(c, text)
 		if b != null:
 			return b
+	return null
+
+
+func _find_search(node: Node) -> LineEdit:
+	if node is LineEdit and (node as LineEdit).is_visible_in_tree():
+		return node
+	for c in node.get_children():
+		var e := _find_search(c)
+		if e != null:
+			return e
 	return null
 
 
@@ -147,26 +158,88 @@ func _process(_delta: float) -> bool:
 		15:
 			_check(main.world.turns > 6, "travel moved the player")
 			_shot("after_travel")
-			_key(KEY_ESCAPE)
 		16:
+			# M7.7: auto-explore starts from the key and stops on any key.
+			_check(_find_button(main, "Auto") != null, "Auto button on the action grid")
+			_assist_turns = main.world.turns
+			_key(KEY_O)
+			wait = 20
+		17:
+			var moved: bool = main.world.turns > _assist_turns
+			_check(moved or main.look_label.text != "", "auto-explore moved or said why it would not (%s)" % main.look_label.text)
+			if not main.auto.is_empty():
+				_key(KEY_SPACE)
+		18:
+			_check(main.auto.is_empty(), "a key press stops auto-explore")
+			_key(KEY_I)
+		19:
+			_check(main.overlay != null, "pack opens")
+			_check(_find_button(main, "Sort: recent") != null, "sort control")
+			_check(_find_button(main, "Show: all") != null, "filter control")
+			_check(_find_search(main) != null, "search box")
+			_shot("pack_controls")
+			_press("Sort: recent")
+		20:
+			_check(_find_button(main, "Sort: name") != null, "sort cycles to name")
+			_press("Show: all")
+		21:
+			_check(_find_button(main, "Show: weapon") != null, "filter cycles to weapon")
+			main.settings.inv_sort_index = 0
+			main.settings.inv_filter_index = 0
+			_key(KEY_ESCAPE)
+		22:
+			_key(KEY_TAB)
+		23:
+			_check(main.overlay != null, "atlas opens on Tab")
+			_shot("atlas")
+			_key(KEY_ESCAPE)
+		24:
+			# M7.7: shortcuts can be rebound, collisions are refused, reset restores.
+			main.settings.touch_controls = false
+			_key(KEY_ESCAPE)
+		25:
+			_press("Settings")
+		26:
+			_press("Keyboard shortcuts...")
+		27:
+			_check(_find_button(main, "Get: G") != null, "default Get key shown")
+			_press("Get: G")
+		28:
+			_key(KEY_Y)
+		29:
+			_check(main.settings.key_for("pickup") == KEY_G, "a movement key is refused")
+			_press("Get: G")
+		30:
+			_key(KEY_V)
+		31:
+			_check(main.settings.key_for("pickup") == KEY_V, "pickup rebound to V")
+			_check(_find_button(main, "Get: V") != null, "screen shows the new key")
+			_press("Reset to defaults")
+		32:
+			_check(main.settings.key_for("pickup") == KEY_G, "reset restores G")
+			main.settings.reset_shortcuts()
+			_press("Back")
+		33:
+			_press("Done")
+		34:
 			if main.overlay == null:
 				_key(KEY_ESCAPE)
-		17:
+		35:
 			_press("Save and return to title")
-		18:
+		36:
 			_check(main.screen == 0, "back on title")
 			_check(_find_button(main, "Continue") != null, "continue offered")
 			_press("Continue")
-		19:
+		37:
 			_check(main.screen == 2 and main.world != null, "continued")
 			main.world.apply_damage(main.world.player, 9999, "a smoke test")
 			main._after_action()
-		20:
+		38:
 			_check(main.screen == 3, "end screen")
 			_check(not SaveIO.exists(), "permadeath erased the save")
 			_shot("death")
 			_press("Title")
-		21:
+		39:
 			_check(main.screen == 0, "title again")
 			_check(_find_button(main, "Continue") == null, "no continue after death")
 			print("UI smoke: %d steps, %d failures" % [step, failures.size()])

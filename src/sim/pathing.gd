@@ -9,8 +9,9 @@ const UNREACHED := -1
 
 ## Distance (in steps) from every tile to `goal`. When `known_only` is true,
 ## only explored tiles are crossed (used for tap-to-travel, so the player's
-## route never reveals the unexplored map).
-static func distance_map(map: FloorMap, goal: Vector2i, known_only: bool = false) -> PackedInt32Array:
+## route never reveals the unexplored map). Tiles in `avoid` are never entered,
+## but the goal itself is always a source.
+static func distance_map(map: FloorMap, goal: Vector2i, known_only: bool = false, avoid: Dictionary = {}) -> PackedInt32Array:
 	var dist := PackedInt32Array()
 	dist.resize(map.width * map.height)
 	dist.fill(UNREACHED)
@@ -28,6 +29,8 @@ static func distance_map(map: FloorMap, goal: Vector2i, known_only: bool = false
 			if not map.in_bounds(n) or dist[map.idx(n)] != UNREACHED:
 				continue
 			if known_only and not map.is_explored(n):
+				continue
+			if not avoid.is_empty() and avoid.has(n):
 				continue
 			# Steps are symmetric, so "can step n -> cur" equals "cur -> n".
 			if not map.can_step(cur, n):
