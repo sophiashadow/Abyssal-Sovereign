@@ -114,3 +114,9 @@ func test_rest_stops_when_a_hostile_comes_into_view() -> void:
 	TestHelpers.monster(w2, "ghoul").awake = true
 	w2.player.hp = 1
 	ok(w2.player_rest(500) < 10, "interrupted by an approaching ghoul")
+
+
+func test_death_leaves_health_at_zero() -> void:
+	var w := TestHelpers.ascii_world(ROOM)
+	w.apply_damage(w.player, 999, "x")
+	eq(w.player.hp, 0, "no negative health shown after death")

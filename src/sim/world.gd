@@ -505,6 +505,7 @@ func apply_damage(target: Actor, amount: int, source: String) -> void:
 			target.hp = 1
 			log_msg("Death reaches for you and finds you already filed. You stand back up.", "good")
 			return
+		target.hp = 0
 		state = State.DEAD
 		death_cause = source
 		log_msg("You die. The record closes over you.", "danger")
