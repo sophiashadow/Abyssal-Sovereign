@@ -57,7 +57,7 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 | `name` | string | yes | |
 | `glyph` | glyph | yes | |
 | `color` | color | yes | |
-| `kind` | enum: weapon, ranged, armor, amulet, consumable, relic | yes | slot or use |
+| `kind` | enum: weapon, ranged, armor, amulet, consumable, relic, key | yes | slot or use |
 | `description` | text | yes | |
 | `damage` | dice | weapon / ranged / projectile | damage dice |
 | `range` | int ≥ 1 | ranged / projectile / scroll | targeting range in tiles |

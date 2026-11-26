@@ -56,4 +56,10 @@ Owner decisions resolved 2026-11-26 (see [docs/LORE.md](docs/LORE.md)): Apotheos
 1. **Procedural affixes & rarity:** Implemented `Affixes` (`common`, `uncommon`, `rare`, `artifact`) across 10 prefixes and 6 suffixes granting stats, resists, elemental conversions, and status procs.
 2. **Identification & BUC:** Run-shuffled disguises for unknown consumables/scrolls (`id_aliases`), hidden affixes until equipped or witnessed (`scroll_of_identify`, `Confessor's Glass`, `Ward-Keeper's Lamp`), and `blessed` / `cursed` gear with slot-locking curses (`scroll_of_unbind`, `Break the Chain`, `Transmute Pain`, relic transmutation).
 3. **Equipment sets, unique artifacts & EXODUS relics:** 3 sets (`Inquisitor's Audit`, `The Eye Unblinking`, `Cinder & Oath`), 4 non-duplicating artifacts (`Unwritten Edge`, `Cowl of the First Witness`, `Serpent's Recurver`, `Chainbreaker Seal`), 3 EXODUS relics (`Severed Crown`, `Ward-Keeper's Lamp`, `Almoner's Purse`), and `SAVE_VERSION := 6`.
-4. **Next (M5.4–M5.5):** Dungeon ecology (traps, secret doors, altars/shrines/ritual circles, locked vaults, merchants/wandering encounters, hazards, Sphere features) and Metaphysical depth (complete Eight Chains grammar, rituals/contracts, Masks/Relics/False Light/Apotheosis/Two Ways synergies).
+
+## Milestone 5.4: dungeon ecology (done 2026-11-26)
+
+1. **Traps & secret doors:** Added `spike`/`cinder`/`rime`/`shackle` traps, `secret_door` caches, passive keen-sight detection, `Search` (`s` / disarm +5 XP), and revealed secret passages opening into guaranteed magical loot.
+2. **Environmental hazards:** Added walkable `ASH_EMBER`, `RIME_ICE`, `MIASMA`, and `SOLAR_GLARE` tiles interacting cleanly with M5.2 damage resistances and status combos, with safe tap-to-travel stops.
+3. **Interactive dungeon sites & Sphere profiles:** Added *Altars of Unbinding*, *Shrines of the Unblinking Eye*, *Geometric Ritual Circles*, *Locked Audit Vaults* (`vault_key` + reusable `ophite_key`), *Wandering Debt-Brokers* (blood/barter), *Trial Bell Monoliths*, Sphere-specific `SPHERE_PROFILES`, and `SAVE_VERSION := 7`.
+4. **Next (M5.5):** Metaphysical depth (complete Eight Chains enemy ability grammar, expanded ritual mechanics/divine contracts/allegiances, deep interactions between Masks, Relics, False Light, Apotheosis, and the Two Ways).

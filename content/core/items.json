@@ -108,6 +108,8 @@
     {"id": "almoners_purse", "name": "Almoner's Purse", "glyph": "*", "color": "#c6aa70", "kind": "relic",
      "description": "A salt-stained leather pouch heavy with leaden debt-tokens.",
      "work_status": "almoners_grace", "work_cost_hp": 0, "work_desc": "No HP cost: regenerate +2/turn, +2 evasion for 8 turns, restore +4 resource.",
-     "transmute_mods": {"max_hp": 8, "speed": 5}, "transmute_desc": "Destroy relic: permanently +8 max HP, +5 speed."}
+     "transmute_mods": {"max_hp": 8, "speed": 5}, "transmute_desc": "Destroy relic: permanently +8 max HP, +5 speed."},
+    {"id": "vault_key", "name": "vault key", "glyph": ")", "color": "#f2c35c", "kind": "key", "stackable": true,
+     "description": "A heavy black-iron key stamped with a vault ledger number."}
   ]
 }

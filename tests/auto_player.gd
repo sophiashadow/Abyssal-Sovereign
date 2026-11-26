@@ -74,6 +74,18 @@ func step() -> bool:
 		return world.player_transmute_relic(relic)
 	if not m.items_at(p.pos).is_empty() and world._can_carry(p, m.items_at(p.pos)[0]):
 		return world.player_pickup()
+	var feat := m.revealed_feature_at(p.pos)
+	if Ecology.is_interactive(feat):
+		var fk := String(feat.get("kind", ""))
+		if fk == "vault_gate" and (_has_item("vault_key") or _has_item("ophite_key")):
+			if world.player_interact(p.pos, "key"):
+				return true
+		elif fk == "shrine":
+			return world.player_interact(p.pos, "witness")
+		elif fk == "ritual_circle" and p.hp * 10 < p.stat("max_hp") * 6:
+			return world.player_interact(p.pos, "drain")
+		elif fk == "altar" and _has_cursed_equipped() and p.hp > 4:
+			return world.player_interact(p.pos, "cleanse")
 	var target := _nearest_visible_hostile()
 	if target != null:
 		if target.is_elite or target.unique or target.tags.has("boss"):
@@ -133,6 +145,13 @@ func _has_cursed_equipped() -> bool:
 	for slot in Actor.SLOTS:
 		var it := world.player.equipped(slot)
 		if it != null and it.buc == "cursed":
+			return true
+	return false
+
+
+func _has_item(tid: String) -> bool:
+	for it in world.player.inventory:
+		if it.template_id == tid:
 			return true
 	return false
 

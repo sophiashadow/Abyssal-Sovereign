@@ -192,7 +192,7 @@ func _show_title() -> void:
 	col.add_child(_btn("Settings", func() -> void: _show_settings(_show_title)))
 	if not OS.has_feature("web"):
 		col.add_child(_btn("Quit", func() -> void: get_tree().quit()))
-	var foot := _label("Set in the world of FALSE LIGHT. v0.5 (M5.3 Equipment & Discovery)", Palette.TEXT_DIM, 0.75)
+	var foot := _label("Set in the world of FALSE LIGHT. v0.5 (M5.4 Dungeon Ecology)", Palette.TEXT_DIM, 0.75)
 	foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(foot)
 
@@ -391,7 +391,7 @@ func _build_game_screen() -> void:
 	actions.add_theme_constant_override("h_separation", int(6 * s))
 	actions.add_theme_constant_override("v_separation", int(6 * s))
 	var action_specs: Array = [["Get", _act_pickup], ["Bag", _show_inventory], ["Build", _show_build], ["Act", _show_abilities],
-			["Fire", _act_fire], ["Stairs", _act_stairs], ["Rest", _act_rest], ["Look", _toggle_look], ["Menu", _show_pause]]
+			["Fire", _act_fire], ["Stairs", _act_stairs], ["Rest", _act_rest], ["Srch", _act_search], ["Look", _toggle_look], ["Menu", _show_pause]]
 	if world.player.has_trait("mask_stances"):
 		action_specs.insert(5, ["Mask", _show_masks])
 	for spec in action_specs:
@@ -422,7 +422,7 @@ func _build_game_screen() -> void:
 		side.add_child(pad_center)
 	else:
 		var mask_hint := "   Mask: m" if world.player.has_trait("mask_stances") else ""
-		side.add_child(_label("Move: arrows, numpad or hjklyubn\nWait: . or 5   Get: g   Bag: i%s\nBuild: c   Act: a (1-6)   Fire: f\nStairs: Enter   Rest: r   Look: x\nTap a known tile to travel; hold or right-click to inspect. Menu: Esc" % mask_hint, Palette.TEXT_DIM, 0.7))
+		side.add_child(_label("Move: arrows, numpad or hjklyubn\nWait: . or 5   Get: g   Bag: i%s\nBuild: c   Act: a (1-6)   Fire: f\nStairs: Enter   Rest: r   Srch: s\nUse: e   Look: x   Menu: Esc\nTap known tile to travel; hold/right-click to inspect." % mask_hint, Palette.TEXT_DIM, 0.7))
 	_refresh()
 
 
@@ -539,6 +539,32 @@ func _act_rest() -> void:
 	if overlay == null:
 		world.player_rest()
 		_after_action()
+
+
+func _act_search() -> void:
+	if overlay == null:
+		world.player_search()
+		_after_action()
+
+
+func _act_interact() -> void:
+	if overlay != null or world.state != World.State.PLAYING:
+		return
+	var m := world.current_floor()
+	var candidates: Array[Vector2i] = [world.player.pos]
+	for d in Grid.DIRS_8:
+		candidates.append(world.player.pos + d)
+	for fp in candidates:
+		var feat := m.revealed_feature_at(fp)
+		if Ecology.is_interactive(feat):
+			if String(feat["kind"]) == "secret_door":
+				if world.player_interact(fp, "open"):
+					_after_action()
+			else:
+				_show_feature(feat)
+			return
+	world.log_msg("There is nothing interactive nearby.", "info")
+	_refresh()
 
 
 func _act_fire() -> void:
@@ -669,10 +695,15 @@ func _on_tile_tapped(p: Vector2i) -> void:
 		return
 	travel.clear()
 	var me := world.player.pos
+	var fm := world.current_floor()
 	if p == me:
-		if not world.current_floor().items_at(me).is_empty():
+		var feat_here := fm.revealed_feature_at(me)
+		if not fm.items_at(me).is_empty():
 			world.player_pickup()
-		elif world.current_floor().get_tile(me) in [Tiles.STAIRS_DOWN, Tiles.STAIRS_UP]:
+		elif Ecology.is_interactive(feat_here):
+			_show_feature(feat_here)
+			return
+		elif fm.get_tile(me) in [Tiles.STAIRS_DOWN, Tiles.STAIRS_UP]:
 			_act_stairs()
 			return
 		else:
@@ -680,6 +711,14 @@ func _on_tile_tapped(p: Vector2i) -> void:
 		_after_action()
 		return
 	if Grid.is_adjacent(me, p):
+		var feat_adj := fm.revealed_feature_at(p)
+		if fm.actor_at(p) == null and Ecology.is_interactive(feat_adj):
+			if String(feat_adj["kind"]) == "secret_door":
+				world.player_interact(p, "open")
+				_after_action()
+			else:
+				_show_feature(feat_adj)
+			return
 		world.player_move(p - me)
 		_after_action()
 		return
@@ -706,8 +745,18 @@ func _process(delta: float) -> void:
 		_travel_clock -= interval
 		var next: Vector2i = travel.pop_front()
 		var me := world.player.pos
-		if not Grid.is_adjacent(me, next) or world.current_floor().actor_at(next) != null:
+		var fm := world.current_floor()
+		if not Grid.is_adjacent(me, next) or fm.actor_at(next) != null:
 			travel.clear()
+			break
+		var next_feat := fm.revealed_feature_at(next)
+		var danger_trap := String(next_feat.get("kind", "")) == "trap" and not bool(next_feat.get("used", false))
+		if Tiles.is_hazard(fm.get_tile(next)) or danger_trap:
+			travel.clear()
+			look_label.text = "You stop before the %s." % (Ecology.label(next_feat) if danger_trap else String(Tiles.NAMES.get(fm.get_tile(next), "hazard")))
+			look_label.visible = true
+			map.marker = next
+			map.queue_redraw()
 			break
 		world.player_move(next - me)
 		var spotted: Actor = null
@@ -791,6 +840,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		_show_abilities()
 	elif k.keycode == KEY_F:
 		_act_fire()
+	elif k.keycode == KEY_S:
+		_act_search()
+	elif k.keycode == KEY_E:
+		_act_interact()
 	elif k.keycode >= KEY_1 and k.keycode <= KEY_6:
 		var idx := k.keycode - KEY_1
 		var acts := world.learned_active_talents()
@@ -887,6 +940,80 @@ func _show_abilities() -> void:
 		col.add_child(b)
 		col.add_child(_label(String(td["description"]), Palette.TEXT_DIM, 0.78))
 	col.add_child(_btn("Close", _close_overlay))
+
+
+func _show_feature(feat: Dictionary) -> void:
+	if world == null or world.state != World.State.PLAYING or overlay != null:
+		return
+	var pos := Vector2i(int(feat["x"]), int(feat["y"]))
+	var kind := String(feat["kind"])
+	var col := _open_overlay(Ecology.label(feat), Color(Ecology.color(feat)))
+	col.add_child(_label(Ecology.description(feat), Palette.TEXT_DIM, 0.9))
+	match kind:
+		"altar":
+			col.add_child(_btn("Cleanse curses (-3 HP, -apotheosis, +Way of Return)", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "cleanse")
+				_after_action()))
+			col.add_child(_btn("Offer tithe (-4 HP: +2 max HP, full resource, -apotheosis)", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "tithe")
+				_after_action()))
+		"shrine":
+			col.add_child(_btn("Witness the floor (ID pack, reveal all traps/secrets)", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "witness")
+				_after_action()))
+			col.add_child(_btn("Claim the Eye (+1 permanent Will, +2 apotheosis, +Serpent)", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "steal")
+				_after_action()))
+		"ritual_circle":
+			col.add_child(_btn("Inscribe affix onto weapon/armor (-4 HP, +apotheosis)", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "inscribe")
+				_after_action()))
+			col.add_child(_btn("Drain circle (heal 50% HP, reset cooldowns & Mask risk)", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "drain")
+				_after_action()))
+		"vault_gate":
+			col.add_child(_btn("Unlock with vault key or Ophite Key", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "key")
+				_after_action()))
+			col.add_child(_btn("Force the iron bars (-4 HP, +apotheosis, wakes floor)", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "force")
+				_after_action()))
+		"merchant":
+			var stock: Array = feat.get("stock", [])
+			for i in stock.size():
+				var row: Dictionary = stock[i]
+				if bool(row.get("sold", false)):
+					continue
+				var item_def := db.get_def("items", String(row["id"]))
+				var price := int(row.get("price_hp", 5))
+				var sidx := i
+				var hb := HBoxContainer.new()
+				hb.add_theme_constant_override("separation", 8)
+				var b1 := _btn("Buy %s (-%d HP)" % [item_def["name"], price], func() -> void:
+					_close_overlay()
+					world.player_interact(pos, "buy:%d:blood" % sidx)
+					_after_action())
+				b1.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				hb.add_child(b1)
+				hb.add_child(_btn("Barter item", func() -> void:
+					_close_overlay()
+					world.player_interact(pos, "buy:%d:barter" % sidx)
+					_after_action()))
+				col.add_child(hb)
+		"challenge":
+			col.add_child(_btn("Ring the Trial Bell (ambush + elite loot +1 stat pt)", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "ring")
+				_after_action()))
+	col.add_child(_btn("Leave", _close_overlay))
 
 
 func _show_gate() -> void:

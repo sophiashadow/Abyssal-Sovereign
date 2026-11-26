@@ -17,6 +17,8 @@ var actors: Array[Actor] = []
 var items: Array[Item] = []
 ## Generation output consumed by World when the floor is first populated.
 var spawns: Array[Dictionary] = []
+## Ecology features (traps, secret doors, altars, shrines, vaults, merchants, challenges).
+var features: Array[Dictionary] = []
 
 
 func setup(w: int, h: int, fill: int = Tiles.WALL) -> void:
@@ -90,6 +92,20 @@ func items_at(p: Vector2i) -> Array[Item]:
 	return out
 
 
+func feature_at(p: Vector2i) -> Dictionary:
+	for f in features:
+		if int(f.get("x", -1)) == p.x and int(f.get("y", -1)) == p.y:
+			return f
+	return {}
+
+
+func revealed_feature_at(p: Vector2i) -> Dictionary:
+	var f := feature_at(p)
+	if not f.is_empty() and bool(f.get("revealed", false)):
+		return f
+	return {}
+
+
 func to_dict() -> Dictionary:
 	var acts := []
 	for a in actors:
@@ -103,7 +119,7 @@ func to_dict() -> Dictionary:
 		"tiles": Marshalls.raw_to_base64(tiles),
 		"explored": Marshalls.raw_to_base64(explored),
 		"up": [up_pos.x, up_pos.y], "down": [down_pos.x, down_pos.y], "exit": [exit_pos.x, exit_pos.y],
-		"actors": acts, "items": its,
+		"actors": acts, "items": its, "features": features.duplicate(true),
 	}
 
 
@@ -122,4 +138,6 @@ static func from_dict(d: Dictionary, db: ContentDB) -> FloorMap:
 		m.actors.append(Actor.from_dict(ad, db))
 	for idd in d["items"]:
 		m.items.append(Item.from_dict(idd))
+	for fd in d.get("features", []):
+		m.features.append(Actor._ints(fd))
 	return m

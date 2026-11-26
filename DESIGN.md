@@ -117,3 +117,22 @@ M5.3 turns loot into run-defining builds and discovery decisions:
 | `human` | `43 / 45` (`96%`) | — | `assassin` 15/15, `fallen_knight` 14/15, `occultist` 14/15 |
 | `cambion` | `39 / 45` (`87%`) | — | `assassin` 15/15, `occultist` 14/15, `fallen_knight` 10/15 |
 | `revenant` | `39 / 45` (`87%`) | — | `occultist` 14/15, `assassin` 13/15, `fallen_knight` 12/15 |
+
+## M5.4 — Dungeon Ecology
+
+M5.4 transforms every Sphere into a distinct mechanical ecology rather than bare rooms:
+
+- **Traps & Secret Doors:** Concealed `spike`, `cinder`, `rime`, and `shackle` traps fire on entry (`revealed` + `used` once triggered). Passive sight checks (`20 + sight * 5%`, or guaranteed while wearing *Eye of Lilith*, *Confessor's Clarity*, *Keeper's Vigil*, or *Lilith*) and `Search` (`s`, radius `3`) uncover hidden traps and `secret_door` caches; searching within `1` tile disarms revealed traps (`+5 XP`). Bumping or interacting with a revealed secret door opens the alcove and drops guaranteed magical loot.
+- **Environmental Hazards:** Walkable Sphere terrain (`ASH_EMBER`, `RIME_ICE`, `MIASMA`, `SOLAR_GLARE`) deals mitigated elemental/metaphysical damage to any actor entering the tile and can ignite/chill/hex/expose—triggering M5.2 combos such as *Thermal Shock* and *Scalding Steam* for both players and monsters.
+- **Altars, Shrines & Ritual Circles:** Interactive sites create tactical resource/apotheosis trade-offs: *Altar of Unbinding* (`Cleanse` curses + `-apotheosis` + `+Way of Return`, or blood `Tithe` for `+2 max HP`), *Shrine of the Unblinking Eye* (`Witness` reveals entire floor + identifies pack, or `Steal` `+1 Will` / `+2 apotheosis`), and *Geometric Ritual Circle* (`Inscribe` affix onto weapon/armor, or `Drain` `50%` heal + clear cooldowns & Mask risk).
+- **Locked Vaults, Debt-Brokers & Trial Bells:** Audit vaults open with a consumable `vault_key` or reusable `ophite_key` relic (or `Force` for HP + apotheosis + alarm) for high-tier loot; wandering *Debt-Brokers* trade identified stock for blood (`HP`) or surplus goods (`barter`); *Trial Bell Monoliths* summon an elite-led ambush for guaranteed high loot and `+1` attribute point.
+- **Signature Sphere Ecology:** Each Sphere (`1–7`, Moon–Saturn) selects its signature hazard tiles, trap mix, and guaranteed encounter sites (`Ecology.SPHERE_PROFILES`).
+
+### Measured Balance (M5.4 held-out soak, `tools/soak.gd --seeds=15 --salt=heldout`, `135` runs)
+
+| Scope | Wins / Runs | Mean Turns | Notes |
+|---|---:|---:|---|
+| Overall | `120 / 135` (`89%`) | `786` | Balanced across origins (`41 / 40 / 39` of 45) & callings (`37 / 42 / 41` of 45) |
+| `human` | `41 / 45` (`91%`) | — | `assassin` 15/15, `occultist` 14/15, `fallen_knight` 12/15 |
+| `cambion` | `40 / 45` (`89%`) | — | `assassin` 15/15, `occultist` 14/15, `fallen_knight` 11/15 |
+| `revenant` | `39 / 45` (`87%`) | — | `fallen_knight` 14/15, `occultist` 14/15, `assassin` 11/15 |

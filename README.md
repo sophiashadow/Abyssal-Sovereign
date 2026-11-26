@@ -2,9 +2,9 @@
 
 An original turn-based traditional roguelike set beneath Terra Tenebrae, in the cosmology of FALSE LIGHT. It is built with Godot 4 and typed GDScript, and plays fully offline.
 
-**Status: v0.5-dev (Milestones 0–4 and M5.1–M5.3 implemented).** It has a title screen, character creation (3 origins × 3 callings), and a seeded seven-sphere descent (Moon through Saturn). Gameplay covers:
+**Status: v0.5-dev (Milestones 0–4 and M5.1–M5.4 implemented).** It has a title screen, character creation (3 origins × 3 callings), and a seeded seven-sphere descent (Moon through Saturn). Gameplay covers:
 
-- Field of view with exploration memory.
+- Field of view with exploration memory, **Search (`s`) / disarm traps / secret caches**, and **interactive dungeon sites (`e`)** (Altars, Shrines, Ritual Circles, Locked Vaults, Debt-Brokers, Trial Bells, and Sphere hazards).
 - Melee and **ranged combat** (`f` / Fire), thrown flasks/projectiles, occult scrolls, XP, levels, **attribute allocation**, and **30 calling talents across 9 trees**.
 - **Physical, elemental & metaphysical damage types** (`physical`, `fire`, `cold`, `radiant`, `void`) with resistances, vulnerabilities, and emergent status combos (*Thermal Shock*, *Scalding Steam*, *Cauterize*, *Hemorrhage*).
 - **Procedural affixes, sets, identification & BUC**: `Uncommon`/`Rare`/`Artifact` drops, run-shuffled unidentified consumables & gear, `Blessed`/`Cursed` equipment, 3 equipment sets, and 6 **Relics** (*Work* for power with a cost, or *Transmute* for permanent stats & unbinding).
@@ -14,7 +14,7 @@ An original turn-based traditional roguelike set beneath Terra Tenebrae, in the 
 - **Eight Chains** enemy abilities, **enemy specials**, deterministic **mutated elites**, and **Sphere mid-bosses** (*Choir Cantor Prime*, *Iron Auditor*).
 - **Sphere Gates** between Spheres (`Stormed`, `Serpent's Key`, `Given Back`, `By Name`) and the **Apotheosis Guard**.
 - The Preliator Sentinel guardian, **Named losses** (Catalogued, Fluent, Gilded), and four victory outcomes (Unwritten Door, The Serpent's Way, The Way of Return, and Victory: By Decree).
-- Permadeath with atomic save/resume (`save_version` 6, migrating v1–v5 saves).
+- Permadeath with atomic save/resume (`save_version` 7, migrating v1–v6 saves).
 
 Android, Windows and Web builds can be exported via `tools/export.sh` (see [ROADMAP.md](ROADMAP.md); Windows runtime, Web browser `user://` persistence, and physical Android device runtime tests have not run yet). Any distributed export must ship Godot's license notices.
 
@@ -45,6 +45,8 @@ xvfb-run -a godot --path . --audio-driver Dummy --script res://tools/ui_smoke.gd
 | Wait | `.` `5` space | centre of the d-pad, or tap yourself |
 | Pick up | `g` `,` | Get, or tap yourself |
 | Stairs | Enter `>` `<` | Stairs, or tap yourself on stairs |
+| Search & disarm traps | `s` | Srch |
+| Use altar / site / secret | `e` | tap adjacent or underfoot site |
 | Rest | `r` | Rest |
 | Inventory | `i` | Bag |
 | Character build & talents | `c` | Build |

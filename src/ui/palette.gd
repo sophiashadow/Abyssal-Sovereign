@@ -20,10 +20,13 @@ const LORE := Color("#b7aecf")
 const TILE_GLYPH := {
 	Tiles.WALL: "#", Tiles.FLOOR: ".", Tiles.STAIRS_DOWN: ">", Tiles.STAIRS_UP: "<",
 	Tiles.DOOR_SEALED: "+", Tiles.DOOR_OPEN: "'",
+	Tiles.ASH_EMBER: "~", Tiles.RIME_ICE: "~", Tiles.MIASMA: "\"", Tiles.SOLAR_GLARE: "*",
 }
 const TILE_COLOR := {
 	Tiles.WALL: Color("#8a7a66"), Tiles.FLOOR: Color("#5a4e5e"), Tiles.STAIRS_DOWN: FALSE_SUN,
 	Tiles.STAIRS_UP: RECORD, Tiles.DOOR_SEALED: ALERT, Tiles.DOOR_OPEN: GOOD,
+	Tiles.ASH_EMBER: Color("#ff7a33"), Tiles.RIME_ICE: Color("#6ec6ff"),
+	Tiles.MIASMA: Color("#8f7ae0"), Tiles.SOLAR_GLARE: FALSE_SUN,
 }
 
 ## Message-log colours by World.log_msg kind.

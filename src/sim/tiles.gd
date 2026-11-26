@@ -10,15 +10,25 @@ const STAIRS_DOWN := 2
 const STAIRS_UP := 3
 const DOOR_SEALED := 4
 const DOOR_OPEN := 5
+const ASH_EMBER := 6
+const RIME_ICE := 7
+const MIASMA := 8
+const SOLAR_GLARE := 9
 
 const NAMES := {
 	WALL: "wall", FLOOR: "floor", STAIRS_DOWN: "stairs down", STAIRS_UP: "stairs up",
 	DOOR_SEALED: "the Unwritten Door (sealed)", DOOR_OPEN: "the Unwritten Door (open)",
+	ASH_EMBER: "smoldering embers", RIME_ICE: "ossuary rime",
+	MIASMA: "abyssal miasma", SOLAR_GLARE: "false-sun glare",
 }
 
 
 static func is_walkable(t: int) -> bool:
-	return t == FLOOR or t == STAIRS_DOWN or t == STAIRS_UP or t == DOOR_OPEN
+	return t == FLOOR or t == STAIRS_DOWN or t == STAIRS_UP or t == DOOR_OPEN or is_hazard(t)
+
+
+static func is_hazard(t: int) -> bool:
+	return t >= ASH_EMBER and t <= SOLAR_GLARE
 
 
 static func is_transparent(t: int) -> bool:

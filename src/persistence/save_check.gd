@@ -10,7 +10,7 @@ const ACTOR_KEYS := ["id", "t", "name", "glyph", "color", "player", "x", "y", "h
 	"stat_points", "talent_points", "resource", "talents", "cooldowns",
 	"resists", "specials", "elite", "flags"]
 const ITEM_KEYS := ["id", "t", "q", "x", "y", "rar", "aff", "buc", "idn", "mods", "res", "dt", "st"]
-const FLOOR_KEYS := ["depth", "w", "h", "tiles", "explored", "up", "down", "exit", "actors", "items"]
+const FLOOR_KEYS := ["depth", "w", "h", "tiles", "explored", "up", "down", "exit", "actors", "items", "features"]
 
 
 static func problems(d: Dictionary, db: ContentDB) -> PackedStringArray:
@@ -134,3 +134,8 @@ static func _floor(v: Variant, db: ContentDB, where: String, out: PackedStringAr
 	if _list(v["items"], where + " items", out):
 		for it in v["items"]:
 			_item(it, db, where + " item", out)
+	if not _list(v["features"], where + " features", out):
+		return
+	for f in v["features"]:
+		if not _has_keys(f, ["kind", "sub", "x", "y", "revealed", "used"], where + " feature", out):
+			return

@@ -108,7 +108,81 @@ static func generate(floor_def: Dictionary, seed_value: int) -> FloorMap:
 			continue
 		occupied[p] = true
 		m.spawns.append({"kind": "item", "id": rng.pick_weighted(floor_def["item_table"]), "pos": p})
+	_place_ecology(m, occupied, rng)
 	return m
+
+
+static func _place_ecology(m: FloorMap, occupied: Dictionary, rng: Rng) -> void:
+	var prof: Dictionary = Ecology.SPHERE_PROFILES.get(m.depth, Ecology.SPHERE_PROFILES[1])
+	var non_start: Array[int] = []
+	for i in range(1, m.rooms.size()):
+		non_start.append(i)
+	if non_start.is_empty():
+		return
+	var h_tile := int(prof["hazard"])
+	var n_haz := rng.range_i(int(prof["h_min"]), int(prof["h_max"]))
+	for _h in n_haz:
+		var p := _free_spot(m, m.rooms[rng.pick(non_start)], occupied, rng)
+		if p.x < 0:
+			continue
+		occupied[p] = true
+		m.set_tile(p, h_tile)
+	var trap_pool: Array = prof["traps"]
+	var n_traps := 2 + m.depth / 2
+	for _t in n_traps:
+		var p := _free_spot(m, m.rooms[rng.pick(non_start)], occupied, rng)
+		if p.x < 0:
+			continue
+		occupied[p] = true
+		m.features.append({
+			"kind": "trap", "sub": String(rng.pick(trap_pool)),
+			"x": p.x, "y": p.y, "revealed": false, "used": false,
+		})
+	for sdef in prof["sites"]:
+		var p := _free_spot(m, m.rooms[rng.pick(non_start)], occupied, rng)
+		if p.x < 0:
+			continue
+		occupied[p] = true
+		var feat := {
+			"kind": String(sdef["kind"]), "sub": String(sdef["sub"]),
+			"x": p.x, "y": p.y, "revealed": true, "used": false,
+		}
+		if feat["kind"] == "merchant":
+			var stock := []
+			for _si in 3:
+				stock.append({
+					"id": String(rng.pick(Ecology.BROKER_POOL)),
+					"price_hp": rng.range_i(4, 6),
+					"sold": false,
+				})
+			feat["stock"] = stock
+		m.features.append(feat)
+	var secret_candidates := _secret_wall_candidates(m)
+	var n_secrets := mini(2, secret_candidates.size())
+	for _s in n_secrets:
+		var idx := rng.range_i(0, secret_candidates.size() - 1)
+		var sp: Vector2i = secret_candidates[idx]
+		secret_candidates.remove_at(idx)
+		m.features.append({
+			"kind": "secret_door", "sub": "cache",
+			"x": sp.x, "y": sp.y, "revealed": false, "used": false,
+		})
+
+
+static func _secret_wall_candidates(m: FloorMap) -> Array[Vector2i]:
+	var out: Array[Vector2i] = []
+	for y in range(2, m.height - 2):
+		for x in range(2, m.width - 2):
+			var p := Vector2i(x, y)
+			if m.get_tile(p) != Tiles.WALL:
+				continue
+			var floor_nbrs := 0
+			for d in Grid.DIRS_4:
+				if m.get_tile(p + d) == Tiles.FLOOR:
+					floor_nbrs += 1
+			if floor_nbrs == 1:
+				out.append(p)
+	return out
 
 
 static func _center(r: Rect2i) -> Vector2i:

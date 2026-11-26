@@ -79,3 +79,10 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 - **Save schema:** `World.SAVE_VERSION := 6` with deterministic migration `v1 -> ... -> v5 -> v6` adding root `id_known`, `id_aliases`, `uniques`, plus extended item fields (`rar`, `aff`, `buc`, `idn`, `mods`, `res`, `dt`, `st`) validated by `SaveCheck`.
 - **World APIs:** `World.item_name`, `World.is_item_identified`, `World.identify_item`, `World.identify_pack`, `World.unbind_curses`, `scroll_of_identify`, `scroll_of_unbind`, and unique artifact spawning.
 - **UI:** Set bonus summaries in `_show_build()`, rarity/BUC/affix/ID-aware `_item_stats()` and inventory labels in `src/ui/main.gd`, plus floor item rarity tinting in `MapView`.
+
+## M5.4 Additions (Dungeon Ecology)
+
+- **Core, Sim & Gen:** `Tiles` hazards (`ASH_EMBER`, `RIME_ICE`, `MIASMA`, `SOLAR_GLARE`), `src/sim/ecology.gd` (`Ecology` traps, hazards, Sphere profiles, site descriptors), `FloorMap.features` serialization, `DungeonGen._place_ecology()` deterministic hazard/trap/secret/site placement, and `vault_key` (`kind: "key"`).
+- **Save schema:** `World.SAVE_VERSION := 7` with migration `v6 -> v7` backfilling `features` on serialized floors (`SaveCheck.FLOOR_KEYS` updated).
+- **World APIs:** `World.player_search()`, `World.player_interact(pos, choice)`, `_on_actor_enter_tile()`, `_passive_detect()`, and `_open_secret_door()`.
+- **UI:** `Palette` hazard visuals, `MapView` revealed feature rendering, `Main` `Srch` (`s`), `Use` (`e`), travel hazard/trap stops, and `_show_feature()` interactive overlays.

@@ -110,6 +110,11 @@ func _draw() -> void:
 				col = Color(it.effective_color(world.db)) if world.is_item_identified(it) else Color(String(d["color"]))
 				if not world.is_item_identified(it) and (it.rarity != "common" or it.buc == "blessed"):
 					col = col.lerp(Palette.FALSE_SUN, 0.35)
+			else:
+				var feat := m.revealed_feature_at(p)
+				if not feat.is_empty():
+					glyph = Ecology.glyph(feat)
+					col = Color(Ecology.color(feat))
 			if not vis:
 				col = Palette.remembered(col)
 			var cell := off + Vector2(cx * tile_px, cy * tile_px)

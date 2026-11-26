@@ -102,3 +102,8 @@ Resolved (2026-11-26):
 - **EXODUS Relics** (`Canon-derived` names + Work-or-Transmute frame from EXODUS; effects `Proposed`): `Severed Crown`, `Ward-Keeper's Lamp`, `Almoner's Purse`.
 - **Equipment sets & unique artifacts** (`Canon-derived` names framing `Proposed` set bonuses and artifact stats): *Inquisitor's Audit*, *The Eye Unblinking*, *Cinder & Oath*, *Unwritten Edge*, *Cowl of the First Witness*, *Serpent's Recurver*, *Chainbreaker Seal*.
 - **Affixes, identification & BUC** (`Proposed` mechanics): `scroll of witness`, `scroll of unbinding`, and affix nomenclature grounded in Abyssal Sovereign motifs.
+
+## M5.4 Dungeon Ecology Provenance
+
+- **Sphere Ecology Profiles & Hazards** (`Canon-derived` motifs framing `Proposed` terrain & traps): embers, ossuary rime, abyssal miasma, and false-sun glare tailored per Sphere (Moon–Saturn), plus ledger-spike, cinder-wire, rime-seal, and shackle-snare traps.
+- **Interactive Sites & Brokers** (`Proposed` roguelike sites using canon metaphysics): *Altars of Unbinding*, *Shrines of the Unblinking Eye*, *Geometric Ritual Circles*, *Locked Audit Vaults* (synergizing with the `Ophite Key`), *Wandering Debt-Brokers*, and *Trial Bell Monoliths*.

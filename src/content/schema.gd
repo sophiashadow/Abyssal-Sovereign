@@ -47,7 +47,7 @@ const FIELDS := {
 		"name": {"type": "string", "required": true},
 		"glyph": {"type": "glyph", "required": true},
 		"color": {"type": "color", "required": true},
-		"kind": {"type": "enum:weapon|ranged|armor|amulet|consumable|relic", "required": true},
+		"kind": {"type": "enum:weapon|ranged|armor|amulet|consumable|relic|key", "required": true},
 		"description": {"type": "text", "required": true},
 		"damage": {"type": "dice", "required": false},
 		"range": {"type": "int", "required": false, "min": 1},

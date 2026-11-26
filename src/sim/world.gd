@@ -10,7 +10,7 @@ extends RefCounted
 ## id 1, so the player wins ties. Player actions return true if they spent
 ## time; the world then runs monsters until it is the player's turn again.
 
-const SAVE_VERSION := 6
+const SAVE_VERSION := 7
 const PLAYER_ID := 1
 const COST_MOVE := 100
 const COST_ATTACK := 100
@@ -414,9 +414,16 @@ func player_move(dir: Vector2i) -> bool:
 	if m.get_tile(target) == Tiles.DOOR_SEALED:
 		log_msg("The Unwritten Door will not open while its warden stands.", "info")
 		return false
+	var feat_ahead := m.revealed_feature_at(target)
+	if feat_ahead.get("kind", "") == "secret_door" and not bool(feat_ahead.get("used", false)):
+		_open_secret_door(target)
+		return _finish_player_action(COST_ITEM)
 	if not m.can_step(player.pos, target):
 		return false
 	player.pos = target
+	_on_actor_enter_tile(player, target)
+	if state != State.PLAYING:
+		return true
 	_describe_floor_here()
 	if m.get_tile(target) == Tiles.DOOR_OPEN:
 		_win()
@@ -1088,6 +1095,7 @@ func _run_talent_effect(eff: String, td: Dictionary, target: Actor, target_pos: 
 					var push_to := target.pos + pdir
 					if m.can_step(target.pos, push_to) and m.actor_at(push_to) == null:
 						target.pos = push_to
+						_on_actor_enter_tile(target, push_to)
 					elif not m.is_walkable(push_to):
 						var slam := Combat.mitigate(3, target, "physical")
 						log_msg("You slam the %s into the stone (+%d)!" % [target.name, int(slam["damage"])], "combat")
@@ -1357,7 +1365,326 @@ func _begin_player_turn() -> void:
 	_tick_statuses(player)
 	_tick_mask()
 	_natural_regen()
+	_passive_detect()
 	update_fov()
+
+
+func _has_keen_sight() -> bool:
+	var amu := player.equipped("amulet")
+	if amu != null and amu.template_id == "eye_of_lilith":
+		return true
+	if player.has_status("confessors_clarity") or player.has_status("lamp_vigil"):
+		return true
+	return player.has_trait("mask_stances") and player.mask == "lilith"
+
+
+func _passive_detect() -> void:
+	var m := current_floor()
+	var auto := _has_keen_sight()
+	var pct := 100 if auto else clampi(20 + player.stat("sight") * 5, 15, 85)
+	for f in m.features:
+		if bool(f.get("revealed", false)):
+			continue
+		var fp := Vector2i(int(f["x"]), int(f["y"]))
+		if Grid.chebyshev(player.pos, fp) <= 2 and rng.chance_pct(pct):
+			f["revealed"] = true
+			log_msg("You spot a %s!" % Ecology.label(f), "info")
+
+
+func player_search() -> bool:
+	if state != State.PLAYING:
+		return false
+	var m := current_floor()
+	var found := 0
+	var disarmed := 0
+	for f in m.features:
+		var fp := Vector2i(int(f["x"]), int(f["y"]))
+		var dist := Grid.chebyshev(player.pos, fp)
+		if dist <= 3 and not bool(f.get("revealed", false)):
+			f["revealed"] = true
+			found += 1
+			log_msg("You uncover a %s!" % Ecology.label(f), "good")
+		if f.get("kind", "") == "trap" and bool(f.get("revealed", false)) and not bool(f.get("used", false)) and dist <= 1:
+			f["used"] = true
+			disarmed += 1
+			log_msg("You disarm the %s (+5 XP)." % Ecology.label(f), "good")
+			gain_xp(5)
+	if found == 0 and disarmed == 0:
+		log_msg("You search the stonework and find nothing new.", "info")
+	return _finish_player_action(COST_WAIT)
+
+
+func _open_secret_door(pos: Vector2i) -> void:
+	var m := current_floor()
+	var f := m.feature_at(pos)
+	if f.is_empty():
+		return
+	f["revealed"] = true
+	f["used"] = true
+	m.set_tile(pos, Tiles.FLOOR)
+	update_fov()
+	var table: Array = db.floor_for_depth(depth).get("item_table", [])
+	if not table.is_empty():
+		var loot := _new_item(rng.pick_weighted(table))
+		Affixes.roll_equipment(loot, db, depth, rng, true)
+		loot.pos = pos
+		m.items.append(loot)
+		log_msg("The secret stonework slides aside, revealing a %s!" % item_name(loot), "good")
+	else:
+		log_msg("The secret stonework slides aside.", "good")
+
+
+func _on_actor_enter_tile(actor: Actor, pos: Vector2i) -> void:
+	if not actor.is_alive():
+		return
+	var m := current_floor()
+	var t := m.get_tile(pos)
+	if Tiles.is_hazard(t):
+		var h: Dictionary = Ecology.HAZARDS[t]
+		var htype := String(h["damage_type"])
+		var mit := Combat.mitigate(2, actor, htype)
+		var dmg := int(mit["damage"])
+		if actor.is_player:
+			log_msg("The %s sears you for %d (%s)." % [h["name"], dmg, htype], "danger")
+		elif m.is_visible(pos):
+			log_msg("The %s sears the %s for %d (%s)." % [h["name"], actor.name, dmg, htype], "combat")
+		apply_damage(actor, dmg, String(h["name"]), htype)
+		if actor.is_alive() and rng.chance_pct(45):
+			apply_status(actor, String(h["status"]))
+	if not actor.is_alive():
+		return
+	var f := m.feature_at(pos)
+	if f.get("kind", "") == "trap" and not bool(f.get("used", false)):
+		var tdef: Dictionary = Ecology.TRAPS.get(String(f.get("sub", "spike")), Ecology.TRAPS["spike"])
+		f["revealed"] = true
+		f["used"] = true
+		var ttype := String(tdef["damage_type"])
+		var mit := Combat.mitigate(Dice.roll(String(tdef["damage"]), rng), actor, ttype)
+		var dmg := int(mit["damage"])
+		if actor.is_player:
+			log_msg("You trigger a %s for %d (%s)!" % [tdef["name"], dmg, ttype], "danger")
+		elif m.is_visible(pos):
+			log_msg("The %s springs a %s for %d!" % [actor.name, tdef["name"], dmg], "combat")
+		apply_damage(actor, dmg, String(tdef["name"]), ttype)
+		if actor.is_alive():
+			apply_status(actor, String(tdef["status"]))
+
+
+func player_interact(pos: Vector2i, choice: String = "") -> bool:
+	if state != State.PLAYING or Grid.chebyshev(player.pos, pos) > 1:
+		return false
+	var m := current_floor()
+	var f := m.feature_at(pos)
+	if f.is_empty() or not bool(f.get("revealed", false)) or not Ecology.is_interactive(f):
+		return false
+	var kind := String(f["kind"])
+	match kind:
+		"secret_door":
+			_open_secret_door(pos)
+			return _finish_player_action(COST_ITEM)
+		"altar":
+			if choice == "tithe":
+				if player.hp <= 4:
+					log_msg("You lack the blood for the altar's tithe.", "danger")
+					return false
+				player.hp -= 4
+				apotheosis = maxi(0, apotheosis - 1)
+				player.base["max_hp"] = int(player.base.get("max_hp", 10)) + 2
+				player.hp = mini(player.stat("max_hp"), player.hp + 2)
+				player.resource = player.max_resource()
+				f["used"] = true
+				log_msg("You tithe blood outside the ledger (+2 max HP, full resource, -apotheosis).", "good")
+				return _finish_player_action(COST_ITEM)
+			else:
+				if player.hp <= 3:
+					log_msg("You lack the blood to cleanse here.", "danger")
+					return false
+				player.hp -= 3
+				apotheosis = maxi(0, apotheosis - 1)
+				way_return += 1
+				var n := unbind_curses(false)
+				f["used"] = true
+				log_msg("The altar snaps iron bonds free (%d cleansed, +Way of Return)." % n, "good")
+				return _finish_player_action(COST_ITEM)
+		"shrine":
+			if choice == "steal":
+				player.base["will"] = int(player.base.get("will", 0)) + 1
+				apotheosis += 2
+				way_serpent += 1
+				f["used"] = true
+				log_msg("You claim the Eye's sight as your own (+1 Will, +apotheosis).", "lore")
+				return _finish_player_action(COST_ITEM)
+			else:
+				var nid := identify_pack()
+				for ff in m.features:
+					ff["revealed"] = true
+				apply_status(player, "confessors_clarity")
+				f["used"] = true
+				update_fov()
+				log_msg("The Shrine witnesses the floor (%d identified, all traps & secrets revealed)." % nid, "good")
+				return _finish_player_action(COST_ITEM)
+		"ritual_circle":
+			if choice == "drain":
+				var heal := maxi(4, player.stat("max_hp") / 2)
+				player.hp = mini(player.stat("max_hp"), player.hp + heal)
+				player.mask_risk = 0
+				player.cooldowns.clear()
+				f["used"] = true
+				log_msg("The circle drinks your strain (+%d HP, cooldowns & Mask risk cleared)." % heal, "good")
+				return _finish_player_action(COST_ITEM)
+			else:
+				if player.hp <= 4:
+					log_msg("You lack the blood to inscribe an affix.", "danger")
+					return false
+				var gear: Item = player.equipped("weapon")
+				if gear == null:
+					gear = player.equipped("ranged")
+				if gear == null:
+					gear = player.equipped("armor")
+				if gear == null:
+					log_msg("Equip a weapon or armor before inscribing.", "info")
+					return false
+				player.hp -= 4
+				apotheosis += 1
+				var gkind := String(gear.def(db)["kind"])
+				var pool: Array[String] = []
+				for aid in Affixes.PREFIXES:
+					if (Affixes.PREFIXES[aid]["slots"] as Array).has(gkind) and not gear.affixes.has(aid):
+						pool.append(String(aid))
+				if pool.is_empty():
+					for aid in Affixes.SUFFIXES:
+						if (Affixes.SUFFIXES[aid]["slots"] as Array).has(gkind) and not gear.affixes.has(aid):
+							pool.append(String(aid))
+				if pool.is_empty():
+					log_msg("That gear holds no room for another inscription.", "info")
+					return false
+				var picked := String(rng.pick(pool))
+				Affixes.apply_affix(gear, picked)
+				if gear.rarity == "common":
+					gear.rarity = "uncommon"
+				gear.identified = true
+				f["used"] = true
+				log_msg("You inscribe '%s' upon your %s." % [Affixes.label(picked), item_name(gear)], "lore")
+				return _finish_player_action(COST_ITEM)
+		"vault_gate":
+			var key_idx := -1
+			var has_ophite := false
+			for i in player.inventory.size():
+				var tid := player.inventory[i].template_id
+				if tid == "vault_key":
+					key_idx = i
+					break
+				elif tid == "ophite_key":
+					has_ophite = true
+			if choice == "force":
+				if player.hp <= 4:
+					log_msg("You lack the strength to pry the vault bars.", "danger")
+					return false
+				player.hp -= 4
+				apotheosis += 1
+				for a in m.actors:
+					if not a.is_player and a.is_alive() and Grid.chebyshev(pos, a.pos) <= 8:
+						a.awake = true
+						_remember_player(a)
+				log_msg("You force the audit bars open with a clang that echoes!", "danger")
+			else:
+				if key_idx >= 0:
+					var k := player.inventory[key_idx]
+					k.quantity -= 1
+					if k.quantity <= 0:
+						player.inventory.remove_at(key_idx)
+					log_msg("You unlock the audit vault with a vault key.", "good")
+				elif has_ophite:
+					log_msg("The Ophite Key turns silently in the vault lock.", "lore")
+				else:
+					log_msg("Locked: requires a vault key or Ophite Key (or force it).", "info")
+					return false
+			f["used"] = true
+			var table: Array = db.floor_for_depth(depth).get("item_table", [])
+			for n_i in 2:
+				var loot: Item = null
+				if n_i == 0 and depth >= 4:
+					loot = _maybe_artifact_drop()
+				if loot == null and not table.is_empty():
+					loot = _new_item(rng.pick_weighted(table))
+					Affixes.roll_equipment(loot, db, depth, rng, true)
+				if loot != null:
+					loot.pos = pos
+					m.items.append(loot)
+			return _finish_player_action(COST_ITEM)
+		"merchant":
+			var parts := choice.split(":")
+			if parts.size() < 2 or parts[0] != "buy":
+				return false
+			var sidx := int(parts[1])
+			var stock: Array = f.get("stock", [])
+			if sidx < 0 or sidx >= stock.size() or bool(stock[sidx].get("sold", false)):
+				return false
+			var pay_mode := String(parts[2]) if parts.size() >= 3 else "blood"
+			var entry: Dictionary = stock[sidx]
+			var price := int(entry.get("price_hp", 5))
+			if pay_mode == "barter":
+				var b_idx := -1
+				for i in range(player.inventory.size() - 1, -1, -1):
+					var kd := String(player.inventory[i].def(db)["kind"])
+					if kd != "key" and kd != "relic":
+						b_idx = i
+						break
+				if b_idx < 0:
+					log_msg("You carry nothing the broker will take in trade.", "info")
+					return false
+				var offered := player.inventory[b_idx]
+				offered.quantity -= 1
+				if offered.quantity <= 0:
+					player.inventory.remove_at(b_idx)
+			else:
+				if player.hp <= price:
+					log_msg("You lack the blood (%d HP) for that price." % price, "danger")
+					return false
+				player.hp -= price
+			entry["sold"] = true
+			var bought := _new_item(String(entry["id"]))
+			Affixes.roll_equipment(bought, db, depth, rng, false)
+			bought.identified = true
+			if String(bought.def(db)["kind"]) == "consumable":
+				id_known[bought.template_id] = true
+			if _can_carry(player, bought):
+				_add_to_inventory(player, bought)
+			else:
+				bought.pos = pos
+				m.items.append(bought)
+			log_msg("You acquire %s from the Debt-Broker." % item_name(bought), "good")
+			return _finish_player_action(COST_ITEM)
+		"challenge":
+			f["used"] = true
+			var fd := db.floor_for_depth(depth)
+			var mtable: Array = fd.get("monster_table", [])
+			var spawned := 0
+			for d8 in Grid.DIRS_8:
+				if spawned >= 2:
+					break
+				var q := pos + d8
+				if m.is_walkable(q) and m.actor_at(q) == null and not mtable.is_empty():
+					var mon := _new_monster(rng.pick_weighted(mtable), q)
+					if spawned == 0:
+						_apply_elite(mon, String(rng.pick(["cinder", "rime", "void", "iron"])))
+					mon.awake = true
+					_remember_player(mon)
+					mon.next_time = time + rng.range_i(10, 60)
+					m.actors.append(mon)
+					spawned += 1
+			var itable: Array = fd.get("item_table", [])
+			var reward: Item = _maybe_artifact_drop()
+			if reward == null and not itable.is_empty():
+				reward = _new_item(rng.pick_weighted(itable))
+				Affixes.roll_equipment(reward, db, depth + 2, rng, true)
+			if reward != null:
+				reward.pos = pos
+				m.items.append(reward)
+			player.stat_points += 1
+			log_msg("The Trial Bell tolls! Guards rush out—and you gain +1 attribute point.", "lore")
+			return _finish_player_action(COST_WAIT)
+	return false
 
 
 func _tick_cooldowns() -> void:
@@ -1586,6 +1913,7 @@ func _monster_turn(mon: Actor) -> int:
 	var step := Pathing.step_down(m, dmap, mon.pos, blocked)
 	if step != mon.pos:
 		mon.pos = step
+		_on_actor_enter_tile(mon, step)
 		if mon.pos == target and not _monster_sees_player(m, mon):
 			_forget_player(mon)
 		return COST_MOVE
@@ -1899,16 +2227,27 @@ func describe_at(p: Vector2i) -> String:
 		if not its.is_empty():
 			var desc := String(its[0].def(db)["description"]) if is_item_identified(its[0]) else "Unidentified; pick up, equip, or read a scroll of witness."
 			return "%s: %s" % [item_name(its[0]).capitalize(), desc]
+		var feat := m.revealed_feature_at(p)
+		if not feat.is_empty():
+			return "%s: %s" % [Ecology.label(feat), Ecology.description(feat)]
+	var feat_mem := m.revealed_feature_at(p)
+	if not feat_mem.is_empty():
+		return "%s." % Ecology.label(feat_mem)
 	return "%s." % String(Tiles.NAMES.get(m.get_tile(p), "unknown")).capitalize()
 
 
 func _describe_floor_here() -> void:
-	var its := current_floor().items_at(player.pos)
+	var m := current_floor()
+	var t := m.get_tile(player.pos)
+	var feat := m.revealed_feature_at(player.pos)
+	if not feat.is_empty() and Ecology.is_interactive(feat):
+		log_msg("Here stands: %s (press 'e' or tap to use)." % Ecology.label(feat), "lore")
+	var its := m.items_at(player.pos)
 	if its.size() == 1:
 		log_msg("You see here: %s." % item_name(its[0]))
 	elif its.size() > 1:
 		log_msg("Several things lie here.")
-	match current_floor().get_tile(player.pos):
+	match t:
 		Tiles.STAIRS_DOWN:
 			log_msg("Stairs lead down.")
 		Tiles.STAIRS_UP:
@@ -2080,6 +2419,14 @@ static func _migrate(d: Dictionary) -> Dictionary:
 					if typeof(fl.get("actors")) == TYPE_ARRAY:
 						for a in fl["actors"]:
 							_migrate_actor_items_v6(a)
+		ver = 6
+	if ver == 6:
+		out["save_version"] = 7
+		if typeof(out.get("floors")) == TYPE_DICTIONARY:
+			for k in out["floors"]:
+				var fl = out["floors"][k]
+				if typeof(fl) == TYPE_DICTIONARY and not fl.has("features"):
+					fl["features"] = []
 	return out
 
 
