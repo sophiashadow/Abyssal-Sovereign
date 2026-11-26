@@ -74,6 +74,8 @@ static func summarize(runs: Array, db: ContentDB) -> Dictionary:
 	var cover := {}
 	var victories := {}
 	var durations := {}
+	var killers_by_calling := {}
+	var level_at_depth := {}
 	for r in runs:
 		var pol := String(r["policy"])
 		var won := String(r["state"]) == "won"
@@ -94,6 +96,19 @@ static func summarize(runs: Array, db: ContentDB) -> Dictionary:
 			classes[cls] = int(classes.get(cls, 0)) + 1
 			var ck := "d%d" % int(r["depth"])
 			cause_depth[ck] = int(cause_depth.get(ck, 0)) + 1
+			var kc := "%s|%s" % [r["calling"], String(r["cause"])]
+			killers_by_calling[kc] = int(killers_by_calling.get(kc, 0)) + 1
+		if pol != "random":
+			var seen_depth := {}
+			for fl in tel.get("floor_log", []):
+				var dd2 := int(fl["depth"])
+				if not seen_depth.has(dd2):
+					seen_depth[dd2] = true
+					var lk := "%s|d%d" % [pol, dd2]
+					if not level_at_depth.has(lk):
+						level_at_depth[lk] = {"n": 0, "level": 0}
+					level_at_depth[lk]["n"] += 1
+					level_at_depth[lk]["level"] += int(fl["level"])
 		var dk := pol
 		if not durations.has(dk):
 			durations[dk] = {"n": 0, "turns": 0}
@@ -107,8 +122,15 @@ static func summarize(runs: Array, db: ContentDB) -> Dictionary:
 		"runs": runs.size(),
 		"by_policy": _finish(by_pol), "by_calling_policy": _finish(by_cl_pol), "by_origin_policy": _finish(by_sp_pol),
 		"by_pair_nonrandom": _finish(by_pair), "deaths": deaths, "death_classes": classes, "deaths_by_depth": cause_depth,
-		"victories": victories, "coverage": cov, "suspects": suspects, "mean_turns": _means(durations),
+		"victories": victories, "coverage": cov, "killers_by_calling": killers_by_calling, "level_at_depth_entry": _mean_levels(level_at_depth), "suspects": suspects, "mean_turns": _means(durations),
 	}
+
+
+static func _mean_levels(d: Dictionary) -> Dictionary:
+	var out := {}
+	for k in d:
+		out[k] = snappedf(float(d[k]["level"]) / maxi(1, int(d[k]["n"])), 0.1)
+	return out
 
 
 static func _acc(d: Dictionary, k: String, won: bool, dead: bool, r: Dictionary) -> void:
@@ -173,6 +195,11 @@ static func _coverage(c: Dictionary, db: ContentDB) -> Dictionary:
 		used += 1 if c.has("talent_used|" + t) else 0
 	out["talents_learned"] = "%d/%d" % [learned, talents.size()]
 	out["talents_used"] = "%d/%d" % [used, talents.size()]
+	var unused: Array = []
+	for t in talents:
+		if String(db.get_def("talents", t)["kind"]) == "active" and not c.has("talent_used|" + t):
+			unused.append(t)
+	out["active_talents_never_used"] = unused
 	var mons := db.ids("monsters")
 	var seen := 0
 	var unseen: Array = []
@@ -186,7 +213,8 @@ static func _coverage(c: Dictionary, db: ContentDB) -> Dictionary:
 	var floors := db.ids("floors")
 	var fs := 0
 	for f in floors:
-		fs += 1 if c.has("floor_first|" + f) else 0
+		var start := String(db.floor_def(f).get("region_kind", "spine")) == "spine" and int(db.floor_def(f)["depth"]) == 1
+		fs += 1 if c.has("floor_first|" + f) or start else 0
 	out["floors_visited"] = "%d/%d" % [fs, floors.size()]
 	var th := db.ids("threads")
 	var acc := 0
@@ -231,9 +259,11 @@ static func to_markdown(sm: Dictionary) -> String:
 	s += "\nVictories (policy|ending): %s\n" % JSON.stringify(sm["victories"])
 	s += "\n## Coverage\n\n"
 	for k in sm["coverage"]:
-		if k != "optional_content" and k != "monsters_never_killed":
+		if k != "optional_content" and k != "monsters_never_killed" and k != "active_talents_never_used":
 			s += "- %s: %s\n" % [k, sm["coverage"][k]]
 	s += "- monsters never killed: %s\n" % ", ".join(PackedStringArray(sm["coverage"]["monsters_never_killed"]))
+	s += "- active talents never used: %s\n" % ", ".join(PackedStringArray(sm["coverage"]["active_talents_never_used"]))
+	s += "\nMean level on first entry to each depth (policy|depth): %s\n" % JSON.stringify(sm["level_at_depth_entry"])
 	s += "\nOptional-content counters: %s\n" % JSON.stringify(sm["coverage"]["optional_content"])
 	s += "\nSuspect pairs (adaptive sampling): %s\n" % ", ".join(PackedStringArray(sm["suspects"]))
 	return s

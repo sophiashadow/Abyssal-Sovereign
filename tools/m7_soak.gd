@@ -13,7 +13,7 @@ extends SceneTree
 ##   --pairs=sp/cl,sp/cl    default: all 64 origin/calling pairs
 ##   --classes=a,b --species=a,b   filters
 ##   --shard=I/N            run only every Nth job (parallel processes)
-##   --actions=N            override the action cap (default 4000, 12000 for explorer/narrative)
+##   --actions=N            override the action cap (default 4000, 20000 for explorer/narrative)
 ##   --out=PATH             append JSONL (default: print only)
 ##   --claim                claim --salt in the ledger and exit
 ##   --list                 print the job count and exit
@@ -105,7 +105,7 @@ static func run_one(db: ContentDB, sp: String, cl: String, policy: String, idx: 
 	var tel := Telemetry.new()
 	w.telemetry = tel
 	var bot := PolicyPlayer.new(w, policy)
-	var cap := actions if actions > 0 else (12000 if SLOW_POLICIES.has(policy) else 4000)
+	var cap := actions if actions > 0 else (20000 if SLOW_POLICIES.has(policy) else 4000)
 	var t0 := Time.get_ticks_msec()
 	bot.play(cap)
 	var branch_floors := 0

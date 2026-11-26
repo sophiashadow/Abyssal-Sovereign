@@ -18,6 +18,7 @@ extends AutoPlayer
 ## locations). That is a bot convenience, as it was in M6.10, and is documented
 ## in docs/M7_SPEC.md; it is not a claim about what a human can see.
 
+const CONTRACT_IDS: Array[String] = ["the_fast", "vow_of_poverty", "the_taken_name", "the_crown_taken"]
 const POLICIES: Array[String] = ["baseline", "aggressive", "defensive", "explorer", "preserver", "specialist", "narrative", "random"]
 
 ## Signature tree per calling for the specialist policy.
@@ -31,7 +32,7 @@ const DEFENSIVE_EFFECTS: Array[String] = ["shield_brace", "unyielding_march", "t
 		"sanctify_ground", "break_the_chain", "philosophers_loan", "summon_ward_sigil", "fade_to_ash", "backstep", "veil_step"]
 
 var policy := "baseline"
-var floor_budget := 700 ## actions one floor may consume before the explorer gives up on it
+var floor_budget := 500 ## actions one floor may consume before the explorer gives up on it
 var _rng: Rng
 var _fs: Dictionary = {} ## floor_id -> {actions, done, blacklist, handled, searched}
 var _nav_floor := ""
@@ -42,6 +43,7 @@ var _npc_stage: Dictionary = {} ## "fid:nid" -> stage int
 var _thread_choice: Dictionary = {}
 var _retreating := false
 var _contract_tried := false
+var _given_up: Dictionary = {}
 
 
 func _init(w: World, policy_name: String = "baseline") -> void:
@@ -341,7 +343,7 @@ func _site_goal() -> int:
 		"contract_lectern":
 			if world.contract == "" and not _contract_tried and policy in ["explorer", "narrative", "specialist"]:
 				_contract_tried = true
-				return 1 if world.player_interact(p.pos, "sign:the_crown_taken") else 0
+				return 1 if world.player_interact(p.pos, "sign:" + String(_rng.pick(CONTRACT_IDS))) else 0
 		"altar":
 			if healthy and p.hp > 8 and policy != "preserver":
 				return 1 if world.player_interact(p.pos, "tithe") else 0
@@ -481,7 +483,7 @@ func _npc_session(f: Dictionary) -> int:
 		2:
 			# Settle known threads by sacrifice when the goal is far from this floor and health allows.
 			for tid in Threads.matching_threads_for_npc(world.threads_state, world.db, nid, true):
-				if _thread_choice.get(tid, "") == "accepted" and String(world.db.get_def("threads", tid)["goal_kind"]) == "sacrifice_hp":
+				if world.player.hp > 10 and String(world.db.get_def("threads", tid)["goal_kind"]) == "sacrifice_hp":
 					_thread_choice[tid] = "sacrificed"
 					return 1 if world.player_interact(pos, "thread_resolve:%s:sacrifice" % tid) else 0
 			return _npc_session(f)
@@ -505,6 +507,8 @@ func _narrative_goal() -> int:
 		var tdef := world.db.get_def("threads", tid)
 		var gk := String(tdef["goal_kind"])
 		var gref := String(tdef["goal_ref"])
+		if _given_up.has(tid):
+			continue
 		if gk == "work_relic" or gk == "transmute_relic":
 			for i in p.inventory.size():
 				if p.inventory[i].template_id == gref or (gref == "any" and String(p.inventory[i].def(world.db)["kind"]) == "relic"):
@@ -514,6 +518,10 @@ func _narrative_goal() -> int:
 			continue
 		if dest == world.floor_id:
 			if gk == "visit_floor":
+				continue
+			if bool(_fstate()["done"]):
+				_given_up[tid] = true # fully explored and the goal never landed: stop chasing it
+				world._tel("narrative", "given_up:" + tid)
 				continue
 			return -1 # explore here (the kill/talk will land as the floor is cleared)
 		var hop := _next_hop(world.floor_id, dest)
@@ -535,11 +543,13 @@ func _goal_floor(goal_kind: String, goal_ref: String) -> String:
 	if goal_kind == "visit_floor":
 		return goal_ref if world.db.has("floors", goal_ref) else ""
 	if goal_kind == "kill_monster":
+		# Bosses and guardians are certain; spawn tables are only a chance.
 		for fid in world.db.all_floor_ids():
 			var fd := world.db.floor_def(fid)
 			if String(fd.get("boss", "")) == goal_ref or String(fd.get("guardian", "")) == goal_ref:
 				return fid
-			for e in fd.get("monster_table", []):
+		for fid in world.db.all_floor_ids():
+			for e in world.db.floor_def(fid).get("monster_table", []):
 				if String(e.get("id", "")) == goal_ref:
 					return fid
 	return ""
