@@ -390,6 +390,37 @@ func _apply_elite(mon: Actor, kind: String) -> void:
 			mon.resists["physical"] = maxi(20, int(mon.resists.get("physical", 0)))
 			if not mon.specials.has("iron_shackle"):
 				mon.specials.append("iron_shackle")
+		"radiant":
+			mon.name = "Gilded " + mon.name
+			mon.color = "#f2c35c"
+			mon.base["accuracy"] = int(mon.base["accuracy"]) + 1
+			mon.base["damage_type"] = "radiant"
+			mon.resists["radiant"] = maxi(50, int(mon.resists.get("radiant", 0)))
+			if not mon.specials.has("solar_bolt"):
+				mon.specials.append("solar_bolt")
+			if not mon.tags.has("chain_omnipotence"):
+				mon.tags.append("chain_omnipotence")
+		"swift":
+			mon.name = "Fleet " + mon.name
+			mon.color = "#78bea7"
+			mon.base["speed"] = int(mon.base["speed"]) + 25
+			mon.base["evasion"] = int(mon.base["evasion"]) + 2
+			if not mon.specials.has("warren_pounce"):
+				mon.specials.append("warren_pounce")
+		"vampiric":
+			mon.name = "Crimson " + mon.name
+			mon.color = "#ff4d6d"
+			mon.base["bonus_damage"] = int(mon.base.get("bonus_damage", 0)) + 1
+			if not mon.specials.has("leech_bite"):
+				mon.specials.append("leech_bite")
+		"warded":
+			mon.name = "Sealed " + mon.name
+			mon.color = "#aab6c8"
+			mon.base["defense"] = int(mon.base["defense"]) + 2
+			for dt in ["fire", "cold", "void"]:
+				mon.resists[dt] = maxi(25, int(mon.resists.get(dt, 0)))
+			if not mon.specials.has("protect_ally"):
+				mon.specials.append("protect_ally")
 
 
 func _build_floor(d: int) -> FloorMap:
@@ -2214,6 +2245,22 @@ func _monster_turn(mon: Actor) -> int:
 	var sees := _monster_sees_player(m, mon)
 	if sees:
 		_remember_player(mon)
+	if mon.flags.has("telegraph_x") and mon.flags.has("telegraph_y"):
+		var tpos := Vector2i(int(mon.flags["telegraph_x"]), int(mon.flags["telegraph_y"]))
+		mon.flags.erase("telegraph_x")
+		mon.flags.erase("telegraph_y")
+		if Grid.chebyshev(player.pos, tpos) <= 1 and Grid.chebyshev(mon.pos, player.pos) <= 2:
+			var raw := Dice.roll(mon.damage_dice(), rng) + Dice.roll(mon.damage_dice(), rng) + mon.stat("damage_bonus")
+			var dtype := mon.melee_damage_type()
+			var mit := Combat.mitigate(raw, player, dtype)
+			var dmg := int(mit["damage"])
+			log_msg("The %s's telegraphed blow crushes you for %d (%s)!" % [mon.name, dmg, dtype], "danger")
+			apply_damage(player, dmg, mon.name, dtype)
+			if player.is_alive():
+				apply_status(player, "sundered")
+		else:
+			log_msg("You evade the %s's telegraphed blow!" % mon.name, "good")
+		return COST_ATTACK
 	var fog_cd := int(mon.flags.get("fog_cd", 0))
 	if fog_cd > 0:
 		mon.flags["fog_cd"] = fog_cd - 1
@@ -2230,6 +2277,20 @@ func _monster_turn(mon: Actor) -> int:
 		var spec_cost := _try_monster_special(m, mon)
 		if spec_cost > 0:
 			return spec_cost
+	if mon.specials.has("kite_ranged") and sees and not mon.has_status("pinned") and Grid.chebyshev(mon.pos, player.pos) <= 2 and rng.chance_pct(60):
+		var best_retreat := mon.pos
+		var best_dist := Grid.chebyshev(mon.pos, player.pos)
+		for d in Grid.DIRS_8:
+			var q := mon.pos + d
+			if m.can_step(mon.pos, q) and m.actor_at(q) == null:
+				var qd := Grid.chebyshev(q, player.pos)
+				if qd > best_dist:
+					best_dist = qd
+					best_retreat = q
+		if best_retreat != mon.pos:
+			mon.pos = best_retreat
+			_on_actor_enter_tile(mon, best_retreat)
+			return COST_MOVE
 	if Grid.is_adjacent(mon.pos, player.pos) and m.can_step(mon.pos, player.pos):
 		_remember_player(mon)
 		_attack(mon, player)
@@ -2259,6 +2320,46 @@ func _monster_turn(mon: Actor) -> int:
 func _try_monster_special(m: FloorMap, mon: Actor) -> int:
 	var dist := Grid.chebyshev(mon.pos, player.pos)
 	var adj := Grid.is_adjacent(mon.pos, player.pos)
+	if mon.specials.has("telegraph_slam") and dist <= 2 and rng.chance_pct(40):
+		mon.flags["spec_cd"] = 5
+		mon.flags["telegraph_x"] = player.pos.x
+		mon.flags["telegraph_y"] = player.pos.y
+		log_msg("The %s winds back a heavy blow toward (%d, %d)!" % [mon.name, player.pos.x, player.pos.y], "danger")
+		return COST_WAIT
+	if mon.specials.has("support_ward") and rng.chance_pct(50):
+		var ally: Actor = null
+		for a in m.actors:
+			if not a.is_player and a != mon and a.is_alive() and Grid.chebyshev(mon.pos, a.pos) <= 4 and (a.hp < a.stat("max_hp") or not a.has_status("braced")):
+				ally = a
+				break
+		if ally != null:
+			mon.flags["spec_cd"] = 5
+			apply_status(ally, "braced")
+			ally.hp = mini(ally.stat("max_hp"), ally.hp + 3)
+			log_msg("The %s wards and mends the %s." % [mon.name, ally.name], "danger")
+			return COST_WAIT
+	if mon.specials.has("support_rally") and rng.chance_pct(45):
+		var rallied := 0
+		for a in m.actors:
+			if not a.is_player and a != mon and a.is_alive() and Grid.chebyshev(mon.pos, a.pos) <= 4:
+				a.awake = true
+				_remember_player(a)
+				apply_status(a, "apostate_focus")
+				rallied += 1
+		if rallied > 0:
+			mon.flags["spec_cd"] = 6
+			log_msg("The %s rallies %d nearby companion%s!" % [mon.name, rallied, "" if rallied == 1 else "s"], "danger")
+			return COST_WAIT
+	if mon.specials.has("lay_hazard") and dist <= 4 and rng.chance_pct(45):
+		var step := Grid.sign_vec(player.pos - mon.pos)
+		var hp_tile := mon.pos + step
+		if m.get_tile(hp_tile) == Tiles.FLOOR and hp_tile != player.pos and m.portal_at(hp_tile).is_empty():
+			mon.flags["spec_cd"] = 5
+			var dtype := mon.melee_damage_type()
+			var htile := Tiles.ASH_EMBER if dtype == "fire" else (Tiles.RIME_ICE if dtype == "cold" else (Tiles.SOLAR_GLARE if dtype == "radiant" else Tiles.MIASMA))
+			m.set_tile(hp_tile, htile)
+			log_msg("The %s scatters %s across the flagstones!" % [mon.name, Tiles.NAMES[htile]], "danger")
+			return COST_WAIT
 	if mon.specials.has("judgment_nova") and dist <= 2 and rng.chance_pct(45):
 		mon.flags["spec_cd"] = 7
 		var raw := Dice.roll("1d6", rng) + maxi(1, depth / 2)
@@ -2270,6 +2371,20 @@ func _try_monster_special(m: FloorMap, mon: Actor) -> int:
 		return COST_WAIT
 	if adj:
 		return -1
+	if mon.specials.has("pull_chain") and not player.has_status("pinned") and dist >= 2 and dist <= 4 and rng.chance_pct(45):
+		var tr_pull := projectile_trace(mon.pos, player.pos, 4)
+		if tr_pull["hit_actor"] == player:
+			var pull_dir := Grid.sign_vec(mon.pos - player.pos)
+			var dest := player.pos + pull_dir
+			if m.can_step(player.pos, dest) and m.actor_at(dest) == null:
+				mon.flags["spec_cd"] = 5
+				player.pos = dest
+				_on_actor_enter_tile(player, dest)
+				if player.is_alive():
+					apply_status(player, "pinned")
+				update_fov()
+				log_msg("The %s yanks a chain and drags you closer!" % mon.name, "danger")
+				return COST_ATTACK
 	if mon.specials.has("warren_pounce") and not mon.has_status("pinned") and dist >= 2 and dist <= 3 and rng.chance_pct(55):
 		var step := Grid.sign_vec(player.pos - mon.pos)
 		var dest := mon.pos
@@ -2295,7 +2410,10 @@ func _try_monster_special(m: FloorMap, mon: Actor) -> int:
 	var sid := ""
 	var cd := 4
 	var label := "strikes"
-	if mon.specials.has("iron_shackle"):
+	var drain_res := false
+	if mon.specials.has("drain_resource"):
+		dtype = "void"; sid = "demanded"; cd = 5; label = "drains your resolve with a void bolt at"; drain_res = true
+	elif mon.specials.has("iron_shackle"):
 		dtype = "physical"; sid = "pinned"; cd = 6; label = "hurls an iron shackle at"
 	elif mon.specials.has("cinder_bolt"):
 		dtype = "fire"; sid = "burning"; cd = 4; label = "casts a cinder bolt at"
@@ -2318,6 +2436,9 @@ func _try_monster_special(m: FloorMap, mon: Actor) -> int:
 		return COST_ATTACK
 	var dmg := int(res["damage"])
 	log_msg("The %s %s you for %d%s!" % [mon.name, label, dmg, _combat_note(res)], "danger")
+	if drain_res and player.resource > 0:
+		player.resource = maxi(0, player.resource - 2)
+		log_msg("Your %s drains by 2!" % player.resource_label().to_lower(), "danger")
 	apply_damage(player, dmg, mon.name, dtype)
 	if player.is_alive() and sid != "" and rng.chance_pct(70):
 		apply_status(player, sid)
@@ -2347,11 +2468,21 @@ func _attack(attacker: Actor, defender: Actor) -> void:
 	if r["sneak"]:
 		verb = "strike unseen at" if attacker.is_player else "strikes unseen at"
 	var dtype := String(r.get("type", "physical"))
+	var hit_dmg := int(r["damage"])
 	var note := _combat_note(r)
-	log_msg("%s %s %s for %d%s." % [who, verb, whom, r["damage"], note], "danger" if defender.is_player else "combat")
+	if not attacker.is_player and attacker.specials.has("ambusher") and not attacker.flags.has("ambush_spent"):
+		attacker.flags["ambush_spent"] = 1
+		hit_dmg += 3
+		log_msg("%s strikes from concealment!" % who, "danger")
+		if defender.is_alive():
+			apply_status(defender, "bleeding")
+	if not attacker.is_player and attacker.specials.has("exploit_status") and (defender.has_status("sundered") or defender.has_status("exposure") or defender.has_status("pinned") or defender.has_status("entangled")):
+		hit_dmg += 3
+		log_msg("%s exploits your exposed guard!" % who, "danger")
+	log_msg("%s %s %s for %d%s." % [who, verb, whom, hit_dmg, note], "danger" if defender.is_player else "combat")
 	if attacker.is_player and attacker.resource_kind() == "poise" and (bool(r["crit"]) or bool(r["sneak"])):
 		attacker.resource = mini(attacker.max_resource(), attacker.resource + 1)
-	apply_damage(defender, int(r["damage"]), attacker.name, dtype)
+	apply_damage(defender, hit_dmg, attacker.name, dtype)
 	if attacker.is_player and defender.is_alive():
 		var w := attacker.equipped("weapon")
 		if w != null:
@@ -2401,6 +2532,12 @@ func apply_damage(target: Actor, amount: int, source: String, dmg_type: String =
 	if amount <= 0 and dmg_type != "physical":
 		log_msg("%s resists completely." % ("You" if target.is_player else "The " + target.name), "info")
 		return
+	if not target.is_player and dmg_type == "physical" and amount > 1:
+		for a in current_floor().actors:
+			if not a.is_player and a != target and a.is_alive() and a.specials.has("protect_ally") and Grid.is_adjacent(a.pos, target.pos):
+				amount = maxi(1, amount - 2)
+				log_msg("The %s shields the %s!" % [a.name, target.name], "info")
+				break
 	if dmg_type == "cold" and amount > 0 and current_floor().get_tile(target.pos) == Tiles.WATER_SHALLOW:
 		amount = maxi(1, int(roundf(float(amount) * 1.25)))
 	amount = _apply_damage_combos(target, amount, dmg_type)

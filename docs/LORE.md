@@ -116,3 +116,9 @@ Surface locations from FALSE LIGHT PR #300 (`BREADTH_PASS.md`) inform undergroun
 - **Day-House Cellars** (`Canon`, Rulebook §15.1 day-house of the registered poor): pantry sub-levels under the day-houses.
 - **Back Courts Undercroft, Shut Chapel Crypt, Tithe Road Tunnels, Unrecorded Market Seams, Archive Stair Annex, Hidden Assembly Catacomb, Processional Underway, Sun-House Furnaces, Closed Stacks Vault** (`Canon-derived` underground passages/annexes informed by PR #300 and Rulebook §1.1/§1.2/§1.4/§14/§15.1/§16).
 - **Censer Foundry, Velvet Ossuary, Gilded Cloister, Audit Cisterns, Preliator Garrison, Seal Foundry Deep, Debts Cathedral, Ophite Seam Hollow, Unwritten Margin, Cage Oubliette, Witness Hermitage** (`Proposed` regional branches, vaults, strongholds, and sanctuaries across Spheres 3–7).
+
+## M6.2 Bestiary Provenance (The Inhabitants)
+
+- **Dominion soldiers/officials & Inquisition agents** (`Canon-derived` organ roles from Rulebook §1.1–§1.2 / EXODUS; specific enemy archetypes `Proposed`): `tithe_bailiff`, `audit_clerk`, `crux_halberdier`, `garrison_crossbowman`, `gate_warden`, `processional_lancer`, `sealer_captain`, `iron_bulwark`, `heresy_tracker`, `confessor_hound`, `censor_adept`, `quill_interrogator`, `penance_flagellant`, `ledger_zealot`, `edict_herald`.
+- **Ossuary undead, False-sun manifestations, Contract-bound entities & Rogue Geometry servants** (`Canon-derived` motifs from Rulebook §7/§14 & EXODUS; archetypes `Proposed`): `bone_hoarder`..`chain_revenant`, `solar_wisp`..`censer_elemental`, `oath_debtor`..`seal_golem`, `broken_cantor`..`runaway_almoner`.
+- **Unrecorded creatures, Metaphysical predators, Ritual constructs, Sphere-adapted organisms & 12 new named regional bosses** (`Proposed` original additions; excluded Rulebook §13 Tier 1–2 real-world threat archetypes remain untouched).

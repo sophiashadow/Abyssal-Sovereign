@@ -100,3 +100,8 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 - **Terrain & Generation:** Added `Tiles.BRANCH_IN`, `BRANCH_OUT`, `WATER_SHALLOW` (+25 move cost, douses `burning`, +25% cold damage), `SANCTUARY_FLOOR` (2x regen rate, -1 Subjugation gain), and `IRON_GRATE` (wakes unaware foes within radius 5). `FloorMap` tracks `floor_id` and `portals`; `DungeonGen.generate()` places bidirectional branch portals and regional terrain/sites.
 - **World & Save v9:** `World.floors` keyed by `floor_id`, deterministic per-run `_build_atlas()` selecting 2 of 3 branches per Sphere plus active `alt_down` cross-Sphere routes with Sphere Gate support, `SAVE_VERSION := 9` with `v8 -> v9` migration.
 - **UI:** Region kind indicators in HUD, portal prompt/travel, and `_show_atlas()` (`Tab` / Pause menu).
+
+## M6.2 Additions (The Inhabitants)
+
+- **Content:** Expanded `content/core/monsters.json` to 76 archetypes across 10 families including 15 named bosses/guardians (12 new regional bosses across spine and branch floors).
+- **Tactical AI & Encounter Composition:** Added `telegraph_slam` (2-turn telegraphed area blow), `kite_ranged`, `ambusher`, `support_ward`, `support_rally`, `drain_resource`, `lay_hazard`, `pull_chain`, `protect_ally` (physical shield aura), and `exploit_status` in `World`, 4 additional elite mutations (`radiant`, `swift`, `vampiric`, `warded`), and multi-role room squad grouping in `DungeonGen`.

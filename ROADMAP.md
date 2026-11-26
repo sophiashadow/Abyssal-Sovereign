@@ -76,4 +76,9 @@ M5 (The Depth Pass: M5.1–M5.5) is complete.
 1. **28-floor Atlas across Seven Spheres:** Expanded `floors.json` from 7 linear floors to 7 main-spine floors plus 21 regional sub-floors (branches, sanctuaries, vaults, strongholds, settlements), with deterministic per-run selection of 2 branches per Sphere (`21` active floors per run) and bidirectional `alt_down` cross-Sphere routes.
 2. **Regional Terrain & Portals:** Added `BRANCH_IN`, `BRANCH_OUT`, `WATER_SHALLOW`, `SANCTUARY_FLOOR`, and `IRON_GRATE` with distinct movement, elemental, noise, regen, and Subjugation rules, plus Atlas overlay (`Tab` / Pause) and `SAVE_VERSION := 9` (`v8 -> v9` migration).
 
-Remaining M6 submilestones track M6.2–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.
+## Milestone 6.2: The Inhabitants (done 2026-11-26)
+
+1. **76-archetype Bestiary & 15 Bosses/Guardians:** Expanded `monsters.json` across 10 distinct families plus 12 new named regional bosses across spine and branch floors.
+2. **Tactical AI, Elite Mutations & Squads:** Added `telegraph_slam`, `kite_ranged`, `ambusher`, `support_ward`, `support_rally`, `drain_resource`, `lay_hazard`, `pull_chain`, `protect_ally`, and `exploit_status`, plus 4 new elite mutations (`radiant`, `swift`, `vampiric`, `warded`) and squad room spawns.
+
+Remaining M6 submilestones track M6.3–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.

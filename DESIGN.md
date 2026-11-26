@@ -170,3 +170,16 @@ M6.1 expands the seven linear Sphere floors into a 28-floor multi-region Atlas (
 | `human` | `41 / 45` (`91%`) | — | `assassin` 15/15, `occultist` 14/15, `fallen_knight` 12/15 |
 | `cambion` | `31 / 45` (`69%`) | — | `assassin` 10/15, `occultist` 12/15, `fallen_knight` 9/15 |
 | `revenant` | `39 / 45` (`87%`) | — | `assassin` 13/15, `occultist` 14/15, `fallen_knight` 12/15 |
+
+## M6.2 — The Inhabitants
+
+M6.2 expands the bestiary to `76` archetypes across `10` families including `15` named bosses/guardians (`12` new regional bosses across spine and branch floors), `9` new tactical AI behaviors (`telegraph_slam`, `kite_ranged`, `ambusher`, `support_ward`, `support_rally`, `drain_resource`, `lay_hazard`, `pull_chain`, `protect_ally`, `exploit_status`), `4` additional elite mutations (`radiant`, `swift`, `vampiric`, `warded`), and multi-role room squad generation.
+
+### Measured Balance (M6.2 held-out soak, `tools/soak.gd --seeds=15 --salt=heldout`, `135` runs)
+
+| Scope | Wins / Runs | Mean Turns | Notes |
+|---|---:|---:|---|
+| Overall | `104 / 135` (`77%`) | `717` | Callings: `Knight 28/45`, `Occultist 40/45`, `Assassin 36/45` |
+| `human` | `40 / 45` (`89%`) | — | `assassin` 14/15, `occultist` 15/15, `fallen_knight` 11/15 |
+| `cambion` | `31 / 45` (`69%`) | — | `assassin` 12/15, `occultist` 12/15, `fallen_knight` 7/15 |
+| `revenant` | `33 / 45` (`73%`) | — | `assassin` 10/15, `occultist` 13/15, `fallen_knight` 10/15 |

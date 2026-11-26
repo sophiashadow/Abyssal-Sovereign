@@ -131,8 +131,12 @@ static func generate(floor_def: Dictionary, seed_value: int, extra_portals: Arra
 		monster_rooms.append(i)
 	var regular_spawns: Array[int] = []
 	var n_monsters := rng.range_i(int(floor_def["monsters_min"]), int(floor_def["monsters_max"]))
-	for _i in n_monsters:
-		var p := _free_spot(m, m.rooms[rng.pick(monster_rooms)], occupied, rng)
+	var last_room := -1
+	for i in n_monsters:
+		# Group ~40% of encounters into multi-role squads inside the same room.
+		var r_idx := last_room if (last_room >= 0 and i % 3 == 1 and rng.chance_pct(75)) else int(rng.pick(monster_rooms))
+		last_room = r_idx
+		var p := _free_spot(m, m.rooms[r_idx], occupied, rng)
 		if p.x < 0:
 			continue
 		occupied[p] = true
@@ -145,7 +149,7 @@ static func generate(floor_def: Dictionary, seed_value: int, extra_portals: Arra
 			var idx := int(rng.pick(regular_spawns))
 			if not chosen.has(idx):
 				chosen[idx] = true
-				m.spawns[idx]["elite"] = rng.pick(["cinder", "rime", "void", "iron"])
+				m.spawns[idx]["elite"] = rng.pick(["cinder", "rime", "void", "iron", "radiant", "swift", "vampiric", "warded"])
 	var n_items := rng.range_i(int(floor_def["items_min"]), int(floor_def["items_max"]))
 	for _i in n_items:
 		var p := _free_spot(m, m.rooms[rng.range_i(0, m.rooms.size() - 1)], occupied, rng)
