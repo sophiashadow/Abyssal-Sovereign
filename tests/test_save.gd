@@ -207,6 +207,19 @@ func test_v9_save_migrates_to_v10() -> void:
 		ok(w2.npcs_met.is_empty(), "npcs_met backfilled")
 
 
+func test_v10_save_migrates_to_v11() -> void:
+	var w := World.new_run(db(), 4242, "human", "fallen_knight", "Mig10")
+	var d := _through_json(w)
+	d["save_version"] = 10
+	d.erase("threads_state")
+	var errors: PackedStringArray = []
+	var w2 := World.from_dict(db(), d, errors)
+	eq(errors.size(), 0, "v10 save migrates cleanly: %s" % ", ".join(errors))
+	ok(w2 != null, "migrated v10 world loaded")
+	if w2 != null:
+		ok(w2.threads_state.has("active") and w2.threads_state.has("completed"), "threads_state backfilled")
+
+
 func test_round_trip_is_exact() -> void:
 	var w := World.new_run(db(), 4242, "cambion", "occultist", "Rt")
 	w.player_spend_stat("will")

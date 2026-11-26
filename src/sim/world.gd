@@ -10,7 +10,7 @@ extends RefCounted
 ## id 1, so the player wins ties. Player actions return true if they spent
 ## time; the world then runs monsters until it is the player's turn again.
 
-const SAVE_VERSION := 10
+const SAVE_VERSION := 11
 const SUBJUGATION_LIMIT := 6
 ## Eight Chains grammar: monster tag -> status laid on the player and chance per hit.
 ## (chain_fog is delivered by the litany in _monster_turn.)
@@ -70,6 +70,7 @@ var spawned_uniques: Array[String] = []
 var npc_standing: Dictionary = {} # npc_id -> int (-2..+3)
 var faction_flags: Dictionary = {} # faction_id -> active pole id
 var npcs_met: Array[String] = []
+var threads_state: Dictionary = {"pool": [], "active": {}, "completed": [], "refused": [], "failed": [], "pending": []}
 var messages: Array[Dictionary] = []
 ## Bumped whenever messages change, so the UI can redraw lazily.
 var log_serial: int = 0
@@ -88,6 +89,7 @@ static func new_run(content: ContentDB, seed_value: int, species_id: String, cla
 	w.player = w._make_player(species_id, class_id, hero_name)
 	w._init_discovery()
 	w._build_atlas()
+	w.threads_state = Threads.init_state(content, w.atlas, seed_value)
 	w._enter_floor(1, true)
 	var fd := w.current_floor_def()
 	w.log_msg("You descend beneath Terra Tenebrae. %s." % fd.get("name", "The dark"), "lore")
@@ -556,6 +558,8 @@ func _enter_floor_by_id(target_id: String, arrival_kind: String, from_id: String
 		if not a.is_player:
 			a.next_time = maxi(a.next_time, time + 1)
 	_player_dist_pos = Vector2i(-99999, -99999)
+	_thread_event("floor", target_id)
+	_thread_event("visit_floor", target_id)
 
 
 func _adjacent_free(m: FloorMap, p: Vector2i) -> Vector2i:
@@ -1145,6 +1149,8 @@ func player_work_relic(index: int) -> bool:
 	update_fov()
 	var msg := "You work the %s (-%d HP)." % [d["name"], cost] if cost > 0 else "You work the %s." % d["name"]
 	log_msg(msg, "good")
+	_thread_event("relic", it.template_id)
+	_thread_event("work_relic", it.template_id)
 	return _finish_player_action(COST_ITEM)
 
 
@@ -1165,6 +1171,8 @@ func player_transmute_relic(index: int) -> bool:
 	way_serpent += 1
 	update_fov()
 	log_msg("You transmute the %s; its power stays with you." % d["name"], "lore")
+	_thread_event("relic", it.template_id)
+	_thread_event("transmute_relic", it.template_id)
 	return _finish_player_action(COST_ITEM)
 
 
@@ -1956,6 +1964,7 @@ func _begin_player_turn() -> void:
 	_tick_subjugation()
 	_tick_wards()
 	_update_allegiance()
+	_tick_threads()
 	update_fov()
 
 
@@ -2107,6 +2116,7 @@ func player_sign_contract(cid: String) -> bool:
 	contract_progress = 0
 	apotheosis = maxi(0, apotheosis + int(cd.get("apotheosis", 0)))
 	log_msg("You sign %s. Oath: %s" % [cd["name"], cd["oath_text"]], "lore")
+	_thread_event("contract", cid)
 	return true
 
 
@@ -2132,6 +2142,7 @@ func _contract_event(ev: String) -> void:
 func _advance_contract() -> void:
 	if contract == "" or not db.has("contracts", contract):
 		return
+	var signed_cid := contract
 	contract_progress += 1
 	var cd := db.get_def("contracts", contract)
 	if contract_progress >= int(cd["floors"]):
@@ -2147,6 +2158,7 @@ func _advance_contract() -> void:
 		contract_progress = 0
 	else:
 		log_msg("%s: the oath holds (%d/%d)." % [cd["name"], contract_progress, int(cd["floors"])], "info")
+	_thread_event("attest_contract", signed_cid)
 
 
 func _breach_contract(reason: String) -> void:
@@ -2517,11 +2529,30 @@ func _interact_npc(pos: Vector2i, f: Dictionary, choice: String) -> bool:
 	var pole := String(ndef["faction_pole"])
 	if not npcs_met.has(nid):
 		npcs_met.append(nid)
+	if choice.begins_with("thread_accept:"):
+		var tid := choice.substr(14)
+		if not discover_thread(tid):
+			return false
+		return _finish_player_action(COST_WAIT)
+	if choice.begins_with("thread_resolve:"):
+		var parts := choice.split(":")
+		if parts.size() >= 3:
+			var tid := parts[1]
+			var method := parts[2]
+			if method == "refuse":
+				if not refuse_thread(tid):
+					return false
+				return _finish_player_action(COST_WAIT)
+			if not resolve_thread(tid, method):
+				return false
+			return _finish_player_action(COST_ITEM)
 	if choice == "talk" or choice == "":
 		var pole_label := String(fdef["pole_a_label"] if pole == String(fdef["pole_a"]) else fdef["pole_b_label"])
 		log_msg("%s: \"%s\" (%s — %s)" % [String(ndef["name"]), String(ndef["greeting"]), String(fdef["name"]), pole_label], "lore")
 		if not npc_standing.has(nid):
 			npc_standing[nid] = 1 if faction_pole_of(fid) == pole else 0
+		_thread_event("npc", nid)
+		_thread_event("npc_talk", nid)
 		return _finish_player_action(COST_WAIT)
 	if choice == "pledge":
 		set_faction_pole(fid, pole)
@@ -2617,6 +2648,219 @@ func _interact_npc(pos: Vector2i, f: Dictionary, choice: String) -> bool:
 		adjust_npc_standing(nid, 1)
 		return _finish_player_action(COST_ITEM)
 	return false
+
+
+func active_thread_ids() -> Array[String]:
+	var out: Array[String] = []
+	for k in threads_state.get("active", {}):
+		out.append(String(k))
+	out.sort()
+	return out
+
+
+func resolved_thread_count() -> int:
+	return (threads_state.get("completed", []) as Array).size()
+
+
+func discover_thread(tid: String) -> bool:
+	if not db.has("threads", tid):
+		return false
+	if Threads.is_known(threads_state, tid):
+		return false
+	if not Threads.activate(threads_state, tid, turns):
+		return false
+	var tdef := db.get_def("threads", tid)
+	log_msg("Thread uncovered — %s: %s" % [String(tdef["name"]), String(tdef["lead_text"])], "lore")
+	return true
+
+
+func resolve_thread(tid: String, method: String = "goal") -> bool:
+	if not db.has("threads", tid):
+		return false
+	if not Threads.is_known(threads_state, tid):
+		discover_thread(tid)
+	var act: Dictionary = threads_state.get("active", {})
+	if not act.has(tid):
+		return false
+	var tdef := db.get_def("threads", tid)
+	if method == "sacrifice":
+		var spare_idx := -1
+		for i in player.inventory.size():
+			var d := player.inventory[i].def(db)
+			if String(d.get("kind", "")) == "consumable" and String(d.get("effect", "")) != "heal":
+				spare_idx = i
+				break
+		if spare_idx >= 0 and player.hp <= 4:
+			var sp := player.inventory[spare_idx]
+			sp.quantity -= 1
+			if sp.quantity <= 0:
+				player.inventory.remove_at(spare_idx)
+			log_msg("You settle '%s' by bartering supplies." % String(tdef["name"]), "lore")
+		elif player.hp > 4:
+			player.hp -= 4
+			log_msg("You settle '%s' in measured blood (-4 HP)." % String(tdef["name"]), "lore")
+		else:
+			log_msg("You lack vigor or barter goods to settle '%s' right now." % String(tdef["name"]), "danger")
+			return false
+	act.erase(tid)
+	var comp: Array = threads_state.get("completed", [])
+	if not comp.has(tid):
+		comp.append(tid)
+	_grant_thread_reward(tdef)
+	return true
+
+
+func refuse_thread(tid: String) -> bool:
+	if not db.has("threads", tid):
+		return false
+	var comp: Array = threads_state.get("completed", [])
+	var ref: Array = threads_state.get("refused", [])
+	var fail_l: Array = threads_state.get("failed", [])
+	if comp.has(tid) or ref.has(tid) or fail_l.has(tid):
+		return false
+	var act: Dictionary = threads_state.get("active", {})
+	act.erase(tid)
+	ref.append(tid)
+	var tdef := db.get_def("threads", tid)
+	var delay := maxi(4, int(tdef.get("delay_turns", 6)))
+	(threads_state["pending"] as Array).append({
+		"tid": tid,
+		"effect": String(tdef["refusal_effect"]),
+		"due_turn": turns + delay,
+	})
+	log_msg("You turn aside from '%s'. Consequences will catch up below." % String(tdef["name"]), "info")
+	return true
+
+
+func abandon_thread(tid: String) -> bool:
+	var act: Dictionary = threads_state.get("active", {})
+	if not act.has(tid) or not db.has("threads", tid):
+		return false
+	act.erase(tid)
+	(threads_state["failed"] as Array).append(tid)
+	var tdef := db.get_def("threads", tid)
+	adjust_npc_standing(String(tdef["npc_id"]), -1)
+	log_msg("Thread abandoned: %s." % String(tdef["name"]), "info")
+	return true
+
+
+func _thread_event(ev_kind: String, ev_ref: String) -> void:
+	if state != State.PLAYING or threads_state.is_empty():
+		return
+	var pool: Array = threads_state.get("pool", [])
+	for tid_v in pool:
+		var tid := String(tid_v)
+		if not db.has("threads", tid) or Threads.is_known(threads_state, tid):
+			continue
+		var tdef := db.get_def("threads", tid)
+		if String(tdef["trigger_kind"]) == ev_kind and (String(tdef["trigger_ref"]) == ev_ref or String(tdef["trigger_ref"]) == "any"):
+			discover_thread(tid)
+	var act_keys := active_thread_ids()
+	for tid in act_keys:
+		if not db.has("threads", tid):
+			continue
+		var tdef := db.get_def("threads", tid)
+		var gk := String(tdef["goal_kind"])
+		var gref := String(tdef["goal_ref"])
+		if gk == ev_kind and (gref == ev_ref or gref == "any"):
+			resolve_thread(tid, "goal")
+
+
+func _tick_threads() -> void:
+	if turns <= 0 or state != State.PLAYING or threads_state.is_empty():
+		return
+	var pending: Array = threads_state.get("pending", [])
+	var keep: Array = []
+	for ev in pending:
+		if turns >= int(ev.get("due_turn", 0)):
+			_apply_thread_consequence(String(ev.get("effect", "")), String(ev.get("tid", "")))
+		else:
+			keep.append(ev)
+	threads_state["pending"] = keep
+	for tid in active_thread_ids():
+		var entry: Dictionary = threads_state["active"][tid]
+		if turns - int(entry.get("accepted_turn", turns)) > 350 and depth >= 5:
+			abandon_thread(tid)
+
+
+func _grant_thread_reward(tdef: Dictionary) -> void:
+	var tname := String(tdef["name"])
+	var nid := String(tdef["npc_id"])
+	adjust_npc_standing(nid, 1)
+	match String(tdef["reward_kind"]):
+		"stat_point":
+			player.stat_points += 1
+			log_msg("Thread settled (%s): +1 attribute point!" % tname, "good")
+		"talent_point":
+			player.talent_points += 1
+			log_msg("Thread settled (%s): +1 talent point!" % tname, "good")
+		"heal_vigor":
+			var heal := maxi(6, player.stat("max_hp") / 2)
+			player.hp = mini(player.stat("max_hp"), player.hp + heal)
+			player.resource = mini(player.max_resource(), player.resource + 6)
+			log_msg("Thread settled (%s): +%d HP and +6 %s!" % [tname, heal, player.resource_label()], "good")
+		"loot_magic":
+			var table: Array = current_floor_def().get("item_table", [])
+			var reward: Item = _maybe_artifact_drop()
+			if reward == null and not table.is_empty():
+				reward = _new_item(rng.pick_weighted(table))
+				Affixes.roll_equipment(reward, db, depth + 2, rng, true)
+			if reward != null:
+				reward.identified = true
+				if _can_carry(player, reward):
+					_add_to_inventory(player, reward)
+				else:
+					reward.pos = player.pos
+					current_floor().items.append(reward)
+				log_msg("Thread settled (%s): received %s!" % [tname, item_name(reward)], "good")
+		"reduce_chains":
+			subjugation = maxi(0, subjugation - 2)
+			for cid in ["demanded", "dread", "debility", "degradation", "perception_fog", "entangled"]:
+				_remove_status(player, cid)
+			log_msg("Thread settled (%s): Subjugation eases (-2) and chains loosen." % tname, "good")
+		"way_return":
+			way_return += 1
+			log_msg("Thread settled (%s): your step turns toward the Way of Return." % tname, "lore")
+		"way_serpent":
+			way_serpent += 1
+			log_msg("Thread settled (%s): you cut a mark toward the Serpent's Way." % tname, "lore")
+		"faction_pole":
+			var fid := String(tdef["faction"])
+			var pole := String(db.get_def("npcs", nid)["faction_pole"])
+			set_faction_pole(fid, pole)
+			log_msg("Thread settled (%s): institution alignment shifted." % tname, "lore")
+
+
+func _apply_thread_consequence(eff: String, tid: String) -> void:
+	if not db.has("threads", tid):
+		return
+	var tdef := db.get_def("threads", tid)
+	var nid := String(tdef["npc_id"])
+	match eff:
+		"standing_drop":
+			adjust_npc_standing(nid, -1)
+			log_msg("Word of your refusal over '%s' reaches %s (-standing)." % [String(tdef["name"]), String(db.get_def("npcs", nid)["name"])], "danger")
+		"subjugation_spike":
+			subjugation = mini(chain_limit(), subjugation + 2)
+			log_msg("An unkept thread (%s) tightens the Dominion's audit (+2 Subjugation)!" % String(tdef["name"]), "danger")
+		"faction_shift":
+			var fid := String(tdef["faction"])
+			var fdef := db.get_def("factions", fid)
+			var npc_pole := String(db.get_def("npcs", nid)["faction_pole"])
+			var opp := String(fdef["pole_b"] if npc_pole == String(fdef["pole_a"]) else fdef["pole_a"])
+			set_faction_pole(fid, opp)
+			log_msg("Your refusal tilts %s toward %s." % [String(fdef["name"]), String(fdef["pole_b_label"] if opp == String(fdef["pole_b"]) else fdef["pole_a_label"])], "lore")
+		"ambush_alert":
+			var alerted := 0
+			for a in current_floor().actors:
+				if not a.is_player and a.is_alive() and not a.awake and Grid.chebyshev(player.pos, a.pos) <= 10:
+					a.awake = true
+					_remember_player(a)
+					alerted += 1
+			log_msg("Whispers over '%s' draw nearby eyes (%d alerted)!" % [String(tdef["name"]), alerted], "danger")
+		"curse_mark":
+			_chain_hit("dread")
+			log_msg("Refusal over '%s' leaves a bitter dread on your trail." % String(tdef["name"]), "danger")
 
 
 func _tick_cooldowns() -> void:
@@ -3155,6 +3399,8 @@ func _kill_monster(mon: Actor) -> void:
 	log_msg("The %s is destroyed." % mon.name, "good")
 	var sp := db.get_def("species", player.species_id)
 	gain_xp(int(roundf(mon.xp_value * float(sp.get("xp_mult", 1.0)))))
+	_thread_event("boss", mon.template_id)
+	_thread_event("kill_monster", mon.template_id)
 	if player.has_trait("soul_siphon") and not player.has_status("isolation"):
 		var heal := 1 + maxi(0, player.stat("will")) + player.talent_rank("alchemical_restraint")
 		player.hp = mini(player.stat("max_hp"), player.hp + heal)
@@ -3407,6 +3653,7 @@ func to_dict() -> Dictionary:
 		"npc_standing": npc_standing.duplicate(true),
 		"faction_flags": faction_flags.duplicate(true),
 		"npcs_met": npcs_met.duplicate(),
+		"threads_state": threads_state.duplicate(true),
 		"rng": rng.get_state_string(),
 		"player": player.to_dict(),
 		"floors": fl,
@@ -3554,6 +3801,11 @@ static func _migrate(d: Dictionary) -> Dictionary:
 		out["npc_standing"] = out.get("npc_standing", {})
 		out["faction_flags"] = out.get("faction_flags", {})
 		out["npcs_met"] = out.get("npcs_met", [])
+		ver = 10
+	if ver == 10:
+		out["save_version"] = 11
+		if not out.has("threads_state"):
+			out["threads_state"] = {"pool": [], "active": {}, "completed": [], "refused": [], "failed": [], "pending": []}
 	return out
 
 
@@ -3641,6 +3893,7 @@ static func from_dict(content: ContentDB, d: Dictionary, errors: PackedStringArr
 	w.faction_flags = d.get("faction_flags", {}).duplicate(true)
 	for mid in d.get("npcs_met", []):
 		w.npcs_met.append(String(mid))
+	w.threads_state = Actor._ints(d.get("threads_state", {"pool": [], "active": {}, "completed": [], "refused": [], "failed": [], "pending": []}))
 	w.rng = Rng.new(0)
 	w.rng.set_state_string(String(d["rng"]))
 	w.player = Actor.from_dict(d["player"], content)

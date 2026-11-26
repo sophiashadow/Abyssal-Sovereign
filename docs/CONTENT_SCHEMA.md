@@ -168,6 +168,23 @@ Divine contracts (rites of the Two Ways). One may be held at a time; the oath is
 | `service` | enum: repair_curse, bless_gear, identify_rumor, barter_gear, heal_shelter, reduce_chains, contract_aid, attest_way | yes | deterministic encounter service |
 | `provenance` | enum: canon, canon_derived, interpretation, proposed | yes | canon status tag |
 
+## threads
+
+| Field | Type | Req | Notes |
+|---|---|---|---|
+| `id`, `name`, `description` | | yes | |
+| `lead_text` | text | yes | prompt shown when the thread surfaces |
+| `trigger_kind` | enum: npc, floor, boss, relic, contract | yes | what surfaces the thread in play |
+| `trigger_ref` | string | yes | triggering entity id or `"any"` |
+| `faction` | ref:factions | yes | institution entangled in the thread |
+| `npc_id` | ref:npcs | yes | recurring figure tied to the thread |
+| `goal_kind` | enum: visit_floor, kill_monster, npc_talk, work_relic, transmute_relic, attest_contract, sacrifice_hp | yes | resolution condition (or barter/sacrifice/refusal alternative) |
+| `goal_ref` | string | yes | target id or `"any"` |
+| `delay_turns` | int ≥ 0 | yes | turns before delayed aftermath fires |
+| `reward_kind` | enum: stat_point, talent_point, heal_vigor, loot_magic, reduce_chains, way_return, way_serpent, faction_pole | yes | reward when fulfilled |
+| `refusal_effect` | enum: standing_drop, subjugation_spike, faction_shift, ambush_alert, curse_mark | yes | consequence on refusal or abandonment |
+| `provenance` | enum: canon, canon_derived, interpretation, proposed | yes | canon status tag |
+
 ## monsters
 
 Monster `tags` that drive the Eight Chains grammar: `chain_isolation`, `chain_fog`, `chain_debility`, `chain_threat`, `chain_indulgence`, `chain_omnipotence`, `chain_degradation`, `chain_trivial`. Each hit on the player may apply that chain; every chain advances the Subjugation clock.

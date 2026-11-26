@@ -5,14 +5,14 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 ## State as of 2026-11-26
 
 - **Branch:** `main` (default branch on `origin`, github.com/sophiashadow/Abyssal-Sovereign), preserving full commit history from `ccr-c6f8b898-fu2jtp`.
-- **Milestones:** M0–M5 (`fac51e8`, Depth Pass complete), **M6.1** (Atlas: 28 floors, save v9), **M6.2** (Inhabitants: 76 archetypes, 15 bosses/guardians), **M6.3** (Origins & Callings: 8×8, 104 talents), **M6.4** (Armory & Treasury: 165 items, 46 affixes, 12 sets, 26 artifacts, 16 relics), **M6.5 (People, Institutions and Allegiances, save v10)** — `18` recurring NPCs across `8` two-minded institutions, deterministic placement, standing (`-2..+3`), institutional pole splits (no good/evil meter), People overlay (`p`).
-- **Last verified (local, Linux, M6.5):**
-  - `tools/verify.sh` (M6.5):
-    - `tools/test.sh`: `123` tests, `123` passed, `0` failed, `2245` checks (`0` engine errors).
+- **Milestones:** M0–M5 (`fac51e8`, Depth Pass complete), **M6.1** (Atlas: 28 floors, save v9), **M6.2** (Inhabitants: 76 archetypes, 15 bosses/guardians), **M6.3** (Origins & Callings: 8×8, 104 talents), **M6.4** (Armory & Treasury: 165 items, 46 affixes, 12 sets, 26 artifacts, 16 relics), **M6.5** (People & Institutions: 18 NPCs, 8 factions, save v10), **M6.6 (Threads Beneath the Record, save v11)** — `24` multi-stage threads (`8` deterministic Atlas-matched leads per run), alternative goal/sacrifice/refusal/abandonment paths, delayed aftermath scheduler, non-spoiler Thread Journal (`j`).
+- **Last verified (local, Linux, M6.6):**
+  - `tools/verify.sh` (M6.6):
+    - `tools/test.sh`: `126` tests, `126` passed, `0` failed, `2284` checks (`0` engine errors).
     - `tools/ui_smoke.gd` at `1280×720` and `2340×1080`: `21` steps, `0` failures each.
   - `tools/soak.gd --seeds=2 --salt=heldout` (M6.3): bot wins `69%` (`88/128` runs across all `64` pairs, mean `918` turns).
-  - *Prior M4 exports (`build/`)*: `tools/export.sh all` refreshed Linux/Windows/Web/Android-debug exports at v0.4 (`apksigner verify` SHA-256 `a0000912831e593cdea65be68bda40f99f0d0e4d779332fff711199eb578a279`); exports have not yet been rebuilt after M5.1–M6.5.
-- **NOT_RUN:** Post-M5.1–M6.5 platform exports, Windows runtime, Web browser `user://` persistence test, physical Android device install/test (no device attached to `adb`), release-signed Android APK, M5.2–M6.5 human playtest. There is no CI.
+  - *Prior M4 exports (`build/`)*: `tools/export.sh all` refreshed Linux/Windows/Web/Android-debug exports at v0.4 (`apksigner verify` SHA-256 `a0000912831e593cdea65be68bda40f99f0d0e4d779332fff711199eb578a279`); exports have not yet been rebuilt after M5.1–M6.6.
+- **NOT_RUN:** Post-M5.1–M6.6 platform exports, Windows runtime, Web browser `user://` persistence test, physical Android device install/test (no device attached to `adb`), release-signed Android APK, M5.2–M6.6 human playtest. There is no CI.
 
 ## Setup
 
@@ -43,7 +43,8 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 - **M6.3 (Origins and Callings):** Done (2026-11-26).
 - **M6.4 (The Armory and Treasury):** Done (2026-11-26).
 - **M6.5 (People, Institutions and Allegiances):** Done (2026-11-26).
-- **Next:** **M6.6 (Threads Beneath the Record)** — add `"threads"` (`24` multi-stage threads, deterministic per-run subset, delayed consequences, alternative resolutions, refusal/abandonment outcomes) and `SAVE_VERSION := 11`. Then M6.7–M6.10 per `docs/M6_SPEC.md`.
+- **M6.6 (Threads Beneath the Record):** Done (2026-11-26).
+- **Next:** **M6.7 (Dungeon Variety and Emergent Encounters)** — `10` composable room archetypes (`src/gen/room_archetypes.gd`) + `4` emergent interactive features (`rune_puzzle`, `abandoned_rite`, `sanctuary_hearth`, `echo_cache`) preserving 100% map connectivity. Then M6.8–M6.10 per `docs/M6_SPEC.md`.
 - **Platform verification (M3 / M6.10):** Rebuild exports after M6 tranches (`tools/export.sh`), test physical Android device / Windows / Web when available, and configure release signing with an owner-created keystore outside the repo.
 
 Smaller known defects (fixed 2026-11-26):

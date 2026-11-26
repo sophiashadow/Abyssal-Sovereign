@@ -93,4 +93,8 @@ M5 (The Depth Pass: M5.1–M5.5) is complete.
 
 1. **18 Recurring NPCs & 8 Divided Institutions (`SAVE_VERSION := 10`):** Added `"factions"` and `"npcs"` content packs, deterministic floor placement, `npc_standing` (`-2..+3`) and `faction_flags` persistence (`v9 -> v10` migration), 8 deterministic NPC service types, and People & Institutions overlay (`p`).
 
-Remaining M6 submilestones track M6.6–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.
+## Milestone 6.6: Threads Beneath the Record (done 2026-11-26)
+
+1. **24 World Threads & Delayed Consequences (`SAVE_VERSION := 11`):** Added `threads.json`, `Threads` seeded per-run subset selection, alternative resolution (`goal`/`sacrifice`/`refuse`/`abandon`), delayed aftermath scheduling, non-spoiler Thread Journal (`j`), and `v10 -> v11` save migration.
+
+Remaining M6 submilestones track M6.7–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.

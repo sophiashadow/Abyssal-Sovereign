@@ -189,6 +189,15 @@ func _kind_rules(kind: String, e: Dictionary, where: String) -> void:
 			var fdef: Dictionary = _data["factions"][fid]
 			if pole != String(fdef.get("pole_a", "")) and pole != String(fdef.get("pole_b", "")):
 				errors.append("%s: faction_pole '%s' is not a pole of '%s'" % [where, pole, fid])
+	elif kind == "threads":
+		var gk := String(e.get("goal_kind", ""))
+		var gref := String(e.get("goal_ref", ""))
+		if gk == "visit_floor" and not _data["floors"].has(gref):
+			errors.append("%s: goal_ref '%s' is not a valid floor" % [where, gref])
+		elif gk == "kill_monster" and gref != "any" and not _data["monsters"].has(gref):
+			errors.append("%s: goal_ref '%s' is not a valid monster" % [where, gref])
+		elif gk == "npc_talk" and not _data["npcs"].has(gref):
+			errors.append("%s: goal_ref '%s' is not a valid npc" % [where, gref])
 
 
 func _global_rules() -> void:

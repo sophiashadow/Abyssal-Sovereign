@@ -866,6 +866,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_show_atlas()
 	elif k.keycode == KEY_P:
 		_show_people()
+	elif k.keycode == KEY_J:
+		_show_threads()
 	elif k.keycode >= KEY_1 and k.keycode <= KEY_6:
 		var idx := k.keycode - KEY_1
 		var acts := world.learned_active_talents()
@@ -1094,6 +1096,29 @@ func _show_feature(feat: Dictionary) -> void:
 					_close_overlay()
 					world.player_interact(pos, "refuse")
 					_after_action()))
+				var tids := Threads.matching_threads_for_npc(world.threads_state, db, nid)
+				for tid in tids:
+					var tdef := db.get_def("threads", tid)
+					if Threads.is_known(world.threads_state, tid):
+						col.add_child(_label("Thread [%s]: %s" % [String(tdef["name"]), String(tdef["description"])], Palette.FALSE_SUN, 0.82))
+						col.add_child(_btn("Settle '%s' by sacrifice (-4 HP or pack item)" % String(tdef["name"]), func() -> void:
+							_close_overlay()
+							world.player_interact(pos, "thread_resolve:%s:sacrifice" % tid)
+							_after_action()))
+						col.add_child(_btn("Refuse '%s'" % String(tdef["name"]), func() -> void:
+							_close_overlay()
+							world.player_interact(pos, "thread_resolve:%s:refuse" % tid)
+							_after_action()))
+					else:
+						col.add_child(_label("Whisper: %s" % String(tdef["lead_text"]), Palette.LORE, 0.82))
+						col.add_child(_btn("Take up '%s'" % String(tdef["name"]), func() -> void:
+							_close_overlay()
+							world.player_interact(pos, "thread_accept:%s" % tid)
+							_after_action()))
+						col.add_child(_btn("Decline '%s'" % String(tdef["name"]), func() -> void:
+							_close_overlay()
+							world.player_interact(pos, "thread_resolve:%s:refuse" % tid)
+							_after_action()))
 	col.add_child(_btn("Leave", _close_overlay))
 
 
@@ -1246,6 +1271,47 @@ func _show_people() -> void:
 	close.call_deferred("grab_focus")
 
 
+func _show_threads() -> void:
+	if world == null or world.state != World.State.PLAYING:
+		return
+	var col := _open_overlay("Threads Beneath the Record", Palette.FALSE_SUN)
+	col.add_child(_label("Only threads you have uncovered are recorded here.", Palette.TEXT_DIM, 0.84))
+	var act: Dictionary = world.threads_state.get("active", {})
+	col.add_child(_label("Active (%d):" % act.size(), Palette.GOLD, 0.9))
+	if act.is_empty():
+		col.add_child(_label("  No active leads yet.", Palette.TEXT_DIM, 0.82))
+	else:
+		var akeys := act.keys()
+		akeys.sort()
+		for tid in akeys:
+			if db.has("threads", String(tid)):
+				var tdef := db.get_def("threads", String(tid))
+				col.add_child(_label("  • %s — %s" % [String(tdef["name"]), String(tdef["description"])], Palette.TEXT, 0.82))
+				col.add_child(_btn("Abandon '%s'" % String(tdef["name"]), func() -> void:
+					world.abandon_thread(String(tid))
+					_close_overlay()
+					_after_action()))
+	var comp: Array = world.threads_state.get("completed", [])
+	if not comp.is_empty():
+		col.add_child(_label("Settled (%d):" % comp.size(), Palette.GOOD, 0.88))
+		for tid in comp:
+			if db.has("threads", String(tid)):
+				col.add_child(_label("  ✓ " + String(db.get_def("threads", String(tid))["name"]), Palette.GOOD, 0.82))
+	var ref_list: Array = world.threads_state.get("refused", [])
+	var fail_list: Array = world.threads_state.get("failed", [])
+	if not ref_list.is_empty() or not fail_list.is_empty():
+		col.add_child(_label("Refused / Abandoned (%d):" % [ref_list.size() + fail_list.size()], Palette.ALERT, 0.88))
+		for tid in ref_list:
+			if db.has("threads", String(tid)):
+				col.add_child(_label("  ✕ %s [Refused]" % String(db.get_def("threads", String(tid))["name"]), Palette.TEXT_DIM, 0.82))
+		for tid in fail_list:
+			if db.has("threads", String(tid)):
+				col.add_child(_label("  — %s [Abandoned]" % String(db.get_def("threads", String(tid))["name"]), Palette.TEXT_DIM, 0.82))
+	var close := _btn("Close", _close_overlay)
+	col.add_child(close)
+	close.call_deferred("grab_focus")
+
+
 func _show_pause() -> void:
 	if world == null or world.state != World.State.PLAYING:
 		return
@@ -1256,6 +1322,7 @@ func _show_pause() -> void:
 	col.add_child(resume)
 	col.add_child(_btn("Atlas", _show_atlas))
 	col.add_child(_btn("People & Institutions", _show_people))
+	col.add_child(_btn("Threads", _show_threads))
 	col.add_child(_btn("Settings", func() -> void: _show_settings(_build_game_screen)))
 	col.add_child(_btn("Save and return to title", func() -> void:
 		_autosave()

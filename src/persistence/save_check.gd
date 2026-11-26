@@ -43,6 +43,9 @@ static func problems(d: Dictionary, db: ContentDB) -> PackedStringArray:
 		out.append("atlas or visited_floors state is malformed")
 	if typeof(d.get("npc_standing")) != TYPE_DICTIONARY or typeof(d.get("faction_flags")) != TYPE_DICTIONARY or typeof(d.get("npcs_met")) != TYPE_ARRAY:
 		out.append("npc or faction state is malformed")
+	var ts: Variant = d.get("threads_state")
+	if typeof(ts) != TYPE_DICTIONARY or not (ts.has("pool") and ts.has("active") and ts.has("completed") and ts.has("refused") and ts.has("failed") and ts.has("pending")):
+		out.append("threads_state is malformed")
 	return out
 
 

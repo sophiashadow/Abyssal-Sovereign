@@ -19,7 +19,7 @@ extends RefCounted
 ##   table:<kind>  array of {"id": ref:<kind>, "weight": int > 0}
 ##   trait         a trait id implemented in src/sim/traits.gd
 
-const KINDS: Array[String] = ["statuses", "items", "species", "classes", "talents", "contracts", "factions", "npcs", "monsters", "floors"]
+const KINDS: Array[String] = ["statuses", "items", "species", "classes", "talents", "contracts", "factions", "npcs", "threads", "monsters", "floors"]
 
 ## Stats that equipment, statuses and species may modify.
 const MOD_STATS: Array[String] = [
@@ -148,6 +148,22 @@ const FIELDS := {
 		"floors": {"type": "list:ref:floors", "required": true},
 		"greeting": {"type": "text", "required": true},
 		"service": {"type": "enum:repair_curse|bless_gear|identify_rumor|barter_gear|heal_shelter|reduce_chains|contract_aid|attest_way", "required": true},
+		"provenance": {"type": "enum:canon|canon_derived|interpretation|proposed", "required": true},
+	},
+	"threads": {
+		"id": {"type": "id", "required": true},
+		"name": {"type": "string", "required": true},
+		"description": {"type": "text", "required": true},
+		"lead_text": {"type": "text", "required": true},
+		"trigger_kind": {"type": "enum:npc|floor|boss|relic|contract", "required": true},
+		"trigger_ref": {"type": "string", "required": true},
+		"faction": {"type": "ref:factions", "required": true},
+		"npc_id": {"type": "ref:npcs", "required": true},
+		"goal_kind": {"type": "enum:visit_floor|kill_monster|npc_talk|work_relic|transmute_relic|attest_contract|sacrifice_hp", "required": true},
+		"goal_ref": {"type": "string", "required": true},
+		"delay_turns": {"type": "int", "required": true, "min": 0},
+		"reward_kind": {"type": "enum:stat_point|talent_point|heal_vigor|loot_magic|reduce_chains|way_return|way_serpent|faction_pole", "required": true},
+		"refusal_effect": {"type": "enum:standing_drop|subjugation_spike|faction_shift|ambush_alert|curse_mark", "required": true},
 		"provenance": {"type": "enum:canon|canon_derived|interpretation|proposed", "required": true},
 	},
 	"monsters": {

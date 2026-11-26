@@ -123,3 +123,9 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 - **Content & Schema:** Added `"factions"` (`8` two-minded institutions with competing `pole_a`/`pole_b` flags) and `"npcs"` (`18` recurring figures with preferred floors, deterministic services, and institutional leanings) in `ContentSchema` and `ContentDB._kind_rules()`.
 - **Simulation & Save v10:** Deterministically places `"npc"` features (`_place_floor_npcs()`) per floor seed; tracks `npc_standing` (`-2..+3`), `faction_flags`, and `npcs_met` across save version `10` (`v9 -> v10` migration in `_migrate()` + validation in `SaveCheck`); implements `_interact_npc()` (`talk`, `service`, `pledge`, `refuse`, standing gating & opposing-pole shifts).
 - **UI:** Extended `Ecology` + `_show_feature()` with `"npc"` dialogue/service/pledge controls and added `_show_people()` (`p` / Pause) showing institutional splits and met NPCs.
+
+## M6.6 Additions (Threads Beneath the Record)
+
+- **Content & Sim:** Added `"threads"` schema + `content/core/threads.json` (`24` multi-stage threads) and `src/sim/threads.gd` (`Threads` selecting an Atlas-matched seeded subset of `8` per run without forced completionism).
+- **World & Save v11:** Added `threads_state` persistence (`pool`, `active`, `completed`, `refused`, `failed`, `pending`), `SAVE_VERSION := 11` (`v10 -> v11` migration + `SaveCheck`), event hooks across floor entry, boss kills, Relic Work/Transmute, contract attestation, and NPC dialogue, alternative `sacrifice` / `refuse` / `abandon` paths, and delayed aftermath ticks (`_tick_threads()`).
+- **UI:** Added non-spoiler Thread Journal overlay (`j` / Pause `"Threads"`) and NPC thread offer/resolution actions inside `_show_feature()`.

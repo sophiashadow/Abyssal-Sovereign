@@ -203,3 +203,7 @@ M6.4 expands equipment and utility breadth to `165` base items (`26` unique arti
 ## M6.5 — People, Institutions and Allegiances
 
 M6.5 populates Terra Tenebrae with `18` recurring characters across `8` two-minded institutions (no single good-versus-evil meter; backing one internal pole shifts standing with opposing members of that institution and alters service access, barter, healing, identification, Way attestations, and Subjugation relief).
+
+## M6.6 — Threads Beneath the Record
+
+M6.6 introduces `24` organic multi-stage threads (`8` drawn deterministically per run matching that seed's active Atlas branches). Threads emerge through NPC dialogue, regional thresholds, Relic draws, and Contracts—offering fulfillment, blood/barter sacrifice, explicit refusal (queuing delayed aftermath events), and abandonment consequences without a forced completionist quest log.
