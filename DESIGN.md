@@ -25,7 +25,7 @@
 - **Endings.**
   - **Victories:** Killing the Preliator Sentinel on depth 7 opens the Unwritten Door; stepping through yields **Victory: By Decree** (if `apotheosis >= 8`), **The Serpent's Way**, **The Way of Return**, or the balanced **Unwritten Door** escape.
   - **Named losses:** Deaths classify as **Gilded** (under False Light / Reckoning), **Fluent** (under Mask seizure or Eight Chains status), or **Catalogued**.
-- **Saves.** One slot (`save_version` 3, with `v1 → v2 → v3` migration), written atomically. It is deleted on death or victory.
+- **Saves.** One slot (`save_version` 8, with `v1 → v2 → ... → v8` migration), written atomically. It is deleted on death or victory.
 
 ### Origins and callings
 
@@ -59,7 +59,7 @@ Known imbalance: in the 7-sphere soak (`180 runs`, `72 wins / 40%`), Fallen Knig
 
 ## Where the mythology goes next
 
-Milestones 1–4 implemented Masks as stances, the Seven Spheres with Sphere Gates, the two Ways as victory families, the first two Eight Chains abilities, the Apotheosis guard ("By Decree"), Relics (Work or Transmute), and Named losses. Remaining mythology candidates for future depth include the remaining six Eight Chains abilities, rites/covenants between Spheres, and item identification. Each needs owner review before shipping.
+Milestones 1–5 implemented Masks as stances, the Seven Spheres with Sphere Gates, the two Ways as victory families, all Eight Chains abilities with the Subjugation clock, Divine Contracts with Lecterns of Rites, item identification/BUC/sets/artifacts, the Apotheosis guard ("By Decree"), all six EXODUS Relics (Work or Transmute), and Named losses. Milestone 6 (The Breadth Pass: The Unrecorded World) expands the Atlas, bestiary, origins/callings, armory, recurring people/institutions, procedural threads, codex, and portable worldbuilding manifest (see `docs/M6_SPEC.md`).
 
 ## M5.1 — Character Development
 

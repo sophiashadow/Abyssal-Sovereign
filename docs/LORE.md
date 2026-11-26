@@ -55,19 +55,16 @@ The expansions already label some of their own content as proposals. Where they 
 | **Apotheosis Guard & "By Decree" victory** | Canon-derived | Rulebook §10.4 ("a smaller Rex Mundi wearing your face") & EXODUS "By Decree", accepted as a hollow win by owner decision (2026-11-26). |
 | Palette: void, Lux magenta, record parchment, false-sun gold, mask hues | Canon (visual) | FALSE LIGHT visual identity. Colours are used only as hex values. |
 
-## Candidates for later milestones (not built; not canon)
+## Implemented mythology status (M2–M5.5)
 
-These turn source metaphysics into mechanics. Each needs owner review before it ships.
+The candidate metaphysics tracked during M1 have been implemented in M2–M5.5 (see rows above and provenance sections below):
+- **Masks as stances** (M2.1), **Seven Spheres & Sphere Gates** (M4), **Two Ways out & Divine Contracts** (M4, M5.5), **Eight Chains & Subjugation clock** (M2.2, M5.5), **Apotheosis Guard & "By Decree"** (M4, M5.5), **Six EXODUS Relics: Work or Transmute** (M2.3, M5.3), and **Named losses** (M2.4).
+- All newly introduced M6 locations, families, origins, callings, items, people, institutions, and threads are recorded below and in `content/lore/world_manifest.json` with explicit `Canon`, `Canon-derived`, `Interpretation`, or `Proposed` provenance tags.
 
-| Candidate | Source basis | Mechanic sketch | Open question |
-|---|---|---|---|
-| **Masks as stances** (Nyx, Eris, Lilith, the Bare Face) | Canon: rulebook §9. Each mask is a "frequency", "a department of one sovereign". | Switch stance for a turn cost. Each gives a strength and accrues its own risk: Dissolution, Isolation, Exposure, Flatline. "Governance is the true stat" (§9.5), so the skill is in switching well, not in maxing one mask. | Whether masks fit every class, or are the Occultist's core kit. The latter would also address the Occultist's balance deficit. |
-| **Seven Spheres as depth bands** | Expansion (OCCULT); the planets-as-spheres reading is the expansion's own proposal | Each band has a sphere's pressure (Moon: Hollow, Mars: Strain, Saturn: the Cage) and a gate. Gates can be passed by four methods: Stormed, Serpent's Key, Given back, By name. Each method has a different cost. | Must not imply the source's ascent is a "level-up". The gate methods are choices, not tiers. |
-| **Two ways out**: the Serpent's way and the Way of Return | Expansion (OCCULT, EXODUS) | Two alternative victory families with distinct rites: Refusal, the Taken Name, the Crown Taken; versus the Fast, the Vow of Poverty, the Vow to the Named. Walking between them is allowed, as in the source. | Keep both accounts possible. The game never declares which account is true. |
-| **Eight Chains as an enemy grammar** | Canon: rulebook §14 | Enemy abilities drawn from the coercion grammar: isolation (separates you from allies or light), monopolising perception (fog), induced debility, threats, indulgences, displays of omnipotence, degradation, trivial demands. A Subjugation clock ends in Entangled. | Present these as systemic forces of Rex Mundi's order, never as depictions of real people. |
-| **Apotheosis guard** | Canon: rulebook §10.4 ("a smaller Rex Mundi wearing your face") | A hidden track that rises with unchecked power. At high values the game stops rewarding you. Reset by orientation plus witness. | See the owner decision below. |
-| **Relics: Work or Transmute** | Expansion (EXODUS): the Confessor's Glass, the Ophite Key, the Broken Halo, the Severed Crown, the Ward-Keeper's Lamp, the Almoner's Purse | Each relic has two uses: work it (power with a cost) or transmute it (give up the power for something lasting) | Relic effects are Proposed. Only names and the two-use frame are sourced. |
-| **Losses with names** | Expansion (EXODUS): Catalogued, Fluent, Gilded | Death screens that name how the record won, beyond hit points | None |
+## Open candidate questions (not settled without owner decision)
+
+- Whether the Architect knows anything is above it (the Serpent's account vs. Wisdom's account vs. the Unsaid) remains explicitly ambiguous in play.
+- Proposed M6 expansions (branches, monster archetypes, new origins/callings, PR #300 people/factions/threads) remain tagged **Proposed** pending owner canon review.
 
 ## Owner decisions
 

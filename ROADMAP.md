@@ -10,8 +10,8 @@ Everything in the M1 brief is implemented. The automated evidence is the headles
 
 ### Known defects and limits
 
-- **Occultist & Assassin balance (7 Spheres):** Fallen Knight leads in bot soak runs (`49/60` vs. `17/60` Assassin and `6/60` Occultist on 7 floors), as the soak bot does not kite, exploit Nyx/Lilith tactics, or work relics.
-- **Ranged play:** there are no ranged attacks, spells or doors (other than the sealed one), and there is no item identification.
+- **Occultist & Assassin balance (7 Spheres):** *(Resolved in M5.1–M5.5)* M4 saw Fallen Knight lead `49/60` vs. Assassin `17/60` and Occultist `6/60`; after M5.5 Depth Pass, the held-out soak reaches `110/135` (`81%`) with balanced callings (`Knight 29/45`, `Occultist 40/45`, `Assassin 41/45`).
+- **Ranged play & identification:** *(Resolved in M5.2–M5.3)* Ranged slot, thrown projectiles, occult scrolls, secret doors, and consumable/gear identification are implemented.
 - **Typography and accessibility:** the glyph font is the engine default (proportional, centred per cell). A dedicated monospace font needs a license check first. There is no colour-blind palette option and no screen-reader support.
 - **Unverified runtimes:** Windows runtime, Web browser `user://` persistence, physical Android device install/touch/kill-save test, and Android release signing are `NOT_RUN`.
 

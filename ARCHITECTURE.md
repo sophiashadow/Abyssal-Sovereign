@@ -3,11 +3,11 @@
 ## Layers
 
 ```
-content/core/*.json        data: species, classes, items, monsters, statuses, floors
+content/core/*.json        data: species, classes, talents, contracts, items, monsters, statuses, floors
 src/core/                  Rng (seeded, saveable), Dice, Grid helpers
 src/content/               ContentSchema (field rules), ContentDB (load, validate, look up)
 src/gen/                   DungeonGen: pure function (floor def, seed) -> FloorMap + spawn plan
-src/sim/                   World, Actor, Item, FloorMap, Tiles, Traits, Masks, Fov, Pathing, Combat
+src/sim/                   World, Actor, Item, Affixes, ItemSets, Ecology, FloorMap, Tiles, Traits, Masks, Fov, Pathing, Combat
 src/persistence/           SaveIO (atomic file), SaveCheck (structural validation)
 src/ui/                    main.gd (screens, input, autosave), MapView, Palette, GameSettings
 tests/                     headless suite, helpers, AutoPlayer bot
@@ -31,7 +31,7 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 
 ## Saves
 
-- **Format.** `user://run.save.json`, holding a `save_version` (currently 3; v1 and v2 saves migrate automatically), run state, all visited floors, and the log. Terrain and exploration are base64 byte arrays.
+- **Format.** `user://run.save.json`, holding a `save_version` (currently 8; v1–v7 saves migrate automatically), run state, all visited floors, and the log. Terrain and exploration are base64 byte arrays.
 - **Writes are atomic:** the save goes to `.tmp`, then is renamed.
 - **Loading.**
   1. Parse the JSON.
