@@ -2,7 +2,7 @@
 
 An original turn-based traditional roguelike set beneath Terra Tenebrae, in the cosmology of FALSE LIGHT. It is built with Godot 4 and typed GDScript, and plays fully offline.
 
-**Status: Milestone 1, playable on Linux desktop.** It has a title screen and character creation (3 origins × 3 callings) and a seeded three-floor descent. Gameplay covers:
+**Status: Milestone 2 complete; Milestone 3 export presets & builds ready on Linux.** It has a title screen and character creation (3 origins × 3 callings) and a seeded three-floor descent. Gameplay covers:
 
 - Field of view with exploration memory.
 - Melee combat, XP and levels.
@@ -12,7 +12,7 @@ An original turn-based traditional roguelike set beneath Terra Tenebrae, in the 
 - A victory through the Unwritten Door.
 - Permadeath with save and resume.
 
-Android, Windows and Web builds have not been produced yet (see [ROADMAP.md](ROADMAP.md)).
+Android, Windows and Web builds can be exported via `tools/export.sh` (see [ROADMAP.md](ROADMAP.md); Windows, Web browser `user://` persistence, and physical Android device runtime tests have not run yet). Any distributed export must ship Godot's license notices.
 
 ## Run it
 
@@ -22,6 +22,8 @@ The game requires Godot **4.7.2** (standard build, not .NET).
 godot --path .                 # play
 tools/test.sh                  # headless test suite (exit 0 = all passed)
 tools/test.sh test_save        # one test file
+tools/export.sh                # export Linux, Windows, and Web builds into build/
+tools/export.sh all            # also export Android debug APK into build/android/
 godot --headless --path . --script res://tools/soak.gd -- --seeds=20            # balance soak
 xvfb-run -a godot --path . --audio-driver Dummy --script res://tools/ui_smoke.gd # UI smoke (needs a display)
 ```

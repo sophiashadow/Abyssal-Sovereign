@@ -5,12 +5,13 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 ## State as of 2026-11-26
 
 - **Branch:** `ccr-c6f8b898-fu2jtp` on `origin` (github.com/sophiashadow/Abyssal-Sovereign). Not merged; no default branch exists yet. Creating `main` or a PR is an owner decision.
-- **Milestones:** M0 (foundations), M1 (playable three-floor slice), and M2 (Masks as stances, Eight Chains abilities, Relics, Named losses) are implemented and tested on Linux, from source.
+- **Milestones:** M0 (foundations), M1 (playable three-floor slice), M2 (Masks as stances, Eight Chains abilities, Relics, Named losses), and M3 (export presets + Linux/Windows/Web/Android-debug builds) are implemented.
 - **Last verified (local, Linux):**
   - `tools/test.sh`: 71 tests, 71 passed, 0 failed, 1392 checks.
   - `tools/ui_smoke.gd` (`1280×720` and `2340×1080` phone settings): 21 steps, 0 failures.
   - `tools/soak.gd --salt=heldout`: bot wins 39% of 180 runs.
-- **NOT_RUN:** any export build (Linux, Android, Windows, Web), any device test, any human playtest. There is no CI.
+  - `tools/export.sh all`: built `build/linux/abyssal-sovereign.x86_64` (71M, smoke-tested with `--audio-driver Dummy --quit-after 30`), `build/windows/abyssal-sovereign.exe` (105M), `build/web/index.html` (39M total), and `build/android/abyssal-sovereign-debug.apk` (56M, debug-signed, contains `assets/content/core/classes.json`).
+- **NOT_RUN:** Windows runtime, Web browser `user://` persistence test, physical Android device test, release-signed Android APK, any human playtest. There is no CI.
 
 ## Setup
 
@@ -34,9 +35,9 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 3. ~~**Relics, worked or transmuted**~~ (`kind: "relic"` schema + `Confessor's Glass`, `Ophite Key`, `Broken Halo` in `items.json` / `floors.json`, `player_work_relic` / `player_transmute_relic` in `World`, UI buttons in `main.gd`, tests in `tests/test_items.gd`).
 4. ~~**Named losses**~~ (`World.named_loss()` classifying `Gilded`, `Fluent`, and `Catalogued` on the death screen, tests in `tests/test_turns.gd`).
 
-## Next assignment: Milestone 3 (platforms) or Milestone 4 (depth)
+## Next assignment: Milestone 4 (depth) and Milestone 3 remaining verification
 
-- **Milestone 3 (platforms):** Linux export preset and build; Android debug APK (needs owner SDK license acceptance); release signing (owner keystore outside repo); Windows and Web exports.
+- **Milestone 3 remaining:** Test Windows binary on Windows, verify Web `user://` IndexedDB persistence in a browser, test the Android debug APK on a physical device (touch, back button, autosave on kill), and configure release signing with an owner-created keystore outside the repo.
 - **Milestone 4 (depth):** Seven Spheres as depth bands with gates, the two Ways as alternative victories, and the Apotheosis ("By Decree") guard/victory.
 
 Smaller known defects (fixed 2026-11-26):

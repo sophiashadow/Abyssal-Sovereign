@@ -25,12 +25,12 @@ Everything in the M1 brief is implemented. The automated evidence is the headles
 
 Owner decisions resolved 2026-11-26 (see [docs/LORE.md](docs/LORE.md)): Apotheosis ("By Decree") can be a win; the Unwritten Door, origins, and callings are canon.
 
-## Milestone 3: platforms
+## Milestone 3: platforms (presets & local builds done 2026-11-26)
 
-1. **Linux export preset and build.**
-2. **Android debug APK.** Needs Godot export templates and the Android SDK; SDK license acceptance is an owner decision. Then a device test of touch, back button and autosave on kill.
-3. **Release signing.** Needs a keystore the owner creates and keeps outside the repo.
-4. **Windows and Web exports.** Web needs a check of `user://` persistence.
+1. **Linux export preset and build:** Done (`build/linux/abyssal-sovereign.x86_64`, verified launching cleanly).
+2. **Android debug APK:** Done (`build/android/abyssal-sovereign-debug.apk`, aligned & debug-signed; physical device test `NOT_RUN`).
+3. **Release signing:** Needs a keystore the owner creates and keeps outside the repo.
+4. **Windows and Web exports:** Done (`build/windows/abyssal-sovereign.exe`, `build/web/index.html`; Windows runtime and Web browser `user://` persistence `NOT_RUN`).
 
 ## Milestone 4: depth
 

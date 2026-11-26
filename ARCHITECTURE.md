@@ -31,7 +31,7 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 
 ## Saves
 
-- **Format.** `user://run.save.json`, holding a `save_version` (currently 1), run state, all visited floors, and the log. Terrain and exploration are base64 byte arrays.
+- **Format.** `user://run.save.json`, holding a `save_version` (currently 2; v1 saves migrate automatically), run state, all visited floors, and the log. Terrain and exploration are base64 byte arrays.
 - **Writes are atomic:** the save goes to `.tmp`, then is renamed.
 - **Loading.**
   1. Parse the JSON.
@@ -55,6 +55,6 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 
 ## Platform notes
 
-- **Linux:** run from source with Godot 4.7.2 (tested here). No export preset yet.
-- **Android:** landscape sensor orientation is set. Touch controls default on for touch devices. The back button opens the menu and closes overlays. Autosave on pause covers process kills. No APK has been built: export templates, the SDK and a signing key are needed (see ROADMAP).
-- **Windows / Web:** no platform-specific code. Neither has been built or tested. On Web, Quit is hidden, and `user://` maps to IndexedDB.
+- **Linux:** run from source with Godot 4.7.2 or exported via `tools/export.sh linux` (`build/linux/abyssal-sovereign.x86_64` verified launching cleanly).
+- **Android:** landscape sensor orientation is set, and `import_etc2_astc` is enabled in `project.godot`. Touch controls default on for touch devices. The back button opens the menu and closes overlays. Autosave on pause covers process kills. Debug APK builds via `tools/export.sh android` (`build/android/abyssal-sovereign-debug.apk`); physical device testing and release signing remain `NOT_RUN`.
+- **Windows / Web:** no platform-specific code. Exported via `tools/export.sh windows web` (`build/windows/abyssal-sovereign.exe` and `build/web/index.html`). On Web, Quit is hidden, and `user://` maps to IndexedDB (browser runtime/persistence `NOT_RUN`; Windows runtime `NOT_RUN`).
