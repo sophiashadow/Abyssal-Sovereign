@@ -146,6 +146,28 @@ Divine contracts (rites of the Two Ways). One may be held at a time; the oath is
 | `floors` | int ≥ 1 | yes | new floors descended with the oath intact to fulfil it |
 | `apotheosis` | int | no | change to Apotheosis when signed |
 
+## factions
+
+| Field | Type | Req | Notes |
+|---|---|---|---|
+| `id`, `name`, `description` | | yes | |
+| `pole_a`, `pole_a_label` | id, string | yes | first internal division within the institution |
+| `pole_b`, `pole_b_label` | id, string | yes | competing internal division within the institution |
+| `provenance` | enum: canon, canon_derived, interpretation, proposed | yes | canon status tag |
+
+## npcs
+
+| Field | Type | Req | Notes |
+|---|---|---|---|
+| `id`, `name` | | yes | |
+| `role` | string | yes | title or calling (e.g. Stitcher, Marshal) |
+| `faction` | ref:factions | yes | institution the character navigates |
+| `faction_pole` | id | yes | matches `pole_a` or `pole_b` of `faction` |
+| `floors` | list:ref:floors | yes | Spine or branch floors where they may appear |
+| `greeting` | text | yes | contextual dialogue line |
+| `service` | enum: repair_curse, bless_gear, identify_rumor, barter_gear, heal_shelter, reduce_chains, contract_aid, attest_way | yes | deterministic encounter service |
+| `provenance` | enum: canon, canon_derived, interpretation, proposed | yes | canon status tag |
+
 ## monsters
 
 Monster `tags` that drive the Eight Chains grammar: `chain_isolation`, `chain_fog`, `chain_debility`, `chain_threat`, `chain_indulgence`, `chain_omnipotence`, `chain_degradation`, `chain_trivial`. Each hit on the player may apply that chain; every chain advances the Subjugation clock.

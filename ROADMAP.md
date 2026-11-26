@@ -89,4 +89,8 @@ M5 (The Depth Pass: M5.1–M5.5) is complete.
 
 1. **165 Base Items, 46 Affixes, 12 Sets, 26 Artifacts, 16 Relics:** Expanded `items.json`, `Affixes`, `ItemSets` (with `subjugation_cap_bonus`), 15 new scroll spells in `World._cast_scroll()`, and distributed loot pools across all 28 `floors.json` tables.
 
-Remaining M6 submilestones track M6.5–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.
+## Milestone 6.5: People, Institutions and Allegiances (done 2026-11-26)
+
+1. **18 Recurring NPCs & 8 Divided Institutions (`SAVE_VERSION := 10`):** Added `"factions"` and `"npcs"` content packs, deterministic floor placement, `npc_standing` (`-2..+3`) and `faction_flags` persistence (`v9 -> v10` migration), 8 deterministic NPC service types, and People & Institutions overlay (`p`).
+
+Remaining M6 submilestones track M6.6–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.

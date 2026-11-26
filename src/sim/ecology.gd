@@ -99,6 +99,8 @@ static func glyph(feat: Dictionary) -> String:
 			return "!"
 		"ward_sigil":
 			return "*"
+		"npc":
+			return "N"
 	return "?"
 
 
@@ -126,6 +128,8 @@ static func color(feat: Dictionary) -> String:
 			return "#ff7a33"
 		"ward_sigil":
 			return "#c77dff"
+		"npc":
+			return "#78bea7"
 	return "#eee5d3"
 
 
@@ -152,6 +156,8 @@ static func label(feat: Dictionary) -> String:
 			return "Trial Bell Monolith" + (" (rung)" if bool(feat.get("used", false)) else "")
 		"ward_sigil":
 			return "Ophite Ward-Sigil"
+		"npc":
+			return String(feat.get("npc_name", feat.get("sub", "Unrecorded Traveler")))
 	return "feature"
 
 
@@ -177,6 +183,8 @@ static func description(feat: Dictionary) -> String:
 			return "An iron bell inscribed 'RING TO PROVE WORTH'. Summons an ambush for elite plunder and growth."
 		"ward_sigil":
 			return "A humming geometric ward that strikes adjacent foes with Void."
+		"npc":
+			return "A recurring soul navigating Terra Tenebrae's competing institutions."
 	return ""
 
 
@@ -186,6 +194,6 @@ static func is_interactive(feat: Dictionary) -> bool:
 	var k := String(feat.get("kind", ""))
 	if k == "trap":
 		return false
-	if bool(feat.get("used", false)) and k != "merchant":
+	if bool(feat.get("used", false)) and not (k in ["merchant", "npc"]):
 		return false
 	return true

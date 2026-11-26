@@ -41,6 +41,8 @@ static func problems(d: Dictionary, db: ContentDB) -> PackedStringArray:
 		out.append("floor_id is missing or unknown")
 	if typeof(d.get("atlas")) != TYPE_DICTIONARY or typeof(d.get("visited_floors")) != TYPE_ARRAY or int(d.get("max_sphere_reached", 0)) < 1:
 		out.append("atlas or visited_floors state is malformed")
+	if typeof(d.get("npc_standing")) != TYPE_DICTIONARY or typeof(d.get("faction_flags")) != TYPE_DICTIONARY or typeof(d.get("npcs_met")) != TYPE_ARRAY:
+		out.append("npc or faction state is malformed")
 	return out
 
 

@@ -117,3 +117,9 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 - **Content:** Expanded `content/core/items.json` to `165` base items (`27` melee, `23` ranged/implements, `22` armor, `22` amulets including `26` unique artifacts; `18` heal/status consumables, `14` projectiles/bombs, `20` scrolls, `3` keys, `16` relics) and `statuses.json` with 17 consumable/scroll/relic statuses; updated `floors.json` loot tables.
 - **Affixes & Sets:** Expanded `Affixes` (`24` prefixes + `22` suffixes = `46` affixes, `24` potion & `24` scroll disguise aliases) and `ItemSets` (`12` sets with 2pc/3pc bonuses including `subjugation_cap_bonus` wired into `World.chain_limit()`).
 - **Simulation:** Added `15` new scroll spells in `World._cast_scroll()`, side-effects for new relics in `World.player_work_relic()`, and generic `kind == "key"` unlocking at `vault_gate`s.
+
+## M6.5 Additions (People, Institutions and Allegiances)
+
+- **Content & Schema:** Added `"factions"` (`8` two-minded institutions with competing `pole_a`/`pole_b` flags) and `"npcs"` (`18` recurring figures with preferred floors, deterministic services, and institutional leanings) in `ContentSchema` and `ContentDB._kind_rules()`.
+- **Simulation & Save v10:** Deterministically places `"npc"` features (`_place_floor_npcs()`) per floor seed; tracks `npc_standing` (`-2..+3`), `faction_flags`, and `npcs_met` across save version `10` (`v9 -> v10` migration in `_migrate()` + validation in `SaveCheck`); implements `_interact_npc()` (`talk`, `service`, `pledge`, `refuse`, standing gating & opposing-pole shifts).
+- **UI:** Extended `Ecology` + `_show_feature()` with `"npc"` dialogue/service/pledge controls and added `_show_people()` (`p` / Pause) showing institutional splits and met NPCs.

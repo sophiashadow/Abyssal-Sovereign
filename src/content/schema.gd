@@ -19,7 +19,7 @@ extends RefCounted
 ##   table:<kind>  array of {"id": ref:<kind>, "weight": int > 0}
 ##   trait         a trait id implemented in src/sim/traits.gd
 
-const KINDS: Array[String] = ["statuses", "items", "species", "classes", "talents", "contracts", "monsters", "floors"]
+const KINDS: Array[String] = ["statuses", "items", "species", "classes", "talents", "contracts", "factions", "npcs", "monsters", "floors"]
 
 ## Stats that equipment, statuses and species may modify.
 const MOD_STATS: Array[String] = [
@@ -128,6 +128,27 @@ const FIELDS := {
 		"reward_mods": {"type": "mods", "required": true},
 		"floors": {"type": "int", "required": true, "min": 1},
 		"apotheosis": {"type": "int", "required": false},
+	},
+	"factions": {
+		"id": {"type": "id", "required": true},
+		"name": {"type": "string", "required": true},
+		"description": {"type": "text", "required": true},
+		"pole_a": {"type": "id", "required": true},
+		"pole_a_label": {"type": "string", "required": true},
+		"pole_b": {"type": "id", "required": true},
+		"pole_b_label": {"type": "string", "required": true},
+		"provenance": {"type": "enum:canon|canon_derived|interpretation|proposed", "required": true},
+	},
+	"npcs": {
+		"id": {"type": "id", "required": true},
+		"name": {"type": "string", "required": true},
+		"role": {"type": "string", "required": true},
+		"faction": {"type": "ref:factions", "required": true},
+		"faction_pole": {"type": "id", "required": true},
+		"floors": {"type": "list:ref:floors", "required": true},
+		"greeting": {"type": "text", "required": true},
+		"service": {"type": "enum:repair_curse|bless_gear|identify_rumor|barter_gear|heal_shelter|reduce_chains|contract_aid|attest_way", "required": true},
+		"provenance": {"type": "enum:canon|canon_derived|interpretation|proposed", "required": true},
 	},
 	"monsters": {
 		"id": {"type": "id", "required": true},

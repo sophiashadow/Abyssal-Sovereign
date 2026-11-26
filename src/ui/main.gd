@@ -864,6 +864,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_act_interact()
 	elif k.keycode == KEY_TAB:
 		_show_atlas()
+	elif k.keycode == KEY_P:
+		_show_people()
 	elif k.keycode >= KEY_1 and k.keycode <= KEY_6:
 		var idx := k.keycode - KEY_1
 		var acts := world.learned_active_talents()
@@ -1063,6 +1065,35 @@ func _show_feature(feat: Dictionary) -> void:
 				_close_overlay()
 				world.player_interact(pos, "ring")
 				_after_action()))
+		"npc":
+			var nid := String(feat.get("sub", ""))
+			if db.has("npcs", nid):
+				var ndef := db.get_def("npcs", nid)
+				var fdef := db.get_def("factions", String(ndef["faction"]))
+				var st := world.npc_standing_of(nid)
+				col.add_child(_label("%s  (Standing %+d)" % [String(fdef["name"]), st], Palette.GOLD, 0.85))
+				col.add_child(_label("\"%s\"" % String(ndef["greeting"]), Palette.TEXT, 0.88))
+				col.add_child(_btn("Speak & ask counsel", func() -> void:
+					_close_overlay()
+					world.player_interact(pos, "talk")
+					_after_action()))
+				var svc_btn := _btn("Accept help (%s)" % String(ndef["service"]).replace("_", " "), func() -> void:
+					_close_overlay()
+					world.player_interact(pos, "service")
+					_after_action())
+				if st <= -2 or bool(feat.get("used", false)):
+					svc_btn.disabled = true
+				col.add_child(svc_btn)
+				var pole_id := String(ndef["faction_pole"])
+				var pole_lbl := String(fdef["pole_a_label"] if pole_id == String(fdef["pole_a"]) else fdef["pole_b_label"])
+				col.add_child(_btn("Back their pole (%s)" % pole_lbl, func() -> void:
+					_close_overlay()
+					world.player_interact(pos, "pledge")
+					_after_action()))
+				col.add_child(_btn("Refuse their ledger (-standing)", func() -> void:
+					_close_overlay()
+					world.player_interact(pos, "refuse")
+					_after_action()))
 	col.add_child(_btn("Leave", _close_overlay))
 
 
@@ -1187,6 +1218,34 @@ func _show_atlas() -> void:
 	close.call_deferred("grab_focus")
 
 
+func _show_people() -> void:
+	if world == null or world.state != World.State.PLAYING:
+		return
+	var col := _open_overlay("People & Institutions", Palette.FALSE_SUN)
+	col.add_child(_label("Two-minded institutions (no single moral ledger):", Palette.GOLD, 0.88))
+	for fid in db.ids("factions"):
+		var fdef := db.get_def("factions", fid)
+		var pole := world.faction_pole_of(fid)
+		var leaning := "Uncommitted (%s vs %s)" % [String(fdef["pole_a_label"]), String(fdef["pole_b_label"])]
+		if pole == String(fdef["pole_a"]):
+			leaning = "Leaning: " + String(fdef["pole_a_label"])
+		elif pole == String(fdef["pole_b"]):
+			leaning = "Leaning: " + String(fdef["pole_b_label"])
+		col.add_child(_label("  %s — %s" % [String(fdef["name"]), leaning], Palette.TEXT if pole != "" else Palette.TEXT_DIM, 0.84))
+	col.add_child(_label("Met below (%d/%d known):" % [world.npcs_met.size(), db.ids("npcs").size()], Palette.GOLD, 0.88))
+	if world.npcs_met.is_empty():
+		col.add_child(_label("  No recurring figures spoken with yet.", Palette.TEXT_DIM, 0.82))
+	else:
+		for nid in world.npcs_met:
+			if db.has("npcs", nid):
+				var ndef := db.get_def("npcs", nid)
+				var st := world.npc_standing_of(nid)
+				col.add_child(_label("  %s (%s) — standing %+d" % [String(ndef["name"]), String(ndef["role"]), st], Palette.TEXT, 0.82))
+	var close := _btn("Close", _close_overlay)
+	col.add_child(close)
+	close.call_deferred("grab_focus")
+
+
 func _show_pause() -> void:
 	if world == null or world.state != World.State.PLAYING:
 		return
@@ -1196,6 +1255,7 @@ func _show_pause() -> void:
 	var resume := _btn("Resume", _close_overlay)
 	col.add_child(resume)
 	col.add_child(_btn("Atlas", _show_atlas))
+	col.add_child(_btn("People & Institutions", _show_people))
 	col.add_child(_btn("Settings", func() -> void: _show_settings(_build_game_screen)))
 	col.add_child(_btn("Save and return to title", func() -> void:
 		_autosave()

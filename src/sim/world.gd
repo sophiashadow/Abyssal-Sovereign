@@ -10,7 +10,7 @@ extends RefCounted
 ## id 1, so the player wins ties. Player actions return true if they spent
 ## time; the world then runs monsters until it is the player's turn again.
 
-const SAVE_VERSION := 9
+const SAVE_VERSION := 10
 const SUBJUGATION_LIMIT := 6
 ## Eight Chains grammar: monster tag -> status laid on the player and chance per hit.
 ## (chain_fog is delivered by the litany in _monster_turn.)
@@ -67,6 +67,9 @@ var next_entity_id: int = 2
 var id_known: Dictionary = {}
 var id_aliases: Dictionary = {}
 var spawned_uniques: Array[String] = []
+var npc_standing: Dictionary = {} # npc_id -> int (-2..+3)
+var faction_flags: Dictionary = {} # faction_id -> active pole id
+var npcs_met: Array[String] = []
 var messages: Array[Dictionary] = []
 ## Bumped whenever messages change, so the UI can redraw lazily.
 var log_serial: int = 0
@@ -453,7 +456,72 @@ func _build_floor_by_id(fid: String) -> FloorMap:
 			it.pos = s["pos"]
 			m.items.append(it)
 	m.spawns.clear()
+	_place_floor_npcs(m, fd)
 	return m
+
+
+func _free_npc_spot(m: FloorMap, nrng: Rng) -> Vector2i:
+	var candidates: Array[Vector2i] = []
+	for r in m.rooms:
+		for y in range(r.position.y + 1, r.end.y - 1):
+			for x in range(r.position.x + 1, r.end.x - 1):
+				var p := Vector2i(x, y)
+				if not (m.get_tile(p) in [Tiles.FLOOR, Tiles.SANCTUARY_FLOOR]):
+					continue
+				if p == m.up_pos or p == m.down_pos or p == m.exit_pos:
+					continue
+				if not m.feature_at(p).is_empty() or m.actor_at(p) != null:
+					continue
+				candidates.append(p)
+	if candidates.is_empty():
+		return Vector2i(-1, -1)
+	return candidates[nrng.range_i(0, candidates.size() - 1)]
+
+
+func _place_floor_npcs(m: FloorMap, fd: Dictionary) -> void:
+	var fid := String(fd["id"])
+	var npc_pool: Array[String] = []
+	for nid in db.ids("npcs"):
+		var flist: Array = db.get_def("npcs", nid).get("floors", [])
+		if flist.has(fid):
+			npc_pool.append(String(nid))
+	if npc_pool.is_empty():
+		return
+	npc_pool.sort()
+	var nrng := Rng.new(_floor_seed_for(fid) ^ 0x4E5043)
+	var count := 2 if String(fd.get("region_kind", "")) == "settlement" and npc_pool.size() >= 2 else 1
+	for _i in count:
+		if npc_pool.is_empty():
+			break
+		var nid := String(nrng.pick(npc_pool))
+		npc_pool.erase(nid)
+		var spot := _free_npc_spot(m, nrng)
+		if spot.x < 0:
+			break
+		var ndef := db.get_def("npcs", nid)
+		m.features.append({
+			"kind": "npc",
+			"sub": nid,
+			"npc_name": "%s (%s)" % [String(ndef["name"]), String(ndef["role"])],
+			"x": spot.x, "y": spot.y,
+			"revealed": true, "used": false,
+		})
+
+
+func npc_standing_of(npc_id: String) -> int:
+	return int(npc_standing.get(npc_id, 0))
+
+
+func faction_pole_of(faction_id: String) -> String:
+	return String(faction_flags.get(faction_id, ""))
+
+
+func adjust_npc_standing(npc_id: String, delta: int) -> void:
+	npc_standing[npc_id] = clampi(npc_standing_of(npc_id) + delta, -2, 3)
+
+
+func set_faction_pole(faction_id: String, pole: String) -> void:
+	faction_flags[faction_id] = pole
 
 
 func _enter_floor(d: int, arriving_from_above: bool) -> void:
@@ -2434,6 +2502,120 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 			player.stat_points += 1
 			log_msg("The Trial Bell tolls! Guards rush out—and you gain +1 attribute point.", "lore")
 			return _finish_player_action(COST_WAIT)
+		"npc":
+			return _interact_npc(pos, f, choice)
+	return false
+
+
+func _interact_npc(pos: Vector2i, f: Dictionary, choice: String) -> bool:
+	var nid := String(f.get("sub", ""))
+	if not db.has("npcs", nid):
+		return false
+	var ndef := db.get_def("npcs", nid)
+	var fid := String(ndef["faction"])
+	var fdef := db.get_def("factions", fid)
+	var pole := String(ndef["faction_pole"])
+	if not npcs_met.has(nid):
+		npcs_met.append(nid)
+	if choice == "talk" or choice == "":
+		var pole_label := String(fdef["pole_a_label"] if pole == String(fdef["pole_a"]) else fdef["pole_b_label"])
+		log_msg("%s: \"%s\" (%s — %s)" % [String(ndef["name"]), String(ndef["greeting"]), String(fdef["name"]), pole_label], "lore")
+		if not npc_standing.has(nid):
+			npc_standing[nid] = 1 if faction_pole_of(fid) == pole else 0
+		return _finish_player_action(COST_WAIT)
+	if choice == "pledge":
+		set_faction_pole(fid, pole)
+		adjust_npc_standing(nid, 1)
+		for other_id in db.ids("npcs"):
+			if other_id != nid and String(db.get_def("npcs", other_id)["faction"]) == fid:
+				if String(db.get_def("npcs", other_id)["faction_pole"]) != pole and npcs_met.has(other_id):
+					adjust_npc_standing(other_id, -1)
+		var pole_label := String(fdef["pole_a_label"] if pole == String(fdef["pole_a"]) else fdef["pole_b_label"])
+		log_msg("You align with %s (%s). %s nods slowly." % [String(fdef["name"]), pole_label, String(ndef["name"])], "lore")
+		return _finish_player_action(COST_WAIT)
+	if choice == "refuse":
+		adjust_npc_standing(nid, -1)
+		var opp := String(fdef["pole_b"] if pole == String(fdef["pole_a"]) else fdef["pole_a"])
+		set_faction_pole(fid, opp)
+		log_msg("You refuse %s's counsel; they close their ledger against you." % String(ndef["name"]), "info")
+		return _finish_player_action(COST_WAIT)
+	if choice == "service":
+		if npc_standing_of(nid) <= -2:
+			log_msg("%s turns away and refuses all assistance." % String(ndef["name"]), "danger")
+			return false
+		if bool(f.get("used", false)):
+			log_msg("%s has already extended their help on this floor." % String(ndef["name"]), "info")
+			return false
+		var st_bonus := 1 if npc_standing_of(nid) >= 2 else 0
+		match String(ndef["service"]):
+			"repair_curse":
+				var freed := unbind_curses(true)
+				if freed == 0:
+					log_msg("%s finds your gear uncursed and reinforces a seam (+%d HP healed)." % [String(ndef["name"]), 2 + st_bonus * 2], "good")
+					player.hp = mini(player.stat("max_hp"), player.hp + 2 + st_bonus * 2)
+				else:
+					log_msg("%s strips every iron lock and binding from your gear." % String(ndef["name"]), "good")
+			"bless_gear":
+				var blessed_any := false
+				for slot in Actor.SLOTS:
+					var eq_it := player.equipped(slot)
+					if eq_it != null and eq_it.buc != "blessed":
+						eq_it.buc = "blessed"
+						eq_it.identified = true
+						log_msg("%s blesses your %s." % [String(ndef["name"]), item_name(eq_it)], "good")
+						blessed_any = true
+						break
+				if not blessed_any:
+					player.resource = mini(player.max_resource(), player.resource + 4)
+					log_msg("%s oils your kit (+4 %s)." % [String(ndef["name"]), player.resource_label()], "good")
+			"identify_rumor":
+				var id_n := identify_pack()
+				for feat in current_floor().features:
+					feat["revealed"] = true
+				update_fov()
+				log_msg("%s reads the margins (%d item%s identified, floor secrets marked)." % [String(ndef["name"]), id_n, "" if id_n == 1 else "s"], "good")
+			"barter_gear":
+				var table: Array = current_floor_def().get("item_table", [])
+				if not table.is_empty():
+					var gift := _new_item(rng.pick_weighted(table))
+					Affixes.roll_equipment(gift, db, depth + 1 + st_bonus, rng, true)
+					gift.identified = true
+					if String(gift.def(db)["kind"]) == "consumable":
+						id_known[gift.template_id] = true
+					if _can_carry(player, gift):
+						_add_to_inventory(player, gift)
+					else:
+						gift.pos = pos
+						current_floor().items.append(gift)
+					log_msg("%s trades salvaged stock: %s." % [String(ndef["name"]), item_name(gift)], "good")
+			"heal_shelter":
+				var heal := maxi(6, player.stat("max_hp") / 2) + st_bonus * 3
+				player.hp = mini(player.stat("max_hp"), player.hp + heal)
+				for neg in ["bleeding", "burning", "reckoning"]:
+					_remove_status(player, neg)
+				log_msg("%s tends your wounds under cover (+%d HP)." % [String(ndef["name"]), heal], "good")
+			"reduce_chains":
+				for cid in ["demanded", "dread", "debility", "degradation", "perception_fog", "entangled"]:
+					_remove_status(player, cid)
+				subjugation = maxi(0, subjugation - (2 + st_bonus))
+				log_msg("%s slips the garrison watch; Subjugation eases." % String(ndef["name"]), "good")
+			"contract_aid":
+				if contract != "":
+					_advance_contract()
+					log_msg("%s notches a quiet tally toward your active contract." % String(ndef["name"]), "good")
+				else:
+					apotheosis = maxi(0, apotheosis - 1)
+					log_msg("%s files down a false decree (-1 apotheosis)." % String(ndef["name"]), "good")
+			"attest_way":
+				if faction_pole_of(fid) == String(fdef["pole_b"]):
+					way_serpent += 1 + st_bonus
+					log_msg("%s cuts a marginal mark toward the Serpent's Way." % String(ndef["name"]), "lore")
+				else:
+					way_return += 1 + st_bonus
+					log_msg("%s witnesses your stance toward the Way of Return." % String(ndef["name"]), "lore")
+		f["used"] = true
+		adjust_npc_standing(nid, 1)
+		return _finish_player_action(COST_ITEM)
 	return false
 
 
@@ -3222,6 +3404,9 @@ func to_dict() -> Dictionary:
 		"contract_progress": contract_progress, "contract_log": contract_log.duplicate(true),
 		"id_aliases": id_aliases.duplicate(true),
 		"uniques": spawned_uniques.duplicate(),
+		"npc_standing": npc_standing.duplicate(true),
+		"faction_flags": faction_flags.duplicate(true),
+		"npcs_met": npcs_met.duplicate(),
 		"rng": rng.get_state_string(),
 		"player": player.to_dict(),
 		"floors": fl,
@@ -3363,6 +3548,12 @@ static func _migrate(d: Dictionary) -> Dictionary:
 			out["floors"] = new_floors
 		if not out.has("visited_floors"):
 			out["visited_floors"] = visited if not visited.is_empty() else [out["floor_id"]]
+		ver = 9
+	if ver == 9:
+		out["save_version"] = 10
+		out["npc_standing"] = out.get("npc_standing", {})
+		out["faction_flags"] = out.get("faction_flags", {})
+		out["npcs_met"] = out.get("npcs_met", [])
 	return out
 
 
@@ -3446,6 +3637,10 @@ static func from_dict(content: ContentDB, d: Dictionary, errors: PackedStringArr
 		w.contract = ""
 	for u in d.get("uniques", []):
 		w.spawned_uniques.append(String(u))
+	w.npc_standing = Actor._ints(d.get("npc_standing", {}))
+	w.faction_flags = d.get("faction_flags", {}).duplicate(true)
+	for mid in d.get("npcs_met", []):
+		w.npcs_met.append(String(mid))
 	w.rng = Rng.new(0)
 	w.rng.set_state_string(String(d["rng"]))
 	w.player = Actor.from_dict(d["player"], content)

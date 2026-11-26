@@ -182,6 +182,13 @@ func _kind_rules(kind: String, e: Dictionary, where: String) -> void:
 			var target_f: Dictionary = _data["floors"][String(e["alt_down"])]
 			if int(target_f.get("depth", 0)) <= int(e.get("depth", 0)):
 				errors.append("%s: 'alt_down' target '%s' must be deeper" % [where, String(e["alt_down"])])
+	elif kind == "npcs":
+		var fid := String(e.get("faction", ""))
+		var pole := String(e.get("faction_pole", ""))
+		if _data["factions"].has(fid) and pole != "":
+			var fdef: Dictionary = _data["factions"][fid]
+			if pole != String(fdef.get("pole_a", "")) and pole != String(fdef.get("pole_b", "")):
+				errors.append("%s: faction_pole '%s' is not a pole of '%s'" % [where, pole, fid])
 
 
 func _global_rules() -> void:

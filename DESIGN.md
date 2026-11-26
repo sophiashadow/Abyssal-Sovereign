@@ -199,3 +199,7 @@ M6.3 expands character creation to `8` origins (adding `ashborn`, `veilkin`, `ir
 ## M6.4 — The Armory and Treasury
 
 M6.4 expands equipment and utility breadth to `165` base items (`26` unique artifacts, `16` Work-vs-Transmute relics, `20` scrolls, `14` projectiles/bombs, `18` potions/poultices, `27` melee, `23` ranged/implements, `22` armor, `22` amulets, `3` keys), `46` procedural affixes, and `12` equipment sets (`subjugation_cap` + `mask_risk` build levers) while keeping existing rarity/BUC/identification rules intact and avoiding save-schema churn.
+
+## M6.5 — People, Institutions and Allegiances
+
+M6.5 populates Terra Tenebrae with `18` recurring characters across `8` two-minded institutions (no single good-versus-evil meter; backing one internal pole shifts standing with opposing members of that institution and alters service access, barter, healing, identification, Way attestations, and Subjugation relief).

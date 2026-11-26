@@ -190,6 +190,23 @@ func test_v8_save_migrates_to_v9() -> void:
 		eq(w2.max_sphere_reached, 1, "max_sphere_reached backfilled")
 
 
+func test_v9_save_migrates_to_v10() -> void:
+	var w := World.new_run(db(), 4242, "human", "fallen_knight", "Mig9")
+	var d := _through_json(w)
+	d["save_version"] = 9
+	d.erase("npc_standing")
+	d.erase("faction_flags")
+	d.erase("npcs_met")
+	var errors: PackedStringArray = []
+	var w2 := World.from_dict(db(), d, errors)
+	eq(errors.size(), 0, "v9 save migrates cleanly: %s" % ", ".join(errors))
+	ok(w2 != null, "migrated v9 world loaded")
+	if w2 != null:
+		ok(w2.npc_standing.is_empty(), "npc_standing backfilled")
+		ok(w2.faction_flags.is_empty(), "faction_flags backfilled")
+		ok(w2.npcs_met.is_empty(), "npcs_met backfilled")
+
+
 func test_round_trip_is_exact() -> void:
 	var w := World.new_run(db(), 4242, "cambion", "occultist", "Rt")
 	w.player_spend_stat("will")
