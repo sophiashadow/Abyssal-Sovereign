@@ -98,3 +98,22 @@ M5.2 deepens moment-to-moment tactical combat across ranged positioning, element
 | `human` | `40 / 45` (`89%`) | — | `assassin` 15/15, `occultist` 13/15, `fallen_knight` 12/15 |
 | `cambion` | `36 / 45` (`80%`) | — | `assassin` 15/15, `occultist` 13/15, `fallen_knight` 8/15 |
 | `revenant` | `36 / 45` (`80%`) | — | `occultist` 14/15, `assassin` 12/15, `fallen_knight` 10/15 |
+
+## M5.3 — Equipment & Discovery
+
+M5.3 turns loot into run-defining builds and discovery decisions:
+
+- **Procedural affixes & rarity:** `Affixes` (`src/sim/affixes.gd`) rolls `common`, `uncommon`, `rare`, and unique `artifact` drops across depth-scaled magic odds. Prefixes (`Keen`, `Brutal`, `Ashen`, `Rimed`, `Abyssal`, `Gilded`, `Warded`, `Swift`, `Stout`, `Occult`) and suffixes (`of the Eye`, `of Cinders`, `of Hoarfrost`, `of the Oath`, `of Venom`, `of False Light`) grant stat mods, elemental/void damage types, on-hit statuses, and resistances.
+- **Unidentified consumables & gear:** Every run deterministically shuffles disguise names (`cloudy phial`, `parchment inked 'TITHE'`, etc.) for unseen consumables and scrolls; starting items begin known. Unidentified magical/blessed/cursed gear conceals affixes until equipped or identified by a `scroll of witness`, `Confessor's Glass`, or `Ward-Keeper's Lamp`.
+- **Blessed & Cursed (`BUC`):** Floor drops can be `blessed` (`+1` combat/armor mods, `+10%` Void/Radiant resist) or `cursed` (`-1` combat/armor mods, locked into its equipment slot until freed by a `scroll of unbinding`, `Break the Chain`, `Transmute Pain`, or transmuting a relic).
+- **Equipment Sets & Unique Artifacts:** `ItemSets` (`src/sim/item_sets.gd`) grants 2-piece and 3-piece build bonuses for *Inquisitor's Audit*, *The Eye Unblinking* (including `+3` Mask risk cap), and *Cinder & Oath*. Four non-duplicating unique artifacts (*Unwritten Edge*, *Cowl of the First Witness*, *Serpent's Recurver*, *Chainbreaker Seal*) spawn deterministically at depth `>= 3` or on boss kills.
+- **Additional EXODUS Relics:** Added *Severed Crown*, *Ward-Keeper's Lamp* (identifies pack + clears fog), and *Almoner's Purse* (regen + evasion + restores `+4` class resource).
+
+### Measured Balance (M5.3 held-out soak, `tools/soak.gd --seeds=15 --salt=heldout`, `135` runs)
+
+| Scope | Wins / Runs | Mean Turns | Notes |
+|---|---:|---:|---|
+| Overall | `121 / 135` (`90%`) | `728` | Affixes/sets boosted late-floor durability; M5.4 hazards will tighten depth pressure |
+| `human` | `43 / 45` (`96%`) | — | `assassin` 15/15, `fallen_knight` 14/15, `occultist` 14/15 |
+| `cambion` | `39 / 45` (`87%`) | — | `assassin` 15/15, `occultist` 14/15, `fallen_knight` 10/15 |
+| `revenant` | `39 / 45` (`87%`) | — | `occultist` 14/15, `assassin` 13/15, `fallen_knight` 12/15 |

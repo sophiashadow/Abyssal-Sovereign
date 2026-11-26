@@ -96,3 +96,9 @@ Resolved (2026-11-26):
 - **Elemental & metaphysical taxonomy** (`Proposed` mechanics framed in `Canon-derived` imagery): `physical`, `fire`, `cold`, `radiant` (false-sun light), and `void` (the Eye / uncatalogued dark), plus innate species affinities for Revenants and Cambions.
 - **Dominion & Ossuary foes** (`Canon-derived`): `Choir Cantor Prime` (Gilded Choir), `Iron Auditor` (Iron Scriptorium), `cinder acolyte`, `ossuary arbalest`, `ossuary wight`, and mutated elite prefixes (`Ashen`, `Rime-bound`, `Apostate`, `Ironbound`).
 - **Occult scrolls & ranged armaments** (`Proposed` roguelike tools using canon motifs): `Eye-lens focus`, `abyssal rod`, `sun-censer sling`, `false sun prism`, `scroll of phase step`, `scroll of abyssal lance`, `scroll of cinder ward`.
+
+## M5.3 Equipment & Discovery Provenance
+
+- **EXODUS Relics** (`Canon-derived` names + Work-or-Transmute frame from EXODUS; effects `Proposed`): `Severed Crown`, `Ward-Keeper's Lamp`, `Almoner's Purse`.
+- **Equipment sets & unique artifacts** (`Canon-derived` names framing `Proposed` set bonuses and artifact stats): *Inquisitor's Audit*, *The Eye Unblinking*, *Cinder & Oath*, *Unwritten Edge*, *Cowl of the First Witness*, *Serpent's Recurver*, *Chainbreaker Seal*.
+- **Affixes, identification & BUC** (`Proposed` mechanics): `scroll of witness`, `scroll of unbinding`, and affix nomenclature grounded in Abyssal Sovereign motifs.

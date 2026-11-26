@@ -192,7 +192,7 @@ func _show_title() -> void:
 	col.add_child(_btn("Settings", func() -> void: _show_settings(_show_title)))
 	if not OS.has_feature("web"):
 		col.add_child(_btn("Quit", func() -> void: get_tree().quit()))
-	var foot := _label("Set in the world of FALSE LIGHT. v0.5 (M5.2 Combat Depth)", Palette.TEXT_DIM, 0.75)
+	var foot := _label("Set in the world of FALSE LIGHT. v0.5 (M5.3 Equipment & Discovery)", Palette.TEXT_DIM, 0.75)
 	foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(foot)
 
@@ -463,11 +463,11 @@ func _update_hud() -> void:
 	t.append("Depth %d (%s): %s" % [world.depth, sphere, fd.get("name", "")] if sphere != "" else "Depth %d: %s" % [world.depth, fd.get("name", "")])
 	t.append("Attack %+d  Defense %d  Evasion %+d" % [p.stat("accuracy"), p.stat("defense"), p.stat("evasion")])
 	var w := p.equipped("weapon")
-	t.append("Wielding: %s (%s)" % [w.display_name(db), p.damage_dice()] if w != null else "Wielding: bare hands (1d2)")
+	t.append("Wielding: %s (%s)" % [world.item_name(w), p.damage_dice()] if w != null else "Wielding: bare hands (1d2)")
 	var rw := p.equipped("ranged")
 	if rw != null:
 		var rwd := rw.def(db)
-		t.append("Ranged: %s (%s, rng %d)" % [rw.display_name(db), rwd["damage"], int(rwd["range"])])
+		t.append("Ranged: %s (%s, rng %d)" % [world.item_name(rw), rwd["damage"], int(rwd["range"])])
 	if p.has_trait("mask_stances"):
 		t.append("Mask: [color=%s]%s[/color] (risk %d/%d)" % [Masks.color(p.mask), Masks.label(p.mask), p.mask_risk, World.MASK_RISK_MAX])
 	for s in p.statuses:
@@ -814,6 +814,8 @@ func _show_build() -> void:
 			res_parts.append("%s %+d%%" % [dt.capitalize(), rv])
 	if not res_parts.is_empty():
 		col.add_child(_label("Resists: " + ", ".join(res_parts), Palette.RECORD, 0.85))
+	for sline in ItemSets.summaries(p, db):
+		col.add_child(_label("Set: " + sline, Palette.GOOD, 0.85))
 	var attr_row := HBoxContainer.new()
 	attr_row.add_theme_constant_override("separation", 8)
 	for attr in ContentSchema.ATTRIBUTES:
@@ -1054,7 +1056,7 @@ func _show_inventory() -> void:
 	col.add_child(_label("Equipped", Palette.GOLD, 1.0))
 	for slot in Actor.SLOTS:
 		var it := p.equipped(slot)
-		var text := "%s: %s" % [slot.capitalize(), it.display_name(db) if it != null else "nothing"]
+		var text := "%s: %s" % [slot.capitalize(), world.item_name(it) if it != null else "nothing"]
 		var b := _btn(text, func() -> void: _show_item(it, -1, slot))
 		b.disabled = it == null
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -1067,9 +1069,10 @@ func _show_inventory() -> void:
 	for i in p.inventory.size():
 		var it := p.inventory[i]
 		var idx := i
-		var b := _btn(it.display_name(db), func() -> void: _show_item(it, idx, ""))
+		var b := _btn(world.item_name(it), func() -> void: _show_item(it, idx, ""))
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.add_theme_color_override("font_color", Color(String(it.def(db)["color"])).lerp(Palette.TEXT, 0.35))
+		var tint := Color(it.effective_color(db)) if world.is_item_identified(it) else Color(String(it.def(db)["color"]))
+		b.add_theme_color_override("font_color", tint.lerp(Palette.TEXT, 0.35))
 		col.add_child(b)
 		if first == null:
 			first = b
@@ -1078,17 +1081,24 @@ func _show_inventory() -> void:
 	(first if first != null else close).call_deferred("grab_focus")
 
 
-func _item_stats(d: Dictionary) -> String:
+func _item_stats(it: Item) -> String:
+	if not world.is_item_identified(it):
+		return "Unidentified — equip, use, or read a scroll of witness to reveal its properties."
+	var d := it.def(db)
 	var parts: PackedStringArray = []
+	if it.rarity != "common":
+		parts.append("[%s]" % it.rarity.capitalize())
+	if it.buc != "uncursed":
+		parts.append(it.buc.capitalize())
 	match String(d["kind"]):
 		"weapon":
-			parts.append("Damage %s (%s)" % [d["damage"], String(d.get("damage_type", "physical"))])
+			parts.append("Damage %s (%s)" % [d["damage"], it.effective_damage_type(db)])
 			if int(d.get("accuracy", 0)) != 0:
 				parts.append("accuracy %+d" % int(d["accuracy"]))
 			if int(d.get("crit", 0)) != 0:
 				parts.append("critical %+d%%" % int(d["crit"]))
 		"ranged":
-			parts.append("Ranged %s (%s, range %d)" % [d["damage"], String(d.get("damage_type", "physical")), int(d["range"])])
+			parts.append("Ranged %s (%s, range %d)" % [d["damage"], it.effective_damage_type(db), int(d["range"])])
 			if int(d.get("accuracy", 0)) != 0:
 				parts.append("accuracy %+d" % int(d["accuracy"]))
 			if int(d.get("crit", 0)) != 0:
@@ -1110,12 +1120,19 @@ func _item_stats(d: Dictionary) -> String:
 				parts.append("Grants %s for %d turns" % [sd["name"], int(sd["duration"])])
 		"relic":
 			parts.append("Work: %s\nTransmute: %s" % [d["work_desc"], d["transmute_desc"]])
-	var mods: Dictionary = d.get("mods", {})
-	for k in mods:
-		parts.append("%s %+d" % [String(k).replace("_", " "), int(mods[k])])
-	var rmap: Dictionary = d.get("resists", {})
-	for k in rmap:
-		parts.append("%s resist %+d%%" % [String(k), int(rmap[k])])
+	for stat_name in ContentSchema.MOD_STATS:
+		var mv := it.total_mod(db, stat_name)
+		if mv != 0:
+			parts.append("%s %+d" % [stat_name.replace("_", " "), mv])
+	for dt in ContentSchema.DAMAGE_TYPES:
+		var rv := it.total_resist(db, dt)
+		if rv != 0:
+			parts.append("%s resist %+d%%" % [dt, rv])
+	if it.effective_status(db) != "":
+		parts.append("inflicts %s" % it.effective_status(db))
+	var sid := String(d.get("set_id", ""))
+	if sid != "":
+		parts.append("Set: %s" % ItemSets.set_name(sid))
 	return ", ".join(parts)
 
 
@@ -1123,9 +1140,11 @@ func _show_item(it: Item, index: int, slot: String) -> void:
 	if it == null:
 		return
 	var d := it.def(db)
-	var col := _open_overlay(it.display_name(db).capitalize(), Color(String(d["color"])).lerp(Palette.TEXT, 0.3))
-	col.add_child(_label(String(d["description"]), Palette.TEXT_DIM))
-	col.add_child(_label(_item_stats(d), Palette.RECORD, 0.9))
+	var shown := world.item_name(it).capitalize()
+	var col := _open_overlay(shown, Color(it.effective_color(db)).lerp(Palette.TEXT, 0.3))
+	var desc_txt := String(d["description"]) if world.is_item_identified(it) else "An unfamiliar article. Its properties are hidden until tested or witnessed."
+	col.add_child(_label(desc_txt, Palette.TEXT_DIM))
+	col.add_child(_label(_item_stats(it), Palette.RECORD, 0.9))
 	var main: Button
 	if slot != "":
 		main = _btn("Take off", func() -> void:
@@ -1147,14 +1166,14 @@ func _show_item(it: Item, index: int, slot: String) -> void:
 		elif String(d["kind"]) == "consumable" and String(d.get("effect", "")) == "projectile":
 			main = _btn("Throw", func() -> void:
 				_close_overlay()
-				_start_aim("item", {"index": index, "range": int(d.get("range", 4)), "name": String(d["name"]),
+				_start_aim("item", {"index": index, "range": int(d.get("range", 4)), "name": world.item_name(it),
 					"acc": 2, "dtype": String(d.get("damage_type", "physical"))}))
 			col.add_child(main)
-		elif String(d["kind"]) == "consumable" and String(d.get("effect", "")) == "scroll" and String(d.get("spell", "")) != "cinder_ward":
+		elif String(d["kind"]) == "consumable" and String(d.get("effect", "")) == "scroll" and not (String(d.get("spell", "")) in ["cinder_ward", "identify", "unbind"]):
 			main = _btn("Cast", func() -> void:
 				_close_overlay()
 				var targ := "tile" if String(d.get("spell", "")) == "phase_step" else "enemy"
-				_start_aim("item", {"index": index, "range": int(d.get("range", 5)), "name": String(d["name"]),
+				_start_aim("item", {"index": index, "range": int(d.get("range", 5)), "name": world.item_name(it),
 					"targeting": targ, "dtype": String(d.get("damage_type", "void"))}))
 			col.add_child(main)
 		else:

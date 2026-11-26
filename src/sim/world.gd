@@ -10,7 +10,7 @@ extends RefCounted
 ## id 1, so the player wins ties. Player actions return true if they spent
 ## time; the world then runs monsters until it is the player's turn again.
 
-const SAVE_VERSION := 5
+const SAVE_VERSION := 6
 const PLAYER_ID := 1
 const COST_MOVE := 100
 const COST_ATTACK := 100
@@ -42,6 +42,9 @@ var apotheosis: int = 0
 var way_serpent: int = 0
 var way_return: int = 0
 var next_entity_id: int = 2
+var id_known: Dictionary = {}
+var id_aliases: Dictionary = {}
+var spawned_uniques: Array[String] = []
 var messages: Array[Dictionary] = []
 ## Bumped whenever messages change, so the UI can redraw lazily.
 var log_serial: int = 0
@@ -58,6 +61,7 @@ static func new_run(content: ContentDB, seed_value: int, species_id: String, cla
 	w.run_seed = seed_value
 	w.rng = Rng.new(Rng.derive(seed_value, "play"))
 	w.player = w._make_player(species_id, class_id, hero_name)
+	w._init_discovery()
 	w._enter_floor(1, true)
 	var fd := content.floor_for_depth(1)
 	w.log_msg("You descend beneath Terra Tenebrae. %s." % fd.get("name", "The dark"), "lore")
@@ -108,6 +112,106 @@ func _make_player(species_id: String, class_id: String, hero_name: String) -> Ac
 	a.resource = a.max_resource()
 	a.awake = true
 	return a
+
+
+func _init_discovery() -> void:
+	var potions := Affixes.POTION_ALIASES.duplicate()
+	var scrolls := Affixes.SCROLL_ALIASES.duplicate()
+	_shuffle_strings(potions)
+	_shuffle_strings(scrolls)
+	var pi := 0
+	var si := 0
+	for tid in db.ids("items"):
+		var d := db.get_def("items", tid)
+		if String(d.get("kind", "")) != "consumable":
+			continue
+		if String(d.get("effect", "")) == "scroll":
+			id_aliases[tid] = scrolls[si % scrolls.size()]
+			si += 1
+		else:
+			id_aliases[tid] = potions[pi % potions.size()]
+			pi += 1
+	for it in player.inventory:
+		id_known[it.template_id] = true
+
+
+func _shuffle_strings(arr: Array[String]) -> void:
+	for i in range(arr.size() - 1, 0, -1):
+		var j := rng.range_i(0, i)
+		var tmp := arr[i]
+		arr[i] = arr[j]
+		arr[j] = tmp
+
+
+func item_name(it: Item) -> String:
+	return it.display_name(db, id_known, id_aliases)
+
+
+func is_item_identified(it: Item) -> bool:
+	return it.is_identified_in(db, id_known)
+
+
+func identify_item(it: Item) -> bool:
+	var changed := false
+	if String(it.def(db).get("kind", "")) == "consumable":
+		if not bool(id_known.get(it.template_id, false)):
+			id_known[it.template_id] = true
+			changed = true
+	elif not it.identified:
+		it.identified = true
+		changed = true
+	return changed
+
+
+func identify_pack() -> int:
+	var count := 0
+	for slot in Actor.SLOTS:
+		var eq_it := player.equipped(slot)
+		if eq_it != null and identify_item(eq_it):
+			count += 1
+	for it in player.inventory:
+		if identify_item(it):
+			count += 1
+	return count
+
+
+func unbind_curses(only_equipped: bool = false) -> int:
+	var uncursed := 0
+	for slot in Actor.SLOTS:
+		var it := player.equipped(slot)
+		if it != null and it.buc == "cursed":
+			it.buc = "uncursed"
+			it.identified = true
+			uncursed += 1
+	if not only_equipped:
+		for it in player.inventory:
+			if it.buc == "cursed":
+				it.buc = "uncursed"
+				it.identified = true
+				uncursed += 1
+	if uncursed == 0 and not only_equipped:
+		for slot in Actor.SLOTS:
+			var it := player.equipped(slot)
+			if it != null and it.buc == "uncursed":
+				it.buc = "blessed"
+				it.identified = true
+				log_msg("Your %s shines with quiet blessing." % item_name(it), "good")
+				return 1
+	return uncursed
+
+
+func _maybe_artifact_drop() -> Item:
+	var pool: Array[String] = []
+	for tid in db.ids("items"):
+		if String(db.get_def("items", tid).get("rarity", "common")) == "artifact" and not spawned_uniques.has(tid):
+			pool.append(tid)
+	if pool.is_empty():
+		return null
+	var chosen := String(rng.pick(pool))
+	spawned_uniques.append(chosen)
+	var it := _new_item(chosen)
+	Affixes.roll_equipment(it, db, depth, rng, true)
+	return it
 
 
 func _new_item(template_id: String) -> Item:
@@ -227,7 +331,12 @@ func _build_floor(d: int) -> FloorMap:
 			mon.next_time = time + rng.range_i(0, 99)
 			m.actors.append(mon)
 		else:
-			var it := _new_item(String(s["id"]))
+			var it: Item = null
+			if d >= 3 and rng.chance_pct(8):
+				it = _maybe_artifact_drop()
+			if it == null:
+				it = _new_item(String(s["id"]))
+				Affixes.roll_equipment(it, db, d, rng, false)
 			it.pos = s["pos"]
 			m.items.append(it)
 	m.spawns.clear()
@@ -333,7 +442,7 @@ func player_pickup() -> bool:
 		log_msg("Your pack is full.", "danger")
 		return false
 	current_floor().items.erase(it)
-	var shown := it.display_name(db)
+	var shown := item_name(it)
 	_add_to_inventory(player, it)
 	log_msg("You take the %s." % shown, "good")
 	return _finish_player_action(COST_ITEM)
@@ -346,7 +455,7 @@ func player_drop(index: int) -> bool:
 	player.inventory.remove_at(index)
 	it.pos = player.pos
 	current_floor().items.append(it)
-	log_msg("You drop the %s." % it.display_name(db))
+	log_msg("You drop the %s." % item_name(it))
 	return _finish_player_action(COST_ITEM)
 
 
@@ -362,24 +471,38 @@ func player_use_at(index: int, target_pos: Vector2i = Vector2i(-1, -1)) -> bool:
 	var d := it.def(db)
 	if String(d["kind"]) == "consumable":
 		var eff := String(d["effect"])
+		var acted := false
 		if eff == "projectile":
-			return _throw_consumable(it, index, d, target_pos)
-		if eff == "scroll":
-			return _cast_scroll(it, index, d, target_pos)
-		_consume(player, it, index)
-		return _finish_player_action(COST_ITEM)
+			acted = _throw_consumable(it, index, d, target_pos)
+		elif eff == "scroll":
+			acted = _cast_scroll(it, index, d, target_pos)
+		else:
+			_consume(player, it, index)
+			acted = _finish_player_action(COST_ITEM)
+		if acted:
+			id_known[it.template_id] = true
+		return acted
 	if String(d["kind"]) == "relic":
 		return player_work_relic(index)
 	var slot := _slot_for(it)
-	player.inventory.remove_at(index)
 	var old := player.equipped(slot)
+	if old != null and old.buc == "cursed":
+		old.identified = true
+		log_msg("The cursed %s will not let go! Read a scroll of unbinding or break the chain." % item_name(old), "danger")
+		return false
+	var was_unid := not it.identified
+	it.identified = true
+	player.inventory.remove_at(index)
 	var hp_frac := float(player.hp) / float(player.stat("max_hp"))
 	player.equipment[slot] = it
 	if old != null:
 		player.inventory.insert(index, old)
 	# Gear that changes max health keeps the same fraction of health.
 	player.hp = clampi(int(roundf(hp_frac * player.stat("max_hp"))), 1, player.stat("max_hp"))
-	log_msg("You ready the %s." % it.display_name(db), "good")
+	if was_unid and it.buc == "cursed":
+		log_msg("You ready the %s—and feel a cold lock snap shut!" % item_name(it), "danger")
+	else:
+		log_msg("You ready the %s." % item_name(it), "good")
 	return _finish_player_action(COST_ITEM)
 
 
@@ -455,22 +578,23 @@ func player_fire(target_pos: Vector2i = Vector2i(-1, -1)) -> bool:
 	if foe == null:
 		log_msg("Your shot flies into empty air.", "info")
 		return _finish_player_action(COST_ATTACK)
-	var dtype := String(d.get("damage_type", "physical"))
+	var dtype := w.effective_damage_type(db)
 	var res := Combat.resolve_ranged(player, foe, Grid.chebyshev(player.pos, foe.pos),
-		String(d["damage"]), int(d.get("accuracy", 0)), int(d.get("crit", 0)), dtype, rng)
+		String(d["damage"]), int(d.get("accuracy", 0)) + w.total_mod(db, "accuracy"), int(d.get("crit", 0)), dtype, rng)
 	foe.awake = true
 	_remember_player(foe)
 	if not res["hit"]:
 		log_msg("Your shot misses the %s." % foe.name, "combat")
 		return _finish_player_action(COST_ATTACK)
-	var dmg := int(res["damage"])
+	var dmg := 0 if int(res["damage"]) == 0 else maxi(1, int(res["damage"]) + w.total_mod(db, "damage"))
 	var note := _combat_note(res)
 	log_msg("You shoot the %s for %d%s." % [foe.name, dmg, note], "combat")
 	if player.resource_kind() == "poise" and (bool(res["crit"]) or bool(res["sneak"])):
 		player.resource = mini(player.max_resource(), player.resource + 1)
 	apply_damage(foe, dmg, player.name, dtype)
-	if foe.is_alive() and d.has("status"):
-		apply_status(foe, String(d["status"]))
+	var st := w.effective_status(db)
+	if foe.is_alive() and st != "":
+		apply_status(foe, st)
 	return _finish_player_action(COST_ATTACK)
 
 
@@ -599,6 +723,12 @@ func _cast_scroll(it: Item, index: int, d: Dictionary, target_pos: Vector2i) -> 
 					hits += 1
 			apply_status(player, "braced")
 			log_msg("Cinder ward erupts across %d foe%s and braces your stance." % [hits, "" if hits == 1 else "s"], "good")
+		"identify":
+			var n := identify_pack()
+			log_msg("The witness sheds calm light: %d item%s identified." % [n, "" if n == 1 else "s"] if n > 0 else "Nothing in your pack remains hidden.", "good")
+		"unbind":
+			var n := unbind_curses(false)
+			log_msg("Cold iron locks snap open (%d unbound)." % n if n > 0 else "No curses bound you.", "good")
 	it.quantity -= 1
 	if it.quantity <= 0:
 		player.inventory.remove_at(index)
@@ -643,9 +773,15 @@ func player_work_relic(index: int) -> bool:
 	player.hp -= cost
 	apotheosis += 1
 	apply_status(player, sid)
-	if sid == "confessors_clarity" and player.has_status("perception_fog"):
-		_remove_status(player, "perception_fog")
-		log_msg("The grey fog parts.", "good")
+	if sid in ["confessors_clarity", "lamp_vigil"]:
+		if player.has_status("perception_fog"):
+			_remove_status(player, "perception_fog")
+			log_msg("The grey fog parts.", "good")
+		var n := identify_pack()
+		if n > 0:
+			log_msg("Its light lays bare %d hidden item%s." % [n, "" if n == 1 else "s"], "good")
+	if sid == "almoners_grace":
+		player.resource = mini(player.max_resource(), player.resource + 4)
 	update_fov()
 	var msg := "You work the %s (-%d HP)." % [d["name"], cost] if cost > 0 else "You work the %s." % d["name"]
 	log_msg(msg, "good")
@@ -665,6 +801,9 @@ func player_transmute_relic(index: int) -> bool:
 	if mods.has("max_hp") and int(mods["max_hp"]) > 0:
 		player.hp = mini(player.stat("max_hp"), player.hp + int(mods["max_hp"]))
 	player.inventory.remove_at(index)
+	var freed := unbind_curses(true)
+	if freed > 0:
+		log_msg("The transmutation snaps the curse on your gear!", "good")
 	apotheosis += 2
 	way_serpent += 1
 	update_fov()
@@ -678,13 +817,17 @@ func player_unequip(slot: String) -> bool:
 	var it := player.equipped(slot)
 	if it == null:
 		return false
+	if it.buc == "cursed":
+		it.identified = true
+		log_msg("The cursed %s refuses to come off!" % item_name(it), "danger")
+		return false
 	if player.inventory.size() >= Actor.INVENTORY_LIMIT:
 		log_msg("Your pack is full.", "danger")
 		return false
 	player.equipment.erase(slot)
 	player.inventory.append(it)
 	player.hp = mini(player.hp, player.stat("max_hp"))
-	log_msg("You set aside the %s." % it.display_name(db))
+	log_msg("You set aside the %s." % item_name(it))
 	return _finish_player_action(COST_ITEM)
 
 
@@ -968,6 +1111,7 @@ func _run_talent_effect(eff: String, td: Dictionary, target: Actor, target_pos: 
 		"break_the_chain":
 			for sid in ["isolation", "perception_fog", "bleeding", "pinned"]:
 				_remove_status(player, sid)
+			unbind_curses(true)
 			apply_status(player, "apostate_focus")
 			update_fov()
 			log_msg("You shatter the chains upon you.", "good")
@@ -1054,6 +1198,7 @@ func _run_talent_effect(eff: String, td: Dictionary, target: Actor, target_pos: 
 		"transmute_pain":
 			for sid in ["reckoning", "isolation", "dissolution", "exposure", "hexed"]:
 				_remove_status(player, sid)
+			unbind_curses(true)
 			var heal := 6 + will_v
 			player.hp = mini(player.stat("max_hp"), player.hp + heal)
 			log_msg("You transmute pain into %d health." % heal, "good")
@@ -1243,7 +1388,7 @@ func _tick_mask() -> void:
 		player.mask_risk = maxi(0, player.mask_risk - cool)
 		return
 	player.mask_risk += 1
-	var risk_max := MASK_RISK_MAX + 2 * player.talent_rank("crowned_frequency")
+	var risk_max := MASK_RISK_MAX + 2 * player.talent_rank("crowned_frequency") + ItemSets.mask_risk_bonus(player, db)
 	if player.mask_risk >= risk_max:
 		var old_mask := player.mask
 		var sid := Masks.seizure_status(old_mask)
@@ -1545,8 +1690,10 @@ func _attack(attacker: Actor, defender: Actor) -> void:
 	apply_damage(defender, int(r["damage"]), attacker.name, dtype)
 	if attacker.is_player and defender.is_alive():
 		var w := attacker.equipped("weapon")
-		if w != null and w.def(db).has("status"):
-			apply_status(defender, String(w.def(db)["status"]))
+		if w != null:
+			var st := w.effective_status(db)
+			if st != "":
+				apply_status(defender, st)
 	if not attacker.is_player and defender.is_player and defender.is_alive():
 		if attacker.tags.has("chain_isolation") and not defender.has_status("isolation") and rng.chance_pct(35):
 			apply_status(defender, "isolation")
@@ -1628,11 +1775,16 @@ func _kill_monster(mon: Actor) -> void:
 	if mon.is_elite or mon.tags.has("boss"):
 		var fd := db.floor_for_depth(depth)
 		var table: Array = fd.get("item_table", [])
-		if not table.is_empty():
-			var drop := _new_item(rng.pick_weighted(table))
+		var drop: Item = null
+		if mon.tags.has("boss") and rng.chance_pct(30):
+			drop = _maybe_artifact_drop()
+		if drop == null and not table.is_empty():
+			drop = _new_item(rng.pick_weighted(table))
+			Affixes.roll_equipment(drop, db, depth, rng, true)
+		if drop != null:
 			drop.pos = mon.pos
 			m.items.append(drop)
-			log_msg("The %s drops a %s." % [mon.name, drop.display_name(db)], "good")
+			log_msg("The %s drops a %s." % [mon.name, item_name(drop)], "good")
 	if mon.tags.has("guardian") and m.exit_pos.x >= 0 and m.get_tile(m.exit_pos) == Tiles.DOOR_SEALED:
 		m.set_tile(m.exit_pos, Tiles.DOOR_OPEN)
 		log_msg("The Sentinel falls. Somewhere a seal that was never written down gives way.", "lore")
@@ -1745,14 +1897,15 @@ func describe_at(p: Vector2i) -> String:
 			return "%s%s (%s, %d%% to hit). %s%s%s" % [a.name.capitalize(), rank_tag, cond, Combat.hit_chance(player, a), d["description"], r_str, aware]
 		var its := m.items_at(p)
 		if not its.is_empty():
-			return "%s: %s" % [its[0].display_name(db).capitalize(), its[0].def(db)["description"]]
+			var desc := String(its[0].def(db)["description"]) if is_item_identified(its[0]) else "Unidentified; pick up, equip, or read a scroll of witness."
+			return "%s: %s" % [item_name(its[0]).capitalize(), desc]
 	return "%s." % String(Tiles.NAMES.get(m.get_tile(p), "unknown")).capitalize()
 
 
 func _describe_floor_here() -> void:
 	var its := current_floor().items_at(player.pos)
 	if its.size() == 1:
-		log_msg("You see here: %s." % its[0].display_name(db))
+		log_msg("You see here: %s." % item_name(its[0]))
 	elif its.size() > 1:
 		log_msg("Several things lie here.")
 	match current_floor().get_tile(player.pos):
@@ -1833,6 +1986,9 @@ func to_dict() -> Dictionary:
 		"state": int(state), "cause": death_cause,
 		"apotheosis": apotheosis, "way_serpent": way_serpent, "way_return": way_return,
 		"next_id": next_entity_id,
+		"id_known": id_known.duplicate(true),
+		"id_aliases": id_aliases.duplicate(true),
+		"uniques": spawned_uniques.duplicate(),
 		"rng": rng.get_state_string(),
 		"player": player.to_dict(),
 		"floors": fl,
@@ -1906,7 +2062,49 @@ static func _migrate(d: Dictionary) -> Dictionary:
 							a["resists"] = a.get("resists", {})
 							a["specials"] = a.get("specials", [])
 							a["elite"] = bool(a.get("elite", false))
+		ver = 5
+	if ver == 5:
+		out["save_version"] = 6
+		out["id_known"] = out.get("id_known", {})
+		out["id_aliases"] = out.get("id_aliases", {})
+		out["uniques"] = out.get("uniques", [])
+		if typeof(out.get("player")) == TYPE_DICTIONARY:
+			_migrate_actor_items_v6(out["player"])
+		if typeof(out.get("floors")) == TYPE_DICTIONARY:
+			for k in out["floors"]:
+				var fl = out["floors"][k]
+				if typeof(fl) == TYPE_DICTIONARY:
+					if typeof(fl.get("items")) == TYPE_ARRAY:
+						for it in fl["items"]:
+							_migrate_item_v6(it)
+					if typeof(fl.get("actors")) == TYPE_ARRAY:
+						for a in fl["actors"]:
+							_migrate_actor_items_v6(a)
 	return out
+
+
+static func _migrate_item_v6(it: Variant) -> void:
+	if typeof(it) != TYPE_DICTIONARY:
+		return
+	it["rar"] = it.get("rar", "common")
+	it["aff"] = it.get("aff", [])
+	it["buc"] = it.get("buc", "uncursed")
+	it["idn"] = bool(it.get("idn", true))
+	it["mods"] = it.get("mods", {})
+	it["res"] = it.get("res", {})
+	it["dt"] = String(it.get("dt", ""))
+	it["st"] = String(it.get("st", ""))
+
+
+static func _migrate_actor_items_v6(a: Variant) -> void:
+	if typeof(a) != TYPE_DICTIONARY:
+		return
+	if typeof(a.get("inv")) == TYPE_ARRAY:
+		for it in a["inv"]:
+			_migrate_item_v6(it)
+	if typeof(a.get("eq")) == TYPE_DICTIONARY:
+		for slot in a["eq"]:
+			_migrate_item_v6(a["eq"][slot])
 
 
 ## Rebuilds a run from to_dict() output. Returns null and fills `errors`
@@ -1947,6 +2145,10 @@ static func from_dict(content: ContentDB, d: Dictionary, errors: PackedStringArr
 	w.way_serpent = int(d.get("way_serpent", 0))
 	w.way_return = int(d.get("way_return", 0))
 	w.next_entity_id = int(d["next_id"])
+	w.id_known = d.get("id_known", {}).duplicate(true)
+	w.id_aliases = d.get("id_aliases", {}).duplicate(true)
+	for u in d.get("uniques", []):
+		w.spawned_uniques.append(String(u))
 	w.rng = Rng.new(0)
 	w.rng.set_state_string(String(d["rng"]))
 	w.player = Actor.from_dict(d["player"], content)

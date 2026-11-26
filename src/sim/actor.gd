@@ -109,7 +109,8 @@ func _mod_sum(stat_name: String) -> int:
 	for slot in SLOTS:
 		var it := equipped(slot)
 		if it != null:
-			total += int(it.def(db).get("mods", {}).get(stat_name, 0))
+			total += it.total_mod(db, stat_name)
+	total += ItemSets.mod_sum(self, db, stat_name)
 	for s in statuses:
 		total += int(db.get_def("statuses", s["id"]).get("mods", {}).get(stat_name, 0))
 	if has_trait("mask_stances"):
@@ -175,7 +176,7 @@ func damage_dice() -> String:
 func melee_damage_type() -> String:
 	var w := equipped("weapon")
 	if w != null:
-		return String(w.def(db).get("damage_type", "physical"))
+		return w.effective_damage_type(db)
 	return String(base.get("damage_type", "physical"))
 
 
@@ -186,7 +187,8 @@ func resist(dmg_type: String) -> int:
 	for slot in SLOTS:
 		var it := equipped(slot)
 		if it != null:
-			total += int(it.def(db).get("resists", {}).get(dmg_type, 0))
+			total += it.total_resist(db, dmg_type)
+	total += ItemSets.resist_sum(self, db, dmg_type)
 	for s in statuses:
 		total += int(db.get_def("statuses", s["id"]).get("resists", {}).get(dmg_type, 0))
 	if has_trait("mask_stances"):

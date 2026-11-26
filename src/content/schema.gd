@@ -59,6 +59,8 @@ const FIELDS := {
 		"evasion": {"type": "int", "required": false},
 		"mods": {"type": "mods", "required": false},
 		"resists": {"type": "resists", "required": false},
+		"rarity": {"type": "enum:common|uncommon|rare|artifact", "required": false},
+		"set_id": {"type": "string", "required": false},
 		"effect": {"type": "enum:heal|status|projectile|scroll", "required": false},
 		"heal": {"type": "dice", "required": false},
 		"status": {"type": "ref:statuses", "required": false},

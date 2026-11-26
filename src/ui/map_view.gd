@@ -107,7 +107,9 @@ func _draw() -> void:
 				var it: Item = items[p]
 				var d := it.def(world.db)
 				glyph = String(d["glyph"])
-				col = Color(String(d["color"]))
+				col = Color(it.effective_color(world.db)) if world.is_item_identified(it) else Color(String(d["color"]))
+				if not world.is_item_identified(it) and (it.rarity != "common" or it.buc == "blessed"):
+					col = col.lerp(Palette.FALSE_SUN, 0.35)
 			if not vis:
 				col = Palette.remembered(col)
 			var cell := off + Vector2(cx * tile_px, cy * tile_px)

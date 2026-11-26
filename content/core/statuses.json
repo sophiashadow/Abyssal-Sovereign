@@ -151,6 +151,33 @@
       "duration": 6,
       "resists": {"void": -25, "radiant": -25},
       "color": "#c77dff"
+    },
+    {
+      "id": "crown_decree",
+      "name": "Crown's Decree",
+      "description": "Authority sharpens the strike and steels against the false sun.",
+      "duration": 10,
+      "mods": {"damage": 3, "accuracy": 2},
+      "resists": {"radiant": 25},
+      "color": "#ff4d6d"
+    },
+    {
+      "id": "lamp_vigil",
+      "name": "Keeper's Vigil",
+      "description": "Calm wick-light pierces darkness, fire, and grave-frost.",
+      "duration": 14,
+      "mods": {"sight": 3},
+      "resists": {"fire": 25, "cold": 25},
+      "color": "#6ec6ff"
+    },
+    {
+      "id": "almoners_grace",
+      "name": "Almoner's Debt",
+      "description": "Measured breath mends wounds and hastens the step.",
+      "duration": 8,
+      "regen": 2,
+      "mods": {"evasion": 2},
+      "color": "#c6aa70"
     }
   ]
 }

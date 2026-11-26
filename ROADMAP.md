@@ -50,4 +50,10 @@ Owner decisions resolved 2026-11-26 (see [docs/LORE.md](docs/LORE.md)): Apotheos
 2. **Damage types & resistances:** `physical`, `fire`, `cold`, `radiant`, and `void` damage with innate species/mask/gear/status resistances and vulnerabilities.
 3. **Tactical movement & status synergies:** Added `Vanguard Charge`, `Veil Step`, and `Crippling Shot` (total `30` talents) plus emergent status combos (`Thermal Shock`, `Scalding Steam`, `Cauterize`, `Hemorrhage`, and `False Light` Void fracture).
 4. **Enemy specials, elites & bosses:** Added `ossuary_arbalest`, `cinder_acolyte`, `ossuary_wight`, monster specials (`solar_bolt`, `cinder_bolt`, `grave_chill`, `void_bolt`, `iron_shackle`, `judgment_nova`, `warren_pounce`, `leech_bite`), deterministic elites (`Ashen`, `Rime-bound`, `Apostate`, `Ironbound`), Sphere 3/5 mid-bosses (`Choir Cantor Prime`, `Iron Auditor`), and `SAVE_VERSION := 5`.
-5. **Next (M5.3–M5.5):** Equipment & discovery (affixes, rarity/uniques, unidentified gear & potions, blessed/cursed items, sets), dungeon ecology, and Eight Chains / metaphysical depth.
+
+## Milestone 5.3: equipment and discovery (done 2026-11-26)
+
+1. **Procedural affixes & rarity:** Implemented `Affixes` (`common`, `uncommon`, `rare`, `artifact`) across 10 prefixes and 6 suffixes granting stats, resists, elemental conversions, and status procs.
+2. **Identification & BUC:** Run-shuffled disguises for unknown consumables/scrolls (`id_aliases`), hidden affixes until equipped or witnessed (`scroll_of_identify`, `Confessor's Glass`, `Ward-Keeper's Lamp`), and `blessed` / `cursed` gear with slot-locking curses (`scroll_of_unbind`, `Break the Chain`, `Transmute Pain`, relic transmutation).
+3. **Equipment sets, unique artifacts & EXODUS relics:** 3 sets (`Inquisitor's Audit`, `The Eye Unblinking`, `Cinder & Oath`), 4 non-duplicating artifacts (`Unwritten Edge`, `Cowl of the First Witness`, `Serpent's Recurver`, `Chainbreaker Seal`), 3 EXODUS relics (`Severed Crown`, `Ward-Keeper's Lamp`, `Almoner's Purse`), and `SAVE_VERSION := 6`.
+4. **Next (M5.4–M5.5):** Dungeon ecology (traps, secret doors, altars/shrines/ritual circles, locked vaults, merchants/wandering encounters, hazards, Sphere features) and Metaphysical depth (complete Eight Chains grammar, rituals/contracts, Masks/Relics/False Light/Apotheosis/Two Ways synergies).

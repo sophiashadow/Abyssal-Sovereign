@@ -60,6 +60,12 @@ func step() -> bool:
 		return world.player_stairs()
 	if p.hp * 10 < p.stat("max_hp") * 7 and world.can_rest():
 		return world.player_rest(50) > 0
+	var unbind_idx := _find_scroll("unbind")
+	if unbind_idx >= 0 and _has_cursed_equipped():
+		return world.player_use(unbind_idx)
+	var id_idx := _find_scroll("identify")
+	if id_idx >= 0 and _unidentified_count() >= 2:
+		return world.player_use(id_idx)
 	var upgrade := _find_upgrade()
 	if upgrade >= 0:
 		return world.player_use(upgrade)
@@ -115,6 +121,30 @@ func _find_consumable(effect: String) -> int:
 	return -1
 
 
+func _find_scroll(spell_name: String) -> int:
+	for i in world.player.inventory.size():
+		var d := world.player.inventory[i].def(world.db)
+		if String(d["kind"]) == "consumable" and String(d.get("effect", "")) == "scroll" and String(d.get("spell", "")) == spell_name:
+			return i
+	return -1
+
+
+func _has_cursed_equipped() -> bool:
+	for slot in Actor.SLOTS:
+		var it := world.player.equipped(slot)
+		if it != null and it.buc == "cursed":
+			return true
+	return false
+
+
+func _unidentified_count() -> int:
+	var n := 0
+	for it in world.player.inventory:
+		if not world.is_item_identified(it):
+			n += 1
+	return n
+
+
 func _find_relic() -> int:
 	for i in world.player.inventory.size():
 		var d := world.player.inventory[i].def(world.db)
@@ -125,25 +155,43 @@ func _find_relic() -> int:
 
 func _score(it: Item) -> int:
 	var d := it.def(world.db)
+	if it.identified and it.buc == "cursed":
+		return -999
+	var base := -1
 	match String(d["kind"]):
 		"weapon":
-			return Dice.max_value(String(d["damage"])) + Dice.min_value(String(d["damage"])) + int(d.get("accuracy", 0))
+			base = Dice.max_value(String(d["damage"])) + Dice.min_value(String(d["damage"])) + int(d.get("accuracy", 0))
 		"ranged":
-			return Dice.max_value(String(d["damage"])) + Dice.min_value(String(d["damage"])) + int(d.get("range", 4)) + int(d.get("accuracy", 0))
+			base = Dice.max_value(String(d["damage"])) + Dice.min_value(String(d["damage"])) + int(d.get("range", 4)) + int(d.get("accuracy", 0))
 		"armor":
-			return int(d.get("defense", 0)) * 3 + int(d.get("evasion", 0))
+			base = int(d.get("defense", 0)) * 3 + int(d.get("evasion", 0))
 		"amulet":
-			return 1
-	return -1
+			base = 2
+	if base < 0:
+		return -1
+	var bonus := it.total_mod(world.db, "damage") * 2 + it.total_mod(world.db, "defense") * 2 + it.total_mod(world.db, "might") + it.total_mod(world.db, "will") + it.total_mod(world.db, "agility") + it.total_mod(world.db, "accuracy") + it.total_mod(world.db, "evasion")
+	if it.rarity == "artifact":
+		bonus += 8
+	elif it.rarity == "rare":
+		bonus += 4
+	elif it.rarity == "uncommon":
+		bonus += 2
+	if it.buc == "blessed":
+		bonus += 2
+	return base + bonus
 
 
 func _find_upgrade() -> int:
 	for i in world.player.inventory.size():
 		var it := world.player.inventory[i]
+		if it.identified and it.buc == "cursed":
+			continue
 		var slot := world._slot_for(it)
 		if slot == "":
 			continue
 		var cur := world.player.equipped(slot)
+		if cur != null and cur.buc == "cursed":
+			continue
 		if cur == null or _score(it) > _score(cur):
 			return i
 	return -1

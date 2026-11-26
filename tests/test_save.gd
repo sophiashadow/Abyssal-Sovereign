@@ -106,6 +106,32 @@ func test_v4_save_migrates_to_v5() -> void:
 		ok(w2.player.specials.is_empty(), "default specials empty")
 
 
+func test_v5_save_migrates_to_v6() -> void:
+	var w := World.new_run(db(), 4242, "human", "assassin", "Mig5")
+	var d := _through_json(w)
+	d["save_version"] = 5
+	d.erase("id_known")
+	d.erase("id_aliases")
+	d.erase("uniques")
+	for it in d["player"]["inv"]:
+		for k in ["rar", "aff", "buc", "idn", "mods", "res", "dt", "st"]:
+			it.erase(k)
+	for slot in d["player"]["eq"]:
+		for k in ["rar", "aff", "buc", "idn", "mods", "res", "dt", "st"]:
+			d["player"]["eq"][slot].erase(k)
+	for k in d["floors"]:
+		for it in d["floors"][k]["items"]:
+			for fk in ["rar", "aff", "buc", "idn", "mods", "res", "dt", "st"]:
+				it.erase(fk)
+	var errors: PackedStringArray = []
+	var w2 := World.from_dict(db(), d, errors)
+	eq(errors.size(), 0, "v5 save migrates cleanly: %s" % ", ".join(errors))
+	ok(w2 != null, "migrated v5 world loaded")
+	if w2 != null:
+		eq(w2.player.inventory[0].buc, "uncursed", "default buc applied")
+		ok(w2.player.inventory[0].identified, "default identified applied")
+
+
 func test_round_trip_is_exact() -> void:
 	var w := World.new_run(db(), 4242, "cambion", "occultist", "Rt")
 	w.player_spend_stat("will")

@@ -69,6 +69,8 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 | `evasion` | int | no | armor evasion bonus (may be negative) |
 | `mods` | mods | amulet | applied while equipped |
 | `resists` | resists | no | percentage resistances while equipped |
+| `rarity` | enum: common, uncommon, rare, artifact | no | item rarity tier (default `common`) |
+| `set_id` | string | no | equipment set identifier |
 | `effect` | enum: heal, status, projectile, scroll | consumable | |
 | `heal` | dice | if effect heal | |
 | `status` | ref:statuses | if effect status / optional on weapon/projectile | |

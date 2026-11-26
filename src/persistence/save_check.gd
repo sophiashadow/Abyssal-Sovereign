@@ -9,7 +9,7 @@ const ACTOR_KEYS := ["id", "t", "name", "glyph", "color", "player", "x", "y", "h
 	"unique", "species", "class", "mask", "mask_risk",
 	"stat_points", "talent_points", "resource", "talents", "cooldowns",
 	"resists", "specials", "elite", "flags"]
-const ITEM_KEYS := ["id", "t", "q", "x", "y"]
+const ITEM_KEYS := ["id", "t", "q", "x", "y", "rar", "aff", "buc", "idn", "mods", "res", "dt", "st"]
 const FLOOR_KEYS := ["depth", "w", "h", "tiles", "explored", "up", "down", "exit", "actors", "items"]
 
 
@@ -33,6 +33,8 @@ static func problems(d: Dictionary, db: ContentDB) -> PackedStringArray:
 				break
 	if typeof(d.get("rng")) != TYPE_STRING or not String(d["rng"]).is_valid_int():
 		out.append("random state is malformed")
+	if typeof(d.get("id_known")) != TYPE_DICTIONARY or typeof(d.get("id_aliases")) != TYPE_DICTIONARY or typeof(d.get("uniques")) != TYPE_ARRAY:
+		out.append("discovery state is malformed")
 	return out
 
 
@@ -59,6 +61,12 @@ static func _item(v: Variant, db: ContentDB, where: String, out: PackedStringArr
 		return
 	if not db.has("items", String(v["t"])):
 		out.append("%s refers to unknown item '%s'" % [where, str(v["t"])])
+	if not (String(v["rar"]) in ["common", "uncommon", "rare", "artifact"]):
+		out.append("%s has invalid rarity '%s'" % [where, str(v["rar"])])
+	if not (String(v["buc"]) in ["blessed", "uncursed", "cursed"]):
+		out.append("%s has invalid buc '%s'" % [where, str(v["buc"])])
+	if typeof(v["aff"]) != TYPE_ARRAY or typeof(v["idn"]) != TYPE_BOOL or typeof(v["mods"]) != TYPE_DICTIONARY or typeof(v["res"]) != TYPE_DICTIONARY:
+		out.append("%s has malformed affix or identification data" % where)
 
 
 static func _actor(v: Variant, db: ContentDB, where: String, out: PackedStringArray) -> void:

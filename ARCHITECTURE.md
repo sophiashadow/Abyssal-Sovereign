@@ -72,3 +72,10 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 - **Save schema:** `World.SAVE_VERSION := 5` with deterministic migration `v1 -> v2 -> v3 -> v4 -> v5` adding `resists`, `specials`, and `elite` to actors (`SaveCheck.ACTOR_KEYS` updated).
 - **World & Combat APIs:** `Combat.mitigate`, `Combat.ranged_hit_chance`, `Combat.resolve_ranged`; `World.projectile_trace`, `World.player_fire`, `World.player_use_at`, `World.player_use_talent(tid, target_pos)`.
 - **Targeting UI:** `MapView.aim_path` trajectory overlay and `Main` Aim Mode (`f` / `Fire`, `Throw`, `Cast`, `Tab` target cycling, tile tap confirmation).
+
+## M5.3 Additions (Equipment & Discovery)
+
+- **Core & Sim modules:** `src/sim/affixes.gd` (`Affixes`: prefixes, suffixes, `BUC`, run-shuffled aliases) and `src/sim/item_sets.gd` (`ItemSets`: 2pc/3pc set aggregation and Mask risk cap bonus); extended `Item` (`src/sim/item.gd`) with per-instance `rarity`, `affixes`, `buc`, `identified`, `mods`, `resists`, `bonus_damage_type`, `bonus_status`.
+- **Save schema:** `World.SAVE_VERSION := 6` with deterministic migration `v1 -> ... -> v5 -> v6` adding root `id_known`, `id_aliases`, `uniques`, plus extended item fields (`rar`, `aff`, `buc`, `idn`, `mods`, `res`, `dt`, `st`) validated by `SaveCheck`.
+- **World APIs:** `World.item_name`, `World.is_item_identified`, `World.identify_item`, `World.identify_pack`, `World.unbind_curses`, `scroll_of_identify`, `scroll_of_unbind`, and unique artifact spawning.
+- **UI:** Set bonus summaries in `_show_build()`, rarity/BUC/affix/ID-aware `_item_stats()` and inventory labels in `src/ui/main.gd`, plus floor item rarity tinting in `MapView`.
