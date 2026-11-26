@@ -1067,6 +1067,42 @@ func _show_feature(feat: Dictionary) -> void:
 				_close_overlay()
 				world.player_interact(pos, "ring")
 				_after_action()))
+		"rune_puzzle":
+			col.add_child(_btn("Align the rings calmly (+XP, +resource, ID pack)", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "solve_order")
+				_after_action()))
+			col.add_child(_btn("Snap the rune lock (+scaled gear, +1 Subjugation)", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "solve_force")
+				_after_action()))
+		"abandoned_rite":
+			col.add_child(_btn("Complete the chalk circle (-2 HP, Apostate Focus)", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "complete")
+				_after_action()))
+			col.add_child(_btn("Dismantle safely (-1 Subjugation, +resource, +10 XP)", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "dismantle")
+				_after_action()))
+		"sanctuary_hearth":
+			col.add_child(_btn("Kindle deeply (spend 1 consumable if carried: 50% HP + full resource)", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "rest_blood")
+				_after_action()))
+			col.add_child(_btn("Rest quietly (+6 HP, -1 Subjugation)", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "rest_quiet")
+				_after_action()))
+		"echo_cache":
+			col.add_child(_btn("Read survey notes (reveal traps & walls nearby)", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "read")
+				_after_action()))
+			col.add_child(_btn("Extract hidden salvage", func() -> void:
+				_close_overlay()
+				world.player_interact(pos, "salvage")
+				_after_action()))
 		"npc":
 			var nid := String(feat.get("sub", ""))
 			if db.has("npcs", nid):

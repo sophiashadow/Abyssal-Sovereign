@@ -129,3 +129,8 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 - **Content & Sim:** Added `"threads"` schema + `content/core/threads.json` (`24` multi-stage threads) and `src/sim/threads.gd` (`Threads` selecting an Atlas-matched seeded subset of `8` per run without forced completionism).
 - **World & Save v11:** Added `threads_state` persistence (`pool`, `active`, `completed`, `refused`, `failed`, `pending`), `SAVE_VERSION := 11` (`v10 -> v11` migration + `SaveCheck`), event hooks across floor entry, boss kills, Relic Work/Transmute, contract attestation, and NPC dialogue, alternative `sacrifice` / `refuse` / `abandon` paths, and delayed aftermath ticks (`_tick_threads()`).
 - **UI:** Added non-spoiler Thread Journal overlay (`j` / Pause `"Threads"`) and NPC thread offer/resolution actions inside `_show_feature()`.
+
+## M6.7 Additions (Dungeon Variety and Emergent Encounters)
+
+- **Generation:** Added `src/gen/room_archetypes.gd` (`RoomArchetypes`: `10` regional composable room archetypes invoked in `DungeonGen.generate()` without breaking walkability or flood-fill connectivity) and emergent site placement in `DungeonGen._place_ecology()`.
+- **Sim & UI:** Extended `Ecology`, `World.player_interact()`, and `Main._show_feature()` with `rune_puzzle`, `abandoned_rite`, `sanctuary_hearth`, and `echo_cache`, keeping full `SAVE_VERSION := 11` compatibility.

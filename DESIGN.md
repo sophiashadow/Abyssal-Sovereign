@@ -207,3 +207,7 @@ M6.5 populates Terra Tenebrae with `18` recurring characters across `8` two-mind
 ## M6.6 — Threads Beneath the Record
 
 M6.6 introduces `24` organic multi-stage threads (`8` drawn deterministically per run matching that seed's active Atlas branches). Threads emerge through NPC dialogue, regional thresholds, Relic draws, and Contracts—offering fulfillment, blood/barter sacrifice, explicit refusal (queuing delayed aftermath events), and abandonment consequences without a forced completionist quest log.
+
+## M6.7 — Dungeon Variety and Emergent Encounters
+
+M6.7 layers `10` composable interior room archetypes onto dungeon chambers (`pillared_hall`, `cross_vault`, `sanctuary_alcove`, `ambush_choke`, `ritual_chamber`, `flooded_cistern`, `archive_stacks`, `gauntlet_corridor`, `settlement_court`, `broken_cloister`) while preserving `100%` flood-fill connectivity, and seeds `4` emergent interactive encounter features (`rune_puzzle`, `abandoned_rite`, `sanctuary_hearth`, `echo_cache`) presenting resource, stealth, Subjugation, and knowledge trade-offs.

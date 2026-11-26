@@ -101,6 +101,14 @@ static func glyph(feat: Dictionary) -> String:
 			return "*"
 		"npc":
 			return "N"
+		"rune_puzzle":
+			return "&"
+		"abandoned_rite":
+			return "o"
+		"sanctuary_hearth":
+			return "^"
+		"echo_cache":
+			return "~"
 	return "?"
 
 
@@ -130,6 +138,12 @@ static func color(feat: Dictionary) -> String:
 			return "#c77dff"
 		"npc":
 			return "#78bea7"
+		"rune_puzzle", "abandoned_rite":
+			return "#c77dff"
+		"sanctuary_hearth":
+			return "#78bea7"
+		"echo_cache":
+			return "#d3bea0"
 	return "#eee5d3"
 
 
@@ -158,6 +172,14 @@ static func label(feat: Dictionary) -> String:
 			return "Ophite Ward-Sigil"
 		"npc":
 			return String(feat.get("npc_name", feat.get("sub", "Unrecorded Traveler")))
+		"rune_puzzle":
+			return "Unsealed Rune Lock" + (" (cleared)" if bool(feat.get("used", false)) else "")
+		"abandoned_rite":
+			return "Abandoned Chalk Circle" + (" (cleared)" if bool(feat.get("used", false)) else "")
+		"sanctuary_hearth":
+			return "Shuttered Sanctuary Hearth" + (" (cold)" if bool(feat.get("used", false)) else "")
+		"echo_cache":
+			return "Wall-Hollow Echo" + (" (empty)" if bool(feat.get("used", false)) else "")
 	return "feature"
 
 
@@ -185,6 +207,14 @@ static func description(feat: Dictionary) -> String:
 			return "A humming geometric ward that strikes adjacent foes with Void."
 		"npc":
 			return "A recurring soul navigating Terra Tenebrae's competing institutions."
+		"rune_puzzle":
+			return "A three-ring chalk lock left humming in a vault corner. Align the order safely or break it open."
+		"abandoned_rite":
+			return "Half-erased geometric salt lines still radiating faint residue. Complete the rite or scrape it clean."
+		"sanctuary_hearth":
+			return "A cold stone basin with buried embers where unrecorded runners catch breath below sight."
+		"echo_cache":
+			return "Loose masonry hiding survey scraps and salvaged stock forgotten behind false walls."
 	return ""
 
 

@@ -142,3 +142,7 @@ Surface locations from FALSE LIGHT PR #300 (`BREADTH_PASS.md`) inform undergroun
 ## M6.6 World Threads Provenance
 
 - **24 Organic World Threads** (`Proposed` narrative/procedural threads tying PR #300 NPCs, Atlas branches, Relics, Contracts, and Two Ways together without forced completionism): *The Unrecorded Tally in the Drain*, *Loose Leaf Below the Stair*, *Tanner's Cold Mark*, *Short Brass at the Flues*, *Carrying the Margin Word*, *Testing the Lent Glass*, *The Grate Marshal's Reckoning*, *Clean Oil for the Shut Chapel*, *Witness at the Seventh Sill*, *Broth for the Unfiled*, *Snapping the Wax Stamp*, *Frost on the Tithe Axle*, *Silencing the Brass Key*, *Counter-Signed Obligation*, *Ink-Stained Cistern Sluice*, *After the Furnace Falls*, *Leaden Weights Below*, *Chained Folio in the Stacks*, *Through Confessor's Glass*, *Quenching the Great Die*, *Where Bronze Keys Turn*, *Beyond the Ruled Column*, and *Clean Flagstones at Saturn*.
+
+## M6.7 Dungeon Variety & Emergent Encounters Provenance
+
+- **10 Room Archetypes & 4 Emergent Sites** (`Proposed` tactical geometry and non-linear chamber features): *Pillared Hall*, *Cross Vault*, *Sanctuary Alcove*, *Ambush Choke*, *Ritual Chamber*, *Flooded Cistern*, *Archive Stacks*, *Gauntlet Corridor*, *Settlement Court*, and *Broken Cloister*, alongside *Unsealed Rune Locks*, *Abandoned Chalk Circles*, *Shuttered Sanctuary Hearths*, and *Wall-Hollow Echoes*.

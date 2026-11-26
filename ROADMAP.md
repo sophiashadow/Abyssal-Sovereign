@@ -97,4 +97,8 @@ M5 (The Depth Pass: M5.1–M5.5) is complete.
 
 1. **24 World Threads & Delayed Consequences (`SAVE_VERSION := 11`):** Added `threads.json`, `Threads` seeded per-run subset selection, alternative resolution (`goal`/`sacrifice`/`refuse`/`abandon`), delayed aftermath scheduling, non-spoiler Thread Journal (`j`), and `v10 -> v11` save migration.
 
-Remaining M6 submilestones track M6.7–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.
+## Milestone 6.7: Dungeon Variety and Emergent Encounters (done 2026-11-26)
+
+1. **10 Room Archetypes & 4 Emergent Sites:** Added `RoomArchetypes`, safe interior tactical geometry preserving `100%` connectivity, and interactive `rune_puzzle`, `abandoned_rite`, `sanctuary_hearth`, and `echo_cache` sites.
+
+Remaining M6 submilestones track M6.8–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.

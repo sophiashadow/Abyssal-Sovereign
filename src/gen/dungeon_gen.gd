@@ -157,6 +157,7 @@ static func generate(floor_def: Dictionary, seed_value: int, extra_portals: Arra
 			continue
 		occupied[p] = true
 		m.spawns.append({"kind": "item", "id": rng.pick_weighted(floor_def["item_table"]), "pos": p})
+	RoomArchetypes.apply_to_map(m, floor_def, occupied, rng)
 	_place_ecology(m, floor_def, occupied, rng)
 	return m
 
@@ -237,6 +238,11 @@ static func _place_ecology(m: FloorMap, floor_def: Dictionary, occupied: Diction
 				})
 			feat["stock"] = stock
 		m.features.append(feat)
+	var emergent_kind := String(rng.pick(["rune_puzzle", "abandoned_rite", "sanctuary_hearth", "echo_cache"]))
+	var ep := _free_spot(m, m.rooms[rng.pick(non_start)], occupied, rng)
+	if ep.x >= 0:
+		occupied[ep] = true
+		m.features.append({"kind": emergent_kind, "sub": emergent_kind, "x": ep.x, "y": ep.y, "revealed": true, "used": false})
 	var secret_candidates := _secret_wall_candidates(m)
 	var n_secrets := mini(2, secret_candidates.size())
 	for _s in n_secrets:

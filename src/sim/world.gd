@@ -2514,6 +2514,79 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 			player.stat_points += 1
 			log_msg("The Trial Bell tolls! Guards rush out—and you gain +1 attribute point.", "lore")
 			return _finish_player_action(COST_WAIT)
+		"rune_puzzle":
+			f["used"] = true
+			if choice == "solve_force":
+				subjugation = mini(chain_limit(), subjugation + 1)
+				var r_table: Array = current_floor_def().get("item_table", [])
+				if not r_table.is_empty():
+					var it := _new_item(rng.pick_weighted(r_table))
+					Affixes.roll_equipment(it, db, depth + 2, rng, true)
+					it.pos = pos
+					m.items.append(it)
+				log_msg("You snap the rune lock violently! Salvage spills out (+1 Subjugation).", "lore")
+			else:
+				var nid := identify_pack()
+				player.resource = mini(player.max_resource(), player.resource + 3)
+				gain_xp(15)
+				log_msg("The rings click silently (%d identified, +3 %s, +15 XP)." % [nid, player.resource_label()], "good")
+			return _finish_player_action(COST_ITEM)
+		"abandoned_rite":
+			f["used"] = true
+			if choice == "complete":
+				player.hp = maxi(1, player.hp - 2)
+				apotheosis += 1
+				apply_status(player, "apostate_focus")
+				log_msg("You close the unfinished circle (-2 HP, Apostate Focus gained).", "lore")
+			else:
+				subjugation = maxi(0, subjugation - 1)
+				player.resource = mini(player.max_resource(), player.resource + 4)
+				gain_xp(10)
+				log_msg("You sweep the chalk lines clean (-1 Subjugation, +4 %s, +10 XP)." % player.resource_label(), "good")
+			return _finish_player_action(COST_WAIT)
+		"sanctuary_hearth":
+			f["used"] = true
+			if choice == "rest_blood":
+				var spend_idx := -1
+				for i in player.inventory.size():
+					if String(player.inventory[i].def(db).get("kind", "")) == "consumable":
+						spend_idx = i
+						break
+				if spend_idx >= 0:
+					var sp := player.inventory[spend_idx]
+					sp.quantity -= 1
+					if sp.quantity <= 0:
+						player.inventory.remove_at(spend_idx)
+				var heal := maxi(8, player.stat("max_hp") / 2)
+				player.hp = mini(player.stat("max_hp"), player.hp + heal)
+				player.resource = player.max_resource()
+				for st in ["bleeding", "chilled", "dread"]:
+					_remove_status(player, st)
+				log_msg("Warm ash-embers restore your vigor (+%d HP, full %s)." % [heal, player.resource_label()], "good")
+			else:
+				player.hp = mini(player.stat("max_hp"), player.hp + 6)
+				subjugation = maxi(0, subjugation - 1)
+				log_msg("You catch quiet breath by the hearth (+6 HP, -1 Subjugation).", "good")
+			return _finish_player_action(COST_WAIT)
+		"echo_cache":
+			f["used"] = true
+			if choice == "salvage":
+				var c_table: Array = current_floor_def().get("item_table", [])
+				if not c_table.is_empty():
+					var item_c := _new_item(rng.pick_weighted(c_table))
+					Affixes.roll_equipment(item_c, db, depth + 1, rng, false)
+					item_c.pos = pos
+					m.items.append(item_c)
+					log_msg("You draw forgotten salvage from the wall hollow.", "good")
+			else:
+				for feat in m.features:
+					feat["revealed"] = true
+				for fy in range(maxi(0, pos.y - 10), mini(m.height, pos.y + 11)):
+					for fx in range(maxi(0, pos.x - 10), mini(m.width, pos.x + 11)):
+						m.set_explored(Vector2i(fx, fy))
+				update_fov()
+				log_msg("Scraps inside the wall reveal traps, caches, and stairs nearby.", "good")
+			return _finish_player_action(COST_ITEM)
 		"npc":
 			return _interact_npc(pos, f, choice)
 	return false
