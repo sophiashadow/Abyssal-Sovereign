@@ -102,6 +102,50 @@ func equipped(slot: String) -> Item:
 	return equipment.get(slot) as Item
 
 
+func masks_worn() -> Array:
+	var arr: Variant = flags.get("masks_worn", [])
+	return arr if arr is Array else []
+
+
+func all_three_masks_worn() -> bool:
+	var cur := masks_worn()
+	for m in Masks.ACTIVE_MASKS:
+		if not cur.has(m):
+			return false
+	return true
+
+
+func record_mask_worn(mask_id: String) -> bool:
+	if not Masks.ACTIVE_MASKS.has(mask_id):
+		return all_three_masks_worn()
+	var cur: Array = masks_worn().duplicate()
+	if not cur.has(mask_id):
+		cur.append(mask_id)
+		flags["masks_worn"] = cur
+	return all_three_masks_worn()
+
+
+func is_venefica_unlocked() -> bool:
+	return bool(flags.get("venefica_unlocked", false))
+
+
+func unlock_venefica(early: bool = false) -> void:
+	flags["venefica_unlocked"] = true
+	if early and not flags.has("venefica_early"):
+		flags["venefica_early"] = true
+
+
+func mask_seized_turns() -> int:
+	return maxi(0, int(flags.get("mask_seized_turns", 0)))
+
+
+func set_mask_seized_turns(n: int) -> void:
+	if n <= 0:
+		flags.erase("mask_seized_turns")
+	else:
+		flags["mask_seized_turns"] = n
+
+
 func _mod_sum(stat_name: String) -> int:
 	if equipment.is_empty() and statuses.is_empty() and talents.is_empty() and not has_trait("mask_stances"):
 		return 0
@@ -117,11 +161,11 @@ func _mod_sum(stat_name: String) -> int:
 		total += int(Masks.mods(mask).get(stat_name, 0))
 		var cf := talent_rank("crowned_frequency")
 		if cf > 0:
-			if mask == "nyx" and stat_name == "evasion":
+			if (mask == "nyx" or mask == Masks.UNION_ID) and stat_name == "evasion":
 				total += cf
-			elif mask == "eris" and stat_name == "damage":
+			if (mask == "eris" or mask == Masks.UNION_ID) and stat_name == "damage":
 				total += cf
-			elif mask == "lilith" and stat_name == "will":
+			if (mask == "lilith" or mask == Masks.UNION_ID) and stat_name == "will":
 				total += cf
 	for tid in talents:
 		var rank := int(talents[tid])

@@ -5,6 +5,8 @@ extends RefCounted
 ## seizure status until you cool down in Bare Face or rotate frequencies.
 
 const ORDER: Array[String] = ["bare_face", "nyx", "eris", "lilith"]
+const ACTIVE_MASKS: Array[String] = ["nyx", "eris", "lilith"]
+const UNION_ID := "lux_venefica"
 
 const DEFS := {
 	"bare_face": {
@@ -39,11 +41,23 @@ const DEFS := {
 		"seizure": "exposure",
 		"color": "#e8c547",
 	},
+	"lux_venefica": {
+		"name": "Lux Venefica",
+		"summary": "Union of Nyx, Eris & Lilith: +2 evasion/damage/sight/will, +1 accuracy, +20% Void/Fire/Radiant, stealth & fog sight, cools risk. Fractures under False Light or bondage.",
+		"mods": {"evasion": 2, "damage": 2, "accuracy": 1, "sight": 2, "will": 2},
+		"resists": {"void": 20, "fire": 20, "radiant": 20},
+		"seizure": "",
+		"color": "#f2d8ff",
+	},
 }
 
 
 static func is_valid(id: String) -> bool:
 	return DEFS.has(id)
+
+
+static func is_union(id: String) -> bool:
+	return id == UNION_ID
 
 
 static func label(id: String) -> String:

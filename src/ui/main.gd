@@ -477,7 +477,12 @@ func _update_hud() -> void:
 		var rwd := rw.def(db)
 		t.append("Ranged: %s (%s, rng %d)" % [world.item_name(rw), rwd["damage"], int(rwd["range"])])
 	if p.has_trait("mask_stances"):
-		t.append("Mask: [color=%s]%s[/color] (risk %d/%d)" % [Masks.color(p.mask), Masks.label(p.mask), p.mask_risk, World.MASK_RISK_MAX])
+		var mtag := ""
+		if p.mask == Masks.UNION_ID:
+			mtag = " [Unified]"
+		elif p.mask_seized_turns() > 0:
+			mtag = " [Seized %dt]" % p.mask_seized_turns()
+		t.append("Mask: [color=%s]%s[/color]%s (risk %d/%d)" % [Masks.color(p.mask), Masks.label(p.mask), mtag, p.mask_risk, World.MASK_RISK_MAX])
 	if world.subjugation > 0:
 		var clim := world.chain_limit()
 		var scol := Palette.ALERT.to_html(false) if world.subjugation >= clim - 1 else Palette.FALSE_SUN.to_html(false)
@@ -1211,6 +1216,24 @@ func _show_masks() -> void:
 		b.disabled = active
 		col.add_child(b)
 		col.add_child(_label(Masks.summary(mid), Palette.TEXT_DIM, 0.78))
+	if world.player.mask == Masks.UNION_ID:
+		var ub := _btn("Lux Venefica (unified)", func() -> void: pass)
+		ub.disabled = true
+		col.add_child(ub)
+		col.add_child(_label(Masks.summary(Masks.UNION_ID), Palette.TEXT_DIM, 0.78))
+	elif world.player.is_venefica_unlocked():
+		var verb := "Reunify: Lux Venefica" if int(world.player.flags.get("venefica_fractures", 0)) > 0 else "Unify: Lux Venefica"
+		var reason := world.can_unify_venefica()
+		var ub := _btn(verb if reason == "" else "%s (%s)" % [verb, reason], func() -> void:
+			_close_overlay()
+			if world.player_switch_mask(Masks.UNION_ID):
+				_after_action()
+		)
+		ub.disabled = reason != ""
+		col.add_child(ub)
+		col.add_child(_label(Masks.summary(Masks.UNION_ID), Palette.TEXT_DIM, 0.78))
+	else:
+		col.add_child(_label("Lux Venefica (locked): wear Nyx, Eris & Lilith (%d/3) or speak your Name at a gate." % world.player.masks_worn().size(), Palette.TEXT_DIM, 0.78))
 	col.add_child(_btn("Close", _close_overlay))
 
 

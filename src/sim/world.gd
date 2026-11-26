@@ -560,6 +560,8 @@ func _enter_floor_by_id(target_id: String, arrival_kind: String, from_id: String
 	_player_dist_pos = Vector2i(-99999, -99999)
 	_thread_event("floor", target_id)
 	_thread_event("visit_floor", target_id)
+	if not first_ever or target_id != db.spine_floor_id(1):
+		_maybe_surface_venefica_naming()
 
 
 func _adjacent_free(m: FloorMap, p: Vector2i) -> Vector2i:
@@ -1263,6 +1265,9 @@ func player_descend_gate(method: String) -> bool:
 			"by_name":
 				apotheosis = maxi(0, apotheosis - 1)
 				log_msg("You speak your own name to the gate; something below hears it.", "lore")
+				if player.has_trait("mask_stances") and not player.is_venefica_unlocked():
+					player.unlock_venefica(true)
+					log_msg("The gate answers your spoken name — Lux Venefica can now unify early (m).", "good")
 	if first_visit:
 		_contract_event("gate:" + method)
 		_contract_event("descend")
@@ -1322,17 +1327,86 @@ func player_stairs() -> bool:
 	return false
 
 
+static func fracture_mask_for(cause: String) -> String:
+	if cause in ["false_light", "chain_indulgence", "exposure", "chain_omnipotence", "perception_fog", "philosophers_loan"]:
+		return "lilith"
+	if cause in ["entangled", "isolation", "dread", "pinned", "chain_isolation", "chain_threat"]:
+		return "eris"
+	return "nyx"
+
+
+func can_unify_venefica() -> String:
+	if player == null or not player.has_trait("mask_stances"):
+		return "Requires Mask Governance."
+	if not player.is_venefica_unlocked():
+		return "Wear Nyx, Eris & Lilith (%d/3) or speak your Name at a gate." % player.masks_worn().size()
+	if player.mask == Masks.UNION_ID:
+		return "Already unified."
+	if player.has_status("false_light"):
+		return "Cannot unify under the False Light."
+	if player.has_status("entangled"):
+		return "Cannot unify while Entangled."
+	if player.mask_seized_turns() > 0 or player.has_status("dissolution") or player.has_status("isolation") or player.has_status("exposure"):
+		return "Resolve Mask seizure first."
+	return ""
+
+
+func fracture_venefica(cause: String, reason: String = "") -> String:
+	if player == null or not player.has_trait("mask_stances") or player.mask != Masks.UNION_ID:
+		return ""
+	var pick := fracture_mask_for(cause)
+	player.mask = pick
+	player.set_mask_seized_turns(8)
+	player.mask_risk = maxi(player.mask_risk, MASK_RISK_MAX / 2)
+	player.flags["venefica_fractures"] = int(player.flags.get("venefica_fractures", 0)) + 1
+	var sid := Masks.seizure_status(pick)
+	if sid != "":
+		apply_status(player, sid)
+	var why := reason if reason != "" else cause
+	log_msg("Lux Venefica fractures (%s)! %s seizes the wheel." % [why, Masks.label(pick)], "danger")
+	update_fov()
+	return pick
+
+
+func _maybe_surface_venefica_naming() -> bool:
+	if player == null or not player.has_trait("mask_stances"):
+		return false
+	if not player.all_three_masks_worn() or bool(player.flags.get("venefica_named_seen", false)):
+		return false
+	player.flags["venefica_named_seen"] = true
+	player.unlock_venefica(false)
+	log_msg("A whisper carries across the stone — 'Venefica.' All three Masks answer to one name; Lux Venefica stirs within you (m).", "lore")
+	return true
+
+
 func player_switch_mask(mask_id: String) -> bool:
 	if state != State.PLAYING or not player.has_trait("mask_stances") or not Masks.is_valid(mask_id):
 		return false
 	if player.mask == mask_id:
 		return false
-	player.mask = mask_id
-	if mask_id == "bare_face":
-		player.mask_risk = maxi(0, player.mask_risk - 2)
-		log_msg("You drop the Mask and wear your Bare Face.", "info")
+	if mask_id == Masks.UNION_ID:
+		var reason := can_unify_venefica()
+		if reason != "":
+			log_msg(reason, "info")
+			return false
+		player.mask = Masks.UNION_ID
+		player.set_mask_seized_turns(0)
+		log_msg("Nyx, Eris, and Lilith converge: you stand unified as Lux Venefica.", "good")
 	else:
-		log_msg("You put on %s." % Masks.label(mask_id), "good")
+		player.mask = mask_id
+		if mask_id == "bare_face":
+			player.mask_risk = maxi(0, player.mask_risk - 2)
+			if player.mask_seized_turns() > 0:
+				player.set_mask_seized_turns(maxi(0, player.mask_seized_turns() - 2))
+			log_msg("You drop the Mask and wear your Bare Face.", "info")
+		else:
+			var all_three := player.record_mask_worn(mask_id)
+			log_msg("You put on %s." % Masks.label(mask_id), "good")
+			if all_three:
+				if not player.is_venefica_unlocked():
+					player.unlock_venefica(false)
+					log_msg("All three Masks have answered: Lux Venefica can now be unified (m).", "good")
+				_maybe_surface_venefica_naming()
 	update_fov()
 	var cost := COST_WAIT / 2 if player.talent_rank("quick_shift") > 0 else COST_WAIT
 	return _finish_player_action(cost)
@@ -1555,7 +1629,7 @@ func _run_talent_effect(eff: String, td: Dictionary, target: Actor, target_pos: 
 			_remove_status(player, "pinned")
 			if player.has_trait("mask_stances"):
 				player.mask_risk = maxi(0, player.mask_risk - 1)
-				if player.mask == "nyx":
+				if player.mask == "nyx" or player.mask == Masks.UNION_ID:
 					apply_status(player, "veiled")
 			update_fov()
 			log_msg("You slip through the veil.", "good")
@@ -1580,7 +1654,7 @@ func _run_talent_effect(eff: String, td: Dictionary, target: Actor, target_pos: 
 		"gaze_of_lilith":
 			_remove_status(player, "perception_fog")
 			update_fov()
-			var base_d := 5 if (player.has_trait("mask_stances") and player.mask == "lilith") else 3
+			var base_d := 5 if (player.has_trait("mask_stances") and (player.mask == "lilith" or player.mask == Masks.UNION_ID)) else 3
 			var mit := Combat.mitigate(base_d + will_v + cambion_bonus, target, dtype)
 			var dmg := int(mit["damage"])
 			target.awake = true
@@ -2002,7 +2076,7 @@ func _has_keen_sight() -> bool:
 		return true
 	if player.has_status("confessors_clarity") or player.has_status("lamp_vigil"):
 		return true
-	return player.has_trait("mask_stances") and player.mask == "lilith"
+	return player.has_trait("mask_stances") and (player.mask == "lilith" or player.mask == Masks.UNION_ID)
 
 
 func _passive_detect() -> void:
@@ -2028,7 +2102,7 @@ func _chain_hit(sid: String) -> void:
 	if sid == "perception_fog" and player.has_trait("liminal_sight"):
 		log_msg("Your veil-touched sight ignores the narrowing fog.", "good")
 		return
-	if sid == "perception_fog" and player.has_trait("mask_stances") and player.mask == "lilith":
+	if sid == "perception_fog" and player.has_trait("mask_stances") and (player.mask == "lilith" or player.mask == Masks.UNION_ID):
 		log_msg("Lilith's Eye sees through the narrowing litany.", "good")
 		return
 	if player.has_status("halo_aegis"):
@@ -2040,6 +2114,8 @@ func _chain_hit(sid: String) -> void:
 	if player.has_trait("penance_vigor"):
 		player.resource = mini(player.max_resource(), player.resource + 2)
 		player.hp = mini(player.stat("max_hp"), player.hp + 1)
+	if player.has_trait("mask_stances") and player.mask == Masks.UNION_ID and sid in ["isolation", "dread", "exposure", "debility", "degradation", "demanded", "pinned", "perception_fog"]:
+		fracture_venefica(sid, "bondage: " + sid)
 	if player.has_status("entangled"):
 		return
 	var gain := 1
@@ -2049,7 +2125,7 @@ func _chain_hit(sid: String) -> void:
 		gain -= 1
 	if player.has_status("reckoning"):
 		gain += 1
-	if player.has_trait("mask_stances") and player.mask == "nyx":
+	if player.has_trait("mask_stances") and (player.mask == "nyx" or player.mask == Masks.UNION_ID):
 		gain -= 1
 	if current_floor().get_tile(player.pos) == Tiles.SANCTUARY_FLOOR:
 		gain -= 1
@@ -2067,6 +2143,8 @@ func _entangle() -> void:
 		return
 	apply_status(player, "entangled")
 	log_msg("The chains close: you are Entangled.", "danger")
+	if player.has_trait("mask_stances") and player.mask == Masks.UNION_ID:
+		fracture_venefica("entangled", "Entanglement")
 
 
 func _tick_subjugation() -> void:
@@ -2116,6 +2194,8 @@ func player_sign_contract(cid: String) -> bool:
 	contract_progress = 0
 	apotheosis = maxi(0, apotheosis + int(cd.get("apotheosis", 0)))
 	log_msg("You sign %s. Oath: %s" % [cd["name"], cd["oath_text"]], "lore")
+	if player.has_trait("mask_stances") and player.mask == Masks.UNION_ID:
+		fracture_venefica("contract", "binding contract")
 	_thread_event("contract", cid)
 	return true
 
@@ -2961,9 +3041,14 @@ func _tick_cooldowns() -> void:
 func _tick_mask() -> void:
 	if turns <= 0 or not player.has_trait("mask_stances"):
 		return
+	if player.mask_seized_turns() > 0:
+		player.set_mask_seized_turns(player.mask_seized_turns() - 1)
 	if player.mask == "bare_face":
 		var cool := 2 + player.talent_rank("quick_shift")
 		player.mask_risk = maxi(0, player.mask_risk - cool)
+		return
+	if player.mask == Masks.UNION_ID:
+		player.mask_risk = maxi(0, player.mask_risk - 1)
 		return
 	player.mask_risk += 1
 	var risk_max := MASK_RISK_MAX + 2 * player.talent_rank("crowned_frequency") + ItemSets.mask_risk_bonus(player, db)
@@ -3093,6 +3178,8 @@ func apply_status(a: Actor, sid: String) -> void:
 	a.statuses.append({"id": sid, "turns": dur})
 	if a.is_player:
 		log_msg("%s: %s" % [sd["name"], sd["description"]], "danger" if sid in ["reckoning", "bleeding", "isolation", "perception_fog", "sundered", "burning", "chilled", "pinned", "hexed"] else "good")
+		if sid == "false_light" and a.mask == Masks.UNION_ID:
+			fracture_venefica("false_light", "the False Light")
 
 
 func _remove_status(a: Actor, sid: String) -> void:
@@ -3127,7 +3214,7 @@ func _monster_turn(mon: Actor) -> int:
 		if player.has_trait("mask_stances"):
 			if player.mask == "lilith":
 				perc += 2
-			elif player.mask == "nyx":
+			elif player.mask == "nyx" or player.mask == Masks.UNION_ID:
 				notice_pct = NOTICE_PCT / 2
 		var ue := player.talent_rank("unseen_edge")
 		if ue > 0:
