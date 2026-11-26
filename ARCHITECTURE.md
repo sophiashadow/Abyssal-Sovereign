@@ -65,3 +65,10 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 - **Save schema:** `World.SAVE_VERSION := 4` with deterministic migration `v1 -> v2 -> v3 -> v4` adding `stat_points`, `talent_points`, `resource`, `talents`, and `cooldowns` to serialized actors (`SaveCheck.ACTOR_KEYS` updated).
 - **World APIs:** `player_spend_stat(stat_name)`, `can_learn_talent(talent_id)`, `player_learn_talent(talent_id)`, `learned_active_talents()`, `nearest_visible_hostile(max_range)`, and `player_use_talent(talent_id)`.
 - **UI:** `src/ui/main.gd` exposes `Build` (`c`, attribute allocation + 3 talent trees) and `Act` (`a` / `1`–`6`, active abilities) overlays plus class resource and unspent point counters in the HUD.
+
+## M5.2 Additions (Combat Depth)
+
+- **Core & Content:** `Grid.line(a, b)` Bresenham trace; `ContentSchema.DAMAGE_TYPES` (`physical`, `fire`, `cold`, `radiant`, `void`); `resists` field type checked in `ContentDB`; `ranged`, `projectile`, and `scroll` items plus elite/boss fields (`monsters.specials`, `ranged_damage`, `floors.boss`) in `content/core/*.json`.
+- **Save schema:** `World.SAVE_VERSION := 5` with deterministic migration `v1 -> v2 -> v3 -> v4 -> v5` adding `resists`, `specials`, and `elite` to actors (`SaveCheck.ACTOR_KEYS` updated).
+- **World & Combat APIs:** `Combat.mitigate`, `Combat.ranged_hit_chance`, `Combat.resolve_ranged`; `World.projectile_trace`, `World.player_fire`, `World.player_use_at`, `World.player_use_talent(tid, target_pos)`.
+- **Targeting UI:** `MapView.aim_path` trajectory overlay and `Main` Aim Mode (`f` / `Fire`, `Throw`, `Cast`, `Tab` target cycling, tile tap confirmation).

@@ -27,6 +27,7 @@ const MOD_STATS: Array[String] = [
 	"damage", "crit", "speed", "sight",
 ]
 const ATTRIBUTES: Array[String] = ["might", "agility", "will"]
+const DAMAGE_TYPES: Array[String] = ["physical", "fire", "cold", "radiant", "void"]
 
 const FIELDS := {
 	"statuses": {
@@ -35,7 +36,9 @@ const FIELDS := {
 		"description": {"type": "text", "required": true},
 		"duration": {"type": "int", "required": true, "min": 1},
 		"mods": {"type": "mods", "required": false},
+		"resists": {"type": "resists", "required": false},
 		"regen": {"type": "int", "required": false},
+		"damage_type": {"type": "enum:physical|fire|cold|radiant|void", "required": false},
 		"on_expire": {"type": "ref:statuses", "required": false},
 		"color": {"type": "color", "required": false},
 	},
@@ -44,17 +47,22 @@ const FIELDS := {
 		"name": {"type": "string", "required": true},
 		"glyph": {"type": "glyph", "required": true},
 		"color": {"type": "color", "required": true},
-		"kind": {"type": "enum:weapon|armor|amulet|consumable|relic", "required": true},
+		"kind": {"type": "enum:weapon|ranged|armor|amulet|consumable|relic", "required": true},
 		"description": {"type": "text", "required": true},
 		"damage": {"type": "dice", "required": false},
+		"range": {"type": "int", "required": false, "min": 1},
+		"damage_type": {"type": "enum:physical|fire|cold|radiant|void", "required": false},
+		"aoe_radius": {"type": "int", "required": false, "min": 0},
 		"accuracy": {"type": "int", "required": false},
 		"crit": {"type": "int", "required": false},
 		"defense": {"type": "int", "required": false},
 		"evasion": {"type": "int", "required": false},
 		"mods": {"type": "mods", "required": false},
-		"effect": {"type": "enum:heal|status", "required": false},
+		"resists": {"type": "resists", "required": false},
+		"effect": {"type": "enum:heal|status|projectile|scroll", "required": false},
 		"heal": {"type": "dice", "required": false},
 		"status": {"type": "ref:statuses", "required": false},
+		"spell": {"type": "string", "required": false},
 		"stackable": {"type": "bool", "required": false},
 		"work_status": {"type": "ref:statuses", "required": false},
 		"work_cost_hp": {"type": "int", "required": false, "min": 0},
@@ -72,6 +80,7 @@ const FIELDS := {
 		"xp_mult": {"type": "number", "required": false},
 		"heal_mult": {"type": "number", "required": false},
 		"mods": {"type": "mods", "required": false},
+		"resists": {"type": "resists", "required": false},
 		"traits": {"type": "list:trait", "required": false},
 	},
 	"classes": {
@@ -100,6 +109,8 @@ const FIELDS := {
 		"cost": {"type": "int", "required": false, "min": 0},
 		"cooldown": {"type": "int", "required": false, "min": 0},
 		"range": {"type": "int", "required": false, "min": 0},
+		"damage_type": {"type": "enum:physical|fire|cold|radiant|void", "required": false},
+		"targeting": {"type": "enum:self|enemy|tile", "required": false},
 		"description": {"type": "text", "required": true},
 		"mods": {"type": "mods", "required": false},
 		"effect": {"type": "string", "required": false},
@@ -112,12 +123,17 @@ const FIELDS := {
 		"description": {"type": "text", "required": true},
 		"hp": {"type": "int", "required": true, "min": 1},
 		"damage": {"type": "dice", "required": true},
+		"damage_type": {"type": "enum:physical|fire|cold|radiant|void", "required": false},
+		"ranged_damage": {"type": "dice", "required": false},
+		"ranged_range": {"type": "int", "required": false, "min": 1},
 		"accuracy": {"type": "int", "required": true},
 		"evasion": {"type": "int", "required": true},
 		"defense": {"type": "int", "required": true},
 		"speed": {"type": "int", "required": true, "min": 10},
 		"xp": {"type": "int", "required": true, "min": 0},
 		"perception": {"type": "int", "required": true, "min": 1},
+		"resists": {"type": "resists", "required": false},
+		"specials": {"type": "list:string", "required": false},
 		"tags": {"type": "list:string", "required": false},
 		"unique": {"type": "bool", "required": false},
 	},
@@ -139,12 +155,14 @@ const FIELDS := {
 		"item_table": {"type": "table:items", "required": true},
 		"exit": {"type": "enum:stairs|sealed_door", "required": true},
 		"guardian": {"type": "ref:monsters", "required": false},
+		"boss": {"type": "ref:monsters", "required": false},
 	},
 }
 
 ## Extra rules: per item kind, fields that must be present.
 const ITEM_KIND_REQUIRES := {
 	"weapon": ["damage"],
+	"ranged": ["damage", "range"],
 	"armor": ["defense"],
 	"amulet": ["mods"],
 	"consumable": ["effect"],

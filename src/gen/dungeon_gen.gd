@@ -74,17 +74,33 @@ static func generate(floor_def: Dictionary, seed_value: int) -> FloorMap:
 		m.exit_pos = exit_c
 		m.set_tile(exit_c, Tiles.STAIRS_DOWN)
 		occupied[exit_c] = true
+		var boss_id := String(floor_def.get("boss", ""))
+		if boss_id != "":
+			var boss_pos := _guard_spot(m, exit_c, dist)
+			if boss_pos.x >= 0:
+				occupied[boss_pos] = true
+				m.spawns.append({"kind": "monster", "id": boss_id, "pos": boss_pos, "boss": true})
 
 	var monster_rooms: Array[int] = []
 	for i in range(1, m.rooms.size()):
 		monster_rooms.append(i)
+	var regular_spawns: Array[int] = []
 	var n_monsters := rng.range_i(int(floor_def["monsters_min"]), int(floor_def["monsters_max"]))
 	for _i in n_monsters:
 		var p := _free_spot(m, m.rooms[rng.pick(monster_rooms)], occupied, rng)
 		if p.x < 0:
 			continue
 		occupied[p] = true
+		regular_spawns.append(m.spawns.size())
 		m.spawns.append({"kind": "monster", "id": rng.pick_weighted(floor_def["monster_table"]), "pos": p})
+	if m.depth >= 2 and not regular_spawns.is_empty():
+		var elite_count := 2 if m.depth >= 4 and regular_spawns.size() >= 4 else 1
+		var chosen := {}
+		for _e in elite_count:
+			var idx := int(rng.pick(regular_spawns))
+			if not chosen.has(idx):
+				chosen[idx] = true
+				m.spawns[idx]["elite"] = rng.pick(["cinder", "rime", "void", "iron"])
 	var n_items := rng.range_i(int(floor_def["items_min"]), int(floor_def["items_max"]))
 	for _i in n_items:
 		var p := _free_spot(m, m.rooms[rng.range_i(0, m.rooms.size() - 1)], occupied, rng)

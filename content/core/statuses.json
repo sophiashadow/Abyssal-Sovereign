@@ -90,6 +90,7 @@
       "description": "Stance anchored against the worst.",
       "duration": 5,
       "mods": {"defense": 3, "evasion": 1},
+      "resists": {"physical": 15},
       "color": "#a8b4d9"
     },
     {
@@ -98,6 +99,7 @@
       "description": "Unfettered from the wheel; every stroke lands harder.",
       "duration": 5,
       "mods": {"accuracy": 2, "damage": 2},
+      "resists": {"radiant": 25},
       "color": "#f2c35c"
     },
     {
@@ -114,7 +116,41 @@
       "description": "An arterial cut drains vitality every turn.",
       "duration": 5,
       "regen": -2,
+      "damage_type": "physical",
       "color": "#ff4d6d"
+    },
+    {
+      "id": "burning",
+      "name": "Burning",
+      "description": "Cinder-fire clings to cloth and bone, searing every turn.",
+      "duration": 4,
+      "regen": -2,
+      "damage_type": "fire",
+      "color": "#ff7a33"
+    },
+    {
+      "id": "chilled",
+      "name": "Chilled",
+      "description": "Ossuary frost stiffens the limbs and slows every step.",
+      "duration": 5,
+      "mods": {"speed": -25, "evasion": -1},
+      "color": "#6ec6ff"
+    },
+    {
+      "id": "pinned",
+      "name": "Pinned",
+      "description": "Shackled in place; unable to walk free until the bond breaks.",
+      "duration": 2,
+      "mods": {"evasion": -2},
+      "color": "#c6aa70"
+    },
+    {
+      "id": "hexed",
+      "name": "Hexed",
+      "description": "The Geometry turns hostile: Void and Radiant blows bite 25% deeper.",
+      "duration": 6,
+      "resists": {"void": -25, "radiant": -25},
+      "color": "#c77dff"
     }
   ]
 }

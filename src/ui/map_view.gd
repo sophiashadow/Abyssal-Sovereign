@@ -13,6 +13,7 @@ var world: World
 var tile_px: int = 24
 ## Highlighted tile (look mode, travel target); (-1, -1) for none.
 var marker := Vector2i(-1, -1)
+var aim_path: Array[Vector2i] = []
 var _font: Font
 var _press_at := -1.0
 var _press_pos := Vector2.ZERO
@@ -113,6 +114,11 @@ func _draw() -> void:
 			if vis and actors.has(p) and actors[p] != world.player:
 				draw_rect(Rect2(cell, Vector2(tile_px, tile_px)), Color(col, 0.16))
 			_glyph(cell, glyph, col, fsize)
+	if not aim_path.is_empty():
+		for ap in aim_path:
+			if m.in_bounds(ap):
+				var ac := off + Vector2(ap - o) * tile_px
+				draw_rect(Rect2(ac, Vector2(tile_px, tile_px)), Color(Palette.FALSE_SUN, 0.22))
 	if m.in_bounds(marker):
 		var mc := off + Vector2(marker - o) * tile_px
 		draw_rect(Rect2(mc, Vector2(tile_px, tile_px)), Palette.FALSE_SUN, false, 2.0)

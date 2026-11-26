@@ -5,14 +5,14 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 ## State as of 2026-11-26
 
 - **Branch:** `main` (default branch on `origin`, github.com/sophiashadow/Abyssal-Sovereign), preserving full commit history from `ccr-c6f8b898-fu2jtp`.
-- **Milestones:** M0–M4 and **M5.1 (Character Development)** are implemented (`27` talents across 9 calling trees, attribute/talent points, Stamina/Resonance/Poise + cooldowns, species mechanics, `SAVE_VERSION := 4`, Build & Act UI overlays).
+- **Milestones:** M0–M4, **M5.1 (Character Development)** (`37e5984`, pushed), and **M5.2 (Combat Depth)** are implemented (`ranged` weapons/projectiles/scrolls, 5 damage types + resistances, `30` talents incl. tactical movement, status combos, monster specials, mutated elites & Sphere 3/5 mid-bosses, `SAVE_VERSION := 5`, Aim Mode UI).
 - **Last verified (local, Linux):**
-  - `tools/verify.sh` (M5.1):
-    - `tools/test.sh`: 82 tests, 82 passed, 0 failed, 1531 checks (0 engine errors).
+  - `tools/verify.sh` (M5.2):
+    - `tools/test.sh`: 88 tests, 88 passed, 0 failed, 1598 checks (0 engine errors).
     - `tools/ui_smoke.gd` at `1280×720` and `2340×1080`: 21 steps, 0 failures each.
-  - `tools/soak.gd --seeds=15 --salt=heldout` (M5.1 balance pass): bot wins `75%` (`101/135` runs, mean `795` turns).
-  - *Prior M4 exports (`build/`)*: `tools/export.sh all` refreshed Linux/Windows/Web/Android-debug exports at v0.4 (`apksigner verify` SHA-256 `a0000912831e593cdea65be68bda40f99f0d0e4d779332fff711199eb578a279`); exports have not yet been rebuilt after M5.1.
-- **NOT_RUN:** Post-M5.1 platform exports, Windows runtime, Web browser `user://` persistence test, physical Android device install/test (no device attached to `adb`), release-signed Android APK, any human playtest. There is no CI.
+  - `tools/soak.gd --seeds=15 --salt=heldout` (M5.2 balance pass): bot wins `83%` (`112/135` runs, mean `711` turns).
+  - *Prior M4 exports (`build/`)*: `tools/export.sh all` refreshed Linux/Windows/Web/Android-debug exports at v0.4 (`apksigner verify` SHA-256 `a0000912831e593cdea65be68bda40f99f0d0e4d779332fff711199eb578a279`); exports have not yet been rebuilt after M5.1/M5.2.
+- **NOT_RUN:** Post-M5.1/M5.2 platform exports, Windows runtime, Web browser `user://` persistence test, physical Android device install/test (no device attached to `adb`), release-signed Android APK, M5.2 human playtest. There is no CI.
 
 ## Setup
 
@@ -36,11 +36,12 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 3. ~~**Relics, worked or transmuted**~~ (`kind: "relic"` schema + `Confessor's Glass`, `Ophite Key`, `Broken Halo` in `items.json` / `floors.json`, `player_work_relic` / `player_transmute_relic` in `World`, UI buttons in `main.gd`, tests in `tests/test_items.gd`).
 4. ~~**Named losses**~~ (`World.named_loss()` classifying `Gilded`, `Fluent`, and `Catalogued` on the death screen, tests in `tests/test_turns.gd`).
 
-## Next assignment: M5.2–M5.5 Depth Pass + Playtest & Platform Verification
+## Next assignment: M5.3–M5.5 Depth Pass + Playtest & Platform Verification
 
-- **M5.2 (Combat depth):** Ranged weapons & projectiles, spellcasting & occult abilities, physical/elemental/metaphysical damage types, resistances/vulnerabilities, tactical movement abilities, enemy special attacks, status interactions, and distinct elite enemies/bosses.
+- **M5.3 (Equipment and discovery):** Procedurally generated equipment affixes, equipment rarity and unique artifacts, unidentified potions/scrolls/magical equipment, cursed and blessed equipment, equipment sets and build synergies, and additional relics from authorized FALSE LIGHT mythology.
+- **M5.4–M5.5:** Dungeon ecology (traps, secret doors, altars/shrines/ritual circles, locked vaults, merchants/wandering encounters, hazards, Sphere features) and Metaphysical depth (complete Eight Chains enemy grammar, rituals/contracts, Masks/Relics/False Light/Apotheosis/Two Ways interactions).
 - **Milestone 3 remaining:** Rebuild exports after M5 milestones, install `build/android/abyssal-sovereign-debug.apk` on a physical Android device (`adb install -r build/android/abyssal-sovereign-debug.apk`) and test touch, back button, and autosave on kill; test Windows binary on Windows; verify Web `user://` IndexedDB persistence in a browser; configure release signing with an owner-created keystore outside the repo.
-- **Human playtest & polish:** Playtest M5.1 talent trees, resources, Masks, Sphere Gates, Relics, and the Apotheosis Guard; review Occultist balance vs. Knight/Assassin and remaining items in `ROADMAP.md` (monospace glyph font, colour-blind palette).
+- **Human playtest & polish:** Playtest M5.1 + M5.2 ranged combat, projectiles, scrolls, status combos, and Sphere mid-bosses; review remaining items in `ROADMAP.md` (monospace glyph font, colour-blind palette).
 
 Smaller known defects (fixed 2026-11-26):
 

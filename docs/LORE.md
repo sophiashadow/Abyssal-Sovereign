@@ -90,3 +90,9 @@ Resolved (2026-11-26):
   - *Fallen Knight*: `Oathbreaker`, `Preliator Bulwark`, `Dominion Apostate` (references the Preliators and breaking Dominion Chains).
   - *Occultist*: `Mask Governance`, `The Eye Unblinking`, `Alchemy of False Light` (references Nyx/Eris/Lilith governance and False Light alchemy).
   - *Assassin*: `Tithe-Alley Shadow`, `Venom & Stiletto`, `Acrobatics` (references First-Sphere tithe streets and light blades).
+
+## M5.2 Combat Depth Provenance
+
+- **Elemental & metaphysical taxonomy** (`Proposed` mechanics framed in `Canon-derived` imagery): `physical`, `fire`, `cold`, `radiant` (false-sun light), and `void` (the Eye / uncatalogued dark), plus innate species affinities for Revenants and Cambions.
+- **Dominion & Ossuary foes** (`Canon-derived`): `Choir Cantor Prime` (Gilded Choir), `Iron Auditor` (Iron Scriptorium), `cinder acolyte`, `ossuary arbalest`, `ossuary wight`, and mutated elite prefixes (`Ashen`, `Rime-bound`, `Apostate`, `Ironbound`).
+- **Occult scrolls & ranged armaments** (`Proposed` roguelike tools using canon motifs): `Eye-lens focus`, `abyssal rod`, `sun-censer sling`, `false sun prism`, `scroll of phase step`, `scroll of abyssal lance`, `scroll of cinder ward`.

@@ -30,6 +30,7 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 | list:type | array of that type |
 | mods | object of modifier stat → int. Stats: might, agility, will, max_hp, accuracy, evasion, defense, damage, crit, speed, sight |
 | attrs | object of attribute → int. Attributes: might, agility, will |
+| resists | object of damage type → int (`-100..100`). Types: physical, fire, cold, radiant, void |
 | table:kind | non-empty array of `{"id": ref, "weight": int > 0}` |
 | trait | a trait implemented in `src/sim/traits.gd` |
 
@@ -42,7 +43,9 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 | `description` | text | yes | |
 | `duration` | int ≥ 1 | yes | turns of the bearer |
 | `mods` | mods | no | applied while active |
-| `regen` | int | no | HP healed at the start of each of the bearer's turns |
+| `resists` | resists | no | percentage resistances/vulnerabilities while active |
+| `regen` | int | no | HP healed or drained at the start of each of the bearer's turns |
+| `damage_type` | enum: physical, fire, cold, radiant, void | no | damage type used by negative `regen` ticks |
 | `on_expire` | ref:statuses | no | status applied when this one ends |
 | `color` | color | no | UI tint |
 
@@ -54,17 +57,22 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 | `name` | string | yes | |
 | `glyph` | glyph | yes | |
 | `color` | color | yes | |
-| `kind` | enum: weapon, armor, amulet, consumable, relic | yes | slot or use |
+| `kind` | enum: weapon, ranged, armor, amulet, consumable, relic | yes | slot or use |
 | `description` | text | yes | |
-| `damage` | dice | weapon | replaces unarmed damage |
-| `accuracy` | int | no | weapon accuracy bonus |
-| `crit` | int | no | weapon crit chance bonus, % |
+| `damage` | dice | weapon / ranged / projectile | damage dice |
+| `range` | int ≥ 1 | ranged / projectile / scroll | targeting range in tiles |
+| `damage_type` | enum: physical, fire, cold, radiant, void | no | damage type dealt |
+| `aoe_radius` | int ≥ 0 | no | splash radius for thrown flasks |
+| `accuracy` | int | no | weapon/ranged accuracy bonus |
+| `crit` | int | no | weapon/ranged crit chance bonus, % |
 | `defense` | int | armor | |
 | `evasion` | int | no | armor evasion bonus (may be negative) |
 | `mods` | mods | amulet | applied while equipped |
-| `effect` | enum: heal, status | consumable | |
+| `resists` | resists | no | percentage resistances while equipped |
+| `effect` | enum: heal, status, projectile, scroll | consumable | |
 | `heal` | dice | if effect heal | |
-| `status` | ref:statuses | if effect status | |
+| `status` | ref:statuses | if effect status / optional on weapon/projectile | |
+| `spell` | string | if effect scroll | scroll spell effect key |
 | `stackable` | bool | no | identical items share one inventory slot |
 | `work_status` | ref:statuses | relic | status granted when worked |
 | `work_cost_hp` | int ≥ 0 | no | HP paid to work the relic |
@@ -83,6 +91,7 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 | `xp_mult` | number | no | multiplier on XP gained (default 1) |
 | `heal_mult` | number | no | multiplier on healing from items (default 1) |
 | `mods` | mods | no | permanent |
+| `resists` | resists | no | innate elemental/metaphysical resistances |
 | `traits` | list:trait | no | |
 
 ## classes
@@ -114,6 +123,8 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 | `cost` | int ≥ 0 | no | resource cost for active abilities |
 | `cooldown` | int ≥ 0 | no | cooldown in turns |
 | `range` | int ≥ 0 | no | target range in tiles |
+| `damage_type` | enum: physical, fire, cold, radiant, void | no | damage type dealt |
+| `targeting` | enum: self, enemy, tile | no | UI targeting mode |
 | `description` | text | yes | |
 | `mods` | mods | no | passive stat modifiers per rank |
 | `effect` | string | no | active/passive rule key |
@@ -126,11 +137,16 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 | `glyph`, `color` | | yes | |
 | `hp` | int ≥ 1 | yes | |
 | `damage` | dice | yes | |
+| `damage_type` | enum: physical, fire, cold, radiant, void | no | melee damage type |
+| `ranged_damage` | dice | no | ranged/special attack damage dice |
+| `ranged_range` | int ≥ 1 | no | ranged/special attack max range |
 | `accuracy`, `evasion`, `defense` | int | yes | |
 | `speed` | int ≥ 10 | yes | 100 is normal; higher acts more often |
 | `xp` | int ≥ 0 | yes | awarded on kill |
 | `perception` | int ≥ 1 | yes | distance at which it can notice a visible player |
-| `tags` | list:string | no | free-form (for example `undead`, `guardian`) |
+| `resists` | resists | no | percentage resistances/vulnerabilities |
+| `specials` | list:string | no | special ability keys |
+| `tags` | list:string | no | free-form (for example `undead`, `guardian`, `boss`) |
 | `unique` | bool | no | at most one per floor plan |
 
 ## floors
@@ -148,6 +164,7 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 | `item_table` | table:items | yes | |
 | `exit` | enum: stairs, sealed_door | yes | the deepest floor must be `sealed_door` |
 | `guardian` | ref:monsters | if sealed_door | killing it opens the door; stepping through wins |
+| `boss` | ref:monsters | no | optional Sphere mid-boss spawned near exit |
 
 ## Traits
 

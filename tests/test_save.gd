@@ -85,6 +85,27 @@ func test_v3_save_migrates_to_v4() -> void:
 		ok(w2.player.has_trait("adaptable"), "human receives adaptable trait")
 
 
+func test_v4_save_migrates_to_v5() -> void:
+	var w := World.new_run(db(), 4242, "revenant", "occultist", "Mig4")
+	var d := _through_json(w)
+	d["save_version"] = 4
+	d["player"].erase("resists")
+	d["player"].erase("specials")
+	d["player"].erase("elite")
+	for k in d["floors"]:
+		for a in d["floors"][k]["actors"]:
+			a.erase("resists")
+			a.erase("specials")
+			a.erase("elite")
+	var errors: PackedStringArray = []
+	var w2 := World.from_dict(db(), d, errors)
+	eq(errors.size(), 0, "v4 save migrates cleanly: %s" % ", ".join(errors))
+	ok(w2 != null, "migrated v4 world loaded")
+	if w2 != null:
+		eq(w2.player.is_elite, false, "default elite flag applied")
+		ok(w2.player.specials.is_empty(), "default specials empty")
+
+
 func test_round_trip_is_exact() -> void:
 	var w := World.new_run(db(), 4242, "cambion", "occultist", "Rt")
 	w.player_spend_stat("will")

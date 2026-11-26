@@ -79,3 +79,22 @@ M5.1 expands character building without changing the core turn loop or headless 
 | `revenant` | `31 / 45` (`69%`) | — | `fallen_knight` 14/15, `assassin` 10/15, `occultist` 7/15 |
 
 *(Occultist lags behind Knight and Assassin under deterministic bot play due to Mask risk management; upcoming M5.2 combat depth and enemy special attacks will further re-balance depth progression.)*
+
+## M5.2 — Combat Depth
+
+M5.2 deepens moment-to-moment tactical combat across ranged positioning, elemental/metaphysical resistances, status synergies, and elite encounters:
+
+- **Ranged weapons, projectiles & occult scrolls:** Added dedicated `ranged` gear slot (`ashwood_shortbow`, `eye_focus`, `dominion_arbalest`, `sun_censer_sling`, `abyssal_rod`), thrown `projectile` consumables (`throwing_knife`, `javelin`, `cinder_flask` AoE, `ossuary_rime_vial`, `false_sun_prism`), and occult `scroll` spells (`scroll_of_phase_step`, `scroll_of_abyssal_lance` piercing line, `scroll_of_cinder_ward` fire nova). Line-of-fire uses Bresenham traces (`Grid.line`) blocked by walls and intervening actors.
+- **Damage types & resistances:** Five damage types (`physical`, `fire`, `cold`, `radiant`, `void`). Armor `defense` mitigates `physical` blows; non-physical attacks bypass armor and scale by actor `resist(type)` (`-100..100%`) summed from innate species traits, equipped gear, active statuses, and Occultist Masks.
+- **Tactical movement & ranged talents:** Added `Vanguard Charge` (rush + knockback + wall slam), `Veil Step` (blink + clear `pinned` + cool risk), and `Crippling Shot` (`chilled` / unaware `pinned`), bringing the total to `30` talents.
+- **Status interactions & enemy specials:** `fire` + `chilled` triggers *Thermal Shock* (`+4` + `sundered`); `cold` + `burning` triggers *Scalding Steam* (`+3` + `perception_fog`); `fire` + `bleeding` triggers *Cauterize* (`+2`, removes bleed); `bleeding` + `sundered` triggers *Hemorrhage* (`+3`); `void` + `false_light` fractures the loan (`+3`, `-3` turns). Monsters deploy `warren_pounce`, `ranged_shot`, `solar_bolt`, `cinder_bolt`, `grave_chill`, `void_bolt`, `iron_shackle` (`pinned`), `leech_bite`, and `judgment_nova`.
+- **Elites & Sphere Mid-Bosses:** Depth `>= 2` spawns deterministic mutated elites (`Ashen`, `Rime-bound`, `Apostate`, `Ironbound`); Sphere 3 (`The Gilded Choir`) and Sphere 5 (`The Iron Scriptorium`) place `Choir Cantor Prime` and `Iron Auditor` near the descent gate. Elites and bosses drop floor loot on death.
+
+### Measured Balance (M5.2 held-out soak, `tools/soak.gd --seeds=15 --salt=heldout`, `135` runs)
+
+| Scope | Wins / Runs | Mean Turns | Notes |
+|---|---:|---:|---|
+| Overall | `112 / 135` (`83%`) | `711` | Balanced callings (`Knight 30/45`, `Occultist 40/45`, `Assassin 42/45`) |
+| `human` | `40 / 45` (`89%`) | — | `assassin` 15/15, `occultist` 13/15, `fallen_knight` 12/15 |
+| `cambion` | `36 / 45` (`80%`) | — | `assassin` 15/15, `occultist` 13/15, `fallen_knight` 8/15 |
+| `revenant` | `36 / 45` (`80%`) | — | `occultist` 14/15, `assassin` 12/15, `fallen_knight` 10/15 |

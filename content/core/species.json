@@ -6,10 +6,10 @@
      "description": "The registered living of the Warrens. Adaptable: +25% XP, +1 starting attribute point, and bonus talent points at levels 3 and 6.",
      "attributes": {"might": 1, "agility": 1, "will": 1}, "hp": 4, "hp_per_level": 1, "xp_mult": 1.25, "traits": ["adaptable"]},
     {"id": "revenant", "name": "Revenant",
-     "description": "One of the catalogued dead who refused the record. Hard to kill twice, slow to mend: healing works at half strength.",
-     "attributes": {"might": 2, "agility": 0, "will": 1}, "hp": 6, "hp_per_level": 2, "heal_mult": 0.5, "traits": ["deathless"]},
+     "description": "One of the catalogued dead who refused the record. Hard to kill twice, slow to mend: healing works at half strength. Resists Cold (+50%) and Void (+25%), vulnerable to Radiant (-25%).",
+     "attributes": {"might": 2, "agility": 0, "will": 1}, "hp": 6, "hp_per_level": 2, "heal_mult": 0.5, "resists": {"cold": 50, "void": 25, "radiant": -25}, "traits": ["deathless"]},
     {"id": "cambion", "name": "Cambion",
-     "description": "Born of a contract signed beneath the Geometry. Their blows find the gaps in any armor.",
-     "attributes": {"might": 1, "agility": 1, "will": 2}, "hp": 3, "hp_per_level": 1, "traits": ["infernal_blood"]}
+     "description": "Born of a contract signed beneath the Geometry. Their blows find the gaps in any armor. Resists Fire (+50%) and Void (+25%), vulnerable to Cold (-25%).",
+     "attributes": {"might": 1, "agility": 1, "will": 2}, "hp": 3, "hp_per_level": 1, "resists": {"fire": 50, "void": 25, "cold": -25}, "traits": ["infernal_blood"]}
   ]
 }

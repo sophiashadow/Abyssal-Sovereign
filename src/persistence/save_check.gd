@@ -7,7 +7,8 @@ extends RefCounted
 const ACTOR_KEYS := ["id", "t", "name", "glyph", "color", "player", "x", "y", "hp", "base",
 	"level", "xp", "xpv", "next", "statuses", "inv", "eq", "traits", "tags", "awake",
 	"unique", "species", "class", "mask", "mask_risk",
-	"stat_points", "talent_points", "resource", "talents", "cooldowns", "flags"]
+	"stat_points", "talent_points", "resource", "talents", "cooldowns",
+	"resists", "specials", "elite", "flags"]
 const ITEM_KEYS := ["id", "t", "q", "x", "y"]
 const FLOOR_KEYS := ["depth", "w", "h", "tiles", "explored", "up", "down", "exit", "actors", "items"]
 
@@ -80,6 +81,12 @@ static func _actor(v: Variant, db: ContentDB, where: String, out: PackedStringAr
 			out.append("%s refers to unknown talent '%s'" % [where, str(tid)])
 		elif int(v["talents"][tid]) < 1:
 			out.append("%s has non-positive rank for talent '%s'" % [where, str(tid)])
+	if typeof(v["resists"]) != TYPE_DICTIONARY or typeof(v["specials"]) != TYPE_ARRAY or typeof(v["elite"]) != TYPE_BOOL:
+		out.append("%s has malformed resistances or specials" % where)
+		return
+	for dt in v["resists"]:
+		if not ContentSchema.DAMAGE_TYPES.has(String(dt)):
+			out.append("%s has unknown damage type '%s'" % [where, str(dt)])
 	if bool(v["player"]):
 		if not db.has("species", String(v["species"])) or not db.has("classes", String(v["class"])):
 			out.append("%s has unknown species or class" % where)

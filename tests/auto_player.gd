@@ -70,8 +70,22 @@ func step() -> bool:
 		return world.player_pickup()
 	var target := _nearest_visible_hostile()
 	if target != null:
+		if target.is_elite or target.unique or target.tags.has("boss"):
+			var proj := _find_consumable("projectile")
+			if proj >= 0 and Grid.chebyshev(p.pos, target.pos) <= int(p.inventory[proj].def(world.db).get("range", 4)):
+				if world.player_use_at(proj, target.pos):
+					return true
 		if _try_ranged_talent(target):
 			return true
+		var rw := p.equipped("ranged")
+		if rw != null:
+			var r_max := int(rw.def(world.db).get("range", 5))
+			var dist := Grid.chebyshev(p.pos, target.pos)
+			if dist >= 2 and dist <= r_max and world.projectile_trace(p.pos, target.pos, r_max)["hit_actor"] == target:
+				if world.player_fire(target.pos):
+					return true
+		if p.has_status("pinned"):
+			return world.player_wait()
 		var d := Pathing.distance_map(m, target.pos)
 		var s := Pathing.step_down(m, d, p.pos, func(q: Vector2i) -> bool: return m.actor_at(q) != null and q != target.pos)
 		if s != p.pos:
@@ -114,6 +128,8 @@ func _score(it: Item) -> int:
 	match String(d["kind"]):
 		"weapon":
 			return Dice.max_value(String(d["damage"])) + Dice.min_value(String(d["damage"])) + int(d.get("accuracy", 0))
+		"ranged":
+			return Dice.max_value(String(d["damage"])) + Dice.min_value(String(d["damage"])) + int(d.get("range", 4)) + int(d.get("accuracy", 0))
 		"armor":
 			return int(d.get("defense", 0)) * 3 + int(d.get("evasion", 0))
 		"amulet":
@@ -185,7 +201,7 @@ func _try_combat_talent(foe: Actor) -> bool:
 
 func _try_ranged_talent(foe: Actor) -> bool:
 	var dist := Grid.chebyshev(world.player.pos, foe.pos)
-	for tid in ["unmake_record", "gaze_of_lilith", "siphon_surge", "shadow_step", "defiant_decree"]:
+	for tid in ["crippling_shot", "vanguard_charge", "unmake_record", "gaze_of_lilith", "siphon_surge", "shadow_step", "defiant_decree"]:
 		if _can_use_talent(tid) and dist <= int(world.db.get_def("talents", tid).get("range", 0)):
-			return world.player_use_talent(tid)
+			return world.player_use_talent(tid, foe.pos)
 	return false

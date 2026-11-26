@@ -162,6 +162,10 @@ func _kind_rules(kind: String, e: Dictionary, where: String) -> void:
 			errors.append("%s: effect 'heal' requires field 'heal'" % where)
 		if e.get("effect", "") == "status" and not e.has("status"):
 			errors.append("%s: effect 'status' requires field 'status'" % where)
+		if e.get("effect", "") == "projectile" and (not e.has("damage") or not e.has("range")):
+			errors.append("%s: effect 'projectile' requires fields 'damage' and 'range'" % where)
+		if e.get("effect", "") == "scroll" and not e.has("spell"):
+			errors.append("%s: effect 'scroll' requires field 'spell'" % where)
 	elif kind == "floors":
 		for pair in [["rooms_min", "rooms_max"], ["monsters_min", "monsters_max"], ["items_min", "items_max"]]:
 			if int(e.get(pair[0], 0)) > int(e.get(pair[1], 0)):
@@ -258,6 +262,15 @@ func _check(v: Variant, type: String) -> String:
 					return "has unknown stat '%s' (allowed: %s)" % [k, ", ".join(allowed)]
 				if typeof(v[k]) != TYPE_INT:
 					return "value for '%s' must be a whole number" % k
+			return ""
+		"resists":
+			if typeof(v) != TYPE_DICTIONARY:
+				return "must be an object"
+			for k in v:
+				if not ContentSchema.DAMAGE_TYPES.has(k):
+					return "has unknown damage type '%s' (allowed: %s)" % [k, ", ".join(ContentSchema.DAMAGE_TYPES)]
+				if typeof(v[k]) != TYPE_INT or int(v[k]) < -100 or int(v[k]) > 100:
+					return "resist for '%s' must be an int in -100..100" % k
 			return ""
 	return "has unsupported schema type '%s'" % type
 

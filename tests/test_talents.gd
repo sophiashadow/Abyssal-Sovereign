@@ -4,7 +4,7 @@ extends TestCase
 
 
 func test_talent_trees_and_prereq_level_gating() -> void:
-	eq(db().ids("talents").size(), 27, "27 talents across 9 trees")
+	eq(db().ids("talents").size(), 30, "30 talents across 9 trees")
 	var w := World.new_run(db(), 101, "human", "fallen_knight", "K")
 	eq(w.player.stat_points, 2, "human adaptable starts with 2 stat points")
 	eq(w.player.talent_points, 1, "starts with 1 talent point")

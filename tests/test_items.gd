@@ -117,10 +117,11 @@ func test_healing_and_revenant_half_healing() -> void:
 
 func test_consumed_stack_shrinks_then_vanishes() -> void:
 	var w := TestHelpers.ascii_world(ROOM)
+	var before := w.player.inventory.size()
 	eq(_count(w, "healing_salve"), 1, "one salve")
 	w.player_use(0)
 	eq(_count(w, "healing_salve"), 0, "used up")
-	eq(w.player.inventory.size(), 0, "slot freed")
+	eq(w.player.inventory.size(), before - 1, "slot freed")
 
 
 func test_false_light_is_a_loan_then_reckoning() -> void:

@@ -2,18 +2,19 @@
 
 An original turn-based traditional roguelike set beneath Terra Tenebrae, in the cosmology of FALSE LIGHT. It is built with Godot 4 and typed GDScript, and plays fully offline.
 
-**Status: v0.5-dev (Milestones 0–4 and M5.1 Character Development implemented).** It has a title screen, character creation (3 origins × 3 callings), and a seeded seven-sphere descent (Moon through Saturn). Gameplay covers:
+**Status: v0.5-dev (Milestones 0–4, M5.1 Character Development, and M5.2 Combat Depth implemented).** It has a title screen, character creation (3 origins × 3 callings), and a seeded seven-sphere descent (Moon through Saturn). Gameplay covers:
 
 - Field of view with exploration memory.
-- Melee combat, XP, levels, **attribute allocation**, and **3 talent trees per calling** (`27` active and passive talents).
+- Melee and **ranged combat** (`f` / Fire), thrown flasks/projectiles, occult scrolls, XP, levels, **attribute allocation**, and **30 calling talents across 9 trees**.
+- **Physical, elemental & metaphysical damage types** (`physical`, `fire`, `cold`, `radiant`, `void`) with resistances, vulnerabilities, and emergent status combos (*Thermal Shock*, *Scalding Steam*, *Cauterize*, *Hemorrhage*).
 - **Class resources & cooldowns**: `Stamina` (Fallen Knight), `Resonance` (Occultist), and `Poise` (Assassin).
 - Equipment, consumables, and Relics (Work for temporary power with a cost, or Transmute for permanent stats).
-- **Masks as stances** (`m` key / Mask button for Occultists: Bare Face, Nyx, Eris, Lilith) with risk accrual and seizures.
+- **Masks as stances** (`m` key / Mask button for Occultists: Bare Face, Nyx, Eris, Lilith) with risk accrual, elemental/void resistances, and seizures.
 - The **False Light** status: relief, then the Reckoning.
-- **Eight Chains** enemy abilities (Isolation and Monopolized Sight fog).
+- **Eight Chains** enemy abilities, **enemy specials**, deterministic **mutated elites**, and **Sphere mid-bosses** (*Choir Cantor Prime*, *Iron Auditor*).
 - **Sphere Gates** between Spheres (`Stormed`, `Serpent's Key`, `Given Back`, `By Name`) and the **Apotheosis Guard**.
 - The Preliator Sentinel guardian, **Named losses** (Catalogued, Fluent, Gilded), and four victory outcomes (Unwritten Door, The Serpent's Way, The Way of Return, and Victory: By Decree).
-- Permadeath with atomic save/resume (`save_version` 4, migrating v1/v2/v3 saves).
+- Permadeath with atomic save/resume (`save_version` 5, migrating v1–v4 saves).
 
 Android, Windows and Web builds can be exported via `tools/export.sh` (see [ROADMAP.md](ROADMAP.md); Windows runtime, Web browser `user://` persistence, and physical Android device runtime tests have not run yet). Any distributed export must ship Godot's license notices.
 
@@ -48,6 +49,7 @@ xvfb-run -a godot --path . --audio-driver Dummy --script res://tools/ui_smoke.gd
 | Inventory | `i` | Bag |
 | Character build & talents | `c` | Build |
 | Active talents | `a` or `1`–`6` | Act |
+| Fire ranged weapon | `f` (`Tab` cycles, `Enter`/tap confirms) | Fire |
 | Masks (Occultist) | `m` | Mask |
 | Inspect | `x`, then tap | Look, long-press or right-click |
 | Menu | Esc | Menu, Android back |

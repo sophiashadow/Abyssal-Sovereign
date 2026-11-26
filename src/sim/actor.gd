@@ -4,7 +4,7 @@ extends RefCounted
 ## everything a rule reads goes through stat(), which folds in equipment,
 ## statuses and traits. That keeps modifiers in one place as systems grow.
 
-const SLOTS: Array[String] = ["weapon", "armor", "amulet"]
+const SLOTS: Array[String] = ["weapon", "ranged", "armor", "amulet"]
 const INVENTORY_LIMIT := 16
 
 var db: ContentDB
@@ -43,6 +43,10 @@ var resource: int = 0
 var talents: Dictionary = {}
 ## talent_id -> int remaining turns
 var cooldowns: Dictionary = {}
+## damage_type -> int percent resist (-100..100)
+var resists: Dictionary = {}
+var specials: Array[String] = []
+var is_elite: bool = false
 ## Small per-actor rule state (for example, which floors 'deathless' was spent on).
 var flags: Dictionary = {}
 
@@ -168,6 +172,28 @@ func damage_dice() -> String:
 	return String(base.get("damage", "1d2"))
 
 
+func melee_damage_type() -> String:
+	var w := equipped("weapon")
+	if w != null:
+		return String(w.def(db).get("damage_type", "physical"))
+	return String(base.get("damage_type", "physical"))
+
+
+func resist(dmg_type: String) -> int:
+	if resists.is_empty() and equipment.is_empty() and statuses.is_empty() and not has_trait("mask_stances"):
+		return 0
+	var total := int(resists.get(dmg_type, 0))
+	for slot in SLOTS:
+		var it := equipped(slot)
+		if it != null:
+			total += int(it.def(db).get("resists", {}).get(dmg_type, 0))
+	for s in statuses:
+		total += int(db.get_def("statuses", s["id"]).get("resists", {}).get(dmg_type, 0))
+	if has_trait("mask_stances"):
+		total += int(Masks.resists(mask).get(dmg_type, 0))
+	return clampi(total, -100, 100)
+
+
 func is_alive() -> bool:
 	return hp > 0
 
@@ -196,6 +222,7 @@ func to_dict() -> Dictionary:
 		"mask": mask, "mask_risk": mask_risk,
 		"stat_points": stat_points, "talent_points": talent_points, "resource": resource,
 		"talents": talents.duplicate(true), "cooldowns": cooldowns.duplicate(true),
+		"resists": resists.duplicate(true), "specials": specials.duplicate(), "elite": is_elite,
 		"flags": flags.duplicate(true),
 	}
 
@@ -237,6 +264,10 @@ static func from_dict(d: Dictionary, content: ContentDB) -> Actor:
 	a.resource = int(d.get("resource", 0))
 	a.talents = _ints(d.get("talents", {}))
 	a.cooldowns = _ints(d.get("cooldowns", {}))
+	a.resists = _ints(d.get("resists", {}))
+	for sp in d.get("specials", []):
+		a.specials.append(String(sp))
+	a.is_elite = bool(d.get("elite", false))
 	a.flags = _ints(d["flags"])
 	return a
 

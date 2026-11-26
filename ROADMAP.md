@@ -43,4 +43,11 @@ Owner decisions resolved 2026-11-26 (see [docs/LORE.md](docs/LORE.md)): Apotheos
 2. **Attribute allocation:** Players gain attribute points on odd levels and talent points every level from 2; `Might` increases max HP (`+2/pt`), `Agility` increases crit chance (`+2%/pt`), and `Will` scales Occultist abilities and healing.
 3. **Class resources & cooldowns:** `Stamina` (Fallen Knight), `Resonance` (Occultist), and `Poise` (Assassin), with tactical active cooldowns and Build (`c`) / Act (`a` / `1`–`6`) UI panels.
 4. **Species differentiation:** Humans gain `adaptable` (extra attribute points at levels 2/5 and talent points at levels 3/6); Revenants ignore `bleeding` and gain `Braced` on `deathless` triggers; Cambions pay `-1` HP when working Relics and deal `+2` damage with active talents while at `>= 2` `infernal_blood`.
-5. **Next (M5.2–M5.5):** Combat depth (ranged projectiles, elemental/metaphysical types, resistances, elite enemies), equipment affixes/ID/sets, dungeon ecology, and full Eight Chains/metaphysical depth.
+
+## Milestone 5.2: combat depth (done 2026-11-26)
+
+1. **Ranged & occult arsenal:** Added `ranged` weapon slot, thrown `projectile` items/flasks (including AoE splash), and `scroll` spells (`phase_step`, piercing `abyssal_lance`, `cinder_ward`), with line-of-fire blocking (`Grid.line`) and interactive Aim Mode (`f` / `Fire` + trajectory highlight).
+2. **Damage types & resistances:** `physical`, `fire`, `cold`, `radiant`, and `void` damage with innate species/mask/gear/status resistances and vulnerabilities.
+3. **Tactical movement & status synergies:** Added `Vanguard Charge`, `Veil Step`, and `Crippling Shot` (total `30` talents) plus emergent status combos (`Thermal Shock`, `Scalding Steam`, `Cauterize`, `Hemorrhage`, and `False Light` Void fracture).
+4. **Enemy specials, elites & bosses:** Added `ossuary_arbalest`, `cinder_acolyte`, `ossuary_wight`, monster specials (`solar_bolt`, `cinder_bolt`, `grave_chill`, `void_bolt`, `iron_shackle`, `judgment_nova`, `warren_pounce`, `leech_bite`), deterministic elites (`Ashen`, `Rime-bound`, `Apostate`, `Ironbound`), Sphere 3/5 mid-bosses (`Choir Cantor Prime`, `Iron Auditor`), and `SAVE_VERSION := 5`.
+5. **Next (M5.3–M5.5):** Equipment & discovery (affixes, rarity/uniques, unidentified gear & potions, blessed/cursed items, sets), dungeon ecology, and Eight Chains / metaphysical depth.

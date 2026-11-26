@@ -25,6 +25,7 @@ var _last_save_turn := 0
 
 # Interaction state
 var look_mode := false
+var aim_mode: Dictionary = {}
 var travel: Array[Vector2i] = []
 var _travel_seen := {}
 var _travel_clock := 0.0
@@ -132,6 +133,7 @@ func _clear() -> void:
 	overlay = null
 	travel.clear()
 	look_mode = false
+	aim_mode.clear()
 
 
 func _background() -> void:
@@ -190,7 +192,7 @@ func _show_title() -> void:
 	col.add_child(_btn("Settings", func() -> void: _show_settings(_show_title)))
 	if not OS.has_feature("web"):
 		col.add_child(_btn("Quit", func() -> void: get_tree().quit()))
-	var foot := _label("Set in the world of FALSE LIGHT. v0.4 (Seven Spheres)", Palette.TEXT_DIM, 0.75)
+	var foot := _label("Set in the world of FALSE LIGHT. v0.5 (M5.2 Combat Depth)", Palette.TEXT_DIM, 0.75)
 	foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(foot)
 
@@ -389,9 +391,9 @@ func _build_game_screen() -> void:
 	actions.add_theme_constant_override("h_separation", int(6 * s))
 	actions.add_theme_constant_override("v_separation", int(6 * s))
 	var action_specs: Array = [["Get", _act_pickup], ["Bag", _show_inventory], ["Build", _show_build], ["Act", _show_abilities],
-			["Stairs", _act_stairs], ["Rest", _act_rest], ["Look", _toggle_look], ["Menu", _show_pause]]
+			["Fire", _act_fire], ["Stairs", _act_stairs], ["Rest", _act_rest], ["Look", _toggle_look], ["Menu", _show_pause]]
 	if world.player.has_trait("mask_stances"):
-		action_specs.insert(4, ["Mask", _show_masks])
+		action_specs.insert(5, ["Mask", _show_masks])
 	for spec in action_specs:
 		var b := _btn(spec[0], spec[1])
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -420,7 +422,7 @@ func _build_game_screen() -> void:
 		side.add_child(pad_center)
 	else:
 		var mask_hint := "   Mask: m" if world.player.has_trait("mask_stances") else ""
-		side.add_child(_label("Move: arrows, numpad or hjklyubn\nWait: . or 5   Get: g   Bag: i%s\nBuild: c   Act: a (or 1-6)\nStairs: Enter   Rest: r   Look: x\nTap a known tile to travel; hold or right-click to inspect. Menu: Esc" % mask_hint, Palette.TEXT_DIM, 0.7))
+		side.add_child(_label("Move: arrows, numpad or hjklyubn\nWait: . or 5   Get: g   Bag: i%s\nBuild: c   Act: a (1-6)   Fire: f\nStairs: Enter   Rest: r   Look: x\nTap a known tile to travel; hold or right-click to inspect. Menu: Esc" % mask_hint, Palette.TEXT_DIM, 0.7))
 	_refresh()
 
 
@@ -462,6 +464,10 @@ func _update_hud() -> void:
 	t.append("Attack %+d  Defense %d  Evasion %+d" % [p.stat("accuracy"), p.stat("defense"), p.stat("evasion")])
 	var w := p.equipped("weapon")
 	t.append("Wielding: %s (%s)" % [w.display_name(db), p.damage_dice()] if w != null else "Wielding: bare hands (1d2)")
+	var rw := p.equipped("ranged")
+	if rw != null:
+		var rwd := rw.def(db)
+		t.append("Ranged: %s (%s, rng %d)" % [rw.display_name(db), rwd["damage"], int(rwd["range"])])
 	if p.has_trait("mask_stances"):
 		t.append("Mask: [color=%s]%s[/color] (risk %d/%d)" % [Masks.color(p.mask), Masks.label(p.mask), p.mask_risk, World.MASK_RISK_MAX])
 	for s in p.statuses:
@@ -478,8 +484,10 @@ func _update_hud() -> void:
 
 ## Called after any player action: redraw, autosave, and end-of-run screens.
 func _after_action() -> void:
+	aim_mode.clear()
 	look_label.visible = false
 	if map != null:
+		map.aim_path = []
 		map.marker = Vector2i(-1, -1) if travel.is_empty() else travel[travel.size() - 1]
 	if world.state != World.State.PLAYING:
 		travel.clear()
@@ -533,7 +541,109 @@ func _act_rest() -> void:
 		_after_action()
 
 
+func _act_fire() -> void:
+	if overlay != null or world.state != World.State.PLAYING:
+		return
+	var w := world.player.equipped("ranged")
+	if w == null:
+		world.log_msg("You have no ranged weapon equipped.", "info")
+		_after_action()
+		return
+	var d := w.def(db)
+	_start_aim("fire", {"range": int(d.get("range", 5)), "name": String(d["name"]),
+		"acc": int(d.get("accuracy", 0)), "dtype": String(d.get("damage_type", "physical"))})
+
+
+func _aim_targets(max_range: int) -> Array[Actor]:
+	var foes: Array[Actor] = []
+	for a in world.visible_hostiles():
+		if Grid.chebyshev(world.player.pos, a.pos) <= max_range:
+			foes.append(a)
+	foes.sort_custom(func(a: Actor, b: Actor) -> bool:
+		return Grid.chebyshev(world.player.pos, a.pos) < Grid.chebyshev(world.player.pos, b.pos))
+	return foes
+
+
+func _start_aim(kind: String, payload: Dictionary) -> void:
+	travel.clear()
+	look_mode = false
+	aim_mode = payload.duplicate(true)
+	aim_mode["kind"] = kind
+	var max_r := int(aim_mode.get("range", 5))
+	var foes := _aim_targets(max_r)
+	if not foes.is_empty() and String(aim_mode.get("targeting", "enemy")) != "tile":
+		aim_mode["target"] = foes[0].pos
+	else:
+		aim_mode["target"] = world.player.pos
+	_update_aim_visual()
+
+
+func _cancel_aim() -> void:
+	aim_mode.clear()
+	look_label.visible = false
+	if map != null:
+		map.aim_path = []
+		map.marker = Vector2i(-1, -1)
+		map.queue_redraw()
+
+
+func _cycle_aim() -> void:
+	var max_r := int(aim_mode.get("range", 5))
+	var foes := _aim_targets(max_r)
+	if foes.is_empty():
+		return
+	var cur: Vector2i = aim_mode.get("target", Vector2i(-1, -1))
+	var next_idx := 0
+	for i in foes.size():
+		if foes[i].pos == cur:
+			next_idx = (i + 1) % foes.size()
+			break
+	aim_mode["target"] = foes[next_idx].pos
+	_update_aim_visual()
+
+
+func _update_aim_visual() -> void:
+	if aim_mode.is_empty() or map == null:
+		return
+	var t: Vector2i = aim_mode.get("target", world.player.pos)
+	var max_r := int(aim_mode.get("range", 5))
+	var tr := world.projectile_trace(world.player.pos, t, max_r)
+	map.marker = t
+	map.aim_path = tr["path"]
+	map.queue_redraw()
+	var foe := world.current_floor().actor_at(t)
+	var hint := "Tap tile or Enter/f to confirm; Tab cycles foes; Esc cancels."
+	if foe != null and not foe.is_player:
+		var dist := Grid.chebyshev(world.player.pos, t)
+		var pct := Combat.ranged_hit_chance(world.player, foe, dist, int(aim_mode.get("acc", 0)), String(aim_mode.get("dtype", "physical")))
+		look_label.text = "Aim (%s): %s (%d%% hit). %s" % [aim_mode.get("name", ""), foe.name, pct, hint]
+	else:
+		look_label.text = "Aim (%s): (%d,%d). %s" % [aim_mode.get("name", ""), t.x, t.y, hint]
+	look_label.visible = true
+
+
+func _confirm_aim() -> void:
+	if aim_mode.is_empty():
+		return
+	var kind := String(aim_mode.get("kind", ""))
+	var t: Vector2i = aim_mode.get("target", Vector2i(-1, -1))
+	var acted := false
+	match kind:
+		"fire":
+			acted = world.player_fire(t)
+		"item":
+			acted = world.player_use_at(int(aim_mode.get("index", -1)), t)
+		"talent":
+			acted = world.player_use_talent(String(aim_mode.get("tid", "")), t)
+	_cancel_aim()
+	if acted:
+		_after_action()
+	else:
+		_refresh()
+
+
 func _toggle_look() -> void:
+	_cancel_aim()
 	look_mode = not look_mode
 	look_label.visible = look_mode
 	look_label.text = "Look: tap a tile to inspect it." if look_mode else ""
@@ -549,6 +659,10 @@ func _on_tile_inspected(p: Vector2i) -> void:
 
 func _on_tile_tapped(p: Vector2i) -> void:
 	if overlay != null or world.state != World.State.PLAYING:
+		return
+	if not aim_mode.is_empty():
+		aim_mode["target"] = p
+		_confirm_aim()
 		return
 	if look_mode:
 		_on_tile_inspected(p)
@@ -633,6 +747,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		if screen == Screen.GAME:
 			if overlay != null:
 				_close_overlay()
+			elif not aim_mode.is_empty():
+				_cancel_aim()
 			elif look_mode or not travel.is_empty():
 				travel.clear()
 				if look_mode:
@@ -644,6 +760,13 @@ func _unhandled_input(event: InputEvent) -> void:
 			_show_title()
 		return
 	if screen != Screen.GAME or overlay != null or world.state != World.State.PLAYING:
+		return
+	if not aim_mode.is_empty():
+		get_viewport().set_input_as_handled()
+		if k.keycode == KEY_TAB:
+			_cycle_aim()
+		elif k.keycode in [KEY_ENTER, KEY_KP_ENTER, KEY_F]:
+			_confirm_aim()
 		return
 	get_viewport().set_input_as_handled()
 	if k.unicode == 62 or k.unicode == 60 or k.keycode == KEY_ENTER or k.keycode == KEY_KP_ENTER:
@@ -666,6 +789,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_show_build()
 	elif k.keycode == KEY_A:
 		_show_abilities()
+	elif k.keycode == KEY_F:
+		_act_fire()
 	elif k.keycode >= KEY_1 and k.keycode <= KEY_6:
 		var idx := k.keycode - KEY_1
 		var acts := world.learned_active_talents()
@@ -682,6 +807,13 @@ func _show_build() -> void:
 	var col := _open_overlay("Character Build")
 	col.add_child(_label("Stat points: %d   Talent points: %d   Level %d" % [p.stat_points, p.talent_points, p.level], Palette.FALSE_SUN, 0.9))
 	col.add_child(_label("Attributes (Might %d, Agility %d, Will %d)" % [p.stat("might"), p.stat("agility"), p.stat("will")], Palette.GOLD, 0.9))
+	var res_parts: PackedStringArray = []
+	for dt in ContentSchema.DAMAGE_TYPES:
+		var rv := p.resist(dt)
+		if rv != 0:
+			res_parts.append("%s %+d%%" % [dt.capitalize(), rv])
+	if not res_parts.is_empty():
+		col.add_child(_label("Resists: " + ", ".join(res_parts), Palette.RECORD, 0.85))
 	var attr_row := HBoxContainer.new()
 	attr_row.add_theme_constant_override("separation", 8)
 	for attr in ContentSchema.ATTRIBUTES:
@@ -744,7 +876,9 @@ func _show_abilities() -> void:
 		var status_tag := "CD %d" % cd if cd > 0 else ("%d %s" % [cost, p.resource_label()])
 		var b := _btn("%s%s (%s)" % [key_tag, td["name"], status_tag], func() -> void:
 			_close_overlay()
-			if world.player_use_talent(tid):
+			if String(td.get("targeting", "")) == "tile":
+				_start_aim("talent", {"tid": tid, "range": int(td.get("range", 4)), "name": String(td["name"]), "targeting": "tile"})
+			elif world.player_use_talent(tid):
 				_after_action())
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.disabled = cd > 0 or p.resource < cost
@@ -948,7 +1082,13 @@ func _item_stats(d: Dictionary) -> String:
 	var parts: PackedStringArray = []
 	match String(d["kind"]):
 		"weapon":
-			parts.append("Damage %s" % d["damage"])
+			parts.append("Damage %s (%s)" % [d["damage"], String(d.get("damage_type", "physical"))])
+			if int(d.get("accuracy", 0)) != 0:
+				parts.append("accuracy %+d" % int(d["accuracy"]))
+			if int(d.get("crit", 0)) != 0:
+				parts.append("critical %+d%%" % int(d["crit"]))
+		"ranged":
+			parts.append("Ranged %s (%s, range %d)" % [d["damage"], String(d.get("damage_type", "physical")), int(d["range"])])
 			if int(d.get("accuracy", 0)) != 0:
 				parts.append("accuracy %+d" % int(d["accuracy"]))
 			if int(d.get("crit", 0)) != 0:
@@ -958,8 +1098,13 @@ func _item_stats(d: Dictionary) -> String:
 			if int(d.get("evasion", 0)) != 0:
 				parts.append("evasion %+d" % int(d["evasion"]))
 		"consumable":
-			if String(d["effect"]) == "heal":
+			var eff := String(d["effect"])
+			if eff == "heal":
 				parts.append("Restores %s health" % d["heal"])
+			elif eff == "projectile":
+				parts.append("Thrown %s (%s, range %d)" % [d["damage"], String(d.get("damage_type", "physical")), int(d["range"])])
+			elif eff == "scroll":
+				parts.append("Scroll (range %d)" % int(d.get("range", 5)))
 			else:
 				var sd := db.get_def("statuses", String(d["status"]))
 				parts.append("Grants %s for %d turns" % [sd["name"], int(sd["duration"])])
@@ -968,6 +1113,9 @@ func _item_stats(d: Dictionary) -> String:
 	var mods: Dictionary = d.get("mods", {})
 	for k in mods:
 		parts.append("%s %+d" % [String(k).replace("_", " "), int(mods[k])])
+	var rmap: Dictionary = d.get("resists", {})
+	for k in rmap:
+		parts.append("%s resist %+d%%" % [String(k), int(rmap[k])])
 	return ", ".join(parts)
 
 
@@ -996,6 +1144,19 @@ func _show_item(it: Item, index: int, slot: String) -> void:
 				_close_overlay()
 				world.player_transmute_relic(index)
 				_after_action()))
+		elif String(d["kind"]) == "consumable" and String(d.get("effect", "")) == "projectile":
+			main = _btn("Throw", func() -> void:
+				_close_overlay()
+				_start_aim("item", {"index": index, "range": int(d.get("range", 4)), "name": String(d["name"]),
+					"acc": 2, "dtype": String(d.get("damage_type", "physical"))}))
+			col.add_child(main)
+		elif String(d["kind"]) == "consumable" and String(d.get("effect", "")) == "scroll" and String(d.get("spell", "")) != "cinder_ward":
+			main = _btn("Cast", func() -> void:
+				_close_overlay()
+				var targ := "tile" if String(d.get("spell", "")) == "phase_step" else "enemy"
+				_start_aim("item", {"index": index, "range": int(d.get("range", 5)), "name": String(d["name"]),
+					"targeting": targ, "dtype": String(d.get("damage_type", "void"))}))
+			col.add_child(main)
 		else:
 			var verb := "Use" if String(d["kind"]) == "consumable" else "Equip"
 			main = _btn(verb, func() -> void:
