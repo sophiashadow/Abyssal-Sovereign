@@ -45,7 +45,13 @@ Spec: `docs/M7_SPEC.md`. Owner authorized a push after each task (2026-11-26); n
   - 14 active talents were never used by any policy in b2 (backstep, chain_reversal, cleanse_vapor, fade_to_ash, philosophers_loan, quiet_absolution, rite_blink, slip_the_margin, transmute_pain, unbroken_wall, unwork_chains, unyielding_march, vault_step, volatile_salve).
   - `the_taken_name` contract: 21 broken vs 2 fulfilled in narrative and explorer runs; to be read in M7.6.
   - Threads silently auto-abandon after 350 turns at depth 5 or deeper.
-- **Next:** M7.2 origin and calling changes, each logged in `balance/CHANGES.md` with dev re-measure; then M7.3 to M7.6, M7.7 to M7.9, M7.10 final gate.
+- **M7.2 to M7.6 (audited, bot play on dev seeds; every row with evidence is in `balance/CHANGES.md`):**
+  - One stat change: Veil-Touched base HP 3 to 5 and radiant resist -25 to -10; Unrecorded base HP 3 to 4. Same-seed A/B (o0 to o1): Veil-Touched 56% to 61%, Unrecorded 66% to 68%, controls identical. Veil-Touched is still the weakest origin; whether a residual gap is intended is a human-playtest question.
+  - No change, with reasons: the 14 unused talents (all work, `tests/test_m7_talents.gd`); d2 Vault Enumerator (deaths follow arrival level: 16% at level 1, 8% at level 2, 0 of 563 at level 3 or more); Binder and Cantor (kit-dependent: 50% and 36% generic, 81% and 100% with a specialist); DoT and bursts (no unavoidable burst in 3,036 runs); healing and relic economy (`tests/test_m7_relics.gd`); Sphere pacing (even, narrative backtracking is a navigation problem).
+  - Bot fix: bots crossed every Sphere Gate By Name, which the contract The Taken Name forbids. They now use the Serpent's Key under that contract (c1: broken 12 to 0, fulfilled 2 to 11).
+  - Not instrumented, left to human playtest: per-Sphere mechanical identity; ending preference.
+  - `tools/test.sh` after this batch: 146 tests, 146 passed, 4023 checks, 107.9s (commit `c4cb219`, pushed).
+- **Next:** M7.7 assist and QoL (advisory under-level descent warning, safe auto-explore, Atlas travel, inventory compare, sort, filter and search, log filters, confirmations, pacing), M7.8 profiles and onboarding (SAVE_VERSION 12), M7.9 `docs/PLAYTEST.md`, M7.10 final gate.
 - **NOT_RUN:** UI smoke, exports, validation soak (all M7.10).
 
 ## Known-Defect & Observation Register (for M7)
