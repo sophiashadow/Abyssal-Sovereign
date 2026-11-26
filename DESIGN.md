@@ -211,3 +211,7 @@ M6.6 introduces `24` organic multi-stage threads (`8` drawn deterministically pe
 ## M6.7 — Dungeon Variety and Emergent Encounters
 
 M6.7 layers `10` composable interior room archetypes onto dungeon chambers (`pillared_hall`, `cross_vault`, `sanctuary_alcove`, `ambush_choke`, `ritual_chamber`, `flooded_cistern`, `archive_stacks`, `gauntlet_corridor`, `settlement_court`, `broken_cloister`) while preserving `100%` flood-fill connectivity, and seeds `4` emergent interactive encounter features (`rune_puzzle`, `abandoned_rite`, `sanctuary_hearth`, `echo_cache`) presenting resource, stealth, Subjugation, and knowledge trade-offs.
+
+## M6.8 — Discovery, Codex and Run History
+
+M6.8 tracks cross-run discovery and run outcomes offline in `user://codex.json` strictly separated from permadeath run saves (`user://run.save.json`). The Codex confers zero gameplay stats or RNG influence and never spoils unseen creatures, branches, items, or threads.

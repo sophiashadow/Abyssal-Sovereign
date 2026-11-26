@@ -101,4 +101,8 @@ M5 (The Depth Pass: M5.1–M5.5) is complete.
 
 1. **10 Room Archetypes & 4 Emergent Sites:** Added `RoomArchetypes`, safe interior tactical geometry preserving `100%` connectivity, and interactive `rune_puzzle`, `abandoned_rite`, `sanctuary_hearth`, and `echo_cache` sites.
 
-Remaining M6 submilestones track M6.8–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.
+## Milestone 6.8: Discovery, Codex and Run History (done 2026-11-26)
+
+1. **Knowledge-Only Codex (`user://codex.json`):** Added `Codex`, `CodexIO` (atomic, zero-spoiler, zero-power), Codex overlay (`k` / Title / Pause), and enriched end-of-run Victory/Death summaries.
+
+Remaining M6 submilestones track M6.9–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.

@@ -10,6 +10,7 @@ enum Screen { TITLE, CREATE, GAME, END, ERROR }
 
 var db: ContentDB
 var settings := GameSettings.new()
+var codex := Codex.new()
 var world: World
 var screen: Screen = Screen.TITLE
 
@@ -40,6 +41,7 @@ func _ready() -> void:
 	get_tree().set_auto_accept_quit(false)
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	settings.load_from_disk()
+	codex = CodexIO.load_codex()
 	db = ContentDB.load_default()
 	_apply_theme()
 	if not db.is_valid():
@@ -190,10 +192,11 @@ func _show_title() -> void:
 	col.add_child(nb)
 	if not SaveIO.exists():
 		nb.call_deferred("grab_focus")
+	col.add_child(_btn("Codex", func() -> void: _show_codex(_show_title)))
 	col.add_child(_btn("Settings", func() -> void: _show_settings(_show_title)))
 	if not OS.has_feature("web"):
 		col.add_child(_btn("Quit", func() -> void: get_tree().quit()))
-	var foot := _label("Set in the world of FALSE LIGHT. v0.6 (M6.3 Origins & Callings)", Palette.TEXT_DIM, 0.75)
+	var foot := _label("Set in the world of FALSE LIGHT. v0.6 (M6 Breadth Pass)", Palette.TEXT_DIM, 0.75)
 	foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(foot)
 
@@ -522,6 +525,8 @@ func _autosave() -> void:
 	if world != null and world.state == World.State.PLAYING and screen == Screen.GAME:
 		if SaveIO.save(world) == OK:
 			_last_save_turn = world.turns
+		codex.record_from_world(world)
+		CodexIO.save(codex)
 
 
 # ================================================================ actions
@@ -868,6 +873,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_show_people()
 	elif k.keycode == KEY_J:
 		_show_threads()
+	elif k.keycode == KEY_K:
+		_show_codex()
 	elif k.keycode >= KEY_1 and k.keycode <= KEY_6:
 		var idx := k.keycode - KEY_1
 		var acts := world.learned_active_talents()
@@ -1348,6 +1355,62 @@ func _show_threads() -> void:
 	close.call_deferred("grab_focus")
 
 
+func _show_codex(back: Callable = Callable()) -> void:
+	if world != null:
+		codex.record_from_world(world)
+	var col: VBoxContainer
+	if screen == Screen.GAME and not back.is_valid():
+		col = _open_overlay("Codex of Terra Tenebrae", Palette.FALSE_SUN)
+	else:
+		_clear()
+		col = _menu_column(720.0)
+		col.add_child(_label("Codex of Terra Tenebrae", Palette.FALSE_SUN, 1.3))
+	col.add_child(_label("Knowledge only — grants no power; unseen entries stay unrecorded.", Palette.TEXT_DIM, 0.84))
+	col.add_child(_label("Atlas Places: %d / %d   Creatures: %d / %d   Armory & Relics: %d / %d" % [
+		codex.floors.size(), db.ids("floors").size(),
+		codex.creatures.size(), db.ids("monsters").size(),
+		codex.items.size(), db.ids("items").size(),
+	], Palette.GOLD, 0.88))
+	col.add_child(_label("People: %d / %d   Institutions: %d / %d   Threads: %d / %d" % [
+		codex.npcs.size(), db.ids("npcs").size(),
+		codex.factions.size(), db.ids("factions").size(),
+		codex.threads.size(), db.ids("threads").size(),
+	], Palette.GOLD, 0.88))
+	if not codex.creatures.is_empty():
+		var cnames: PackedStringArray = []
+		var ckeys := codex.creatures.keys()
+		ckeys.sort()
+		for cid in ckeys:
+			if db.has("monsters", String(cid)):
+				cnames.append(String(db.get_def("monsters", String(cid))["name"]))
+		col.add_child(_label("Encountered foes: " + ", ".join(cnames.slice(0, 12)) + (" ..." if cnames.size() > 12 else ""), Palette.TEXT, 0.8))
+	if not codex.floors.is_empty():
+		var fnames: PackedStringArray = []
+		var fkeys := codex.floors.keys()
+		fkeys.sort()
+		for fid in fkeys:
+			if db.has("floors", String(fid)):
+				fnames.append(String(db.get_def("floors", String(fid))["name"]))
+		col.add_child(_label("Walked regions: " + ", ".join(fnames), Palette.TEXT, 0.8))
+	col.add_child(_label("Run History (%d recorded):" % codex.runs.size(), Palette.FALSE_SUN, 0.9))
+	if codex.runs.is_empty():
+		col.add_child(_label("  No completed descents yet.", Palette.TEXT_DIM, 0.82))
+	else:
+		for r in codex.runs.slice(0, 8):
+			var line := "  %s (%s %s) — %s at depth %d (%d turns, %d threads)" % [
+				String(r.get("hero", "?")), String(r.get("species", "")), String(r.get("class_id", "")),
+				String(r.get("title", r.get("outcome", ""))), int(r.get("depth", 1)), int(r.get("turns", 0)), int(r.get("threads_settled", 0))
+			]
+			col.add_child(_label(line, Palette.GOOD if String(r.get("outcome", "")) == "victory" else Palette.TEXT_DIM, 0.8))
+	var close := _btn("Close", func() -> void:
+		if back.is_valid():
+			back.call()
+		else:
+			_close_overlay())
+	col.add_child(close)
+	close.call_deferred("grab_focus")
+
+
 func _show_pause() -> void:
 	if world == null or world.state != World.State.PLAYING:
 		return
@@ -1359,6 +1422,7 @@ func _show_pause() -> void:
 	col.add_child(_btn("Atlas", _show_atlas))
 	col.add_child(_btn("People & Institutions", _show_people))
 	col.add_child(_btn("Threads", _show_threads))
+	col.add_child(_btn("Codex", _show_codex))
 	col.add_child(_btn("Settings", func() -> void: _show_settings(_build_game_screen)))
 	col.add_child(_btn("Save and return to title", func() -> void:
 		_autosave()
@@ -1564,6 +1628,8 @@ func _show_item(it: Item, index: int, slot: String) -> void:
 
 
 func _show_end() -> void:
+	codex.record_run_end(world)
+	CodexIO.save(codex)
 	var won := world.state == World.State.WON
 	var vic := world.victory_kind() if won else {}
 	var loss := {} if won else world.named_loss()
@@ -1580,6 +1646,9 @@ func _show_end() -> void:
 		col.add_child(_label("Slain by %s in %s." % [world.death_cause, fd.get("name", "the dark")], Palette.TEXT))
 	col.add_child(_label("%s, %s %s, level %d. %d turns. Seed %d." % [p.name.left(1).to_upper() + p.name.substr(1), db.get_def("species", p.species_id)["name"],
 		db.get_def("classes", p.class_id)["name"], p.level, world.turns, world.run_seed], Palette.TEXT_DIM, 0.9))
+	col.add_child(_label("Journey: %d floors visited, %d NPCs met, %d threads settled. Return %d / Serpent %d / Apoth %d." % [
+		world.visited_floors.size(), world.npcs_met.size(), world.resolved_thread_count(), world.way_return, world.way_serpent, world.apotheosis
+	], Palette.RECORD, 0.85))
 	col.add_child(_label("Death is permanent: this run's save has been erased.", Palette.TEXT_DIM, 0.8) if not won else _label("This run's save has been erased.", Palette.TEXT_DIM, 0.8))
 	var again := _btn("New run", func() -> void:
 		world = null

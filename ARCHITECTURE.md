@@ -134,3 +134,9 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 
 - **Generation:** Added `src/gen/room_archetypes.gd` (`RoomArchetypes`: `10` regional composable room archetypes invoked in `DungeonGen.generate()` without breaking walkability or flood-fill connectivity) and emergent site placement in `DungeonGen._place_ecology()`.
 - **Sim & UI:** Extended `Ecology`, `World.player_interact()`, and `Main._show_feature()` with `rune_puzzle`, `abandoned_rite`, `sanctuary_hearth`, and `echo_cache`, keeping full `SAVE_VERSION := 11` compatibility.
+
+## M6.8 Additions (Discovery, Codex and Run History)
+
+- **Sim & Persistence:** Added `src/sim/codex.gd` (`Codex`: knowledge-only persistent catalog across creatures, visited places, identified items/relics, met NPCs, institutions, threads, contracts, and last 50 runs) and `src/persistence/codex_io.gd` (`CodexIO`: atomic `user://codex.json` writes strictly separate from `user://run.save.json`).
+- **Determinism isolation:** `World` never reads `Codex`; `Main` records one-way via `codex.record_from_world(world)` during `_autosave()` and `codex.record_run_end(world)` in `_show_end()`.
+- **UI:** Added Codex overlay (`k` / Title / Pause) with zero spoilers for unseen entries, and enriched end-of-run summaries in `_show_end()`.
