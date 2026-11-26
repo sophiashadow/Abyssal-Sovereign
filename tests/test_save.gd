@@ -165,6 +165,31 @@ func test_v7_save_migrates_to_v8() -> void:
 		ok(w2.contract_log.is_empty(), "default contract_log empty")
 
 
+func test_v8_save_migrates_to_v9() -> void:
+	var w := World.new_run(db(), 4242, "human", "fallen_knight", "Mig8")
+	var d := _through_json(w)
+	d["save_version"] = 8
+	var legacy_floors := {}
+	for fid in d["floors"]:
+		var fl: Dictionary = d["floors"][fid]
+		fl.erase("floor_id")
+		fl.erase("portals")
+		legacy_floors[str(int(fl["depth"]))] = fl
+	d["floors"] = legacy_floors
+	d.erase("floor_id")
+	d.erase("atlas")
+	d.erase("visited_floors")
+	d.erase("max_sphere_reached")
+	var errors: PackedStringArray = []
+	var w2 := World.from_dict(db(), d, errors)
+	eq(errors.size(), 0, "v8 save migrates cleanly: %s" % ", ".join(errors))
+	ok(w2 != null, "migrated v8 world loaded")
+	if w2 != null:
+		eq(w2.floor_id, "ossuary_warrens", "spine floor_id restored")
+		ok(w2.visited_floors.has("ossuary_warrens"), "visited_floors backfilled")
+		eq(w2.max_sphere_reached, 1, "max_sphere_reached backfilled")
+
+
 func test_round_trip_is_exact() -> void:
 	var w := World.new_run(db(), 4242, "cambion", "occultist", "Rt")
 	w.player_spend_stat("will")
@@ -224,14 +249,16 @@ func test_corrupt_saves_are_rejected_not_crashed() -> void:
 	var cases := {
 		"missing player": func(d: Dictionary) -> void: d.erase("player"),
 		"player missing hp": func(d: Dictionary) -> void: d["player"].erase("hp"),
-		"unknown monster": func(d: Dictionary) -> void: d["floors"]["1"]["actors"][0]["t"] = "not_a_monster",
+		"unknown monster": func(d: Dictionary) -> void: d["floors"][d["floor_id"]]["actors"][0]["t"] = "not_a_monster",
 		"unknown item": func(d: Dictionary) -> void: d["player"]["inv"].append({"id": 999, "t": "nope", "q": 1, "x": 0, "y": 0}),
-		"truncated terrain": func(d: Dictionary) -> void: d["floors"]["1"]["tiles"] = "AAAA",
+		"truncated terrain": func(d: Dictionary) -> void: d["floors"][d["floor_id"]]["tiles"] = "AAAA",
 		"floors not an object": func(d: Dictionary) -> void: d["floors"] = [],
 		"bad rng": func(d: Dictionary) -> void: d["rng"] = "banana",
 		"unknown species": func(d: Dictionary) -> void: d["player"]["species"] = "angel",
 		"bad slot": func(d: Dictionary) -> void: d["player"]["eq"]["crown"] = d["player"]["eq"]["weapon"],
-		"current floor missing": func(d: Dictionary) -> void: d["depth"] = 3,
+		"current floor missing": func(d: Dictionary) -> void:
+			d["depth"] = 3
+			d["floor_id"] = "gilded_choir",
 		"out-of-range depth": func(d: Dictionary) -> void: d["depth"] = 99,
 		"invalid mask": func(d: Dictionary) -> void: d["player"]["mask"] = "bogus",
 		"string save_version": func(d: Dictionary) -> void: d["save_version"] = "3",

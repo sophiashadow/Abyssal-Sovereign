@@ -10,7 +10,7 @@ const ACTOR_KEYS := ["id", "t", "name", "glyph", "color", "player", "x", "y", "h
 	"stat_points", "talent_points", "resource", "talents", "cooldowns",
 	"resists", "specials", "elite", "flags"]
 const ITEM_KEYS := ["id", "t", "q", "x", "y", "rar", "aff", "buc", "idn", "mods", "res", "dt", "st"]
-const FLOOR_KEYS := ["depth", "w", "h", "tiles", "explored", "up", "down", "exit", "actors", "items", "features"]
+const FLOOR_KEYS := ["floor_id", "depth", "w", "h", "tiles", "explored", "up", "down", "exit", "actors", "items", "features", "portals"]
 
 
 static func problems(d: Dictionary, db: ContentDB) -> PackedStringArray:
@@ -37,6 +37,10 @@ static func problems(d: Dictionary, db: ContentDB) -> PackedStringArray:
 		out.append("discovery state is malformed")
 	if typeof(d.get("contract")) != TYPE_STRING or typeof(d.get("contract_log")) != TYPE_DICTIONARY or int(d.get("subjugation", -1)) < 0 or int(d.get("contract_progress", -1)) < 0:
 		out.append("contract or subjugation state is malformed")
+	if typeof(d.get("floor_id")) != TYPE_STRING or not db.has("floors", String(d.get("floor_id", ""))):
+		out.append("floor_id is missing or unknown")
+	if typeof(d.get("atlas")) != TYPE_DICTIONARY or typeof(d.get("visited_floors")) != TYPE_ARRAY or int(d.get("max_sphere_reached", 0)) < 1:
+		out.append("atlas or visited_floors state is malformed")
 	return out
 
 
@@ -120,6 +124,10 @@ static func _actor(v: Variant, db: ContentDB, where: String, out: PackedStringAr
 
 static func _floor(v: Variant, db: ContentDB, where: String, out: PackedStringArray) -> void:
 	if not _has_keys(v, FLOOR_KEYS, where, out):
+		return
+	if typeof(v["floor_id"]) != TYPE_STRING or not db.has("floors", String(v["floor_id"])):
+		out.append("%s has unknown floor_id '%s'" % [where, str(v["floor_id"])])
+	if not _list(v["portals"], where + " portals", out):
 		return
 	var cells := int(v["w"]) * int(v["h"])
 	if cells <= 0 or typeof(v["tiles"]) != TYPE_STRING or typeof(v["explored"]) != TYPE_STRING:

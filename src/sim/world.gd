@@ -10,7 +10,7 @@ extends RefCounted
 ## id 1, so the player wins ties. Player actions return true if they spent
 ## time; the world then runs monsters until it is the player's turn again.
 
-const SAVE_VERSION := 8
+const SAVE_VERSION := 9
 const SUBJUGATION_LIMIT := 6
 ## Eight Chains grammar: monster tag -> status laid on the player and chance per hit.
 ## (chain_fog is delivered by the litany in _monster_turn.)
@@ -43,7 +43,11 @@ enum State { PLAYING, DEAD, WON }
 var db: ContentDB
 var run_seed: int = 0
 var depth: int = 1
-var floors: Dictionary = {} # depth -> FloorMap
+var floor_id: String = ""
+var floors: Dictionary = {} # floor_id -> FloorMap
+var atlas: Dictionary = {} # floor_id -> Array[{"target", "label", "kind"}]
+var visited_floors: Array[String] = []
+var max_sphere_reached: int = 1
 var player: Actor
 var rng: Rng
 var time: int = 0
@@ -80,12 +84,46 @@ static func new_run(content: ContentDB, seed_value: int, species_id: String, cla
 	w.rng = Rng.new(Rng.derive(seed_value, "play"))
 	w.player = w._make_player(species_id, class_id, hero_name)
 	w._init_discovery()
+	w._build_atlas()
 	w._enter_floor(1, true)
-	var fd := content.floor_for_depth(1)
+	var fd := w.current_floor_def()
 	w.log_msg("You descend beneath Terra Tenebrae. %s." % fd.get("name", "The dark"), "lore")
 	w.log_msg(String(fd.get("description", "")), "lore")
 	w._begin_player_turn()
 	return w
+
+
+func _build_atlas() -> void:
+	atlas.clear()
+	var arng := Rng.new(Rng.derive(run_seed, "atlas"))
+	var active_ids: Dictionary = {}
+	for d in range(1, db.max_depth() + 1):
+		var sid := db.spine_floor_id(d)
+		active_ids[sid] = true
+		atlas[sid] = []
+		var branches := db.branch_floors_for_depth(d)
+		var pool := branches.duplicate()
+		var chosen: Array[Dictionary] = []
+		var count := mini(2, pool.size())
+		for _i in count:
+			var idx := arng.range_i(0, pool.size() - 1)
+			chosen.append(pool[idx])
+			pool.remove_at(idx)
+		for bf in chosen:
+			var bid := String(bf["id"])
+			active_ids[bid] = true
+			atlas[bid] = []
+			(atlas[sid] as Array).append({"target": bid, "label": String(bf["name"]), "kind": "branch_in"})
+	var active_keys := active_ids.keys()
+	active_keys.sort()
+	for fid in active_keys:
+		var fdef := db.floor_def(String(fid))
+		if fdef.has("alt_down"):
+			var tgt := String(fdef["alt_down"])
+			if active_ids.has(tgt):
+				var tdef := db.floor_def(tgt)
+				(atlas[fid] as Array).append({"target": tgt, "label": String(tdef["name"]), "kind": "alt_down"})
+				(atlas[tgt] as Array).append({"target": String(fid), "label": String(fdef["name"]), "kind": "branch_out"})
 
 
 func _make_player(species_id: String, class_id: String, hero_name: String) -> Actor:
@@ -289,11 +327,26 @@ func _slot_for(it: Item) -> String:
 # ---------------------------------------------------------------- floors
 
 func current_floor() -> FloorMap:
-	return floors[depth]
+	return floors[floor_id]
+
+
+func current_floor_def() -> Dictionary:
+	return db.floor_def(floor_id)
+
+
+func portal_at(p: Vector2i) -> Dictionary:
+	return current_floor().portal_at(p)
 
 
 func _floor_seed(d: int) -> int:
 	return Rng.derive(run_seed, "floor:%d" % d)
+
+
+func _floor_seed_for(fid: String) -> int:
+	var fd := db.floor_def(fid)
+	if String(fd.get("region_kind", "spine")) == "spine":
+		return _floor_seed(int(fd["depth"]))
+	return Rng.derive(run_seed, "floor:" + fid)
 
 
 func _apply_elite(mon: Actor, kind: String) -> void:
@@ -340,7 +393,18 @@ func _apply_elite(mon: Actor, kind: String) -> void:
 
 
 func _build_floor(d: int) -> FloorMap:
-	var m := DungeonGen.generate(db.floor_for_depth(d), _floor_seed(d))
+	return _build_floor_by_id(db.spine_floor_id(d))
+
+
+func _build_floor_by_id(fid: String) -> FloorMap:
+	var fd := db.floor_def(fid)
+	var d := int(fd["depth"])
+	var extra: Array = atlas.get(fid, [])
+	var m := DungeonGen.generate(fd, _floor_seed_for(fid), extra)
+	for pt in m.portals:
+		var tid := String(pt.get("target", ""))
+		if db.has("floors", tid):
+			pt["label"] = String(db.floor_def(tid)["name"])
 	for s in m.spawns:
 		if s["kind"] == "monster":
 			var mon := _new_monster(String(s["id"]), s["pos"])
@@ -354,7 +418,7 @@ func _build_floor(d: int) -> FloorMap:
 				it = _maybe_artifact_drop()
 			if it == null:
 				it = _new_item(String(s["id"]))
-				Affixes.roll_equipment(it, db, d, rng, false)
+				Affixes.roll_equipment(it, db, d, rng, bool(s.get("magic", false)))
 			it.pos = s["pos"]
 			m.items.append(it)
 	m.spawns.clear()
@@ -362,14 +426,32 @@ func _build_floor(d: int) -> FloorMap:
 
 
 func _enter_floor(d: int, arriving_from_above: bool) -> void:
-	if floors.has(depth) and player in current_floor().actors:
+	_enter_floor_by_id(db.spine_floor_id(d), "above" if arriving_from_above else "below")
+
+
+func _enter_floor_by_id(target_id: String, arrival_kind: String, from_id: String = "") -> void:
+	if floor_id != "" and floors.has(floor_id) and player in current_floor().actors:
 		current_floor().actors.erase(player)
-	depth = d
-	if not floors.has(d):
-		floors[d] = _build_floor(d)
+	var first_ever := not floors.has(target_id)
+	floor_id = target_id
+	var fd := db.floor_def(target_id)
+	depth = int(fd["depth"])
+	max_sphere_reached = maxi(max_sphere_reached, depth)
+	if not visited_floors.has(target_id):
+		visited_floors.append(target_id)
+	if first_ever:
+		floors[target_id] = _build_floor_by_id(target_id)
 	var m := current_floor()
-	var target := m.up_pos if arriving_from_above else m.down_pos
-	player.pos = _adjacent_free(m, target) if (d == 1 and arriving_from_above) else _nearest_free(m, target)
+	var target := m.up_pos if arrival_kind == "above" else (m.down_pos if m.down_pos.x >= 0 else m.up_pos)
+	if from_id != "":
+		for pt in m.portals:
+			if String(pt.get("target", "")) == from_id:
+				target = Vector2i(int(pt["x"]), int(pt["y"]))
+				break
+	if target_id == db.spine_floor_id(1) and arrival_kind == "above" and first_ever:
+		player.pos = _adjacent_free(m, target)
+	else:
+		player.pos = _nearest_free(m, target)
 	m.actors.insert(0, player)
 	for a in m.actors:
 		if not a.is_player:
@@ -438,6 +520,7 @@ func player_move(dir: Vector2i) -> bool:
 		return _finish_player_action(COST_ITEM)
 	if not m.can_step(player.pos, target):
 		return false
+	var move_cost := COST_MOVE + (25 if m.get_tile(target) == Tiles.WATER_SHALLOW else 0)
 	player.pos = target
 	_on_actor_enter_tile(player, target)
 	if state != State.PLAYING:
@@ -446,7 +529,7 @@ func player_move(dir: Vector2i) -> bool:
 	if m.get_tile(target) == Tiles.DOOR_OPEN:
 		_win()
 		return true
-	return _finish_player_action(COST_MOVE)
+	return _finish_player_action(move_cost)
 
 
 func player_wait() -> bool:
@@ -856,19 +939,41 @@ func player_unequip(slot: String) -> bool:
 	return _finish_player_action(COST_ITEM)
 
 
+func _gate_target_id() -> String:
+	var m := current_floor()
+	var t := m.get_tile(player.pos)
+	if t == Tiles.STAIRS_DOWN and depth < db.max_depth():
+		return db.spine_floor_id(depth + 1)
+	var pt := m.portal_at(player.pos)
+	if not pt.is_empty():
+		var tid := String(pt.get("target", ""))
+		if tid != "" and int(db.floor_def(tid).get("depth", depth)) > depth:
+			return tid
+	return ""
+
+
+func gate_target_def() -> Dictionary:
+	var tid := _gate_target_id()
+	return db.floor_def(tid) if tid != "" else {}
+
+
 func needs_gate_to_descend() -> bool:
-	return state == State.PLAYING and current_floor().get_tile(player.pos) == Tiles.STAIRS_DOWN and not floors.has(depth + 1)
+	if state != State.PLAYING:
+		return false
+	var tid := _gate_target_id()
+	return tid != "" and not floors.has(tid)
 
 
 func player_descend_gate(method: String) -> bool:
 	if state != State.PLAYING:
 		return false
-	if current_floor().get_tile(player.pos) != Tiles.STAIRS_DOWN:
+	var tid := _gate_target_id()
+	if tid == "":
 		log_msg("There are no stairs here.")
 		return false
-	if not GATE_METHODS.has(method) or depth >= db.max_depth():
+	if not GATE_METHODS.has(method):
 		return false
-	var first_visit := not floors.has(depth + 1)
+	var first_visit := not floors.has(tid)
 	if first_visit:
 		match method:
 			"stormed":
@@ -904,7 +1009,9 @@ func player_descend_gate(method: String) -> bool:
 	if first_visit:
 		_contract_event("gate:" + method)
 		_contract_event("descend")
-	_enter_floor(depth + 1, true)
+	var from_id := floor_id
+	var via_portal := not current_floor().portal_at(player.pos).is_empty()
+	_enter_floor_by_id(tid, "portal" if via_portal else "above", from_id if via_portal else "")
 	if first_visit and method == "by_name":
 		var nearest: Actor = null
 		var best_d := 1 << 30
@@ -917,7 +1024,7 @@ func player_descend_gate(method: String) -> bool:
 		if nearest != null:
 			nearest.awake = true
 			_remember_player(nearest)
-	var fd := db.floor_for_depth(depth)
+	var fd := current_floor_def()
 	var sphere := String(fd.get("sphere", ""))
 	var fname := "%s (%s)" % [fd.get("name", "the next floor"), sphere] if sphere != "" else String(fd.get("name", "the next floor"))
 	log_msg("You descend to %s." % fname, "lore")
@@ -925,11 +1032,26 @@ func player_descend_gate(method: String) -> bool:
 	return _finish_player_action(COST_STAIRS)
 
 
-## Takes the stairs under the player, if any.
+## Takes the stairs or branch passage under the player, if any.
 func player_stairs() -> bool:
 	if state != State.PLAYING:
 		return false
-	var t := current_floor().get_tile(player.pos)
+	var m := current_floor()
+	var pt := m.portal_at(player.pos)
+	if not pt.is_empty():
+		var tid := String(pt.get("target", ""))
+		if tid == "" or not db.has("floors", tid):
+			return false
+		if int(db.floor_def(tid).get("depth", depth)) > depth:
+			return player_descend_gate("stormed")
+		var first_visit := not floors.has(tid)
+		_enter_floor_by_id(tid, "portal", m.floor_id)
+		var fd := current_floor_def()
+		log_msg("You cross into %s." % fd.get("name", tid), "lore")
+		if first_visit:
+			log_msg(String(fd.get("description", "")), "lore")
+		return _finish_player_action(COST_STAIRS)
+	var t := m.get_tile(player.pos)
 	if t == Tiles.STAIRS_DOWN:
 		return player_descend_gate("stormed")
 	if t == Tiles.STAIRS_UP:
@@ -937,7 +1059,7 @@ func player_stairs() -> bool:
 			log_msg("Above is the Architect's daylight. You did not come down here to go back.")
 			return false
 		_enter_floor(depth - 1, false)
-		log_msg("You climb back to %s." % db.floor_for_depth(depth).get("name", "the floor above"), "lore")
+		log_msg("You climb back to %s." % current_floor_def().get("name", "the floor above"), "lore")
 		return _finish_player_action(COST_STAIRS)
 	log_msg("There are no stairs here.")
 	return false
@@ -1444,6 +1566,8 @@ func _chain_hit(sid: String) -> void:
 		gain += 1
 	if player.has_trait("mask_stances") and player.mask == "nyx":
 		gain -= 1
+	if current_floor().get_tile(player.pos) == Tiles.SANCTUARY_FLOOR:
+		gain -= 1
 	if gain <= 0:
 		return
 	subjugation += gain
@@ -1594,7 +1718,7 @@ func _open_secret_door(pos: Vector2i) -> void:
 	f["used"] = true
 	m.set_tile(pos, Tiles.FLOOR)
 	update_fov()
-	var table: Array = db.floor_for_depth(depth).get("item_table", [])
+	var table: Array = current_floor_def().get("item_table", [])
 	if not table.is_empty():
 		var loot := _new_item(rng.pick_weighted(table))
 		Affixes.roll_equipment(loot, db, depth, rng, true)
@@ -1610,6 +1734,21 @@ func _on_actor_enter_tile(actor: Actor, pos: Vector2i) -> void:
 		return
 	var m := current_floor()
 	var t := m.get_tile(pos)
+	if t == Tiles.WATER_SHALLOW and actor.has_status("burning"):
+		_remove_status(actor, "burning")
+		if actor.is_player:
+			log_msg("The shallow water douses the flames.", "good")
+		elif m.is_visible(pos):
+			log_msg("The shallow water douses the %s's flames." % actor.name, "info")
+	elif t == Tiles.IRON_GRATE and actor.is_player:
+		var alerted := 0
+		for a in m.actors:
+			if not a.is_player and a.is_alive() and not a.awake and Grid.chebyshev(pos, a.pos) <= 5:
+				a.awake = true
+				_remember_player(a)
+				alerted += 1
+		if alerted > 0:
+			log_msg("The iron grate clangs underfoot, alerting nearby foes!", "danger")
 	if Tiles.is_hazard(t):
 		var h: Dictionary = Ecology.HAZARDS[t]
 		var htype := String(h["damage_type"])
@@ -1793,7 +1932,7 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 					log_msg("Locked: requires a vault key or Ophite Key (or force it).", "info")
 					return false
 			f["used"] = true
-			var table: Array = db.floor_for_depth(depth).get("item_table", [])
+			var table: Array = current_floor_def().get("item_table", [])
 			for n_i in 2:
 				var loot: Item = null
 				if n_i == 0 and depth >= 4:
@@ -1850,7 +1989,7 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 			return _finish_player_action(COST_ITEM)
 		"challenge":
 			f["used"] = true
-			var fd := db.floor_for_depth(depth)
+			var fd := current_floor_def()
 			var mtable: Array = fd.get("monster_table", [])
 			var spawned := 0
 			for d8 in Grid.DIRS_8:
@@ -1928,6 +2067,8 @@ func _natural_regen() -> void:
 		return
 	var mult := float(db.get_def("species", player.species_id).get("heal_mult", 1.0))
 	var interval := maxi(1, int(roundf(REGEN_TURNS / maxf(mult, 0.1))))
+	if current_floor().get_tile(player.pos) == Tiles.SANCTUARY_FLOOR:
+		interval = maxi(1, interval / 2)
 	if turns % interval == 0:
 		player.hp += 1
 
@@ -2260,6 +2401,8 @@ func apply_damage(target: Actor, amount: int, source: String, dmg_type: String =
 	if amount <= 0 and dmg_type != "physical":
 		log_msg("%s resists completely." % ("You" if target.is_player else "The " + target.name), "info")
 		return
+	if dmg_type == "cold" and amount > 0 and current_floor().get_tile(target.pos) == Tiles.WATER_SHALLOW:
+		amount = maxi(1, int(roundf(float(amount) * 1.25)))
 	amount = _apply_damage_combos(target, amount, dmg_type)
 	target.hp -= amount
 	if target.hp > 0:
@@ -2299,7 +2442,7 @@ func _kill_monster(mon: Actor) -> void:
 	if player.resource_kind() == "resonance":
 		player.resource = mini(player.max_resource(), player.resource + 2)
 	if mon.is_elite or mon.tags.has("boss"):
-		var fd := db.floor_for_depth(depth)
+		var fd := current_floor_def()
 		var table: Array = fd.get("item_table", [])
 		var drop: Item = null
 		if mon.tags.has("boss") and rng.chance_pct(30):
@@ -2433,6 +2576,9 @@ func describe_at(p: Vector2i) -> String:
 	var feat_mem := m.revealed_feature_at(p)
 	if not feat_mem.is_empty():
 		return "%s." % Ecology.label(feat_mem)
+	var pt := m.portal_at(p)
+	if not pt.is_empty():
+		return "Passage to %s." % String(pt.get("label", pt.get("target", "")))
 	return "%s." % String(Tiles.NAMES.get(m.get_tile(p), "unknown")).capitalize()
 
 
@@ -2447,6 +2593,10 @@ func _describe_floor_here() -> void:
 		log_msg("You see here: %s." % item_name(its[0]))
 	elif its.size() > 1:
 		log_msg("Several things lie here.")
+	var pt := m.portal_at(player.pos)
+	if not pt.is_empty():
+		log_msg("Passage to %s (press Enter or tap to cross)." % String(pt.get("label", pt.get("target", ""))), "lore")
+		return
 	match t:
 		Tiles.STAIRS_DOWN:
 			log_msg("Stairs lead down.")
@@ -2515,13 +2665,17 @@ func named_loss() -> Dictionary:
 
 func to_dict() -> Dictionary:
 	var fl := {}
-	for d in floors:
-		fl[str(d)] = (floors[d] as FloorMap).to_dict()
+	for fid in floors:
+		fl[String(fid)] = (floors[fid] as FloorMap).to_dict()
 	return {
 		"save_version": SAVE_VERSION,
 		"content": db.fingerprint(),
 		"seed": str(run_seed),
-		"depth": depth, "time": time, "turns": turns,
+		"depth": depth, "floor_id": floor_id,
+		"atlas": atlas.duplicate(true),
+		"visited_floors": visited_floors.duplicate(),
+		"max_sphere_reached": max_sphere_reached,
+		"time": time, "turns": turns,
 		"state": int(state), "cause": death_cause,
 		"apotheosis": apotheosis, "way_serpent": way_serpent, "way_return": way_return,
 		"next_id": next_entity_id,
@@ -2535,6 +2689,17 @@ func to_dict() -> Dictionary:
 		"floors": fl,
 		"log": messages.duplicate(true),
 	}
+
+
+const _LEGACY_SPINE_IDS := {
+	"1": "ossuary_warrens",
+	"2": "tithe_vaults",
+	"3": "gilded_choir",
+	"4": "false_solar_court",
+	"5": "iron_scriptorium",
+	"6": "chamber_of_decrees",
+	"7": "sealed_stair",
+}
 
 
 static func _migrate(d: Dictionary) -> Dictionary:
@@ -2636,6 +2801,30 @@ static func _migrate(d: Dictionary) -> Dictionary:
 		out["contract"] = String(out.get("contract", ""))
 		out["contract_progress"] = int(out.get("contract_progress", 0))
 		out["contract_log"] = out.get("contract_log", {})
+		ver = 8
+	if ver == 8:
+		out["save_version"] = 9
+		var d_str := str(int(out.get("depth", 1)))
+		var cur_fid := String(_LEGACY_SPINE_IDS.get(d_str, "ossuary_warrens"))
+		out["floor_id"] = String(out.get("floor_id", cur_fid))
+		out["atlas"] = out.get("atlas", {})
+		out["max_sphere_reached"] = int(out.get("max_sphere_reached", int(out.get("depth", 1))))
+		var visited := []
+		if typeof(out.get("floors")) == TYPE_DICTIONARY:
+			var new_floors := {}
+			for k in out["floors"]:
+				var fl = out["floors"][k]
+				var fid := String(_LEGACY_SPINE_IDS.get(String(k), String(k)))
+				if typeof(fl) == TYPE_DICTIONARY:
+					fl["floor_id"] = String(fl.get("floor_id", fid))
+					if not fl.has("portals"):
+						fl["portals"] = []
+				new_floors[fid] = fl
+				visited.append(fid)
+			visited.sort()
+			out["floors"] = new_floors
+		if not out.has("visited_floors"):
+			out["visited_floors"] = visited if not visited.is_empty() else [out["floor_id"]]
 	return out
 
 
@@ -2693,6 +2882,14 @@ static func from_dict(content: ContentDB, d: Dictionary, errors: PackedStringArr
 	if w.depth < 1 or w.depth > content.max_depth():
 		errors.append("save has out-of-range depth %d" % w.depth)
 		return null
+	w.floor_id = String(d.get("floor_id", content.spine_floor_id(w.depth)))
+	if not content.has("floors", w.floor_id):
+		errors.append("save has unknown floor_id '%s'" % w.floor_id)
+		return null
+	w.atlas = Actor._ints(d.get("atlas", {}))
+	for vf in d.get("visited_floors", []):
+		w.visited_floors.append(String(vf))
+	w.max_sphere_reached = maxi(w.depth, int(d.get("max_sphere_reached", w.depth)))
 	w.time = int(d["time"])
 	w.turns = int(d["turns"])
 	w.state = int(d["state"]) as State
@@ -2715,9 +2912,12 @@ static func from_dict(content: ContentDB, d: Dictionary, errors: PackedStringArr
 	w.rng.set_state_string(String(d["rng"]))
 	w.player = Actor.from_dict(d["player"], content)
 	for key in d["floors"]:
-		w.floors[int(key)] = FloorMap.from_dict(d["floors"][key], content)
-	if not w.floors.has(w.depth):
-		errors.append("save has no data for current depth %d" % w.depth)
+		var fm := FloorMap.from_dict(d["floors"][key], content)
+		if fm.floor_id == "":
+			fm.floor_id = String(key)
+		w.floors[String(key)] = fm
+	if not w.floors.has(w.floor_id):
+		errors.append("save has no data for current floor '%s'" % w.floor_id)
 		return null
 	for msg in d["log"]:
 		w.messages.append({"t": String(msg["t"]), "k": String(msg["k"]), "n": int(msg["n"])})

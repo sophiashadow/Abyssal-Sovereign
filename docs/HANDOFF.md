@@ -5,14 +5,14 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 ## State as of 2026-11-26
 
 - **Branch:** `main` (default branch on `origin`, github.com/sophiashadow/Abyssal-Sovereign), preserving full commit history from `ccr-c6f8b898-fu2jtp`.
-- **Milestones:** M0–M4, **M5.1** (`37e5984`), **M5.2** (`9cdfb7d`), **M5.3** (`5b98bbf`), **M5.4** (`106da87`), and **M5.5 (Metaphysical Depth)** — completing the **M5 Depth Pass** (all 8 Eight Chains abilities + Subjugation clock -> `entangled`, Masks/Relics/False Light/Apotheosis/Two Ways interactions, 4 Divine Contracts + Lecterns of Rites, `SAVE_VERSION := 8` with v7->v8 migration).
-- **Last verified (local, Linux):**
-  - `tools/verify.sh` (M5.5):
-    - `tools/test.sh`: 106 tests, 106 passed, 0 failed, 1800 checks (0 engine errors).
-    - `tools/ui_smoke.gd` at `1280×720` and `2340×1080`: 21 steps, 0 failures each.
-  - `tools/soak.gd --seeds=15 --salt=heldout` (M5.5 depth pass): bot wins `81%` (`110/135` runs, mean `718` turns).
-  - *Prior M4 exports (`build/`)*: `tools/export.sh all` refreshed Linux/Windows/Web/Android-debug exports at v0.4 (`apksigner verify` SHA-256 `a0000912831e593cdea65be68bda40f99f0d0e4d779332fff711199eb578a279`); exports have not yet been rebuilt after M5.1–M5.5.
-- **NOT_RUN:** Post-M5.1–M5.5 platform exports, Windows runtime, Web browser `user://` persistence test, physical Android device install/test (no device attached to `adb`), release-signed Android APK, M5.2–M5.5 human playtest. There is no CI.
+- **Milestones:** M0–M5 (`fac51e8`, Depth Pass complete), **M6.1 (The Atlas of Terra Tenebrae)** — 28-floor Atlas across the Seven Spheres, deterministic per-run branch selection (`21` active floors/run), bidirectional portals & `alt_down` Sphere Gate routes, `WATER_SHALLOW` / `SANCTUARY_FLOOR` / `IRON_GRATE` terrain rules, Atlas UI (`Tab` / Pause), `SAVE_VERSION := 9` with `v8 -> v9` migration, and durable `docs/M6_SPEC.md`.
+- **Last verified (local, Linux, M6.1):**
+  - `tools/verify.sh` (M6.1):
+    - `tools/test.sh`: `112` tests, `112` passed, `0` failed, `2106` checks (`0` engine errors).
+    - `tools/ui_smoke.gd` at `1280×720` and `2340×1080`: `21` steps, `0` failures each.
+  - `tools/soak.gd --seeds=15 --salt=heldout` (M6.1): bot wins `82%` (`111/135` runs, mean `742` turns).
+  - *Prior M4 exports (`build/`)*: `tools/export.sh all` refreshed Linux/Windows/Web/Android-debug exports at v0.4 (`apksigner verify` SHA-256 `a0000912831e593cdea65be68bda40f99f0d0e4d779332fff711199eb578a279`); exports have not yet been rebuilt after M5.1–M6.1.
+- **NOT_RUN:** Post-M5.1–M6.1 platform exports, Windows runtime, Web browser `user://` persistence test, physical Android device install/test (no device attached to `adb`), release-signed Android APK, M5.2–M6.1 human playtest. There is no CI.
 
 ## Setup
 
@@ -36,10 +36,11 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 3. ~~**Relics, worked or transmuted**~~ (`kind: "relic"` schema + `Confessor's Glass`, `Ophite Key`, `Broken Halo` in `items.json` / `floors.json`, `player_work_relic` / `player_transmute_relic` in `World`, UI buttons in `main.gd`, tests in `tests/test_items.gd`).
 4. ~~**Named losses**~~ (`World.named_loss()` classifying `Gilded`, `Fluent`, and `Catalogued` on the death screen, tests in `tests/test_turns.gd`).
 
-## Next assignment: Playtest & Platform Verification (M5 Depth Pass Complete)
+## Next assignment: Milestone 6 Breadth Pass (`docs/M6_SPEC.md`)
 
-- **Milestone 3 remaining:** Rebuild exports after M5.1–M5.5 (`tools/export.sh all` / `tools/verify.sh --exports`), install `build/android/abyssal-sovereign-debug.apk` on a physical Android device (`adb install -r build/android/abyssal-sovereign-debug.apk`) and test touch, back button, and autosave on kill; test Windows binary on Windows; verify Web `user://` IndexedDB persistence in a browser; configure release signing with an owner-created keystore outside the repo.
-- **Human playtest & polish:** Playtest M5.1–M5.5 talents, combat depth, affixes/sets, dungeon ecology, and metaphysical depth (Eight Chains/Subjugation/Divine Contracts); review remaining items in `ROADMAP.md` (monospace glyph font, colour-blind palette).
+- **M6.1 (The Atlas of Terra Tenebrae):** Done (2026-11-26).
+- **Next:** **M6.2 (The Inhabitants)** — expand `monsters.json` to 60+ archetypes across 10 families + 12+ regional bosses, tactical AI specials/behaviors, 4 elite mutations, and room encounter squads. Then proceed incrementally through M6.3–M6.10 per `docs/M6_SPEC.md`.
+- **Platform verification (M3 / M6.10):** Rebuild exports after M6 tranches (`tools/export.sh`), test physical Android device / Windows / Web when available, and configure release signing with an owner-created keystore outside the repo.
 
 Smaller known defects (fixed 2026-11-26):
 

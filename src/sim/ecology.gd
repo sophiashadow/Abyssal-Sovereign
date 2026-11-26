@@ -42,6 +42,40 @@ const BROKER_POOL: Array[String] = [
 ]
 
 
+static func hazard_tile_from_name(name: String) -> int:
+	match name:
+		"none":
+			return -1
+		"ash_ember":
+			return Tiles.ASH_EMBER
+		"rime_ice":
+			return Tiles.RIME_ICE
+		"miasma":
+			return Tiles.MIASMA
+		"solar_glare":
+			return Tiles.SOLAR_GLARE
+	return -2
+
+
+static func site_def_from_key(key: String) -> Dictionary:
+	match key:
+		"altar":
+			return {"kind": "altar", "sub": "unbinding"}
+		"shrine":
+			return {"kind": "shrine", "sub": "eye"}
+		"ritual_circle":
+			return {"kind": "ritual_circle", "sub": "geometry"}
+		"vault_gate":
+			return {"kind": "vault_gate", "sub": "locked_vault"}
+		"merchant":
+			return {"kind": "merchant", "sub": "broker"}
+		"contract_lectern":
+			return {"kind": "contract_lectern", "sub": "rites"}
+		"challenge":
+			return {"kind": "challenge", "sub": "trial_bell"}
+	return {}
+
+
 static func glyph(feat: Dictionary) -> String:
 	match String(feat.get("kind", "")):
 		"trap":

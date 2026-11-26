@@ -21,12 +21,17 @@ const TILE_GLYPH := {
 	Tiles.WALL: "#", Tiles.FLOOR: ".", Tiles.STAIRS_DOWN: ">", Tiles.STAIRS_UP: "<",
 	Tiles.DOOR_SEALED: "+", Tiles.DOOR_OPEN: "'",
 	Tiles.ASH_EMBER: "~", Tiles.RIME_ICE: "~", Tiles.MIASMA: "\"", Tiles.SOLAR_GLARE: "*",
+	Tiles.BRANCH_IN: ">", Tiles.BRANCH_OUT: "<",
+	Tiles.WATER_SHALLOW: "~", Tiles.SANCTUARY_FLOOR: ",", Tiles.IRON_GRATE: ":",
 }
 const TILE_COLOR := {
 	Tiles.WALL: Color("#8a7a66"), Tiles.FLOOR: Color("#5a4e5e"), Tiles.STAIRS_DOWN: FALSE_SUN,
 	Tiles.STAIRS_UP: RECORD, Tiles.DOOR_SEALED: ALERT, Tiles.DOOR_OPEN: GOOD,
 	Tiles.ASH_EMBER: Color("#ff7a33"), Tiles.RIME_ICE: Color("#6ec6ff"),
 	Tiles.MIASMA: Color("#8f7ae0"), Tiles.SOLAR_GLARE: FALSE_SUN,
+	Tiles.BRANCH_IN: GOOD, Tiles.BRANCH_OUT: GOOD,
+	Tiles.WATER_SHALLOW: Color("#5e7a99"), Tiles.SANCTUARY_FLOOR: Color("#6e8b82"),
+	Tiles.IRON_GRATE: Color("#8c8c9c"),
 }
 
 ## Message-log colours by World.log_msg kind.

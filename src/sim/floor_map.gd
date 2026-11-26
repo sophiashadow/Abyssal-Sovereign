@@ -2,6 +2,7 @@ class_name FloorMap
 extends RefCounted
 ## One dungeon floor: terrain, exploration memory, and what stands on it.
 
+var floor_id: String = ""
 var depth: int = 1
 var width: int = 0
 var height: int = 0
@@ -19,6 +20,8 @@ var items: Array[Item] = []
 var spawns: Array[Dictionary] = []
 ## Ecology features (traps, secret doors, altars, shrines, vaults, merchants, challenges).
 var features: Array[Dictionary] = []
+## Branch & alternate-route portals: {"x", "y", "target", "label", "kind"}.
+var portals: Array[Dictionary] = []
 
 
 func setup(w: int, h: int, fill: int = Tiles.WALL) -> void:
@@ -106,6 +109,13 @@ func revealed_feature_at(p: Vector2i) -> Dictionary:
 	return {}
 
 
+func portal_at(p: Vector2i) -> Dictionary:
+	for pt in portals:
+		if int(pt.get("x", -1)) == p.x and int(pt.get("y", -1)) == p.y:
+			return pt
+	return {}
+
+
 func to_dict() -> Dictionary:
 	var acts := []
 	for a in actors:
@@ -115,17 +125,20 @@ func to_dict() -> Dictionary:
 	for it in items:
 		its.append(it.to_dict())
 	return {
+		"floor_id": floor_id,
 		"depth": depth, "w": width, "h": height,
 		"tiles": Marshalls.raw_to_base64(tiles),
 		"explored": Marshalls.raw_to_base64(explored),
 		"up": [up_pos.x, up_pos.y], "down": [down_pos.x, down_pos.y], "exit": [exit_pos.x, exit_pos.y],
 		"actors": acts, "items": its, "features": features.duplicate(true),
+		"portals": portals.duplicate(true),
 	}
 
 
 static func from_dict(d: Dictionary, db: ContentDB) -> FloorMap:
 	var m := FloorMap.new()
 	m.setup(int(d["w"]), int(d["h"]))
+	m.floor_id = String(d.get("floor_id", ""))
 	m.depth = int(d["depth"])
 	m.tiles = Marshalls.base64_to_raw(String(d["tiles"]))
 	m.explored = Marshalls.base64_to_raw(String(d["explored"]))
@@ -140,4 +153,6 @@ static func from_dict(d: Dictionary, db: ContentDB) -> FloorMap:
 		m.items.append(Item.from_dict(idd))
 	for fd in d.get("features", []):
 		m.features.append(Actor._ints(fd))
+	for pt in d.get("portals", []):
+		m.portals.append(Actor._ints(pt))
 	return m

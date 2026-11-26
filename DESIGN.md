@@ -157,3 +157,16 @@ M5.5 weaves the cosmology directly into tactical play across every enemy family,
 | `human` | `39 / 45` (`87%`) | — | `assassin` 14/15, `occultist` 14/15, `fallen_knight` 11/15 |
 | `cambion` | `34 / 45` (`76%`) | — | `assassin` 14/15, `occultist` 13/15, `fallen_knight` 7/15 |
 | `revenant` | `37 / 45` (`82%`) | — | `assassin` 13/15, `occultist` 13/15, `fallen_knight` 11/15 |
+
+## M6.1 — The Atlas of Terra Tenebrae
+
+M6.1 expands the seven linear Sphere floors into a 28-floor multi-region Atlas (`7` spine + `21` regional branches, sanctuaries, vaults, strongholds, and settlements; `2` branches per Sphere active per run via deterministic seed selection) plus bidirectional portals, `alt_down` cross-Sphere routes with Sphere Gates, and three regional terrain rules (`WATER_SHALLOW`, `SANCTUARY_FLOOR`, `IRON_GRATE`).
+
+### Measured Balance (M6.1 held-out soak, `tools/soak.gd --seeds=15 --salt=heldout`, `135` runs)
+
+| Scope | Wins / Runs | Mean Turns | Notes |
+|---|---:|---:|---|
+| Overall | `111 / 135` (`82%`) | `742` | Callings: `Knight 33/45`, `Occultist 40/45`, `Assassin 38/45` |
+| `human` | `41 / 45` (`91%`) | — | `assassin` 15/15, `occultist` 14/15, `fallen_knight` 12/15 |
+| `cambion` | `31 / 45` (`69%`) | — | `assassin` 10/15, `occultist` 12/15, `fallen_knight` 9/15 |
+| `revenant` | `39 / 45` (`87%`) | — | `assassin` 13/15, `occultist` 14/15, `fallen_knight` 12/15 |

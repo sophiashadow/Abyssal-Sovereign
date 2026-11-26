@@ -69,4 +69,11 @@ Owner decisions resolved 2026-11-26 (see [docs/LORE.md](docs/LORE.md)): Apotheos
 2. **Masks, Relics, False Light, Apotheosis & Two Ways interactions:** Wired live clock modifiers across Masks (`nyx`/`lilith`/`eris`), Relics (`Broken Halo`/`Severed Crown`), `false_light`/`reckoning`, `apotheosis` (`sovereign_mark`), and sustained Way orientations (`return_oriented`, `serpents_seam`).
 3. **Divine contracts & Lectern of Rites:** Added `contracts.json` (*The Fast*, *Vow of Poverty*, *The Taken Name*, *The Crown Taken*), `contract_lectern` sites, `ritual_circle` oath attestation, permanent `reward_mods`, `forsworn` oath breaches, and `SAVE_VERSION := 8`.
 
-M5 (The Depth Pass: M5.1–M5.5) is complete. Remaining work tracks Milestone 3 platform verification and human playtest polish.
+M5 (The Depth Pass: M5.1–M5.5) is complete.
+
+## Milestone 6.1: The Atlas of Terra Tenebrae (done 2026-11-26)
+
+1. **28-floor Atlas across Seven Spheres:** Expanded `floors.json` from 7 linear floors to 7 main-spine floors plus 21 regional sub-floors (branches, sanctuaries, vaults, strongholds, settlements), with deterministic per-run selection of 2 branches per Sphere (`21` active floors per run) and bidirectional `alt_down` cross-Sphere routes.
+2. **Regional Terrain & Portals:** Added `BRANCH_IN`, `BRANCH_OUT`, `WATER_SHALLOW`, `SANCTUARY_FLOOR`, and `IRON_GRATE` with distinct movement, elemental, noise, regen, and Subjugation rules, plus Atlas overlay (`Tab` / Pause) and `SAVE_VERSION := 9` (`v8 -> v9` migration).
+
+Remaining M6 submilestones track M6.2–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.

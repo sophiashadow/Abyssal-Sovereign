@@ -21,6 +21,7 @@ var look_label: Label
 var overlay: Control
 var _log_seen := -1
 var _last_depth := -1
+var _last_floor_id := ""
 var _last_save_turn := 0
 
 # Interaction state
@@ -192,7 +193,7 @@ func _show_title() -> void:
 	col.add_child(_btn("Settings", func() -> void: _show_settings(_show_title)))
 	if not OS.has_feature("web"):
 		col.add_child(_btn("Quit", func() -> void: get_tree().quit()))
-	var foot := _label("Set in the world of FALSE LIGHT. v0.5 (M5.5 Metaphysical Depth)", Palette.TEXT_DIM, 0.75)
+	var foot := _label("Set in the world of FALSE LIGHT. v0.6 (M6.1 The Atlas)", Palette.TEXT_DIM, 0.75)
 	foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(foot)
 
@@ -322,6 +323,7 @@ func _describe_choice(kind: String, id: String) -> String:
 func _start_game(w: World) -> void:
 	world = w
 	_last_depth = world.depth
+	_last_floor_id = world.floor_id
 	_last_save_turn = world.turns
 	_log_seen = -1
 	SaveIO.save(world)
@@ -422,7 +424,7 @@ func _build_game_screen() -> void:
 		side.add_child(pad_center)
 	else:
 		var mask_hint := "   Mask: m" if world.player.has_trait("mask_stances") else ""
-		side.add_child(_label("Move: arrows, numpad or hjklyubn\nWait: . or 5   Get: g   Bag: i%s\nBuild: c   Act: a (1-6)   Fire: f\nStairs: Enter   Rest: r   Srch: s\nUse: e   Look: x   Menu: Esc\nTap known tile to travel; hold/right-click to inspect." % mask_hint, Palette.TEXT_DIM, 0.7))
+		side.add_child(_label("Move: arrows, numpad or hjklyubn\nWait: . or 5   Get: g   Bag: i%s\nBuild: c   Act: a (1-6)   Fire: f\nStairs: Enter   Rest: r   Srch: s\nUse: e   Look: x   Atlas: Tab\nMenu: Esc   Tap to travel; hold/right-click to look." % mask_hint, Palette.TEXT_DIM, 0.7))
 	_refresh()
 
 
@@ -447,7 +449,7 @@ func _escape(t: String) -> String:
 
 func _update_hud() -> void:
 	var p := world.player
-	var fd := db.floor_for_depth(world.depth)
+	var fd := world.current_floor_def()
 	var mx := p.stat("max_hp")
 	var hp_col := Palette.GOOD if p.hp * 2 > mx else (Palette.FALSE_SUN if p.hp * 4 > mx else Palette.ALERT)
 	var t: PackedStringArray = []
@@ -460,7 +462,9 @@ func _update_hud() -> void:
 	if p.stat_points > 0 or p.talent_points > 0:
 		t.append("[color=#%s]Unspent: %d stat, %d talent (Build)[/color]" % [Palette.FALSE_SUN.to_html(false), p.stat_points, p.talent_points])
 	var sphere := String(fd.get("sphere", ""))
-	t.append("Depth %d (%s): %s" % [world.depth, sphere, fd.get("name", "")] if sphere != "" else "Depth %d: %s" % [world.depth, fd.get("name", "")])
+	var rkind := String(fd.get("region_kind", "spine"))
+	var rtag := "" if rkind == "spine" else " [%s]" % rkind.capitalize()
+	t.append("Sphere %d (%s): %s%s" % [world.depth, sphere, fd.get("name", ""), rtag] if sphere != "" else "Depth %d: %s%s" % [world.depth, fd.get("name", ""), rtag])
 	t.append("Attack %+d  Defense %d  Evasion %+d" % [p.stat("accuracy"), p.stat("defense"), p.stat("evasion")])
 	var w := p.equipped("weapon")
 	t.append("Wielding: %s (%s)" % [world.item_name(w), p.damage_dice()] if w != null else "Wielding: bare hands (1d2)")
@@ -506,8 +510,9 @@ func _after_action() -> void:
 		_refresh()
 		_show_end()
 		return
-	if world.depth != _last_depth or world.turns - _last_save_turn >= AUTOSAVE_EVERY_TURNS:
+	if world.depth != _last_depth or world.floor_id != _last_floor_id or world.turns - _last_save_turn >= AUTOSAVE_EVERY_TURNS:
 		_last_depth = world.depth
+		_last_floor_id = world.floor_id
 		_autosave()
 	_refresh()
 
@@ -714,7 +719,7 @@ func _on_tile_tapped(p: Vector2i) -> void:
 		elif Ecology.is_interactive(feat_here):
 			_show_feature(feat_here)
 			return
-		elif fm.get_tile(me) in [Tiles.STAIRS_DOWN, Tiles.STAIRS_UP]:
+		elif fm.get_tile(me) in [Tiles.STAIRS_DOWN, Tiles.STAIRS_UP, Tiles.BRANCH_IN, Tiles.BRANCH_OUT]:
 			_act_stairs()
 			return
 		else:
@@ -855,6 +860,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_act_search()
 	elif k.keycode == KEY_E:
 		_act_interact()
+	elif k.keycode == KEY_TAB:
+		_show_atlas()
 	elif k.keycode >= KEY_1 and k.keycode <= KEY_6:
 		var idx := k.keycode - KEY_1
 		var acts := world.learned_active_talents()
@@ -1060,7 +1067,9 @@ func _show_feature(feat: Dictionary) -> void:
 func _show_gate() -> void:
 	if not world.needs_gate_to_descend() or overlay != null:
 		return
-	var next_fd := db.floor_for_depth(world.depth + 1)
+	var next_fd := world.gate_target_def()
+	if next_fd.is_empty():
+		next_fd = db.floor_for_depth(world.depth + 1)
 	var sphere := String(next_fd.get("sphere", "the next sphere"))
 	var col := _open_overlay("Sphere Gate: %s" % sphere, Palette.FALSE_SUN)
 	col.add_child(_label("Choose how to cross into %s:" % next_fd.get("name", sphere), Palette.TEXT_DIM, 0.85))
@@ -1148,14 +1157,43 @@ func _close_overlay() -> void:
 		_refresh()
 
 
+func _show_atlas() -> void:
+	if world == null or world.state != World.State.PLAYING:
+		return
+	var col := _open_overlay("Atlas of Terra Tenebrae", Palette.FALSE_SUN)
+	col.add_child(_label("Discovered places (%d visited). Unwalked branches remain hidden." % world.visited_floors.size(), Palette.TEXT_DIM, 0.85))
+	for d in range(1, db.max_depth() + 1):
+		var sid := db.spine_floor_id(d)
+		var sdef := db.floor_def(sid)
+		var sphere := String(sdef.get("sphere", str(d)))
+		var visited_s := world.visited_floors.has(sid)
+		var here_s := world.floor_id == sid
+		var s_line := "Sphere %d (%s): %s%s" % [d, sphere, String(sdef["name"]) if visited_s or d <= world.max_sphere_reached else "???", "  [HERE]" if here_s else ""]
+		col.add_child(_label(s_line, Palette.LUX if here_s else (Palette.TEXT if visited_s else Palette.TEXT_DIM), 0.92))
+		for pt in world.atlas.get(sid, []):
+			var bid := String(pt.get("target", ""))
+			if bid == "":
+				continue
+			var bdef := db.floor_def(bid)
+			var vis_b := world.visited_floors.has(bid)
+			var here_b := world.floor_id == bid
+			var bname := String(bdef.get("name", bid)) if vis_b else "Unvisited branch (%s)" % String(bdef.get("region_kind", "branch")).capitalize()
+			if visited_s or vis_b:
+				col.add_child(_label("  └ %s%s" % [bname, "  [HERE]" if here_b else ""], Palette.GOOD if here_b else Palette.TEXT_DIM, 0.82))
+	var close := _btn("Close", _close_overlay)
+	col.add_child(close)
+	close.call_deferred("grab_focus")
+
+
 func _show_pause() -> void:
 	if world == null or world.state != World.State.PLAYING:
 		return
 	var col := _open_overlay("Paused")
-	var fd := db.floor_for_depth(world.depth)
+	var fd := world.current_floor_def()
 	col.add_child(_label("%s. Seed %d." % [fd.get("name", ""), world.run_seed], Palette.TEXT_DIM, 0.85))
 	var resume := _btn("Resume", _close_overlay)
 	col.add_child(resume)
+	col.add_child(_btn("Atlas", _show_atlas))
 	col.add_child(_btn("Settings", func() -> void: _show_settings(_build_game_screen)))
 	col.add_child(_btn("Save and return to title", func() -> void:
 		_autosave()
@@ -1368,7 +1406,7 @@ func _show_end() -> void:
 	var col := _open_overlay(title, title_col)
 	screen = Screen.END
 	var p := world.player
-	var fd := db.floor_for_depth(world.depth)
+	var fd := world.current_floor_def()
 	if won:
 		col.add_child(_label(String(vic["epitaph"]), Palette.LORE))
 	else:

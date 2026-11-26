@@ -173,17 +173,25 @@ Monster `tags` that drive the Eight Chains grammar: `chain_isolation`, `chain_fo
 | Field | Type | Req | Notes |
 |---|---|---|---|
 | `id`, `name`, `description` | | yes | |
-| `depth` | int ≥ 1 | yes | depths must run 1..N with no gaps |
+| `depth` | int ≥ 1 | yes | Sphere depth (`1..N`); spine floors form an unbroken `1..N` sequence |
 | `sphere` | string | no | Sphere name (Moon..Saturn) |
+| `region_kind` | enum: spine, branch, sanctuary, vault, stronghold, settlement | no | defaults to `spine` |
+| `branch` | string | no | optional branch family display name |
+| `hazard` | enum: none, ash_ember, rime_ice, miasma, solar_glare | no | regional hazard tile override |
+| `terrain` | enum: standard, water, sanctuary, iron_grate | no | regional floor terrain feature |
+| `parent` | ref:floors | no | parent floor id (required for non-spine branches) |
+| `alt_down` | ref:floors | no | optional deeper alternate route floor id |
+| `sites` | list:string | no | optional ecology site keys (`altar`, `shrine`, `ritual_circle`, `vault_gate`, `merchant`, `contract_lectern`, `challenge`) |
+| `provenance` | enum: canon, canon_derived, interpretation, proposed | no | lore provenance tag |
 | `width` ≥ 20, `height` ≥ 15 | int | yes | map size |
 | `rooms_min`, `rooms_max` | int ≥ 2 | yes | |
 | `monsters_min`, `monsters_max` | int ≥ 0 | yes | |
 | `items_min`, `items_max` | int ≥ 0 | yes | |
 | `monster_table` | table:monsters | yes | |
 | `item_table` | table:items | yes | |
-| `exit` | enum: stairs, sealed_door | yes | the deepest floor must be `sealed_door` |
+| `exit` | enum: stairs, sealed_door, branch_end | yes | the deepest spine floor must be `sealed_door` |
 | `guardian` | ref:monsters | if sealed_door | killing it opens the door; stepping through wins |
-| `boss` | ref:monsters | no | optional Sphere mid-boss spawned near exit |
+| `boss` | ref:monsters | no | optional Sphere/regional boss spawned near exit |
 
 ## Traits
 

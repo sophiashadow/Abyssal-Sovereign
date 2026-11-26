@@ -24,6 +24,7 @@ static func ascii_world(rows: Array, monsters: Dictionary = {}, species: String 
 	var m := FloorMap.new()
 	m.setup(String(rows[0]).length(), rows.size())
 	m.depth = 1
+	m.floor_id = "ossuary_warrens"
 	for y in rows.size():
 		var line := String(rows[y])
 		for x in line.length():
@@ -47,7 +48,10 @@ static func ascii_world(rows: Array, monsters: Dictionary = {}, species: String 
 				w.player.pos = p
 			elif monsters.has(c):
 				m.actors.append(w._new_monster(String(monsters[c]), p))
-	w.floors[1] = m
+	w.floors["ossuary_warrens"] = m
+	w.floor_id = "ossuary_warrens"
+	w.visited_floors = ["ossuary_warrens"]
+	w.max_sphere_reached = 1
 	w.depth = 1
 	m.actors.insert(0, w.player)
 	w.update_fov()

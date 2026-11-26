@@ -31,7 +31,7 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 
 ## Saves
 
-- **Format.** `user://run.save.json`, holding a `save_version` (currently 8; v1–v7 saves migrate automatically), run state, all visited floors, and the log. Terrain and exploration are base64 byte arrays.
+- **Format.** `user://run.save.json`, holding a `save_version` (currently 9; v1–v8 saves migrate automatically), run state, all visited floors, and the log. Terrain and exploration are base64 byte arrays.
 - **Writes are atomic:** the save goes to `.tmp`, then is renamed.
 - **Loading.**
   1. Parse the JSON.
@@ -93,3 +93,10 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 - **Core, Sim & Ecology:** Added `contract_lectern` (`SPHERE_PROFILES[2, 4, 6]`), `Actor.stat("damage_bonus")` `bonus_damage` support, `World.CHAIN_TAGS`, `World.SUBJUGATION_LIMIT := 6`, `World.chain_limit()`, `_chain_hit()`, `_entangle()`, `_tick_subjugation()`, `_update_allegiance()`, `World.player_sign_contract()`, `_contract_event()`, `_advance_contract()`, `_breach_contract()`, and `ritual_circle` `"attest"` interaction.
 - **Save schema:** `World.SAVE_VERSION := 8` with migration `v7 -> v8` backfilling `subjugation`, `contract`, `contract_progress`, and `contract_log` (validated in `SaveCheck.problems()`).
 - **UI:** Live Subjugation meter, active Contract tracker, and Way allegiance status in HUD, plus Lectern of Rites signing/forsaking and Ritual Circle oath attestation in `_show_feature()`.
+
+## M6.1 Additions (The Atlas of Terra Tenebrae)
+
+- **Content & Schema:** Extended `ContentSchema.FIELDS["floors"]` with `region_kind`, `branch`, `hazard`, `terrain`, `parent`, `alt_down`, `sites`, `provenance`, and `branch_end` exits (`content/core/floors.json` expanded to 28 floors: 7 spine + 21 regional sub-floors). `ContentDB.floor_for_depth()` and `max_depth()` preserve spine semantics; added `floor_def()`, `spine_floor_id()`, `branch_floors_for_depth()`, `all_floor_ids()`.
+- **Terrain & Generation:** Added `Tiles.BRANCH_IN`, `BRANCH_OUT`, `WATER_SHALLOW` (+25 move cost, douses `burning`, +25% cold damage), `SANCTUARY_FLOOR` (2x regen rate, -1 Subjugation gain), and `IRON_GRATE` (wakes unaware foes within radius 5). `FloorMap` tracks `floor_id` and `portals`; `DungeonGen.generate()` places bidirectional branch portals and regional terrain/sites.
+- **World & Save v9:** `World.floors` keyed by `floor_id`, deterministic per-run `_build_atlas()` selecting 2 of 3 branches per Sphere plus active `alt_down` cross-Sphere routes with Sphere Gate support, `SAVE_VERSION := 9` with `v8 -> v9` migration.
+- **UI:** Region kind indicators in HUD, portal prompt/travel, and `_show_atlas()` (`Tab` / Pause menu).

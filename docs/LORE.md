@@ -109,3 +109,10 @@ Resolved (2026-11-26):
 
 - **Eight Chains Ability Grammar & Subjugation Clock** (`Canon-derived` coercion categories from Rulebook §14; numerical clock/interactions `Proposed` in game): completes all eight coercion chains across Dominion and grave foes (`chain_isolation`, `chain_fog`, `chain_debility`, `chain_threat`, `chain_indulgence`, `chain_omnipotence`, `chain_degradation`, `chain_trivial`), with `demanded` halting passive recovery and `subjugation` culminating in `entangled`.
 - **Divine Contracts & Two Ways Rites** (`Canon-derived` rite names from OCCULT/EXODUS; contract rules & permanent stats `Proposed` in game): *The Fast*, *Vow of Poverty*, *The Taken Name*, and *The Crown Taken* at *Lecterns of Rites*, oath attestation at *Ritual Circles*, `forsworn` penalties on breach, and active allegiance states (`return_oriented`, `serpents_seam`, `sovereign_mark`) keeping both Ways playable without declaring either account solely true.
+
+## M6.1 Atlas Provenance (The Unrecorded World)
+
+Surface locations from FALSE LIGHT PR #300 (`BREADTH_PASS.md`) inform underground equivalents or threshold connections beneath Terra Tenebrae without collapsing surface districts into literal caves:
+- **Day-House Cellars** (`Canon`, Rulebook §15.1 day-house of the registered poor): pantry sub-levels under the day-houses.
+- **Back Courts Undercroft, Shut Chapel Crypt, Tithe Road Tunnels, Unrecorded Market Seams, Archive Stair Annex, Hidden Assembly Catacomb, Processional Underway, Sun-House Furnaces, Closed Stacks Vault** (`Canon-derived` underground passages/annexes informed by PR #300 and Rulebook §1.1/§1.2/§1.4/§14/§15.1/§16).
+- **Censer Foundry, Velvet Ossuary, Gilded Cloister, Audit Cisterns, Preliator Garrison, Seal Foundry Deep, Debts Cathedral, Ophite Seam Hollow, Unwritten Margin, Cage Oubliette, Witness Hermitage** (`Proposed` regional branches, vaults, strongholds, and sanctuaries across Spheres 3–7).

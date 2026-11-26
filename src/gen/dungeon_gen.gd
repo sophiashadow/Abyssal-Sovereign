@@ -11,9 +11,10 @@ const ROOM_ATTEMPTS := 400
 const LOOP_CHANCE_PCT := 18
 
 
-static func generate(floor_def: Dictionary, seed_value: int) -> FloorMap:
+static func generate(floor_def: Dictionary, seed_value: int, extra_portals: Array = []) -> FloorMap:
 	var rng := Rng.new(seed_value)
 	var m := FloorMap.new()
+	m.floor_id = String(floor_def["id"])
 	m.depth = int(floor_def["depth"])
 	var w := int(floor_def["width"])
 	var h := int(floor_def["height"])
@@ -50,8 +51,16 @@ static func generate(floor_def: Dictionary, seed_value: int) -> FloorMap:
 				_tunnel(m, _center(m.rooms[i]), _center(m.rooms[j]), rng)
 
 	# Start in room 0; the exit goes in the room farthest from it by walking distance.
+	var rkind := String(floor_def.get("region_kind", "spine"))
 	m.up_pos = _center(m.rooms[0])
-	m.set_tile(m.up_pos, Tiles.STAIRS_UP)
+	m.set_tile(m.up_pos, Tiles.STAIRS_UP if rkind == "spine" else Tiles.BRANCH_OUT)
+	if rkind != "spine" and floor_def.has("parent"):
+		m.portals.append({
+			"x": m.up_pos.x, "y": m.up_pos.y,
+			"target": String(floor_def["parent"]),
+			"label": String(floor_def.get("parent_label", floor_def["parent"])),
+			"kind": "branch_out",
+		})
 	var dist := Pathing.distance_map(m, m.up_pos)
 	var far_room := 1
 	var far_d := -1
@@ -62,14 +71,15 @@ static func generate(floor_def: Dictionary, seed_value: int) -> FloorMap:
 			far_room = i
 	var exit_c := _center(m.rooms[far_room])
 	var occupied := {m.up_pos: true}
-	if String(floor_def["exit"]) == "sealed_door":
+	var exit_kind := String(floor_def["exit"])
+	if exit_kind == "sealed_door":
 		m.exit_pos = exit_c
 		m.set_tile(exit_c, Tiles.DOOR_SEALED)
 		occupied[exit_c] = true
 		var guard_pos := _guard_spot(m, exit_c, dist)
 		occupied[guard_pos] = true
 		m.spawns.append({"kind": "monster", "id": String(floor_def["guardian"]), "pos": guard_pos, "guardian": true})
-	else:
+	elif exit_kind == "stairs":
 		m.down_pos = exit_c
 		m.exit_pos = exit_c
 		m.set_tile(exit_c, Tiles.STAIRS_DOWN)
@@ -80,6 +90,41 @@ static func generate(floor_def: Dictionary, seed_value: int) -> FloorMap:
 			if boss_pos.x >= 0:
 				occupied[boss_pos] = true
 				m.spawns.append({"kind": "monster", "id": boss_id, "pos": boss_pos, "boss": true})
+	else:
+		# Branch end: reward cache or site in the farthest room instead of stairs down.
+		m.exit_pos = exit_c
+		var itable: Array = floor_def.get("item_table", [])
+		if not itable.is_empty():
+			occupied[exit_c] = true
+			m.spawns.append({"kind": "item", "id": rng.pick_weighted(itable), "pos": exit_c, "magic": true})
+		var boss_id := String(floor_def.get("boss", ""))
+		if boss_id != "":
+			var boss_pos := _guard_spot(m, exit_c, dist)
+			if boss_pos.x >= 0:
+				occupied[boss_pos] = true
+				m.spawns.append({"kind": "monster", "id": boss_id, "pos": boss_pos, "boss": true})
+
+	var portal_rooms: Array[int] = []
+	for i in range(1, m.rooms.size()):
+		portal_rooms.append(i)
+	for ep in extra_portals:
+		var p_room: Rect2i = m.rooms[rng.pick(portal_rooms)]
+		var pp := _free_spot(m, p_room, occupied, rng)
+		if pp.x < 0:
+			for ri in portal_rooms:
+				pp = _free_spot(m, m.rooms[ri], occupied, rng)
+				if pp.x >= 0:
+					break
+		if pp.x >= 0:
+			occupied[pp] = true
+			var pkind := String(ep.get("kind", "branch_in"))
+			m.set_tile(pp, Tiles.BRANCH_OUT if pkind == "branch_out" else Tiles.BRANCH_IN)
+			m.portals.append({
+				"x": pp.x, "y": pp.y,
+				"target": String(ep["target"]),
+				"label": String(ep.get("label", ep["target"])),
+				"kind": pkind,
+			})
 
 	var monster_rooms: Array[int] = []
 	for i in range(1, m.rooms.size()):
@@ -108,25 +153,48 @@ static func generate(floor_def: Dictionary, seed_value: int) -> FloorMap:
 			continue
 		occupied[p] = true
 		m.spawns.append({"kind": "item", "id": rng.pick_weighted(floor_def["item_table"]), "pos": p})
-	_place_ecology(m, occupied, rng)
+	_place_ecology(m, floor_def, occupied, rng)
 	return m
 
 
-static func _place_ecology(m: FloorMap, occupied: Dictionary, rng: Rng) -> void:
+static func _place_ecology(m: FloorMap, floor_def: Dictionary, occupied: Dictionary, rng: Rng) -> void:
 	var prof: Dictionary = Ecology.SPHERE_PROFILES.get(m.depth, Ecology.SPHERE_PROFILES[1])
 	var non_start: Array[int] = []
 	for i in range(1, m.rooms.size()):
 		non_start.append(i)
 	if non_start.is_empty():
 		return
+	var terrain := String(floor_def.get("terrain", "standard"))
+	if terrain == "water":
+		for _w in rng.range_i(4, 9):
+			var wp := _free_spot(m, m.rooms[rng.pick(non_start)], occupied, rng)
+			if wp.x >= 0:
+				occupied[wp] = true
+				m.set_tile(wp, Tiles.WATER_SHALLOW)
+	elif terrain == "sanctuary":
+		var sr: Rect2i = m.rooms[rng.pick(non_start)]
+		for sy in range(sr.position.y, sr.end.y):
+			for sx in range(sr.position.x, sr.end.x):
+				var sp := Vector2i(sx, sy)
+				if m.get_tile(sp) == Tiles.FLOOR and not occupied.has(sp):
+					m.set_tile(sp, Tiles.SANCTUARY_FLOOR)
+	elif terrain == "iron_grate":
+		for _g in rng.range_i(5, 10):
+			var gp := _free_spot(m, m.rooms[rng.pick(non_start)], occupied, rng)
+			if gp.x >= 0:
+				occupied[gp] = true
+				m.set_tile(gp, Tiles.IRON_GRATE)
 	var h_tile := int(prof["hazard"])
-	var n_haz := rng.range_i(int(prof["h_min"]), int(prof["h_max"]))
-	for _h in n_haz:
-		var p := _free_spot(m, m.rooms[rng.pick(non_start)], occupied, rng)
-		if p.x < 0:
-			continue
-		occupied[p] = true
-		m.set_tile(p, h_tile)
+	if floor_def.has("hazard"):
+		h_tile = Ecology.hazard_tile_from_name(String(floor_def["hazard"]))
+	if h_tile >= 0:
+		var n_haz := rng.range_i(int(prof["h_min"]), int(prof["h_max"]))
+		for _h in n_haz:
+			var p := _free_spot(m, m.rooms[rng.pick(non_start)], occupied, rng)
+			if p.x < 0:
+				continue
+			occupied[p] = true
+			m.set_tile(p, h_tile)
 	var trap_pool: Array = prof["traps"]
 	var n_traps := 2 + m.depth / 2
 	for _t in n_traps:
@@ -138,7 +206,15 @@ static func _place_ecology(m: FloorMap, occupied: Dictionary, rng: Rng) -> void:
 			"kind": "trap", "sub": String(rng.pick(trap_pool)),
 			"x": p.x, "y": p.y, "revealed": false, "used": false,
 		})
-	for sdef in prof["sites"]:
+	var sites_list: Array = []
+	if floor_def.has("sites"):
+		for skey in floor_def["sites"]:
+			var sd := Ecology.site_def_from_key(String(skey))
+			if not sd.is_empty():
+				sites_list.append(sd)
+	else:
+		sites_list = prof["sites"]
+	for sdef in sites_list:
 		var p := _free_spot(m, m.rooms[rng.pick(non_start)], occupied, rng)
 		if p.x < 0:
 			continue

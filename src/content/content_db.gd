@@ -172,25 +172,43 @@ func _kind_rules(kind: String, e: Dictionary, where: String) -> void:
 				errors.append("%s: '%s' is greater than '%s'" % [where, pair[0], pair[1]])
 		if e.get("exit", "") == "sealed_door" and not e.has("guardian"):
 			errors.append("%s: exit 'sealed_door' requires a 'guardian'" % where)
+		var rkind := String(e.get("region_kind", "spine"))
+		if rkind != "spine":
+			if not e.has("parent"):
+				errors.append("%s: non-spine floor requires 'parent'" % where)
+			if String(e.get("exit", "")) == "sealed_door":
+				errors.append("%s: non-spine floor cannot use exit 'sealed_door'" % where)
+		if e.has("alt_down") and _data["floors"].has(String(e["alt_down"])):
+			var target_f: Dictionary = _data["floors"][String(e["alt_down"])]
+			if int(target_f.get("depth", 0)) <= int(e.get("depth", 0)):
+				errors.append("%s: 'alt_down' target '%s' must be deeper" % [where, String(e["alt_down"])])
 
 
 func _global_rules() -> void:
-	# Floors must form an unbroken run of depths starting at 1, ending in a final exit.
-	var depths := {}
+	# Spine floors must form an unbroken run of depths starting at 1, ending in a final exit.
+	var spine_depths := {}
 	for id in _data["floors"]:
-		var d := int(_data["floors"][id].get("depth", 0))
-		if depths.has(d):
-			errors.append("floors: depth %d is defined by both '%s' and '%s'" % [d, depths[d], id])
-		depths[d] = id
-	if _data["floors"].is_empty():
-		errors.append("floors: no floors defined")
+		var f: Dictionary = _data["floors"][id]
+		if String(f.get("region_kind", "spine")) != "spine":
+			continue
+		var d := int(f.get("depth", 0))
+		if spine_depths.has(d):
+			errors.append("floors: spine depth %d is defined by both '%s' and '%s'" % [d, spine_depths[d], id])
+		spine_depths[d] = id
+	if spine_depths.is_empty():
+		errors.append("floors: no spine floors defined")
 		return
-	for d in range(1, depths.size() + 1):
-		if not depths.has(d):
-			errors.append("floors: depth %d is missing (depths must run 1..N)" % d)
-	var last: Variant = depths.get(depths.size())
+	for d in range(1, spine_depths.size() + 1):
+		if not spine_depths.has(d):
+			errors.append("floors: spine depth %d is missing (depths must run 1..N)" % d)
+	var last: Variant = spine_depths.get(spine_depths.size())
 	if last != null and _data["floors"][last].get("exit", "") != "sealed_door":
-		errors.append("floors: the deepest floor '%s' must use exit 'sealed_door'" % last)
+		errors.append("floors: the deepest spine floor '%s' must use exit 'sealed_door'" % last)
+	for id in _data["floors"]:
+		var f: Dictionary = _data["floors"][id]
+		var fd := int(f.get("depth", 0))
+		if fd > spine_depths.size():
+			errors.append("floors: '%s' depth %d exceeds spine max_depth %d" % [id, fd, spine_depths.size()])
 	if _data["species"].is_empty():
 		errors.append("species: none defined")
 	if _data["classes"].is_empty():
@@ -294,15 +312,42 @@ func ids(kind: String) -> Array[String]:
 	return out
 
 
+func floor_def(fid: String) -> Dictionary:
+	return _data["floors"].get(fid, {})
+
+
+func spine_floor_id(depth: int) -> String:
+	for id in ids("floors"):
+		var f: Dictionary = _data["floors"][id]
+		if String(f.get("region_kind", "spine")) == "spine" and int(f["depth"]) == depth:
+			return id
+	return ""
+
+
 func floor_for_depth(depth: int) -> Dictionary:
-	for id in _data["floors"]:
-		if int(_data["floors"][id]["depth"]) == depth:
-			return _data["floors"][id]
-	return {}
+	var fid := spine_floor_id(depth)
+	return _data["floors"][fid] if fid != "" else {}
+
+
+func branch_floors_for_depth(depth: int) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for id in ids("floors"):
+		var f: Dictionary = _data["floors"][id]
+		if String(f.get("region_kind", "spine")) != "spine" and int(f["depth"]) == depth:
+			out.append(f)
+	return out
+
+
+func all_floor_ids() -> Array[String]:
+	return ids("floors")
 
 
 func max_depth() -> int:
-	return _data["floors"].size()
+	var n := 0
+	for id in _data["floors"]:
+		if String(_data["floors"][id].get("region_kind", "spine")) == "spine":
+			n += 1
+	return n
 
 
 ## A short fingerprint of the loaded content, stored in saves so a resumed run
