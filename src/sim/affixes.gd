@@ -6,13 +6,21 @@ extends RefCounted
 const POTION_ALIASES: Array[String] = [
 	"cloudy phial", "amber vial", "ash-grey draught", "copper flask",
 	"verdigris bottle", "lead-sealed phial", "pale tincture", "gold-flecked vial",
-	"salt-rimmed flask", "pitch-dark draught",
+	"salt-rimmed flask", "pitch-dark draught", "smoked-glass phial", "silt-heavy bottle",
+	"brine-tallow vial", "porphyry flask", "chalk-clouded draught", "iron-stoppered phial",
+	"bitter-bark vial", "waxed cistern bottle", "faded silver phial", "char-stained flask",
+	"opalescent draught", "tarnished tin vial", "russet sedge bottle", "thin vinegar phial",
 ]
 
 const SCROLL_ALIASES: Array[String] = [
 	"parchment inked 'TITHE'", "vellum stamped 'PROSAY'", "charred scroll",
 	"wax-sealed writ", "silver-ruled leaf", "torn ledger-sheet",
-	"ink-stained rubric", "stamped audit-slip",
+	"ink-stained rubric", "stamped audit-slip", "grease-marked census slip",
+	"unnumbered petition", "creased canticle sheet", "Margin-annotated folio",
+	"cracked slate-rubbing", "salt-curled warrant", "blind-embossed writ",
+	"folded Day-House ticket", "red-ruled penalty roll", "ash-smudged palimpsest",
+	"bound choir cue-sheet", "cut-corner summons", "iron-gall fragment",
+	"unsealed witness note", "pricked music-leaf", "hollow-stamped pass",
 ]
 
 const PREFIXES := {
@@ -22,10 +30,24 @@ const PREFIXES := {
 	"rimed": {"label": "Rimed", "slots": ["weapon", "ranged"], "damage_type": "cold", "status": "chilled"},
 	"abyssal": {"label": "Abyssal", "slots": ["weapon", "ranged"], "mods": {"will": 1}, "damage_type": "void"},
 	"gilded": {"label": "Gilded", "slots": ["weapon", "ranged"], "mods": {"accuracy": 1, "damage": 1}, "damage_type": "radiant"},
+	"serrated": {"label": "Serrated", "slots": ["weapon", "ranged"], "mods": {"damage": 1, "crit": 8}, "status": "bleeding"},
+	"sundial": {"label": "Sundial", "slots": ["weapon", "ranged"], "mods": {"accuracy": 2}, "damage_type": "radiant", "status": "exposure"},
+	"hexed_edge": {"label": "Ophite", "slots": ["weapon", "ranged"], "mods": {"will": 1, "crit": 6}, "damage_type": "void", "status": "hexed"},
+	"sundering": {"label": "Sundering", "slots": ["weapon", "ranged"], "mods": {"might": 1, "damage": 1}, "status": "sundered"},
+	"merciless": {"label": "Merciless", "slots": ["weapon", "ranged"], "mods": {"crit": 12, "defense": -1}},
+	"balanced": {"label": "Balanced", "slots": ["weapon", "ranged"], "mods": {"accuracy": 2, "evasion": 1}},
+	"warden_forged": {"label": "Warden-Forged", "slots": ["weapon", "armor"], "mods": {"defense": 2, "might": 1}},
 	"warded": {"label": "Warded", "slots": ["armor", "amulet"], "resists": {"fire": 15, "cold": 15}},
 	"swift": {"label": "Swift", "slots": ["armor", "amulet"], "mods": {"evasion": 1, "speed": 10}},
 	"stout": {"label": "Stout", "slots": ["armor", "amulet"], "mods": {"defense": 1, "max_hp": 4}},
 	"occult": {"label": "Occult", "slots": ["armor", "amulet"], "mods": {"will": 1}, "resists": {"void": 20}},
+	"ash_washed": {"label": "Ash-Washed", "slots": ["armor", "amulet"], "resists": {"fire": 25, "physical": 10}},
+	"rime_tempered": {"label": "Rime-Tempered", "slots": ["armor", "amulet"], "mods": {"defense": 1}, "resists": {"cold": 25}},
+	"unrecorded_pref": {"label": "Unrecorded", "slots": ["armor", "amulet"], "mods": {"evasion": 2, "sight": 1}},
+	"cantors": {"label": "Cantor's", "slots": ["armor", "amulet"], "mods": {"will": 1, "accuracy": 1}, "resists": {"radiant": 15}},
+	"vow_bound": {"label": "Vow-Bound", "slots": ["armor", "amulet"], "mods": {"max_hp": 6, "defense": 1}},
+	"witness_born": {"label": "Witness-Borne", "slots": ["armor", "amulet"], "mods": {"sight": 2, "evasion": 1}},
+	"iron_ledger": {"label": "Ledger-Stamped", "slots": ["weapon", "ranged", "armor"], "mods": {"accuracy": 1, "defense": 1}},
 }
 
 const SUFFIXES := {
@@ -35,6 +57,22 @@ const SUFFIXES := {
 	"of_the_oath": {"label": "of the Oath", "slots": ["weapon", "ranged", "armor", "amulet"], "mods": {"might": 1, "defense": 1}},
 	"of_venom": {"label": "of Venom", "slots": ["weapon", "ranged"], "mods": {"crit": 5}, "status": "bleeding"},
 	"of_false_light": {"label": "of False Light", "slots": ["weapon", "ranged", "armor", "amulet"], "mods": {"damage": 1}, "resists": {"radiant": 25}},
+	"of_the_seam": {"label": "of the Seam", "slots": ["weapon", "ranged", "armor", "amulet"], "mods": {"agility": 1, "evasion": 1}},
+	"of_the_unwritten": {"label": "of the Unwritten", "slots": ["weapon", "ranged", "armor", "amulet"], "mods": {"will": 1}, "resists": {"void": 20}},
+	"of_iron_breath": {"label": "of Iron Breath", "slots": ["armor", "amulet"], "mods": {"max_hp": 6, "defense": 1}},
+	"of_quiet_step": {"label": "of Quiet Step", "slots": ["armor", "amulet"], "mods": {"speed": 15, "evasion": 1}},
+	"of_sharpened_salt": {"label": "of Sharpened Salt", "slots": ["weapon", "ranged"], "mods": {"accuracy": 2, "damage": 1}},
+	"of_penance": {"label": "of Penance", "slots": ["weapon", "ranged", "armor"], "mods": {"might": 1, "max_hp": 4}},
+	"of_unmasking": {"label": "of Unmasking", "slots": ["weapon", "ranged", "amulet"], "mods": {"crit": 8, "sight": 1}},
+	"of_ash": {"label": "of Ash", "slots": ["weapon", "ranged"], "mods": {"damage": 1}, "damage_type": "fire", "status": "burning"},
+	"of_rime": {"label": "of Rime", "slots": ["weapon", "ranged"], "mods": {"accuracy": 1}, "damage_type": "cold", "status": "chilled"},
+	"of_abyssal_ink": {"label": "of Abyssal Ink", "slots": ["weapon", "ranged"], "mods": {"will": 1}, "damage_type": "void", "status": "hexed"},
+	"of_sanctuary": {"label": "of Sanctuary", "slots": ["armor", "amulet"], "resists": {"physical": 15, "void": 15}},
+	"of_the_cellar": {"label": "of the Cellar", "slots": ["armor", "amulet"], "mods": {"evasion": 2, "max_hp": 4}},
+	"of_reckoning": {"label": "of Reckoning", "slots": ["weapon", "ranged"], "mods": {"damage": 2, "crit": 6, "evasion": -1}},
+	"of_the_gate": {"label": "of the Gate", "slots": ["weapon", "armor", "amulet"], "mods": {"defense": 2}, "resists": {"radiant": 15}},
+	"of_vigilance": {"label": "of Vigilance", "slots": ["weapon", "ranged", "armor", "amulet"], "mods": {"sight": 2}},
+	"of_swift_tally": {"label": "of Swift Tally", "slots": ["weapon", "ranged", "amulet"], "mods": {"speed": 10, "accuracy": 1}},
 }
 
 

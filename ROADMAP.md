@@ -85,4 +85,8 @@ M5 (The Depth Pass: M5.1–M5.5) is complete.
 
 1. **8 Origins, 8 Callings, 104 Talents:** Expanded character creation with 5 Proposed origins (`ashborn`, `veilkin`, `ironbound_ward`, `unrecorded`, `penitent`) and 5 Proposed callings (`preliator_warden`, `tithe_marksman`, `rite_weaver`, `false_light_alchemist`, `ophite_binder`), 10 new mechanical traits, `ward_sigil`/`snare` tactical features, and compact Android-readable origin/calling pills.
 
-Remaining M6 submilestones track M6.4–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.
+## Milestone 6.4: The Armory and Treasury (done 2026-11-26)
+
+1. **165 Base Items, 46 Affixes, 12 Sets, 26 Artifacts, 16 Relics:** Expanded `items.json`, `Affixes`, `ItemSets` (with `subjugation_cap_bonus`), 15 new scroll spells in `World._cast_scroll()`, and distributed loot pools across all 28 `floors.json` tables.
+
+Remaining M6 submilestones track M6.5–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.

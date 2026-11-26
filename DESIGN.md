@@ -195,3 +195,7 @@ M6.3 expands character creation to `8` origins (adding `ashborn`, `veilkin`, `ir
 | Overall | `88 / 128` (`69%`) | `918` | All `64` origin×calling pairs sampled (`2` seeds each) |
 | Callings | — | — | `Alchemist 15/16`, `Warden 14/16`, `Knight 12/16`, `Assassin 12/16`, `Arbalester 12/16`, `Occultist 11/16`, `Ophite Binder 9/16`, `Rite Cantor 3/16` |
 | Origins | — | — | `human 13/16`, `ironbound_ward 12/16`, `unrecorded 12/16`, `ashborn 11/16`, `penitent 11/16`, `cambion 10/16`, `revenant 10/16`, `veilkin 9/16` |
+
+## M6.4 — The Armory and Treasury
+
+M6.4 expands equipment and utility breadth to `165` base items (`26` unique artifacts, `16` Work-vs-Transmute relics, `20` scrolls, `14` projectiles/bombs, `18` potions/poultices, `27` melee, `23` ranged/implements, `22` armor, `22` amulets, `3` keys), `46` procedural affixes, and `12` equipment sets (`subjugation_cap` + `mask_risk` build levers) while keeping existing rarity/BUC/identification rules intact and avoiding save-schema churn.

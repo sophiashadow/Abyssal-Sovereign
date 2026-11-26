@@ -871,6 +871,133 @@ func _cast_scroll(it: Item, index: int, d: Dictionary, target_pos: Vector2i) -> 
 		"unbind":
 			var n := unbind_curses(false)
 			log_msg("Cold iron locks snap open (%d unbound)." % n if n > 0 else "No curses bound you.", "good")
+		"sanctuary_ward":
+			apply_status(player, "sanctuary_ward")
+			subjugation = maxi(0, subjugation - 1)
+			var healed := Dice.roll("1d6", rng) + 2
+			player.hp = mini(player.stat("max_hp"), player.hp + healed)
+			log_msg("Quiet sanctuary light steadies your guard (+%d HP, -1 Subjugation)." % healed, "good")
+		"chain_break":
+			for cid in ["pinned", "bleeding", "demanded", "dread", "debility", "degradation", "perception_fog", "entangled", "isolation", "exposure"]:
+				_remove_status(player, cid)
+			subjugation = maxi(0, subjugation - 2)
+			log_msg("The writ strikes your name off the docket; the Chains slacken (-2 Subjugation).", "good")
+		"map_reveal":
+			for fy in range(maxi(0, player.pos.y - 18), mini(m.height, player.pos.y + 19)):
+				for fx in range(maxi(0, player.pos.x - 18), mini(m.width, player.pos.x + 19)):
+					m.set_explored(Vector2i(fx, fy))
+			for f in m.features:
+				if Grid.chebyshev(player.pos, Vector2i(int(f["x"]), int(f["y"]))) <= 18:
+					f["revealed"] = true
+			update_fov()
+			log_msg("Survey lines flare briefly across the stone, revealing walls and seams.", "good")
+		"blink_swap":
+			var foe := nearest_visible_hostile(max_range)
+			if foe == null:
+				var dest := _best_blink_tile(m, max_range)
+				if dest.x < 0:
+					log_msg("No visible anchor for the translocation.", "info")
+					return false
+				player.pos = dest
+			else:
+				var foe_pos := foe.pos
+				foe.pos = player.pos
+				player.pos = foe_pos
+				_remove_status(player, "pinned")
+			update_fov()
+			log_msg("You invert coordinates across the Geometry!", "good")
+		"rime_nova":
+			var r_hits := 0
+			for a in visible_hostiles():
+				if Grid.chebyshev(player.pos, a.pos) <= max_range:
+					a.awake = true
+					_remember_player(a)
+					var mit := Combat.mitigate(Dice.roll("2d5", rng) + will_v, a, "cold")
+					apply_damage(a, int(mit["damage"]), player.name, "cold")
+					if a.is_alive():
+						apply_status(a, "chilled")
+					r_hits += 1
+			log_msg("An ossuary frost-wave sweeps %d foe%s." % [r_hits, "" if r_hits == 1 else "s"], "good")
+		"false_dawn":
+			var f_hits := 0
+			for a in visible_hostiles():
+				if Grid.chebyshev(player.pos, a.pos) <= max_range:
+					a.awake = true
+					_remember_player(a)
+					var mit := Combat.mitigate(Dice.roll("2d5", rng) + will_v, a, "radiant")
+					apply_damage(a, int(mit["damage"]), player.name, "radiant")
+					if a.is_alive():
+						apply_status(a, "exposure")
+					f_hits += 1
+			log_msg("Harsh solar glare exposes %d foe%s." % [f_hits, "" if f_hits == 1 else "s"], "good")
+		"void_snare":
+			var v_hits := 0
+			for a in visible_hostiles():
+				if Grid.chebyshev(player.pos, a.pos) <= max_range:
+					a.awake = true
+					_remember_player(a)
+					var mit := Combat.mitigate(Dice.roll("2d4", rng) + will_v, a, "void")
+					apply_damage(a, int(mit["damage"]), player.name, "void")
+					if a.is_alive():
+						apply_status(a, "pinned")
+					v_hits += 1
+			log_msg("Chalk threads pin %d foe%s in the Margin." % [v_hits, "" if v_hits == 1 else "s"], "good")
+		"iron_skin":
+			_remove_status(player, "sundered")
+			apply_status(player, "iron_skin")
+			log_msg("Your coat and guard set like cold pig-iron.", "good")
+		"haste_litany":
+			apply_status(player, "haste_litany")
+			log_msg("Your stride slips ahead of the sentry's count.", "good")
+		"reclaim_vigor":
+			var h_amt := Dice.roll("3d4+4", rng)
+			player.hp = mini(player.stat("max_hp"), player.hp + h_amt)
+			player.resource = mini(player.max_resource(), player.resource + 6)
+			log_msg("Quiet breath returns (+%d HP, +6 %s)." % [h_amt, player.resource_label()], "good")
+		"consecrate_tile":
+			for d8 in Grid.DIRS_8:
+				var tp: Vector2i = player.pos + d8
+				if m.in_bounds(tp) and m.get_tile(tp) in [Tiles.FLOOR, Tiles.ASH_EMBER, Tiles.RIME_ICE, Tiles.MIASMA, Tiles.SOLAR_GLARE]:
+					m.set_tile(tp, Tiles.SANCTUARY_FLOOR)
+			if m.get_tile(player.pos) == Tiles.FLOOR:
+				m.set_tile(player.pos, Tiles.SANCTUARY_FLOOR)
+			log_msg("Chalk dust settles; clean sanctuary stone rings your feet.", "good")
+		"audit_banish":
+			var foe := nearest_visible_hostile(max_range)
+			if foe == null:
+				log_msg("No visible foe to strike from the roll.", "info")
+				return false
+			if foe.unique:
+				var mit := Combat.mitigate(Dice.roll("2d6+2", rng) + will_v, foe, "void")
+				apply_damage(foe, int(mit["damage"]), player.name, "void")
+				log_msg("The writ tears at %s for %d (void)!" % [foe.name, int(mit["damage"])], "combat")
+			else:
+				var far := _best_blink_tile(m, 6)
+				if far.x >= 0:
+					foe.pos = far
+					apply_status(foe, "chilled")
+					log_msg("A void warrant hurls the %s across the chamber." % foe.name, "good")
+		"quiet_shroud":
+			apply_status(player, "quiet_shroud")
+			apply_status(player, "veiled")
+			log_msg("Linen silence draws tightly around your silhouette.", "good")
+		"cinder_storm":
+			var c_hits := 0
+			for a in visible_hostiles():
+				if Grid.chebyshev(player.pos, a.pos) <= max_range:
+					a.awake = true
+					_remember_player(a)
+					var mit := Combat.mitigate(Dice.roll("2d6", rng) + will_v, a, "fire")
+					apply_damage(a, int(mit["damage"]), player.name, "fire")
+					if a.is_alive():
+						apply_status(a, "burning")
+					c_hits += 1
+			log_msg("Dry furnace embers sweep %d foe%s." % [c_hits, "" if c_hits == 1 else "s"], "good")
+		"oath_salve":
+			_remove_status(player, "reckoning")
+			_remove_status(player, "forsworn")
+			apply_status(player, "apostate_focus")
+			log_msg("You strike an unsigned tally; reckoning releases its grip.", "good")
 	_trigger_ritual_cadence()
 	it.quantity -= 1
 	if it.quantity <= 0:
@@ -923,18 +1050,27 @@ func player_work_relic(index: int) -> bool:
 	player.hp -= cost
 	apotheosis += 1
 	apply_status(player, sid)
-	if sid in ["confessors_clarity", "lamp_vigil"]:
+	if sid in ["confessors_clarity", "lamp_vigil", "witness_mirror_work"]:
 		if player.has_status("perception_fog"):
 			_remove_status(player, "perception_fog")
 			log_msg("The grey fog parts.", "good")
-		var n := identify_pack()
-		if n > 0:
-			log_msg("Its light lays bare %d hidden item%s." % [n, "" if n == 1 else "s"], "good")
-	if sid == "crown_decree":
+		if sid != "witness_mirror_work":
+			var n := identify_pack()
+			if n > 0:
+				log_msg("Its light lays bare %d hidden item%s." % [n, "" if n == 1 else "s"], "good")
+	if sid == "archive_lens_work":
+		for f in current_floor().features:
+			if Grid.chebyshev(player.pos, Vector2i(int(f["x"]), int(f["y"]))) <= 6:
+				f["revealed"] = true
+	if sid == "rime_bell_work":
+		for a in current_floor().actors:
+			if not a.is_player and a.is_alive() and Grid.chebyshev(player.pos, a.pos) <= 2:
+				apply_status(a, "chilled")
+	if sid in ["crown_decree", "unwritten_ledger_work"]:
 		_remove_status(player, "entangled")
-		subjugation = 0
-	if sid == "almoners_grace":
-		player.resource = mini(player.max_resource(), player.resource + 4)
+		subjugation = maxi(0, subjugation - (subjugation if sid == "crown_decree" else 2))
+	if sid in ["almoners_grace", "salt_hourglass_work"]:
+		player.resource = mini(player.max_resource(), player.resource + (4 if sid == "almoners_grace" else 3))
 	if player.has_trait("penance_vigor"):
 		player.resource = mini(player.max_resource(), player.resource + 2)
 		player.hp = mini(player.stat("max_hp"), player.hp + 1)
@@ -1806,7 +1942,7 @@ func _passive_detect() -> void:
 
 
 func chain_limit() -> int:
-	return SUBJUGATION_LIMIT + (2 if way_return - way_serpent >= 2 else 0) + (1 if player.has_trait("ledger_forged") else 0)
+	return SUBJUGATION_LIMIT + (2 if way_return - way_serpent >= 2 else 0) + (1 if player.has_trait("ledger_forged") else 0) + ItemSets.subjugation_cap_bonus(player, db)
 
 
 ## A chain lands on the player: apply its status, then advance the Subjugation clock.
@@ -2184,11 +2320,11 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 			var key_idx := -1
 			var has_ophite := false
 			for i in player.inventory.size():
-				var tid := player.inventory[i].template_id
-				if tid == "vault_key":
+				var item_i := player.inventory[i]
+				if String(item_i.def(db).get("kind", "")) == "key":
 					key_idx = i
 					break
-				elif tid == "ophite_key":
+				elif item_i.template_id == "ophite_key":
 					has_ophite = true
 			if choice == "force":
 				if player.hp <= 4:

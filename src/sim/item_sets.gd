@@ -18,6 +18,51 @@ const SETS := {
 		"2": {"mods": {"might": 2}, "resists": {"fire": 25}, "desc": "+2 might, +25% fire resist"},
 		"3": {"mods": {"crit": 10, "speed": 10}, "resists": {"cold": 20}, "desc": "+10% crit, +10 speed, +20% cold resist"},
 	},
+	"preliator_bastion": {
+		"name": "Preliator's Bastion",
+		"2": {"mods": {"defense": 2}, "resists": {"physical": 10}, "desc": "+2 defense, +10% physical resist"},
+		"3": {"mods": {"max_hp": 6}, "resists": {"radiant": 25}, "subjugation_cap": 1, "desc": "+6 max HP, +25% radiant resist, +1 Subjugation limit"},
+	},
+	"tithe_collectors": {
+		"name": "Tithe Collector's Tally",
+		"2": {"mods": {"accuracy": 2, "might": 1}, "resists": {}, "desc": "+2 accuracy, +1 might"},
+		"3": {"mods": {"damage": 2, "crit": 10}, "resists": {}, "desc": "+2 damage, +10% crit"},
+	},
+	"ophite_seam": {
+		"name": "Ophite Seam",
+		"2": {"mods": {"agility": 1, "evasion": 2}, "resists": {}, "desc": "+1 agility, +2 evasion"},
+		"3": {"mods": {"speed": 15}, "resists": {"void": 25}, "desc": "+15 speed, +25% void resist"},
+	},
+	"ash_penitent": {
+		"name": "Ash Penitent",
+		"2": {"mods": {"will": 1}, "resists": {"fire": 25}, "desc": "+1 will, +25% fire resist"},
+		"3": {"mods": {"damage": 2, "crit": 12}, "resists": {"void": 15}, "desc": "+2 damage, +12% crit, +15% void resist"},
+	},
+	"velvet_ossuary": {
+		"name": "Velvet Ossuary",
+		"2": {"mods": {"max_hp": 6}, "resists": {"cold": 25}, "desc": "+6 max HP, +25% cold resist"},
+		"3": {"mods": {"defense": 2, "will": 2}, "resists": {"physical": 15}, "desc": "+2 defense, +2 will, +15% physical resist"},
+	},
+	"archive_warden": {
+		"name": "Archive Keeper's Seal",
+		"2": {"mods": {"sight": 2, "will": 1}, "resists": {}, "desc": "+2 sight, +1 will"},
+		"3": {"mods": {"accuracy": 2}, "resists": {"void": 20}, "mask_risk": 2, "desc": "+2 accuracy, +20% void resist, +2 Mask risk cap"},
+	},
+	"processional_guard": {
+		"name": "Processional Guard",
+		"2": {"mods": {"might": 1, "accuracy": 2}, "resists": {}, "desc": "+1 might, +2 accuracy"},
+		"3": {"mods": {"defense": 2, "damage": 2}, "resists": {"physical": 10}, "desc": "+2 defense, +2 damage, +10% physical resist"},
+	},
+	"unwritten_margin": {
+		"name": "The Unwritten Margin",
+		"2": {"mods": {"evasion": 2, "agility": 1}, "resists": {}, "desc": "+2 evasion, +1 agility"},
+		"3": {"mods": {"crit": 15, "speed": 15}, "resists": {}, "subjugation_cap": 1, "desc": "+15% crit, +15 speed, +1 Subjugation limit"},
+	},
+	"false_sun_choir": {
+		"name": "Chorus of False Light",
+		"2": {"mods": {"will": 1}, "resists": {"radiant": 25}, "desc": "+1 will, +25% radiant resist"},
+		"3": {"mods": {"damage": 3, "accuracy": 2}, "resists": {}, "mask_risk": 1, "desc": "+3 damage, +2 accuracy, +1 Mask risk cap"},
+	},
 }
 
 
@@ -71,11 +116,27 @@ static func resist_sum(actor: Actor, db: ContentDB, dmg_type: String) -> int:
 	return total
 
 
-static func mask_risk_bonus(actor: Actor, db: ContentDB) -> int:
+static func _bonus_field_sum(actor: Actor, db: ContentDB, field_name: String) -> int:
+	if actor == null or actor.equipment.is_empty():
+		return 0
 	var counts := active_counts(actor, db)
-	if int(counts.get("unblinking_eye", 0)) >= 3:
-		return int(SETS["unblinking_eye"]["3"].get("mask_risk", 0))
-	return 0
+	var total := 0
+	for sid in counts:
+		var c := int(counts[sid])
+		var sdef: Dictionary = SETS[sid]
+		if c >= 2:
+			total += int(sdef["2"].get(field_name, 0))
+		if c >= 3:
+			total += int(sdef["3"].get(field_name, 0))
+	return total
+
+
+static func mask_risk_bonus(actor: Actor, db: ContentDB) -> int:
+	return _bonus_field_sum(actor, db, "mask_risk")
+
+
+static func subjugation_cap_bonus(actor: Actor, db: ContentDB) -> int:
+	return _bonus_field_sum(actor, db, "subjugation_cap")
 
 
 static func summaries(actor: Actor, db: ContentDB) -> Array[String]:
