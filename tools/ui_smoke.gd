@@ -92,7 +92,8 @@ func _process(_delta: float) -> bool:
 		2:
 			_check(main.screen == 1, "creation screen")
 			_shot("create")
-			for choice in ["Cambion", "Occultist"]:
+			_check(_find_button(main, "Exile") != null and _find_button(main, "Exile").button_pressed, "Exile is the default descent")
+			for choice in ["Cambion", "Occultist", "Adversary"]:
 				var b := _find_button(main, choice)
 				_check(b != null and b.toggle_mode, "choice '%s' is a toggle" % choice)
 				if b != null:
@@ -103,6 +104,7 @@ func _process(_delta: float) -> bool:
 		4:
 			_check(main.screen == 2 and main.world != null, "game screen")
 			_check(main.world.player.species_id == "cambion" and main.world.player.class_id == "occultist", "choices applied")
+			_check(main.world.difficulty == "adversary", "profile applied and stored on the run")
 			_check(SaveIO.exists(), "run saved at start")
 			_shot("game")
 			for _i in 4:
@@ -111,6 +113,11 @@ func _process(_delta: float) -> bool:
 			_key(KEY_L)
 		5:
 			_check(main.world.turns >= 4, "keyboard actions advance turns (%d)" % main.world.turns)
+			var hinted := false
+			for m in main.world.messages:
+				if String(m["t"]).begins_with("Hint: "):
+					hinted = true
+			_check(hinted or not main.world.visible_hostiles().is_empty(), "the first-talent hint is posted when no foe is in view")
 			_key(KEY_I)
 		6:
 			_check(main.overlay != null, "inventory opens")

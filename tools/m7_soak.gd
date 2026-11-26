@@ -15,6 +15,8 @@ extends SceneTree
 ##   --shard=I/N            run only every Nth job (parallel processes)
 ##   --actions=N            override the action cap (default 4000, 20000 for explorer/narrative)
 ##   --out=PATH             append JSONL (default: print only)
+##   --profile=ID           run profile (initiate|exile|adversary|sovereign; default exile). Seeds are
+##                          independent of the profile, so profiles are same-seed A/B comparisons.
 ##   --claim                claim --salt in the ledger and exit
 ##   --list                 print the job count and exit
 ## The dungeon seed for a (pair, index) is identical across policies so policies
@@ -86,7 +88,7 @@ func _init() -> void:
 		if n % shard_n != shard_i:
 			continue
 		var j: Array = jobs[n]
-		var rec := run_one(db, String(j[0]), String(j[1]), String(j[2]), int(j[3]), set_name, salt, int(o["actions"]))
+		var rec := run_one(db, String(j[0]), String(j[1]), String(j[2]), int(j[3]), set_name, salt, int(o["actions"]), String(o["profile"]))
 		done += 1
 		if f != null:
 			f.store_line(JSON.stringify(rec))
@@ -98,10 +100,10 @@ func _init() -> void:
 
 
 ## One run, returns a flat record. Also used by the tests.
-static func run_one(db: ContentDB, sp: String, cl: String, policy: String, idx: int, set_name: String, salt: String, actions: int = 0) -> Dictionary:
+static func run_one(db: ContentDB, sp: String, cl: String, policy: String, idx: int, set_name: String, salt: String, actions: int = 0, profile: String = "exile") -> Dictionary:
 	var pair := "%s/%s" % [sp, cl]
 	var seed_val := Rng.derive(idx, "%s:%s:%s" % [set_name, salt, pair])
-	var w := World.new_run(db, seed_val, sp, cl, "Soak")
+	var w := World.new_run(db, seed_val, sp, cl, "Soak", profile)
 	var tel := Telemetry.new()
 	w.telemetry = tel
 	var bot := PolicyPlayer.new(w, policy)
@@ -114,7 +116,7 @@ static func run_one(db: ContentDB, sp: String, cl: String, policy: String, idx: 
 			branch_floors += 1
 	var vic := String(w.victory_kind().get("id", "")) if w.state == World.State.WON else ""
 	return {
-		"set": set_name, "salt": salt, "pair": pair, "species": sp, "calling": cl, "policy": policy, "idx": idx, "seed": seed_val,
+		"set": set_name, "salt": salt, "pair": pair, "profile": w.difficulty, "species": sp, "calling": cl, "policy": policy, "idx": idx, "seed": seed_val,
 		"state": ["playing", "dead", "won"][int(w.state)],
 		"depth": w.depth, "level": w.player.level, "turns": w.turns, "actions_cap": cap, "ms": Time.get_ticks_msec() - t0,
 		"cause": w.death_cause, "victory": vic,
@@ -130,7 +132,7 @@ static func run_one(db: ContentDB, sp: String, cl: String, policy: String, idx: 
 
 func _parse() -> Dictionary:
 	var o := {"set": "dev", "salt": "m7dev", "seeds": 1, "seed_from": 0, "policies": PolicyPlayer.POLICIES.duplicate(),
-			"pairs": [], "species": [], "classes": [], "shard_i": 0, "shard_n": 1, "actions": 0, "out": ""}
+			"pairs": [], "species": [], "classes": [], "shard_i": 0, "shard_n": 1, "actions": 0, "out": "", "profile": "exile"}
 	for arg in OS.get_cmdline_user_args():
 		if arg == "--claim" or arg == "--list":
 			o[arg.substr(2)] = true

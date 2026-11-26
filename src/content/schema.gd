@@ -19,7 +19,7 @@ extends RefCounted
 ##   table:<kind>  array of {"id": ref:<kind>, "weight": int > 0}
 ##   trait         a trait id implemented in src/sim/traits.gd
 
-const KINDS: Array[String] = ["statuses", "items", "species", "classes", "talents", "contracts", "factions", "npcs", "threads", "monsters", "floors"]
+const KINDS: Array[String] = ["statuses", "items", "species", "classes", "talents", "contracts", "factions", "npcs", "threads", "monsters", "floors", "difficulty"]
 
 ## Stats that equipment, statuses and species may modify.
 const MOD_STATS: Array[String] = [
@@ -98,6 +98,7 @@ const FIELDS := {
 		"starting_items": {"type": "list:ref:items", "required": false},
 		"resource": {"type": "enum:stamina|resonance|poise", "required": false},
 		"traits": {"type": "list:trait", "required": false},
+		"signature_tree": {"type": "string", "required": false},
 	},
 	"talents": {
 		"id": {"type": "id", "required": true},
@@ -116,6 +117,18 @@ const FIELDS := {
 		"description": {"type": "text", "required": true},
 		"mods": {"type": "mods", "required": false},
 		"effect": {"type": "string", "required": false},
+	},
+	"difficulty": {
+		"id": {"type": "id", "required": true},
+		"name": {"type": "string", "required": true},
+		"description": {"type": "text", "required": true},
+		"order": {"type": "int", "required": true, "min": 0},
+		"monsters_delta": {"type": "int", "required": false},
+		"group_pct": {"type": "int", "required": false, "min": 0},
+		"elite_delta": {"type": "int", "required": false},
+		"items_delta": {"type": "int", "required": false},
+		"heal_weight_pct": {"type": "int", "required": false, "min": 1},
+		"start_salves": {"type": "int", "required": false},
 	},
 	"contracts": {
 		"id": {"type": "id", "required": true},

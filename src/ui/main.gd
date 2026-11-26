@@ -42,6 +42,7 @@ var _inv_query := ""
 # Character creation choices
 var _pick_species := ""
 var _pick_class := ""
+var _pick_profile := ""
 
 
 func _ready() -> void:
@@ -244,6 +245,8 @@ func _show_create() -> void:
 		_pick_species = db.ids("species")[0]
 	if _pick_class == "":
 		_pick_class = db.ids("classes")[0]
+	if _pick_profile == "":
+		_pick_profile = Difficulty.normalise(db, settings.last_profile)
 	var col := _menu_column(1080.0)
 	col.add_theme_constant_override("separation", int(8 * settings.text_scale()))
 	col.add_child(_label("Who descends?", Palette.LUX, 1.4))
@@ -264,6 +267,11 @@ func _show_create() -> void:
 	col.add_child(_choice_row("classes", cl_desc))
 	col.add_child(cl_desc)
 
+	col.add_child(_label("Descent", Palette.GOLD, 1.05))
+	var pf_desc := _label("", Palette.TEXT_DIM, 0.85)
+	col.add_child(_profile_row(pf_desc))
+	col.add_child(pf_desc)
+
 	var seed_edit := LineEdit.new()
 	seed_edit.placeholder_text = "Seed (blank for random)"
 	seed_edit.custom_minimum_size.y = 44.0 * settings.text_scale()
@@ -274,7 +282,9 @@ func _show_create() -> void:
 	var begin := _btn("Begin the descent", func() -> void:
 		var seed_text := seed_edit.text.strip_edges()
 		var seed_value := seed_text.to_int() if seed_text.is_valid_int() else (Rng.derive(0, seed_text) if seed_text != "" else randi())
-		_start_game(World.new_run(db, seed_value, _pick_species, _pick_class, name_edit.text)))
+		settings.last_profile = _pick_profile
+		settings.save_to_disk()
+		_start_game(World.new_run(db, seed_value, _pick_species, _pick_class, name_edit.text, _pick_profile)))
 	begin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(begin)
 	row.add_child(_btn("Back", _show_title, 140.0 * settings.text_scale()))
@@ -309,6 +319,28 @@ func _choice_row(kind: String, desc: Label) -> Control:
 	return flow
 
 
+## Run profile picker (M7.8). Permadeath is the same in every profile.
+func _profile_row(desc: Label) -> Control:
+	var flow := HFlowContainer.new()
+	flow.add_theme_constant_override("h_separation", 8)
+	flow.add_theme_constant_override("v_separation", 8)
+	var group := ButtonGroup.new()
+	for id in Difficulty.ordered(db):
+		var b := Button.new()
+		b.toggle_mode = true
+		b.button_group = group
+		b.text = String(db.get_def("difficulty", id)["name"])
+		b.custom_minimum_size = Vector2(172.0 * settings.text_scale(), 44.0 * settings.text_scale())
+		b.button_pressed = id == _pick_profile
+		b.toggled.connect(func(on: bool) -> void:
+			if on:
+				_pick_profile = id
+				desc.text = Difficulty.summary(db, id))
+		flow.add_child(b)
+	desc.text = Difficulty.summary(db, _pick_profile)
+	return flow
+
+
 func _describe_choice(kind: String, id: String) -> String:
 	var d := db.get_def(kind, id)
 	var parts: PackedStringArray = [String(d["description"])]
@@ -326,6 +358,8 @@ func _describe_choice(kind: String, id: String) -> String:
 		for g in d.get("starting_equipment", []) + d.get("starting_items", []):
 			gear.append(String(db.get_def("items", String(g))["name"]))
 		parts.append("Carries: " + ", ".join(gear))
+		if String(d.get("signature_tree", "")) != "":
+			parts.append("Built around the %s tree." % String(d["signature_tree"]))
 	return "\n".join(parts)
 
 
@@ -454,6 +488,7 @@ func _refresh() -> void:
 	if world == null or map == null:
 		return
 	map.queue_redraw()
+	_maybe_hint()
 	_update_hud()
 	if world.log_serial != _log_seen:
 		_log_seen = world.log_serial
@@ -461,6 +496,19 @@ func _refresh() -> void:
 		for msg in Assist.filter_log(world.messages, settings.log_kinds(), 60):
 			lines.append("[color=#%s]%s[/color]" % [Palette.log_color(String(msg["k"])).to_html(false), _escape(String(msg["t"]))])
 		log_view.text = "\n".join(lines)
+
+
+## One-time onboarding hint, posted to the log. Advice only: it needs no input,
+## never blocks a command, and stops for good once the player switches it off.
+func _maybe_hint() -> void:
+	if not settings.hints_on or overlay != null or not auto.is_empty() or world.state != World.State.PLAYING:
+		return
+	var h := Hints.next(world, settings.hints_seen)
+	if h.is_empty():
+		return
+	settings.hints_seen[String(h["id"])] = true
+	settings.save_to_disk()
+	world.log_msg("Hint: " + String(h["text"]), "info")
 
 
 func _escape(t: String) -> String:
@@ -1553,8 +1601,9 @@ func _show_codex(back: Callable = Callable()) -> void:
 		col.add_child(_label("  No completed descents yet.", Palette.TEXT_DIM, 0.82))
 	else:
 		for r in codex.runs.slice(0, 8):
-			var line := "  %s (%s %s) — %s at depth %d (%d turns, %d threads)" % [
+			var line := "  %s (%s %s, %s) — %s at depth %d (%d turns, %d threads)" % [
 				String(r.get("hero", "?")), String(r.get("species", "")), String(r.get("class_id", "")),
+				String(Difficulty.profile(db, String(r.get("difficulty", "exile"))).get("name", "Exile")),
 				String(r.get("title", r.get("outcome", ""))), int(r.get("depth", 1)), int(r.get("turns", 0)), int(r.get("threads_settled", 0))
 			]
 			col.add_child(_label(line, Palette.GOOD if String(r.get("outcome", "")) == "victory" else Palette.TEXT_DIM, 0.8))
@@ -1572,7 +1621,7 @@ func _show_pause() -> void:
 		return
 	var col := _open_overlay("Paused")
 	var fd := world.current_floor_def()
-	col.add_child(_label("%s. Seed %d." % [fd.get("name", ""), world.run_seed], Palette.TEXT_DIM, 0.85))
+	col.add_child(_label("%s. Seed %d. Descent: %s." % [fd.get("name", ""), world.run_seed, String(Difficulty.profile(db, world.difficulty).get("name", "Exile"))], Palette.TEXT_DIM, 0.85))
 	var resume := _btn("Resume", _close_overlay)
 	col.add_child(resume)
 	col.add_child(_btn("Atlas", _show_atlas))
@@ -1617,6 +1666,13 @@ func _show_settings(back: Callable) -> void:
 	col.add_child(touch)
 	col.add_child(_btn("Auto-explore and travel: %s" % ("instant" if settings.instant_auto else "animated"), func() -> void:
 		settings.instant_auto = not settings.instant_auto
+		rebuild.call()))
+	col.add_child(_btn("Onboarding hints: %s" % ("on" if settings.hints_on else "off"), func() -> void:
+		settings.hints_on = not settings.hints_on
+		rebuild.call()))
+	col.add_child(_btn("Show hints again", func() -> void:
+		settings.hints_seen.clear()
+		settings.hints_on = true
 		rebuild.call()))
 	col.add_child(_btn("Gate advisories: %s" % ("on" if settings.warn_descent else "off"), func() -> void:
 		settings.warn_descent = not settings.warn_descent

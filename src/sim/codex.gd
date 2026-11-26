@@ -89,6 +89,7 @@ func record_run_end(w: World) -> void:
 		"hero": w.player.name,
 		"species": w.player.species_id,
 		"class_id": w.player.class_id,
+		"difficulty": w.difficulty,
 		"outcome": "victory" if won else "loss",
 		"title": String(summary.get("title", "")),
 		"cause": "" if won else w.death_cause,

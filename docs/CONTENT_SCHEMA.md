@@ -109,6 +109,7 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 | `starting_items` | list:ref:items | no | carried at start |
 | `resource` | enum: stamina, resonance, poise | no | class ability resource |
 | `traits` | list:trait | no | |
+| `signature_tree` | string | no | the talent tree the calling is built around; must match a tree of this calling's talents; drives the first-talent hint |
 
 ## talents
 
@@ -130,6 +131,21 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 | `description` | text | yes | |
 | `mods` | mods | no | passive stat modifiers per rank |
 | `effect` | string | no | active/passive rule key |
+
+## difficulty
+
+Run profiles (M7.8). A profile changes encounter and resource generation only: it never scales a creature's or the player's stats, and permadeath is identical in every profile. `exile` is the current balance and must exist; its values are neutral, so an Exile run generates exactly what earlier versions generated. The chosen profile id is stored in the save (`SAVE_VERSION` 12) and in the run history. Profile names are provisional pending owner review.
+
+| Field | Type | Req | Notes |
+|---|---|---|---|
+| `id`, `name`, `description` | | yes | |
+| `order` | int ≥ 0 | yes | display order, easiest first |
+| `monsters_delta` | int | no | added to both ends of each floor's monster count (floor minimum 1) |
+| `group_pct` | int ≥ 0 | no | percent chance a spawn joins the previous room's squad (neutral 75) |
+| `elite_delta` | int | no | added to the elite count on floors of depth 2 and deeper (never below 0) |
+| `items_delta` | int | no | added to both ends of each floor's item count (floor minimum 1) |
+| `heal_weight_pct` | int ≥ 1 | no | percent scaling of healing-item weights in floor loot tables (neutral 100) |
+| `start_salves` | int | no | healing salves added to (or removed from) the starting pack |
 
 ## contracts
 

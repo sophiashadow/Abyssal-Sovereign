@@ -17,6 +17,10 @@ var travel_speed: int = 20
 var instant_auto: bool = false
 ## Advisory lines on the Sphere Gate screen (under-levelled, low health, no healing).
 var warn_descent: bool = true
+## M7.8 onboarding: optional one-time hints, and the profile last chosen.
+var hints_on: bool = true
+var hints_seen: Dictionary = {}
+var last_profile: String = "exile"
 ## Ask before irreversible choices (Transmute, abandoning a thread, dropping a relic or rare item).
 var confirm_destructive: bool = true
 ## Which message kinds the log shows; indexes LOG_FILTERS.
@@ -114,6 +118,13 @@ func load_from_disk() -> void:
 	travel_speed = clampi(int(cfg.get_value("input", "travel_speed", travel_speed)), 5, 60)
 	instant_auto = bool(cfg.get_value("input", "instant_auto", instant_auto))
 	warn_descent = bool(cfg.get_value("assist", "warn_descent", warn_descent))
+	hints_on = bool(cfg.get_value("assist", "hints_on", hints_on))
+	last_profile = String(cfg.get_value("assist", "last_profile", last_profile))
+	hints_seen.clear()
+	if cfg.has_section("hints"):
+		for h in cfg.get_section_keys("hints"):
+			if bool(cfg.get_value("hints", h, false)):
+				hints_seen[h] = true
 	confirm_destructive = bool(cfg.get_value("assist", "confirm_destructive", confirm_destructive))
 	log_filter_index = clampi(int(cfg.get_value("assist", "log_filter_index", log_filter_index)), 0, LOG_FILTERS.size() - 1)
 	inv_sort_index = clampi(int(cfg.get_value("assist", "inv_sort_index", inv_sort_index)), 0, Assist.SORTS.size() - 1)
@@ -141,6 +152,10 @@ func save_to_disk() -> void:
 	cfg.set_value("input", "travel_speed", travel_speed)
 	cfg.set_value("input", "instant_auto", instant_auto)
 	cfg.set_value("assist", "warn_descent", warn_descent)
+	cfg.set_value("assist", "hints_on", hints_on)
+	cfg.set_value("assist", "last_profile", last_profile)
+	for h in hints_seen:
+		cfg.set_value("hints", String(h), true)
 	cfg.set_value("assist", "confirm_destructive", confirm_destructive)
 	cfg.set_value("assist", "log_filter_index", log_filter_index)
 	cfg.set_value("assist", "inv_sort_index", inv_sort_index)
