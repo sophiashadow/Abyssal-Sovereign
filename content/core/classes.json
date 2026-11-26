@@ -9,7 +9,7 @@
      "traits": ["iron_oath"]},
     {"id": "occultist", "name": "Occultist",
      "description": "A reader of the Eye hidden in the Dominion's own letters. Draws breath from every death they cause.",
-     "attributes": {"might": 0, "agility": 1, "will": 2}, "hp": 10, "hp_per_level": 3,
+     "attributes": {"might": 0, "agility": 1, "will": 2}, "hp": 12, "hp_per_level": 4,
      "starting_equipment": ["ritual_knife", "ash_robe"], "starting_items": ["healing_salve", "vial_of_false_light", "vial_of_false_light"],
      "traits": ["soul_siphon"]},
     {"id": "assassin", "name": "Assassin",

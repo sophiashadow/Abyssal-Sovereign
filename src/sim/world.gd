@@ -19,6 +19,9 @@ const COST_ITEM := 100
 const COST_STAIRS := 100
 const NOTICE_PCT := 60
 const LOG_LIMIT := 300
+## The player recovers 1 health every this many turns (scaled by the
+## species' heal_mult: a revenant mends at half speed).
+const REGEN_TURNS := 6
 
 enum State { PLAYING, DEAD, WON }
 
@@ -370,7 +373,36 @@ func _next_actor() -> Actor:
 
 func _begin_player_turn() -> void:
 	_tick_statuses(player)
+	_natural_regen()
 	update_fov()
+
+
+func _natural_regen() -> void:
+	if turns <= 0 or player.hp >= player.stat("max_hp"):
+		return
+	var mult := float(db.get_def("species", player.species_id).get("heal_mult", 1.0))
+	var interval := maxi(1, int(roundf(REGEN_TURNS / maxf(mult, 0.1))))
+	if turns % interval == 0:
+		player.hp += 1
+
+
+## True when resting is safe: no hostile in view and health not full.
+func can_rest() -> bool:
+	return state == State.PLAYING and visible_hostiles().is_empty() and player.hp < player.stat("max_hp")
+
+
+## Waits repeatedly until health is full, a hostile comes into view, or
+## `max_turns` pass. Returns the number of turns rested.
+func player_rest(max_turns: int = 200) -> int:
+	var n := 0
+	if not can_rest():
+		log_msg("You cannot rest now." if state == State.PLAYING and player.hp < player.stat("max_hp") else "You are already whole.")
+		return 0
+	while n < max_turns and can_rest():
+		player_wait()
+		n += 1
+	log_msg("You rest for %d turns." % n)
+	return n
 
 
 func update_fov() -> void:
@@ -639,6 +671,9 @@ static func from_dict(content: ContentDB, d: Dictionary, errors: PackedStringArr
 	for key in ["seed", "depth", "time", "turns", "state", "next_id", "rng", "player", "floors", "log"]:
 		if not d.has(key):
 			errors.append("save is missing '%s'" % key)
+	if not errors.is_empty():
+		return null
+	errors.append_array(SaveCheck.problems(d, content))
 	if not errors.is_empty():
 		return null
 	var w := World.new()
