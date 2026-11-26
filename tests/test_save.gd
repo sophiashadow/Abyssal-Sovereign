@@ -18,6 +18,25 @@ func _reload(w: World) -> World:
 	return w2
 
 
+func test_v1_save_migrates_to_v2() -> void:
+	var w := World.new_run(db(), 4242, "cambion", "occultist", "Mig")
+	var d := _through_json(w)
+	d["save_version"] = 1
+	d["player"].erase("mask")
+	d["player"].erase("mask_risk")
+	for k in d["floors"]:
+		for a in d["floors"][k]["actors"]:
+			a.erase("mask")
+			a.erase("mask_risk")
+	var errors: PackedStringArray = []
+	var w2 := World.from_dict(db(), d, errors)
+	eq(errors.size(), 0, "v1 save migrates cleanly: %s" % ", ".join(errors))
+	ok(w2 != null, "migrated world loaded")
+	if w2 != null:
+		eq(w2.player.mask, "bare_face", "default mask applied")
+		eq(w2.player.mask_risk, 0, "default mask_risk applied")
+
+
 func test_round_trip_is_exact() -> void:
 	var w := World.new_run(db(), 4242, "cambion", "occultist", "Rt")
 	AutoPlayer.new(w).play(60)

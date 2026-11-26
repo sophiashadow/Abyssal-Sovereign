@@ -28,6 +28,9 @@ func step() -> bool:
 		var heal := _find_consumable("heal")
 		if heal >= 0:
 			return world.player_use(heal)
+	if p.has_trait("mask_stances"):
+		if p.mask != "bare_face" and p.mask_risk >= World.MASK_RISK_MAX - 2:
+			return world.player_switch_mask("bare_face")
 	for d in Grid.DIRS_8:
 		var a := m.actor_at(p.pos + d)
 		if a != null and a != p and m.can_step(p.pos, a.pos):
@@ -35,7 +38,11 @@ func step() -> bool:
 				var vial := _find_consumable("status")
 				if vial >= 0:
 					return world.player_use(vial)
+			if p.has_trait("mask_stances") and p.mask != "eris" and p.mask_risk < World.MASK_RISK_MAX - 3 and not p.has_status("isolation"):
+				return world.player_switch_mask("eris")
 			return world.player_move(d)
+	if p.has_trait("mask_stances") and p.mask != "bare_face" and world.visible_hostiles().is_empty():
+		return world.player_switch_mask("bare_face")
 	if m.get_tile(p.pos) == Tiles.STAIRS_DOWN:
 		if world.can_rest():
 			return world.player_rest(200) > 0
@@ -45,6 +52,9 @@ func step() -> bool:
 	var upgrade := _find_upgrade()
 	if upgrade >= 0:
 		return world.player_use(upgrade)
+	var relic := _find_relic()
+	if relic >= 0:
+		return world.player_transmute_relic(relic)
 	if not m.items_at(p.pos).is_empty() and world._can_carry(p, m.items_at(p.pos)[0]):
 		return world.player_pickup()
 	var target := _nearest_visible_hostile()
@@ -74,6 +84,14 @@ func _find_consumable(effect: String) -> int:
 	for i in world.player.inventory.size():
 		var d := world.player.inventory[i].def(world.db)
 		if String(d["kind"]) == "consumable" and String(d.get("effect", "")) == effect:
+			return i
+	return -1
+
+
+func _find_relic() -> int:
+	for i in world.player.inventory.size():
+		var d := world.player.inventory[i].def(world.db)
+		if String(d["kind"]) == "relic":
 			return i
 	return -1
 

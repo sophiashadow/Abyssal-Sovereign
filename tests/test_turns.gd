@@ -120,3 +120,25 @@ func test_death_leaves_health_at_zero() -> void:
 	var w := TestHelpers.ascii_world(ROOM)
 	w.apply_damage(w.player, 999, "x")
 	eq(w.player.hp, 0, "no negative health shown after death")
+
+
+func test_named_losses_classify_gilded_fluent_and_catalogued() -> void:
+	var w1 := TestHelpers.ascii_world(ROOM)
+	w1.apply_damage(w1.player, 999, "warren rat")
+	eq(w1.named_loss()["id"], "catalogued", "ordinary death is Catalogued")
+
+	var w2 := TestHelpers.ascii_world(ROOM)
+	w2.apply_status(w2.player, "reckoning")
+	w2.apply_damage(w2.player, 999, "ghoul")
+	eq(w2.named_loss()["id"], "gilded", "reckoning death is Gilded")
+
+	var w3 := TestHelpers.ascii_world(ROOM)
+	w3.apply_status(w3.player, "false_light")
+	w3.apply_damage(w3.player, 999, "ghoul")
+	eq(w3.named_loss()["id"], "gilded", "false_light death is Gilded")
+
+	for sid in ["isolation", "perception_fog", "dissolution", "exposure"]:
+		var w4 := TestHelpers.ascii_world(ROOM)
+		w4.apply_status(w4.player, sid)
+		w4.apply_damage(w4.player, 999, "Preliator Sentinel")
+		eq(w4.named_loss()["id"], "fluent", "%s death is Fluent" % sid)

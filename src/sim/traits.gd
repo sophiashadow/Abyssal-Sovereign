@@ -11,6 +11,7 @@ const KNOWN := {
 	"soul_siphon": "Each kill restores 1 + will health.",
 	"deathless": "Once per floor, a killing blow leaves you at 1 health instead.",
 	"infernal_blood": "Your attacks ignore 1 point of the target's defense.",
+	"mask_stances": "Wear the Masks as stances (Bare Face, Nyx, Eris, Lilith), switching for 1 turn.",
 }
 
 

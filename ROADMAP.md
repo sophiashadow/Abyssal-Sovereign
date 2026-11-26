@@ -11,23 +11,19 @@ Everything in the M1 brief is implemented. The automated evidence is the headles
 ### Known defects and limits
 
 - **Occultist balance:** weakest calling. Held-out bot win rate is 13%, against 60% for the Knight. Fix it with a kit (see M2), not stats.
-- **Monster pursuit:** awake monsters always know where the player is, so there is no losing pursuers. Add last-known-position tracking.
 - **Ranged play:** there are no ranged attacks, spells or doors (other than the sealed one), and there is no item identification.
 - **Saves:** no save migration code yet. Only v1 exists.
 - **Platforms:** no export presets and no builds for any platform. Android, Windows and Web are untested.
 - **Typography and accessibility:** the glyph font is the engine default (proportional, centred per cell). A dedicated monospace font needs a license check first. There is no colour-blind palette option and no screen-reader support.
-- **Starting position:** the player starts on the up stairs, and the `@` hides the `<` until they move.
 
-## Milestone 2: the mythology as mechanics (proposed, needs owner review)
+## Milestone 2: the mythology as mechanics (done 2026-11-26)
 
-Use the candidates in [docs/LORE.md](docs/LORE.md), in this order:
-
-1. **Masks as stances.** This also gives the Occultist its kit.
-2. **Eight Chains enemy abilities.** Two or three, starting with Isolation and Monopolization of Perception, which maps to fog.
-3. **Relics, worked or transmuted.**
+1. **Masks as stances** (`mask_stances` on Occultist: Bare Face, Nyx, Eris, Lilith; `SAVE_VERSION` 2).
+2. **Eight Chains enemy abilities** (`chain_isolation` on cultist of the false sun, `chain_fog` / `perception_fog` on Preliator Sentinel).
+3. **Relics, worked or transmuted** (*Confessor's Glass*, *Ophite Key*, *Broken Halo*).
 4. **Named losses** (Catalogued, Fluent, Gilded) on the death screen.
 
-Owner decisions are needed first: the apotheosis or "By Decree" ending, and the lore placement for species and classes.
+Owner decisions resolved 2026-11-26 (see [docs/LORE.md](docs/LORE.md)): Apotheosis ("By Decree") can be a win; the Unwritten Door, origins, and callings are canon.
 
 ## Milestone 3: platforms
 

@@ -19,6 +19,62 @@
       "duration": 40,
       "mods": {"accuracy": -3, "evasion": -3, "damage": -1},
       "color": "#ff4d6d"
+    },
+    {
+      "id": "dissolution",
+      "name": "Dissolution",
+      "description": "Nyx's veil thins too far; form and guard fray together.",
+      "duration": 15,
+      "mods": {"defense": -2, "evasion": -2},
+      "color": "#8f7ae0"
+    },
+    {
+      "id": "isolation",
+      "name": "Isolation",
+      "description": "Eris's edge cuts you off from rest and mending.",
+      "duration": 15,
+      "mods": {"accuracy": -1},
+      "color": "#e05a47"
+    },
+    {
+      "id": "exposure",
+      "name": "Exposure",
+      "description": "The Eye stays open both ways; you are seen and struck more easily.",
+      "duration": 15,
+      "mods": {"evasion": -2, "defense": -1},
+      "color": "#e8c547"
+    },
+    {
+      "id": "perception_fog",
+      "name": "Monopolized Sight",
+      "description": "A grey fog closes in; only what is within arm's reach remains clear.",
+      "duration": 10,
+      "mods": {"sight": -4},
+      "color": "#9b8aa6"
+    },
+    {
+      "id": "confessors_clarity",
+      "name": "Confessor's Clarity",
+      "description": "The glass cuts through veil and fog alike.",
+      "duration": 12,
+      "mods": {"accuracy": 3, "sight": 3},
+      "color": "#78bea7"
+    },
+    {
+      "id": "ophite_insight",
+      "name": "Ophite Insight",
+      "description": "You see the seam in every guard before it closes.",
+      "duration": 12,
+      "mods": {"evasion": 3, "crit": 15},
+      "color": "#8f7ae0"
+    },
+    {
+      "id": "halo_aegis",
+      "name": "Broken Halo's Ward",
+      "description": "Snapped iron still remembers how to turn a blow.",
+      "duration": 12,
+      "mods": {"defense": 3, "damage": 1},
+      "color": "#f2c35c"
     }
   ]
 }

@@ -6,7 +6,7 @@ extends RefCounted
 
 const ACTOR_KEYS := ["id", "t", "name", "glyph", "color", "player", "x", "y", "hp", "base",
 	"level", "xp", "xpv", "next", "statuses", "inv", "eq", "traits", "tags", "awake",
-	"unique", "species", "class", "flags"]
+	"unique", "species", "class", "mask", "mask_risk", "flags"]
 const ITEM_KEYS := ["id", "t", "q", "x", "y"]
 const FLOOR_KEYS := ["depth", "w", "h", "tiles", "explored", "up", "down", "exit", "actors", "items"]
 

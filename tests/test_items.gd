@@ -140,3 +140,43 @@ func test_false_light_is_a_loan_then_reckoning() -> void:
 	ok(not w.player.has_status("false_light"), "it fades")
 	ok(w.player.has_status("reckoning"), "and the reckoning arrives")
 	eq(w.player.stat("accuracy"), acc - 3, "the collection")
+
+
+func test_relic_work_pays_hp_applies_status_and_clears_fog() -> void:
+	var w := TestHelpers.ascii_world(ROOM)
+	w._add_to_inventory(w.player, w._new_item("confessors_glass"))
+	var idx := w.player.inventory.size() - 1
+	w.apply_status(w.player, "perception_fog")
+	var hp_before := w.player.hp
+	var acc_before := w.player.stat("accuracy")
+	ok(w.player_work_relic(idx), "worked confessors_glass")
+	eq(w.player.hp, hp_before - 3, "paid 3 HP cost")
+	ok(w.player.has_status("confessors_clarity"), "work status applied")
+	ok(not w.player.has_status("perception_fog"), "perception_fog cleared")
+	eq(w.player.stat("accuracy"), acc_before + 3, "clarity +3 accuracy")
+	eq(_count(w, "confessors_glass"), 1, "working keeps relic in inventory")
+	ok(not w.player_work_relic(idx), "cannot stack already active relic status")
+	w._remove_status(w.player, "confessors_clarity")
+	w.player.hp = 3
+	ok(not w.player_work_relic(idx), "refuses work when hp <= cost")
+	eq(w.player.hp, 3, "did not kill player")
+
+
+func test_relic_transmute_consumes_item_and_grants_permanent_mods() -> void:
+	var w := TestHelpers.ascii_world(ROOM)
+	w._add_to_inventory(w.player, w._new_item("broken_halo"))
+	var idx := w.player.inventory.size() - 1
+	var max_hp := w.player.stat("max_hp")
+	var def := w.player.stat("defense")
+	ok(w.player_transmute_relic(idx), "transmuted broken_halo")
+	eq(_count(w, "broken_halo"), 0, "relic consumed on transmute")
+	eq(w.player.stat("max_hp"), max_hp + 6, "permanent +6 max_hp")
+	eq(w.player.stat("defense"), def + 1, "permanent +1 defense")
+	var json := JSON.new()
+	json.parse(JSON.stringify(w.to_dict()))
+	var errs: PackedStringArray = []
+	var w2 := World.from_dict(db(), json.data, errs)
+	eq(errs.size(), 0, "transmuted world loads cleanly")
+	if w2 != null:
+		eq(w2.player.stat("max_hp"), max_hp + 6, "transmuted max_hp persists across save/load")
+		eq(w2.player.stat("defense"), def + 1, "transmuted defense persists across save/load")

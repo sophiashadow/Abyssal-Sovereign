@@ -34,6 +34,8 @@ var awake: bool = false
 var unique: bool = false
 var species_id: String = ""
 var class_id: String = ""
+var mask: String = "bare_face"
+var mask_risk: int = 0
 ## Small per-actor rule state (for example, which floors 'deathless' was spent on).
 var flags: Dictionary = {}
 
@@ -61,6 +63,8 @@ func _mod_sum(stat_name: String) -> int:
 			total += int(it.def(db).get("mods", {}).get(stat_name, 0))
 	for s in statuses:
 		total += int(db.get_def("statuses", s["id"]).get("mods", {}).get(stat_name, 0))
+	if has_trait("mask_stances"):
+		total += int(Masks.mods(mask).get(stat_name, 0))
 	return total
 
 
@@ -130,6 +134,7 @@ func to_dict() -> Dictionary:
 		"level": level, "xp": xp, "xpv": xp_value, "next": next_time, "statuses": st,
 		"inv": inv, "eq": eq, "traits": traits.duplicate(), "tags": tags.duplicate(),
 		"awake": awake, "unique": unique, "species": species_id, "class": class_id,
+		"mask": mask, "mask_risk": mask_risk,
 		"flags": flags.duplicate(true),
 	}
 
@@ -164,6 +169,8 @@ static func from_dict(d: Dictionary, content: ContentDB) -> Actor:
 	a.unique = bool(d["unique"])
 	a.species_id = String(d["species"])
 	a.class_id = String(d["class"])
+	a.mask = String(d.get("mask", "bare_face"))
+	a.mask_risk = int(d.get("mask_risk", 0))
 	a.flags = _ints(d["flags"])
 	return a
 

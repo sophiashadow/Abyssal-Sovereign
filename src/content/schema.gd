@@ -44,7 +44,7 @@ const FIELDS := {
 		"name": {"type": "string", "required": true},
 		"glyph": {"type": "glyph", "required": true},
 		"color": {"type": "color", "required": true},
-		"kind": {"type": "enum:weapon|armor|amulet|consumable", "required": true},
+		"kind": {"type": "enum:weapon|armor|amulet|consumable|relic", "required": true},
 		"description": {"type": "text", "required": true},
 		"damage": {"type": "dice", "required": false},
 		"accuracy": {"type": "int", "required": false},
@@ -56,6 +56,11 @@ const FIELDS := {
 		"heal": {"type": "dice", "required": false},
 		"status": {"type": "ref:statuses", "required": false},
 		"stackable": {"type": "bool", "required": false},
+		"work_status": {"type": "ref:statuses", "required": false},
+		"work_cost_hp": {"type": "int", "required": false, "min": 0},
+		"work_desc": {"type": "text", "required": false},
+		"transmute_mods": {"type": "mods", "required": false},
+		"transmute_desc": {"type": "text", "required": false},
 	},
 	"species": {
 		"id": {"type": "id", "required": true},
@@ -125,4 +130,5 @@ const ITEM_KIND_REQUIRES := {
 	"armor": ["defense"],
 	"amulet": ["mods"],
 	"consumable": ["effect"],
+	"relic": ["work_status", "work_desc", "transmute_mods", "transmute_desc"],
 }

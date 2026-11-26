@@ -18,7 +18,8 @@
                        {"id": "false_sun_cultist", "weight": 4}, {"id": "ghoul", "weight": 1}],
      "item_table": [{"id": "healing_salve", "weight": 4}, {"id": "bone_tincture", "weight": 2}, {"id": "vial_of_false_light", "weight": 2},
                     {"id": "chain_hauberk", "weight": 1}, {"id": "notched_longsword", "weight": 1}, {"id": "flail_of_penance", "weight": 1},
-                    {"id": "eye_of_lilith", "weight": 1}, {"id": "broken_tithe_seal", "weight": 1}],
+                    {"id": "eye_of_lilith", "weight": 1}, {"id": "broken_tithe_seal", "weight": 1},
+                    {"id": "confessors_glass", "weight": 1}, {"id": "ophite_key", "weight": 1}],
      "exit": "stairs"},
     {"id": "sealed_stair", "depth": 3, "name": "The Sealed Stair",
      "description": "The lowest record. Past the Sentinel is a door the Architect never wrote down.",
@@ -26,7 +27,8 @@
      "monsters_min": 9, "monsters_max": 12, "items_min": 5, "items_max": 8,
      "monster_table": [{"id": "catalogued_dead", "weight": 3}, {"id": "false_sun_cultist", "weight": 4}, {"id": "ghoul", "weight": 4}],
      "item_table": [{"id": "bone_tincture", "weight": 3}, {"id": "healing_salve", "weight": 3}, {"id": "vial_of_false_light", "weight": 2},
-                    {"id": "preliator_plate", "weight": 1}, {"id": "crux_gladii", "weight": 1}, {"id": "flail_of_penance", "weight": 1}],
+                    {"id": "preliator_plate", "weight": 1}, {"id": "crux_gladii", "weight": 1}, {"id": "flail_of_penance", "weight": 1},
+                    {"id": "ophite_key", "weight": 1}, {"id": "broken_halo", "weight": 1}],
      "exit": "sealed_door", "guardian": "preliator_sentinel"}
   ]
 }

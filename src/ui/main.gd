@@ -382,8 +382,11 @@ func _build_game_screen() -> void:
 	actions.columns = 2 if settings.touch_controls else 3
 	actions.add_theme_constant_override("h_separation", int(6 * s))
 	actions.add_theme_constant_override("v_separation", int(6 * s))
-	for spec in [["Get", _act_pickup], ["Bag", _show_inventory], ["Stairs", _act_stairs],
-			["Rest", _act_rest], ["Look", _toggle_look], ["Menu", _show_pause]]:
+	var action_specs: Array = [["Get", _act_pickup], ["Bag", _show_inventory], ["Stairs", _act_stairs],
+			["Rest", _act_rest], ["Look", _toggle_look], ["Menu", _show_pause]]
+	if world.player.has_trait("mask_stances"):
+		action_specs.insert(2, ["Mask", _show_masks])
+	for spec in action_specs:
 		var b := _btn(spec[0], spec[1])
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.focus_mode = Control.FOCUS_NONE
@@ -410,7 +413,8 @@ func _build_game_screen() -> void:
 		pad_center.add_child(pad)
 		side.add_child(pad_center)
 	else:
-		side.add_child(_label("Move: arrows, numpad or hjklyubn\nWait: . or 5   Get: g   Bag: i\nStairs: Enter   Rest: r   Look: x\nTap a known tile to travel; hold or right-click to inspect. Menu: Esc", Palette.TEXT_DIM, 0.7))
+		var mask_hint := "   Mask: m" if world.player.has_trait("mask_stances") else ""
+		side.add_child(_label("Move: arrows, numpad or hjklyubn\nWait: . or 5   Get: g   Bag: i%s\nStairs: Enter   Rest: r   Look: x\nTap a known tile to travel; hold or right-click to inspect. Menu: Esc" % mask_hint, Palette.TEXT_DIM, 0.7))
 	_refresh()
 
 
@@ -447,6 +451,8 @@ func _update_hud() -> void:
 	t.append("Attack %+d  Defense %d  Evasion %+d" % [p.stat("accuracy"), p.stat("defense"), p.stat("evasion")])
 	var w := p.equipped("weapon")
 	t.append("Wielding: %s (%s)" % [w.display_name(db), p.damage_dice()] if w != null else "Wielding: bare hands (1d2)")
+	if p.has_trait("mask_stances"):
+		t.append("Mask: [color=%s]%s[/color] (risk %d/%d)" % [Masks.color(p.mask), Masks.label(p.mask), p.mask_risk, World.MASK_RISK_MAX])
 	for s in p.statuses:
 		var sd := db.get_def("statuses", s["id"])
 		t.append("[color=%s]%s (%d)[/color]" % [String(sd.get("color", "#eee5d3")), sd["name"], int(s["turns"])])
@@ -637,9 +643,29 @@ func _unhandled_input(event: InputEvent) -> void:
 		_act_rest()
 	elif k.keycode == KEY_X:
 		_toggle_look()
+	elif k.keycode == KEY_M:
+		_show_masks()
 
 
 # ================================================================ overlays
+
+func _show_masks() -> void:
+	if not world.player.has_trait("mask_stances") or overlay != null:
+		return
+	var col := _open_overlay("Masks (risk %d/%d)" % [world.player.mask_risk, World.MASK_RISK_MAX])
+	for mid in Masks.ORDER:
+		var active := world.player.mask == mid
+		var title := "%s (worn)" % Masks.label(mid) if active else Masks.label(mid)
+		var b := _btn(title, func() -> void:
+			_close_overlay()
+			if world.player_switch_mask(mid):
+				_after_action()
+		)
+		b.disabled = active
+		col.add_child(b)
+		col.add_child(_label(Masks.summary(mid), Palette.TEXT_DIM, 0.78))
+	col.add_child(_btn("Close", _close_overlay))
+
 
 ## A modal panel over the game screen. Returns the column to fill.
 func _open_overlay(title: String, title_color: Color = Palette.LUX) -> VBoxContainer:
@@ -798,6 +824,8 @@ func _item_stats(d: Dictionary) -> String:
 			else:
 				var sd := db.get_def("statuses", String(d["status"]))
 				parts.append("Grants %s for %d turns" % [sd["name"], int(sd["duration"])])
+		"relic":
+			parts.append("Work: %s\nTransmute: %s" % [d["work_desc"], d["transmute_desc"]])
 	var mods: Dictionary = d.get("mods", {})
 	for k in mods:
 		parts.append("%s %+d" % [String(k).replace("_", " "), int(mods[k])])
@@ -819,12 +847,23 @@ func _show_item(it: Item, index: int, slot: String) -> void:
 			_after_action())
 		col.add_child(main)
 	else:
-		var verb := "Use" if String(d["kind"]) == "consumable" else "Equip"
-		main = _btn(verb, func() -> void:
-			_close_overlay()
-			world.player_use(index)
-			_after_action())
-		col.add_child(main)
+		if String(d["kind"]) == "relic":
+			main = _btn("Work", func() -> void:
+				_close_overlay()
+				world.player_work_relic(index)
+				_after_action())
+			col.add_child(main)
+			col.add_child(_btn("Transmute", func() -> void:
+				_close_overlay()
+				world.player_transmute_relic(index)
+				_after_action()))
+		else:
+			var verb := "Use" if String(d["kind"]) == "consumable" else "Equip"
+			main = _btn(verb, func() -> void:
+				_close_overlay()
+				world.player_use(index)
+				_after_action())
+			col.add_child(main)
 		col.add_child(_btn("Drop", func() -> void:
 			_close_overlay()
 			world.player_drop(index)
@@ -835,14 +874,16 @@ func _show_item(it: Item, index: int, slot: String) -> void:
 
 func _show_end() -> void:
 	var won := world.state == World.State.WON
-	var col := _open_overlay("You passed through the Unwritten Door." if won else "The record closes over you.",
-		Palette.GOOD if won else Palette.ALERT)
+	var loss := {} if won else world.named_loss()
+	var title := "You passed through the Unwritten Door." if won else "Loss: %s" % String(loss["title"])
+	var col := _open_overlay(title, Palette.GOOD if won else Palette.ALERT)
 	screen = Screen.END
 	var p := world.player
 	var fd := db.floor_for_depth(world.depth)
 	if won:
 		col.add_child(_label("The Sentinel is unmade and the door the Architect never wrote down stands behind you. Beyond it is a dark that is yours.", Palette.LORE))
 	else:
+		col.add_child(_label(String(loss["epitaph"]), Palette.LORE))
 		col.add_child(_label("Slain by %s in %s." % [world.death_cause, fd.get("name", "the dark")], Palette.TEXT))
 	col.add_child(_label("%s, %s %s, level %d. %d turns. Seed %d." % [p.name.left(1).to_upper() + p.name.substr(1), db.get_def("species", p.species_id)["name"],
 		db.get_def("classes", p.class_id)["name"], p.level, world.turns, world.run_seed], Palette.TEXT_DIM, 0.9))

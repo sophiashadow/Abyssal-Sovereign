@@ -54,7 +54,7 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 | `name` | string | yes | |
 | `glyph` | glyph | yes | |
 | `color` | color | yes | |
-| `kind` | enum: weapon, armor, amulet, consumable | yes | slot or use |
+| `kind` | enum: weapon, armor, amulet, consumable, relic | yes | slot or use |
 | `description` | text | yes | |
 | `damage` | dice | weapon | replaces unarmed damage |
 | `accuracy` | int | no | weapon accuracy bonus |
@@ -66,6 +66,11 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 | `heal` | dice | if effect heal | |
 | `status` | ref:statuses | if effect status | |
 | `stackable` | bool | no | identical items share one inventory slot |
+| `work_status` | ref:statuses | relic | status granted when worked |
+| `work_cost_hp` | int ≥ 0 | no | HP paid to work the relic |
+| `work_desc` | text | relic | summary of the work effect |
+| `transmute_mods` | mods | relic | permanent stat changes when transmuted |
+| `transmute_desc` | text | relic | summary of the transmute effect |
 
 ## species
 
@@ -132,3 +137,4 @@ Traits are behaviour implemented in code. Content may only name these:
 - `soul_siphon`: heal 1 + will on each kill.
 - `deathless`: once per floor, a killing blow leaves you at 1 HP.
 - `infernal_blood`: your blows ignore 1 point of defense.
+- `mask_stances`: wear the Masks as stances (Bare Face, Nyx, Eris, Lilith), switching for 1 turn.

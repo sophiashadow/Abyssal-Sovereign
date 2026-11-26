@@ -85,3 +85,11 @@ func _check_floor(m: FloorMap, fd: Dictionary) -> String:
 	if monsters < int(fd["monsters_min"]) / 2:
 		return "too few monsters placed (%d)" % monsters
 	return ""
+
+
+func test_player_starts_beside_up_stairs() -> void:
+	var w := World.new_run(db(), 777, "human", "assassin", "A")
+	var m := w.current_floor()
+	ok(w.player.pos != m.up_pos, "player does not hide up stairs at spawn")
+	ok(Grid.is_adjacent(w.player.pos, m.up_pos), "player starts beside up stairs")
+	ok(m.is_walkable(w.player.pos), "player starts on walkable tile")

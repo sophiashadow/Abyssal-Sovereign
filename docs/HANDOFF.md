@@ -5,11 +5,11 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 ## State as of 2026-11-26
 
 - **Branch:** `ccr-c6f8b898-fu2jtp` on `origin` (github.com/sophiashadow/Abyssal-Sovereign). Not merged; no default branch exists yet. Creating `main` or a PR is an owner decision.
-- **Milestones:** M0 (foundations) and M1 (playable three-floor slice) are implemented and tested on Linux, from source.
-- **Last verified (local, in a Linux container):**
-  - `tools/test.sh`: 59 tests, 59 passed, 0 failed, 1331 checks.
-  - `tools/ui_smoke.gd` under Xvfb: 21 steps, 0 failures at 1280×720 and at 2340×1080.
-  - `tools/soak.gd --salt=heldout`: bot wins 33% of 180 runs.
+- **Milestones:** M0 (foundations), M1 (playable three-floor slice), and M2 (Masks as stances, Eight Chains abilities, Relics, Named losses) are implemented and tested on Linux, from source.
+- **Last verified (local, Linux):**
+  - `tools/test.sh`: 71 tests, 71 passed, 0 failed, 1392 checks.
+  - `tools/ui_smoke.gd` (`1280×720` and `2340×1080` phone settings): 21 steps, 0 failures.
+  - `tools/soak.gd --salt=heldout`: bot wins 39% of 180 runs.
 - **NOT_RUN:** any export build (Linux, Android, Windows, Web), any device test, any human playtest. There is no CI.
 
 ## Setup
@@ -27,25 +27,29 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 - `docs/LORE.md`: every lore element tagged Canon / Interpretation / Proposed, plus excluded material and open owner decisions.
 - `docs/CONTENT_SCHEMA.md`: the JSON content format. A test checks that it matches the code.
 
-## Next assignment: Milestone 2 (needs owner review of each design first)
+## Milestone 2 (done 2026-11-26)
 
-1. **Masks as stances**, which also gives the Occultist a kit. Propose it as a `docs/LORE.md` row tagged Proposed. Implement as a trait plus content, with tests, and confirm on the soak's held-out salt.
-2. **Two Eight Chains enemy abilities**, starting with Isolation and Monopolization of Perception (the fog).
-3. **Relics**, worked or transmuted.
-4. **Named losses** on the death screen.
+1. ~~**Masks as stances**~~ (`Masks`, `mask_stances` trait on Occultist, `SAVE_VERSION := 2` with v1→v2 migration, HUD/`m` key/overlay, `tests/test_masks.gd`).
+2. ~~**Two Eight Chains enemy abilities**~~ (`chain_isolation` on `false_sun_cultist` and `chain_fog` / `perception_fog` on `preliator_sentinel`, tests in `tests/test_ai.gd`).
+3. ~~**Relics, worked or transmuted**~~ (`kind: "relic"` schema + `Confessor's Glass`, `Ophite Key`, `Broken Halo` in `items.json` / `floors.json`, `player_work_relic` / `player_transmute_relic` in `World`, UI buttons in `main.gd`, tests in `tests/test_items.gd`).
+4. ~~**Named losses**~~ (`World.named_loss()` classifying `Gilded`, `Fluent`, and `Catalogued` on the death screen, tests in `tests/test_turns.gd`).
 
-Smaller known defects you can fix without a design decision, each test-first:
+## Next assignment: Milestone 3 (platforms) or Milestone 4 (depth)
 
-- Awake monsters are omniscient: add last-known-position tracking.
-- The player starts on the up stairs, so the `@` hides the `<`.
-- Text scale at phone resolution is unverified: inject `user://settings.cfg` before the smoke and check the screenshots.
+- **Milestone 3 (platforms):** Linux export preset and build; Android debug APK (needs owner SDK license acceptance); release signing (owner keystore outside repo); Windows and Web exports.
+- **Milestone 4 (depth):** Seven Spheres as depth bands with gates, the two Ways as alternative victories, and the Apotheosis ("By Decree") guard/victory.
+
+Smaller known defects (fixed 2026-11-26):
+
+- ~~Awake monsters are omniscient: add last-known-position tracking.~~ (Fixed: monsters pursue last-seen position and lose awareness once they check it and still don't see the player.)
+- ~~The player starts on the up stairs, so the `@` hides the `<`.~~ (Fixed: depth 1 spawns the player adjacent to `<`.)
+- ~~Text scale at phone resolution is unverified: inject `user://settings.cfg` before the smoke and check the screenshots.~~ (Verified at `2340x1080` with `text_scale_index=2`, `tile_size_index=4`, `touch_controls=true`: 21/21 smoke steps passed; HUD, inventory, settings, and map render cleanly, with the character creation screen's bottom action row slightly below the fold in its scroll container.)
 
 ## Owner decisions still open
 
-- Is apotheosis ("By Decree") a winning ending?
-- Is the Unwritten Door canon?
-- Where do the origins and callings sit in the lore?
 - Android SDK license acceptance and a release keystore. The owner creates the keystore and keeps it outside the repo.
+
+*(Resolved 2026-11-26: Apotheosis can be a win; the Unwritten Door is canon; origins and callings are canon. Recorded in `docs/LORE.md`.)*
 
 ## Do not
 

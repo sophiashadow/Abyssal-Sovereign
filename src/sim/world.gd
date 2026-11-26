@@ -10,7 +10,7 @@ extends RefCounted
 ## id 1, so the player wins ties. Player actions return true if they spent
 ## time; the world then runs monsters until it is the player's turn again.
 
-const SAVE_VERSION := 1
+const SAVE_VERSION := 2
 const PLAYER_ID := 1
 const COST_MOVE := 100
 const COST_ATTACK := 100
@@ -18,6 +18,7 @@ const COST_WAIT := 100
 const COST_ITEM := 100
 const COST_STAIRS := 100
 const NOTICE_PCT := 60
+const MASK_RISK_MAX := 12
 const LOG_LIMIT := 300
 ## The player recovers 1 health every this many turns (scaled by the
 ## species' heal_mult: a revenant mends at half speed).
@@ -176,12 +177,20 @@ func _enter_floor(d: int, arriving_from_above: bool) -> void:
 		floors[d] = _build_floor(d)
 	var m := current_floor()
 	var target := m.up_pos if arriving_from_above else m.down_pos
-	player.pos = _nearest_free(m, target)
+	player.pos = _adjacent_free(m, target) if (d == 1 and arriving_from_above) else _nearest_free(m, target)
 	m.actors.insert(0, player)
 	for a in m.actors:
 		if not a.is_player:
 			a.next_time = maxi(a.next_time, time + 1)
 	_player_dist_pos = Vector2i(-99999, -99999)
+
+
+func _adjacent_free(m: FloorMap, p: Vector2i) -> Vector2i:
+	for dir in Grid.DIRS_8:
+		var q := p + dir
+		if m.is_walkable(q) and m.actor_at(q) == null:
+			return q
+	return _nearest_free(m, p)
 
 
 func _nearest_free(m: FloorMap, p: Vector2i) -> Vector2i:
@@ -282,6 +291,8 @@ func player_use(index: int) -> bool:
 	if String(d["kind"]) == "consumable":
 		_consume(player, it, index)
 		return _finish_player_action(COST_ITEM)
+	if String(d["kind"]) == "relic":
+		return player_work_relic(index)
 	var slot := _slot_for(it)
 	player.inventory.remove_at(index)
 	var old := player.equipped(slot)
@@ -292,6 +303,50 @@ func player_use(index: int) -> bool:
 	# Gear that changes max health keeps the same fraction of health.
 	player.hp = clampi(int(roundf(hp_frac * player.stat("max_hp"))), 1, player.stat("max_hp"))
 	log_msg("You ready the %s." % it.display_name(db), "good")
+	return _finish_player_action(COST_ITEM)
+
+
+func player_work_relic(index: int) -> bool:
+	if state != State.PLAYING or index < 0 or index >= player.inventory.size():
+		return false
+	var it := player.inventory[index]
+	var d := it.def(db)
+	if String(d["kind"]) != "relic":
+		return false
+	var sid := String(d["work_status"])
+	var cost := int(d.get("work_cost_hp", 0))
+	if player.has_status(sid):
+		log_msg("The %s is already active." % d["name"])
+		return false
+	if cost > 0 and player.hp <= cost:
+		log_msg("You lack the blood to work the %s." % d["name"], "danger")
+		return false
+	player.hp -= cost
+	apply_status(player, sid)
+	if sid == "confessors_clarity" and player.has_status("perception_fog"):
+		_remove_status(player, "perception_fog")
+		log_msg("The grey fog parts.", "good")
+	update_fov()
+	var msg := "You work the %s (-%d HP)." % [d["name"], cost] if cost > 0 else "You work the %s." % d["name"]
+	log_msg(msg, "good")
+	return _finish_player_action(COST_ITEM)
+
+
+func player_transmute_relic(index: int) -> bool:
+	if state != State.PLAYING or index < 0 or index >= player.inventory.size():
+		return false
+	var it := player.inventory[index]
+	var d := it.def(db)
+	if String(d["kind"]) != "relic":
+		return false
+	var mods: Dictionary = d.get("transmute_mods", {})
+	for k in mods:
+		player.base[k] = int(player.base.get(k, 0)) + int(mods[k])
+	if mods.has("max_hp") and int(mods["max_hp"]) > 0:
+		player.hp = mini(player.stat("max_hp"), player.hp + int(mods["max_hp"]))
+	player.inventory.remove_at(index)
+	update_fov()
+	log_msg("You transmute the %s; its power stays with you." % d["name"], "lore")
 	return _finish_player_action(COST_ITEM)
 
 
@@ -331,6 +386,22 @@ func player_stairs() -> bool:
 		return _finish_player_action(COST_STAIRS)
 	log_msg("There are no stairs here.")
 	return false
+
+
+func player_switch_mask(mask_id: String) -> bool:
+	if state != State.PLAYING or not player.has_trait("mask_stances") or not Masks.is_valid(mask_id):
+		return false
+	if player.mask == mask_id:
+		return false
+	player.mask = mask_id
+	if mask_id == "bare_face":
+		player.mask_risk = maxi(0, player.mask_risk - 2)
+		log_msg("You drop the Mask and wear your Bare Face.", "info")
+	else:
+		player.mask_risk = maxi(0, player.mask_risk - 3)
+		log_msg("You put on %s." % Masks.label(mask_id), "good")
+	update_fov()
+	return _finish_player_action(COST_WAIT)
 
 
 func _finish_player_action(cost: int) -> bool:
@@ -373,12 +444,32 @@ func _next_actor() -> Actor:
 
 func _begin_player_turn() -> void:
 	_tick_statuses(player)
+	_tick_mask()
 	_natural_regen()
 	update_fov()
 
 
+func _tick_mask() -> void:
+	if turns <= 0 or not player.has_trait("mask_stances"):
+		return
+	if player.mask == "bare_face":
+		player.mask_risk = maxi(0, player.mask_risk - 2)
+		return
+	player.mask_risk += 1
+	if player.mask_risk >= MASK_RISK_MAX:
+		var old_mask := player.mask
+		var sid := Masks.seizure_status(old_mask)
+		player.mask = "bare_face"
+		player.mask_risk = 0
+		if sid != "":
+			apply_status(player, sid)
+		log_msg("%s seizes and tears away!" % Masks.label(old_mask), "danger")
+
+
 func _natural_regen() -> void:
 	if turns <= 0 or player.hp >= player.stat("max_hp"):
+		return
+	if (player.has_trait("mask_stances") and player.mask == "eris") or player.has_status("isolation"):
 		return
 	var mult := float(db.get_def("species", player.species_id).get("heal_mult", 1.0))
 	var interval := maxi(1, int(roundf(REGEN_TURNS / maxf(mult, 0.1))))
@@ -386,9 +477,11 @@ func _natural_regen() -> void:
 		player.hp += 1
 
 
-## True when resting is safe: no hostile in view and health not full.
+## True when resting is safe: no hostile in view, not isolated, and health not full.
 func can_rest() -> bool:
-	return state == State.PLAYING and visible_hostiles().is_empty() and player.hp < player.stat("max_hp")
+	if state != State.PLAYING or player.has_status("isolation"):
+		return false
+	return visible_hostiles().is_empty() and player.hp < player.stat("max_hp")
 
 
 ## Waits repeatedly until health is full, a hostile comes into view, or
@@ -450,22 +543,68 @@ func _remove_status(a: Actor, sid: String) -> void:
 
 # ---------------------------------------------------------------- monsters
 
+func _monster_sees_player(m: FloorMap, mon: Actor) -> bool:
+	return m.is_visible(mon.pos) and Grid.chebyshev(mon.pos, player.pos) <= mon.stat("sight")
+
+
+func _remember_player(mon: Actor) -> void:
+	mon.flags["seen_x"] = player.pos.x
+	mon.flags["seen_y"] = player.pos.y
+
+
+func _forget_player(mon: Actor) -> void:
+	mon.awake = false
+	mon.flags.erase("seen_x")
+	mon.flags.erase("seen_y")
+
+
 func _monster_turn(mon: Actor) -> int:
 	var m := current_floor()
 	if not mon.awake:
 		var dist := Grid.chebyshev(mon.pos, player.pos)
-		if m.is_visible(mon.pos) and dist <= mon.stat("perception") and rng.chance_pct(NOTICE_PCT):
+		var perc := mon.stat("perception")
+		var notice_pct := NOTICE_PCT
+		if player.has_trait("mask_stances"):
+			if player.mask == "lilith":
+				perc += 2
+			elif player.mask == "nyx":
+				notice_pct = NOTICE_PCT / 2
+		if _monster_sees_player(m, mon) and dist <= perc and rng.chance_pct(notice_pct):
 			mon.awake = true
+			_remember_player(mon)
 			log_msg("The %s notices you." % mon.name, "danger")
 		return COST_WAIT
+	var sees := _monster_sees_player(m, mon)
+	if sees:
+		_remember_player(mon)
+	var fog_cd := int(mon.flags.get("fog_cd", 0))
+	if fog_cd > 0:
+		mon.flags["fog_cd"] = fog_cd - 1
+	if mon.tags.has("chain_fog") and sees and fog_cd <= 0 and not player.has_status("perception_fog") and Grid.chebyshev(mon.pos, player.pos) <= 5 and rng.chance_pct(50):
+		mon.flags["fog_cd"] = 8
+		apply_status(player, "perception_fog")
+		update_fov()
+		log_msg("The %s recites a narrowing litany; the dark closes in." % mon.name, "danger")
+		return COST_WAIT
 	if Grid.is_adjacent(mon.pos, player.pos) and m.can_step(mon.pos, player.pos):
+		_remember_player(mon)
 		_attack(mon, player)
 		return COST_ATTACK
-	var dmap := player_distance_map()
+	var target := player.pos
+	if mon.flags.has("seen_x") and mon.flags.has("seen_y"):
+		target = Vector2i(int(mon.flags["seen_x"]), int(mon.flags["seen_y"]))
+	else:
+		_remember_player(mon)
+	if mon.pos == target and not sees:
+		_forget_player(mon)
+		return COST_WAIT
+	var dmap := player_distance_map() if target == player.pos else Pathing.distance_map(m, target)
 	var blocked := func(p: Vector2i) -> bool: return m.actor_at(p) != null
 	var step := Pathing.step_down(m, dmap, mon.pos, blocked)
 	if step != mon.pos:
 		mon.pos = step
+		if mon.pos == target and not _monster_sees_player(m, mon):
+			_forget_player(mon)
 		return COST_MOVE
 	return COST_WAIT
 
@@ -481,6 +620,8 @@ func player_distance_map() -> PackedInt32Array:
 
 func _attack(attacker: Actor, defender: Actor) -> void:
 	defender.awake = true
+	if attacker.is_player and not defender.is_player:
+		_remember_player(defender)
 	var r := Combat.resolve(attacker, defender, rng)
 	var who := "You" if attacker.is_player else "The %s" % attacker.name
 	var whom := "you" if defender.is_player else "the %s" % defender.name
@@ -493,6 +634,8 @@ func _attack(attacker: Actor, defender: Actor) -> void:
 	var crit_note := " A grievous wound!" if r["crit"] else ""
 	log_msg("%s %s %s for %d.%s" % [who, verb, whom, r["damage"], crit_note], "danger" if defender.is_player else "combat")
 	apply_damage(defender, int(r["damage"]), attacker.name)
+	if not attacker.is_player and defender.is_player and defender.is_alive() and attacker.tags.has("chain_isolation") and not defender.has_status("isolation") and rng.chance_pct(35):
+		apply_status(defender, "isolation")
 
 
 func apply_damage(target: Actor, amount: int, source: String) -> void:
@@ -523,7 +666,7 @@ func _kill_monster(mon: Actor) -> void:
 	log_msg("The %s is destroyed." % mon.name, "good")
 	var sp := db.get_def("species", player.species_id)
 	gain_xp(int(roundf(mon.xp_value * float(sp.get("xp_mult", 1.0)))))
-	if player.has_trait("soul_siphon"):
+	if player.has_trait("soul_siphon") and not player.has_status("isolation"):
 		var heal := 1 + maxi(0, player.stat("will"))
 		player.hp = mini(player.stat("max_hp"), player.hp + heal)
 	if mon.tags.has("guardian") and m.exit_pos.x >= 0 and m.get_tile(m.exit_pos) == Tiles.DOOR_SEALED:
@@ -643,6 +786,26 @@ func _win() -> void:
 	log_msg("You step through the Unwritten Door, into a dark the Architect never mapped.", "lore")
 
 
+func named_loss() -> Dictionary:
+	if player.has_status("false_light") or player.has_status("reckoning"):
+		return {
+			"id": "gilded",
+			"title": "Gilded",
+			"epitaph": "The False Light collected in full. Your name is entered in gold ink.",
+		}
+	if player.has_status("dissolution") or player.has_status("isolation") or player.has_status("exposure") or player.has_status("perception_fog"):
+		return {
+			"id": "fluent",
+			"title": "Fluent",
+			"epitaph": "You learned the Dominion's grammar too well; its chains closed before you could step free.",
+		}
+	return {
+		"id": "catalogued",
+		"title": "Catalogued",
+		"epitaph": "The record closes over you. Another tithe number filed beneath Terra Tenebrae.",
+	}
+
+
 # ---------------------------------------------------------------- persistence
 
 func to_dict() -> Dictionary:
@@ -663,12 +826,37 @@ func to_dict() -> Dictionary:
 	}
 
 
+static func _migrate(d: Dictionary) -> Dictionary:
+	var ver := int(d.get("save_version", -1))
+	if ver == 1:
+		var out := d.duplicate(true)
+		out["save_version"] = 2
+		if typeof(out.get("player")) == TYPE_DICTIONARY:
+			out["player"]["mask"] = out["player"].get("mask", "bare_face")
+			out["player"]["mask_risk"] = int(out["player"].get("mask_risk", 0))
+		if typeof(out.get("floors")) == TYPE_DICTIONARY:
+			for k in out["floors"]:
+				var fl = out["floors"][k]
+				if typeof(fl) == TYPE_DICTIONARY and typeof(fl.get("actors")) == TYPE_ARRAY:
+					for a in fl["actors"]:
+						if typeof(a) == TYPE_DICTIONARY:
+							a["mask"] = a.get("mask", "bare_face")
+							a["mask_risk"] = int(a.get("mask_risk", 0))
+		return out
+	return d
+
+
 ## Rebuilds a run from to_dict() output. Returns null and fills `errors`
 ## if the data cannot be used; never returns a half-built world.
 static func from_dict(content: ContentDB, d: Dictionary, errors: PackedStringArray) -> World:
-	if int(d.get("save_version", -1)) != SAVE_VERSION:
+	if typeof(d) != TYPE_DICTIONARY:
+		errors.append("save is not an object")
+		return null
+	var raw_ver := int(d.get("save_version", -1))
+	if raw_ver < 1 or raw_ver > SAVE_VERSION:
 		errors.append("save version %s is not supported (expected %d)" % [str(Actor._ints(d.get("save_version"))), SAVE_VERSION])
 		return null
+	d = _migrate(d)
 	for key in ["seed", "depth", "time", "turns", "state", "next_id", "rng", "player", "floors", "log"]:
 		if not d.has(key):
 			errors.append("save is missing '%s'" % key)

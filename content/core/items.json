@@ -34,6 +34,19 @@
     {"id": "bone_tincture", "name": "bone tincture", "glyph": "!", "color": "#aab6c8", "kind": "consumable",
      "description": "Bitter, cold and slow to act, but it mends what salve cannot.", "effect": "heal", "heal": "4d4+4", "stackable": true},
     {"id": "vial_of_false_light", "name": "vial of false light", "glyph": "!", "color": "#f2c35c", "kind": "consumable",
-     "description": "Liquid relief from the false sun. It helps at once. Then it collects.", "effect": "status", "status": "false_light", "stackable": true}
+     "description": "Liquid relief from the false sun. It helps at once. Then it collects.", "effect": "status", "status": "false_light", "stackable": true},
+
+    {"id": "confessors_glass", "name": "Confessor's Glass", "glyph": "*", "color": "#78bea7", "kind": "relic",
+     "description": "A lensground pane from an old confessional. Looking through it hurts the eyes and leaves nothing hidden.",
+     "work_status": "confessors_clarity", "work_cost_hp": 3, "work_desc": "Pay 3 HP: +3 accuracy, +3 sight for 12 turns (clears fog).",
+     "transmute_mods": {"sight": 1, "accuracy": 1}, "transmute_desc": "Destroy relic: permanently +1 sight, +1 accuracy."},
+    {"id": "ophite_key", "name": "Ophite Key", "glyph": "*", "color": "#8f7ae0", "kind": "relic",
+     "description": "A cold bronze key bitten by green salt. It turns in locks that have no door.",
+     "work_status": "ophite_insight", "work_cost_hp": 3, "work_desc": "Pay 3 HP: +3 evasion, +15% crit for 12 turns.",
+     "transmute_mods": {"agility": 1, "evasion": 1}, "transmute_desc": "Destroy relic: permanently +1 agility, +1 evasion."},
+    {"id": "broken_halo", "name": "Broken Halo", "glyph": "*", "color": "#f2c35c", "kind": "relic",
+     "description": "Half a crown of gilt iron, snapped clean across the brow.",
+     "work_status": "halo_aegis", "work_cost_hp": 4, "work_desc": "Pay 4 HP: +3 defense, +1 damage for 12 turns.",
+     "transmute_mods": {"max_hp": 6, "defense": 1}, "transmute_desc": "Destroy relic: permanently +6 max HP, +1 defense."}
   ]
 }

@@ -36,7 +36,7 @@ The expansions already label some of their own content as proposals. Where they 
 | The Warrens | Canon | Rulebook §1.4 ("not a dungeon") |
 | **The descent goes *beneath* the Warrens** (ossuaries, tithe vaults, a sealed stair) | Interpretation | The rulebook says the Warrens are not a dungeon. So the dungeon here is set below them, in places the record has buried. This avoids contradicting §1.4. |
 | "You do not clear Terra Tenebrae. You survive it, unwork it, and get free of it." | Canon | Rulebook §1. It shapes the M1 victory: escape, not conquest. |
-| **Victory: through the Unwritten Door** past the Preliator Sentinel | Proposed (in game) | An escape ending in the spirit of EXODUS's "A Door They Can't Close". The door "the Architect never wrote down" is new. It implies the Architect's record has gaps, without saying why. |
+| **Victory: through the Unwritten Door** past the Preliator Sentinel | Canon | Owner decision (2026-11-26): the Unwritten Door is canon. Escape ending in the spirit of EXODUS's "A Door They Can't Close"; implies the Architect's record has gaps without saying why. |
 | False Light status: relief, then the Reckoning | Canon-derived | Rulebook §7 (Communion, then the Reckoning). Simplified to accuracy, damage and regeneration up, then a longer penalty. The exact numbers are Proposed. |
 | Vial of false light ("It helps at once. Then it collects.") | Proposed (in game) | An item that delivers the §7 mechanism |
 | The Eye; Lilith as the one who left | Canon | Rulebook §1.3, §9 (Lilith: the Eye) |
@@ -44,8 +44,12 @@ The expansions already label some of their own content as proposals. Where they 
 | Catalogued dead; tithe numbers; the record | Interpretation | The Inquisition would "catalogue you rather than strike your name" (EXODUS), turned into undead that keep their appointments |
 | Cultists of the false sun | Interpretation | Devotees of Prosay's radiance (rulebook §7). They believe the suffering they inflict is holy duty, a §14 "Occasional Indulgences / Demonstrating Omnipotence" register. They are presented as people under a mechanism, not as evil by nature. |
 | Preliator Sentinel (guardian) | Proposed (in game) | A warden of the Dominion: "measured, tireless, sure it is holy". It is new as a named enemy. |
-| Species: Human, Revenant, Cambion | Proposed (in game) | Named in the owner's founding brief. Their placement here (registered living, catalogued dead who refused the record, born of a contract beneath the Geometry) is Proposed. |
-| Classes: Fallen Knight, Occultist, Assassin | Proposed (in game) | Named in the brief. Their ties to the Dominion, the Eye and the tithe-alleys are Proposed. |
+| Species: Human, Revenant, Cambion | Canon | Owner decision (2026-11-26): origins are canon. Placement here: registered living, catalogued dead who refused the record, born of a contract beneath the Geometry. |
+| Classes: Fallen Knight, Occultist, Assassin | Canon | Owner decision (2026-11-26): callings are canon. Ties to the Dominion, the Eye and the tithe-alleys. |
+| **Masks as stances** (Bare Face, Nyx, Eris, Lilith) | Proposed (in game) | Rulebook §9 ("a department of one sovereign", "Governance is the true stat"). Occultist switches stance for 1 turn; holding a Mask builds risk toward seizure (Dissolution, Isolation, Exposure). |
+| **Eight Chains enemy abilities** (`chain_isolation`, `chain_fog`) | Canon-derived | Rulebook §14 (Isolation and Monopolization of Perception). Dominion foes inflict Isolation (suppresses rest, regen and soul siphon) and Monopolized Sight (fog shrinking FOV). |
+| **Relics: Work or Transmute** (Confessor's Glass, Ophite Key, Broken Halo) | Proposed (in game) | Names and Work-or-Transmute frame from EXODUS; specific effects are Proposed. |
+| **Named losses** (Catalogued, Fluent, Gilded) | Proposed (in game) | Names from EXODUS; death screen classifies how the record claimed the run. |
 | Palette: void, Lux magenta, record parchment, false-sun gold, mask hues | Canon (visual) | FALSE LIGHT visual identity. Colours are used only as hex values. |
 
 ## Candidates for later milestones (not built; not canon)
@@ -62,11 +66,13 @@ These turn source metaphysics into mechanics. Each needs owner review before it 
 | **Relics: Work or Transmute** | Expansion (EXODUS): the Confessor's Glass, the Ophite Key, the Broken Halo, the Severed Crown, the Ward-Keeper's Lamp, the Almoner's Purse | Each relic has two uses: work it (power with a cost) or transmute it (give up the power for something lasting) | Relic effects are Proposed. Only names and the two-use frame are sourced. |
 | **Losses with names** | Expansion (EXODUS): Catalogued, Fluent, Gilded | Death screens that name how the record won, beyond hit points | None |
 
-## Owner decisions needed
+## Owner decisions
 
-1. **An "apotheosis" victory.** The founding brief invites alternative victories, and "Sovereign" is in the title. The rulebook, however, treats becoming the light as the trap (§2: "You orient toward the light. You do not become it."; §10.4). The proposal is a crown ending in the shape of EXODUS's "By Decree": "You won. That's the problem." It would be a hollow victory, explicitly marked as the Architect's shape wearing your face. It would not be a triumphant ascension. Not built until the owner decides.
-2. **Whether the Unwritten Door may be canon for FALSE LIGHT as well**, or stays specific to this game.
-3. **Species and class lore placement** (table above). It is currently Proposed and live in the M1 text.
+Resolved (2026-11-26):
+
+1. **An "apotheosis" victory:** Owner confirmed Apotheosis can be a win. Follows the shape of EXODUS's "By Decree" and rulebook §10.4 ("a smaller Rex Mundi wearing your face")—a hollow victory rather than a triumphant ascension.
+2. **The Unwritten Door:** Owner confirmed it is canon.
+3. **Origins (species) and callings (classes):** Owner confirmed they are canon.
 
 ## Excluded
 
