@@ -183,3 +183,15 @@ M6.2 expands the bestiary to `76` archetypes across `10` families including `15`
 | `human` | `40 / 45` (`89%`) | — | `assassin` 14/15, `occultist` 15/15, `fallen_knight` 11/15 |
 | `cambion` | `31 / 45` (`69%`) | — | `assassin` 12/15, `occultist` 12/15, `fallen_knight` 7/15 |
 | `revenant` | `33 / 45` (`73%`) | — | `assassin` 10/15, `occultist` 13/15, `fallen_knight` 10/15 |
+
+## M6.3 — Origins and Callings
+
+M6.3 expands character creation to `8` origins (adding `ashborn`, `veilkin`, `ironbound_ward`, `unrecorded`, `penitent`) and `8` callings (adding `preliator_warden`, `tithe_marksman`, `rite_weaver`, `false_light_alchemist`, `ophite_binder`), `10` new traits, `104` talents across `24` trees (`13` per calling), `ward_sigil` + `snare` tactical features, and compact Android-readable origin/calling pills while reusing `stamina`/`resonance`/`poise`.
+
+### Measured Balance (M6.3 held-out soak, `tools/soak.gd --seeds=2 --salt=heldout`, `128` runs)
+
+| Scope | Wins / Runs | Mean Turns | Notes |
+|---|---:|---:|---|
+| Overall | `88 / 128` (`69%`) | `918` | All `64` origin×calling pairs sampled (`2` seeds each) |
+| Callings | — | — | `Alchemist 15/16`, `Warden 14/16`, `Knight 12/16`, `Assassin 12/16`, `Arbalester 12/16`, `Occultist 11/16`, `Ophite Binder 9/16`, `Rite Cantor 3/16` |
+| Origins | — | — | `human 13/16`, `ironbound_ward 12/16`, `unrecorded 12/16`, `ashborn 11/16`, `penitent 11/16`, `cambion 10/16`, `revenant 10/16`, `veilkin 9/16` |

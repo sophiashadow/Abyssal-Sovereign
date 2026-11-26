@@ -10,6 +10,21 @@
      "attributes": {"might": 2, "agility": 0, "will": 1}, "hp": 6, "hp_per_level": 2, "heal_mult": 0.5, "resists": {"cold": 50, "void": 25, "radiant": -25}, "traits": ["deathless"]},
     {"id": "cambion", "name": "Cambion",
      "description": "Born of a contract signed beneath the Geometry. Their blows find the gaps in any armor. Resists Fire (+50%) and Void (+25%), vulnerable to Cold (-25%).",
-     "attributes": {"might": 1, "agility": 1, "will": 2}, "hp": 3, "hp_per_level": 1, "resists": {"fire": 50, "void": 25, "cold": -25}, "traits": ["infernal_blood"]}
+     "attributes": {"might": 1, "agility": 1, "will": 2}, "hp": 3, "hp_per_level": 1, "resists": {"fire": 50, "void": 25, "cold": -25}, "traits": ["infernal_blood"]},
+    {"id": "ashborn", "name": "Ash-Marked",
+     "description": "Scoured in the Sun-House flues until fire answered back. Immune to embers; burning mends +1 HP/turn and fire blows deal +1 damage.",
+     "attributes": {"might": 2, "agility": 0, "will": 1}, "hp": 5, "hp_per_level": 2, "resists": {"fire": 50, "cold": -25}, "traits": ["cinder_born"]},
+    {"id": "veilkin", "name": "Veil-Touched",
+     "description": "Long dwellers along the Ophite seams. Immune to Monopolized Sight and passively spots hidden traps and secret doors.",
+     "attributes": {"might": 0, "agility": 1, "will": 2}, "hp": 3, "hp_per_level": 1, "mods": {"sight": 1}, "resists": {"void": 35, "radiant": -25}, "traits": ["liminal_sight"]},
+    {"id": "ironbound_ward", "name": "Iron-Vowed",
+     "description": "Forged to carry sealed decrees without flinching. Immune to Pinned and gains +1 Subjugation threshold, at a slight step cost.",
+     "attributes": {"might": 2, "agility": 0, "will": 1}, "hp": 7, "hp_per_level": 2, "mods": {"speed": -5}, "resists": {"physical": 15, "cold": 20}, "traits": ["ledger_forged"]},
+    {"id": "unrecorded", "name": "Unrecorded",
+     "description": "Struck off every census before birth. Foes miss 10% more often and notice 20% less easily.",
+     "attributes": {"might": 0, "agility": 2, "will": 1}, "hp": 3, "hp_per_level": 1, "resists": {"void": 25}, "traits": ["unfiled"]},
+    {"id": "penitent", "name": "Debt-Sworn",
+     "description": "Carries an open tally in blood and breath. Working a Relic or suffering a Chain restores +2 class resource and +1 HP.",
+     "attributes": {"might": 1, "agility": 1, "will": 1}, "hp": 5, "hp_per_level": 1, "resists": {"radiant": 20}, "traits": ["penance_vigor"]}
   ]
 }

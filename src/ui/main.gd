@@ -193,7 +193,7 @@ func _show_title() -> void:
 	col.add_child(_btn("Settings", func() -> void: _show_settings(_show_title)))
 	if not OS.has_feature("web"):
 		col.add_child(_btn("Quit", func() -> void: get_tree().quit()))
-	var foot := _label("Set in the world of FALSE LIGHT. v0.6 (M6.1 The Atlas)", Palette.TEXT_DIM, 0.75)
+	var foot := _label("Set in the world of FALSE LIGHT. v0.6 (M6.3 Origins & Callings)", Palette.TEXT_DIM, 0.75)
 	foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(foot)
 
@@ -234,28 +234,29 @@ func _show_create() -> void:
 		_pick_species = db.ids("species")[0]
 	if _pick_class == "":
 		_pick_class = db.ids("classes")[0]
-	var col := _menu_column(900.0)
-	col.add_child(_label("Who descends?", Palette.LUX, 1.5))
+	var col := _menu_column(1080.0)
+	col.add_theme_constant_override("separation", int(8 * settings.text_scale()))
+	col.add_child(_label("Who descends?", Palette.LUX, 1.4))
 
 	var name_edit := LineEdit.new()
 	name_edit.placeholder_text = "Name (optional)"
 	name_edit.max_length = 24
-	name_edit.custom_minimum_size.y = 48.0 * settings.text_scale()
+	name_edit.custom_minimum_size.y = 44.0 * settings.text_scale()
 	col.add_child(name_edit)
 
-	col.add_child(_label("Origin", Palette.GOLD, 1.1))
-	var sp_desc := _label("", Palette.TEXT_DIM, 0.9)
+	col.add_child(_label("Origin", Palette.GOLD, 1.05))
+	var sp_desc := _label("", Palette.TEXT_DIM, 0.85)
 	col.add_child(_choice_row("species", sp_desc))
 	col.add_child(sp_desc)
 
-	col.add_child(_label("Calling", Palette.GOLD, 1.1))
-	var cl_desc := _label("", Palette.TEXT_DIM, 0.9)
+	col.add_child(_label("Calling", Palette.GOLD, 1.05))
+	var cl_desc := _label("", Palette.TEXT_DIM, 0.85)
 	col.add_child(_choice_row("classes", cl_desc))
 	col.add_child(cl_desc)
 
 	var seed_edit := LineEdit.new()
 	seed_edit.placeholder_text = "Seed (blank for random)"
-	seed_edit.custom_minimum_size.y = 48.0 * settings.text_scale()
+	seed_edit.custom_minimum_size.y = 44.0 * settings.text_scale()
 	col.add_child(seed_edit)
 
 	var row := HBoxContainer.new()
@@ -273,8 +274,8 @@ func _show_create() -> void:
 
 func _choice_row(kind: String, desc: Label) -> Control:
 	var flow := HFlowContainer.new()
-	flow.add_theme_constant_override("h_separation", 10)
-	flow.add_theme_constant_override("v_separation", 10)
+	flow.add_theme_constant_override("h_separation", 8)
+	flow.add_theme_constant_override("v_separation", 8)
 	var group := ButtonGroup.new()
 	for id in db.ids(kind):
 		var d := db.get_def(kind, id)
@@ -282,7 +283,7 @@ func _choice_row(kind: String, desc: Label) -> Control:
 		b.toggle_mode = true
 		b.button_group = group
 		b.text = String(d["name"])
-		b.custom_minimum_size = Vector2(200.0 * settings.text_scale(), 52.0 * settings.text_scale())
+		b.custom_minimum_size = Vector2(172.0 * settings.text_scale(), 44.0 * settings.text_scale())
 		var current := _pick_species if kind == "species" else _pick_class
 		b.button_pressed = id == current
 		b.toggled.connect(func(on: bool) -> void:
@@ -592,7 +593,8 @@ func _act_fire() -> void:
 		_after_action()
 		return
 	var d := w.def(db)
-	_start_aim("fire", {"range": int(d.get("range", 5)), "name": String(d["name"]),
+	var r_bonus := 1 if world.player.has_trait("steady_aim") else 0
+	_start_aim("fire", {"range": int(d.get("range", 5)) + r_bonus, "name": String(d["name"]),
 		"acc": int(d.get("accuracy", 0)), "dtype": String(d.get("damage_type", "physical"))})
 
 
@@ -1372,7 +1374,8 @@ func _show_item(it: Item, index: int, slot: String) -> void:
 		elif String(d["kind"]) == "consumable" and String(d.get("effect", "")) == "projectile":
 			main = _btn("Throw", func() -> void:
 				_close_overlay()
-				_start_aim("item", {"index": index, "range": int(d.get("range", 4)), "name": world.item_name(it),
+				var r_bonus := 1 if world.player.has_trait("steady_aim") else 0
+				_start_aim("item", {"index": index, "range": int(d.get("range", 4)) + r_bonus, "name": world.item_name(it),
 					"acc": 2, "dtype": String(d.get("damage_type", "physical"))}))
 			col.add_child(main)
 		elif String(d["kind"]) == "consumable" and String(d.get("effect", "")) == "scroll" and not (String(d.get("spell", "")) in ["cinder_ward", "identify", "unbind"]):

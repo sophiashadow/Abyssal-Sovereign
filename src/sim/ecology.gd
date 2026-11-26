@@ -9,6 +9,7 @@ const TRAPS := {
 	"cinder": {"name": "cinder-wire trap", "damage": "1d6+2", "damage_type": "fire", "status": "burning"},
 	"rime": {"name": "rime-seal trap", "damage": "1d6+1", "damage_type": "cold", "status": "chilled"},
 	"shackle": {"name": "shackle-snare trap", "damage": "1d4+1", "damage_type": "physical", "status": "pinned"},
+	"snare": {"name": "ophite snare", "damage": "1d6+2", "damage_type": "void", "status": "pinned"},
 }
 
 const HAZARDS := {
@@ -96,6 +97,8 @@ static func glyph(feat: Dictionary) -> String:
 			return "%"
 		"challenge":
 			return "!"
+		"ward_sigil":
+			return "*"
 	return "?"
 
 
@@ -121,6 +124,8 @@ static func color(feat: Dictionary) -> String:
 			return "#c77dff"
 		"challenge":
 			return "#ff7a33"
+		"ward_sigil":
+			return "#c77dff"
 	return "#eee5d3"
 
 
@@ -145,6 +150,8 @@ static func label(feat: Dictionary) -> String:
 			return "Lectern of Rites"
 		"challenge":
 			return "Trial Bell Monolith" + (" (rung)" if bool(feat.get("used", false)) else "")
+		"ward_sigil":
+			return "Ophite Ward-Sigil"
 	return "feature"
 
 
@@ -168,6 +175,8 @@ static func description(feat: Dictionary) -> String:
 			return "A black-lacquered lectern open to the rites of the Two Ways. Sign a divine contract: a boon now, an oath to keep, a reward if you do."
 		"challenge":
 			return "An iron bell inscribed 'RING TO PROVE WORTH'. Summons an ambush for elite plunder and growth."
+		"ward_sigil":
+			return "A humming geometric ward that strikes adjacent foes with Void."
 	return ""
 
 

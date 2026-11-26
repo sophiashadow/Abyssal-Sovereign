@@ -25,7 +25,8 @@ func step() -> bool:
 	var p := world.player
 	var m := world.current_floor()
 	while p.stat_points > 0:
-		var attr := "might" if p.class_id == "fallen_knight" else ("will" if p.class_id == "occultist" else "agility")
+		var rk := p.resource_kind()
+		var attr := "might" if rk == "stamina" else ("will" if rk == "resonance" else "agility")
 		if not world.player_spend_stat(attr):
 			break
 	while p.talent_points > 0:
@@ -257,10 +258,11 @@ func _try_combat_talent(foe: Actor) -> bool:
 	if p.has_status("reckoning") and p.hp * 2 < p.stat("max_hp") and _can_use_talent("transmute_pain"):
 		return world.player_use_talent("transmute_pain")
 	if p.hp * 2 < p.stat("max_hp"):
-		for def_tid in ["unyielding_march", "shield_brace"]:
+		for def_tid in ["unyielding_march", "shield_brace", "unbroken_wall", "iron_posture", "threshold_hold", "volatile_salve", "cleanse_vapor", "quiet_absolution", "sanctify_ground"]:
 			if _can_use_talent(def_tid):
 				return world.player_use_talent(def_tid)
-	for off_tid in ["coup_de_grace", "flurry", "arterial_cut", "sunder_strike", "iron_cleave", "gaze_of_lilith", "siphon_surge", "unmake_record", "defiant_decree"]:
+	for off_tid in ["coup_de_grace", "flurry", "arterial_cut", "sunder_strike", "iron_cleave", "gaze_of_lilith", "siphon_surge", "unmake_record", "defiant_decree",
+			"bulwark_slam", "warden_bash", "counter_sweep", "summon_ward_sigil", "ophite_ward", "place_snare", "unmaking_chorus", "margin_collapse"]:
 		if _can_use_talent(off_tid):
 			return world.player_use_talent(off_tid)
 	return false
@@ -268,7 +270,9 @@ func _try_combat_talent(foe: Actor) -> bool:
 
 func _try_ranged_talent(foe: Actor) -> bool:
 	var dist := Grid.chebyshev(world.player.pos, foe.pos)
-	for tid in ["crippling_shot", "vanguard_charge", "unmake_record", "gaze_of_lilith", "siphon_surge", "shadow_step", "defiant_decree"]:
+	for tid in ["crippling_shot", "vanguard_charge", "siege_breaker", "unmake_record", "erasure_seal", "gaze_of_lilith", "siphon_surge", "void_tether", "caustic_bolt", "shadow_step", "defiant_decree",
+			"execution_bolt", "twin_quarrel", "piercing_bolt", "barbed_quarrel", "beacon_shot", "snare_shot", "pinning_volley",
+			"hex_sigil", "serpent_hex", "radiant_rebuke", "solar_distillate", "null_litany", "alchemical_bomb", "frost_tincture", "thermal_catalysis", "chain_shackle", "warden_challenge"]:
 		if _can_use_talent(tid) and dist <= int(world.db.get_def("talents", tid).get("range", 0)):
 			return world.player_use_talent(tid, foe.pos)
 	return false

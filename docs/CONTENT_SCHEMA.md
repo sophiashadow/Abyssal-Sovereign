@@ -204,3 +204,13 @@ Traits are behaviour implemented in code. Content may only name these:
 - `infernal_blood`: your blows ignore 1 point of defense.
 - `mask_stances`: wear the Masks as stances (Bare Face, Nyx, Eris, Lilith), switching for 1 turn.
 - `adaptable`: starts with +1 attribute point and gains a bonus talent point at levels 3 and 6.
+- `cinder_born`: immune to embers; burning mends +1 HP/turn and fire blows deal +1 damage.
+- `liminal_sight`: immune to Monopolized Sight and passively spots hidden traps and secret doors.
+- `ledger_forged`: immune to Pinned and +1 Subjugation threshold.
+- `unfiled`: hostile attacks lose 10% hit chance and unaware foes notice 20% less easily.
+- `penance_vigor`: working a Relic or taking a Chain restores +2 resource and +1 HP.
+- `bulwark_stance`: reduces ranged/special damage by 25% while Braced or waiting and adds +1 defense while Braced.
+- `steady_aim`: ranged weapons and thrown projectiles gain +2 accuracy, +1 range, and pierce 1 defense.
+- `ritual_cadence`: scrolls and dungeon rites restore +4 Resonance and grant Braced.
+- `alchemical_potency`: healing items and thrown flasks gain +35% potency and Reckoning fades 10 turns sooner.
+- `chain_binder`: debuffing active talents reduce Subjugation by 1.

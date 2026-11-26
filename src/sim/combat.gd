@@ -11,13 +11,21 @@ const HIT_PER_POINT := 5
 
 
 static func hit_chance(attacker: Actor, defender: Actor) -> int:
-	return clampi(BASE_HIT + HIT_PER_POINT * (attacker.stat("accuracy") - defender.stat("evasion")), 5, 95)
+	var pct := BASE_HIT + HIT_PER_POINT * (attacker.stat("accuracy") - defender.stat("evasion"))
+	if defender.has_trait("unfiled"):
+		pct -= 10
+	return clampi(pct, 5, 95)
 
 
 static func ranged_hit_chance(attacker: Actor, defender: Actor, dist: int, item_acc: int, dmg_type: String) -> int:
 	var attr := attacker.stat("will") if dmg_type != "physical" else attacker.stat("agility")
 	var acc := int(attacker.base.get("accuracy", 0)) + attr + item_acc - maxi(0, dist - 3)
-	return clampi(BASE_HIT + HIT_PER_POINT * (acc - defender.stat("evasion")), 5, 95)
+	if attacker.has_trait("steady_aim"):
+		acc += 2
+	var pct := BASE_HIT + HIT_PER_POINT * (acc - defender.stat("evasion"))
+	if defender.has_trait("unfiled"):
+		pct -= 10
+	return clampi(pct, 5, 95)
 
 
 static func mitigate(raw: int, defender: Actor, dmg_type: String, pierce_def: int = 0) -> Dictionary:
@@ -59,7 +67,9 @@ static func resolve(attacker: Actor, defender: Actor, rng: Rng) -> Dictionary:
 	var wb_rank := attacker.talent_rank("ward_breaker")
 	if wb_rank > 0 and (defender.tags.has("dominion") or defender.tags.has("guardian")):
 		raw += 2 * wb_rank
-	var pierce := 1 if attacker.has_trait("infernal_blood") else 0
+	if dtype == "fire" and attacker.has_trait("cinder_born"):
+		raw += 1
+	var pierce := (1 if attacker.has_trait("infernal_blood") else 0) + (1 if attacker.has_trait("steady_aim") else 0)
 	var mit := mitigate(raw, defender, dtype, pierce)
 	result["damage"] = int(mit["damage"])
 	result["resist"] = int(mit["resist"])
@@ -91,7 +101,9 @@ static func resolve_ranged(attacker: Actor, defender: Actor, dist: int, dice: St
 	var wb_rank := attacker.talent_rank("ward_breaker")
 	if wb_rank > 0 and (defender.tags.has("dominion") or defender.tags.has("guardian")):
 		raw += 2 * wb_rank
-	var pierce := 1 if attacker.has_trait("infernal_blood") else 0
+	if dmg_type == "fire" and attacker.has_trait("cinder_born"):
+		raw += 1
+	var pierce := (1 if attacker.has_trait("infernal_blood") else 0) + (1 if attacker.has_trait("steady_aim") else 0)
 	var mit := mitigate(raw, defender, dmg_type, pierce)
 	result["damage"] = int(mit["damage"])
 	result["resist"] = int(mit["resist"])

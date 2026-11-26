@@ -105,3 +105,9 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 
 - **Content:** Expanded `content/core/monsters.json` to 76 archetypes across 10 families including 15 named bosses/guardians (12 new regional bosses across spine and branch floors).
 - **Tactical AI & Encounter Composition:** Added `telegraph_slam` (2-turn telegraphed area blow), `kite_ranged`, `ambusher`, `support_ward`, `support_rally`, `drain_resource`, `lay_hazard`, `pull_chain`, `protect_ally` (physical shield aura), and `exploit_status` in `World`, 4 additional elite mutations (`radiant`, `swift`, `vampiric`, `warded`), and multi-role room squad grouping in `DungeonGen`.
+
+## M6.3 Additions (Origins and Callings)
+
+- **Content & Traits:** Expanded `content/core/species.json` to 8 origins and `content/core/classes.json` to 8 callings, all reusing `stamina`/`resonance`/`poise`; expanded `content/core/talents.json` to 104 talents (13 per calling across 3 trees each); added 10 traits in `src/sim/traits.gd` (`cinder_born`, `liminal_sight`, `ledger_forged`, `unfiled`, `penance_vigor`, `bulwark_stance`, `steady_aim`, `ritual_cadence`, `alchemical_potency`, `chain_binder`).
+- **Simulation:** Wired all 10 origin/calling traits across `Actor`, `Combat`, `Ecology`, and `World`, added `ward_sigil` + `"snare"` trap features and `_tick_wards()`, and implemented active talent effects for all 5 new callings (`warden_bash`, `threshold_hold`, `bulwark_slam`, `warden_challenge`, `piercing_bolt`, `barbed_quarrel`, `twin_quarrel`, `pinning_volley`, `beacon_shot`, `execution_bolt`, `hex_sigil`, `summon_ward_sigil`, `place_snare`, `chain_shackle`, `unmaking_chorus`, `radiant_rebuke`, `sanctify_ground`, `alchemical_bomb`, `frost_tincture`, `thermal_catalysis`, `volatile_salve`, `philosophers_loan`).
+- **UI:** Compacted `_show_create()` pill layout for phone readability while preserving smoke labels, and wired `steady_aim` `+1` ranged reach in Aim Mode.

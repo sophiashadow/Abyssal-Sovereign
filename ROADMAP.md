@@ -81,4 +81,8 @@ M5 (The Depth Pass: M5.1–M5.5) is complete.
 1. **76-archetype Bestiary & 15 Bosses/Guardians:** Expanded `monsters.json` across 10 distinct families plus 12 new named regional bosses across spine and branch floors.
 2. **Tactical AI, Elite Mutations & Squads:** Added `telegraph_slam`, `kite_ranged`, `ambusher`, `support_ward`, `support_rally`, `drain_resource`, `lay_hazard`, `pull_chain`, `protect_ally`, and `exploit_status`, plus 4 new elite mutations (`radiant`, `swift`, `vampiric`, `warded`) and squad room spawns.
 
-Remaining M6 submilestones track M6.3–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.
+## Milestone 6.3: Origins and Callings (done 2026-11-26)
+
+1. **8 Origins, 8 Callings, 104 Talents:** Expanded character creation with 5 Proposed origins (`ashborn`, `veilkin`, `ironbound_ward`, `unrecorded`, `penitent`) and 5 Proposed callings (`preliator_warden`, `tithe_marksman`, `rite_weaver`, `false_light_alchemist`, `ophite_binder`), 10 new mechanical traits, `ward_sigil`/`snare` tactical features, and compact Android-readable origin/calling pills.
+
+Remaining M6 submilestones track M6.4–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.

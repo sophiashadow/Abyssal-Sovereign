@@ -566,6 +566,7 @@ func player_move(dir: Vector2i) -> bool:
 func player_wait() -> bool:
 	if state != State.PLAYING:
 		return false
+	player.flags["wait_turn"] = turns + 1
 	return _finish_player_action(COST_WAIT)
 
 
@@ -699,7 +700,7 @@ func player_fire(target_pos: Vector2i = Vector2i(-1, -1)) -> bool:
 		log_msg("You have no ranged weapon equipped.", "info")
 		return false
 	var d := w.def(db)
-	var max_range := int(d.get("range", 5))
+	var max_range := int(d.get("range", 5)) + (1 if player.has_trait("steady_aim") else 0)
 	var tpos := _resolve_target_pos(target_pos, max_range, true)
 	if tpos.x < 0:
 		log_msg("No target in range.", "info")
@@ -753,7 +754,7 @@ func _combat_note(res: Dictionary) -> String:
 
 
 func _throw_consumable(it: Item, index: int, d: Dictionary, target_pos: Vector2i) -> bool:
-	var max_range := int(d.get("range", 4))
+	var max_range := int(d.get("range", 4)) + (1 if player.has_trait("steady_aim") else 0)
 	var tpos := _resolve_target_pos(target_pos, max_range, true)
 	if tpos.x < 0:
 		log_msg("No target in range for %s." % d["name"], "info")
@@ -769,6 +770,7 @@ func _throw_consumable(it: Item, index: int, d: Dictionary, target_pos: Vector2i
 		log_msg("Your throw is blocked by stone.", "info")
 		return false
 	var dtype := String(d.get("damage_type", "physical"))
+	var flask_bonus := 2 if (player.has_trait("alchemical_potency") and String(d.get("glyph", "")) == "!") else 0
 	if aoe > 0:
 		var center: Vector2i = foe.pos if foe != null else Vector2i(tr["impact"])
 		var targets: Array[Actor] = []
@@ -780,7 +782,7 @@ func _throw_consumable(it: Item, index: int, d: Dictionary, target_pos: Vector2i
 		for a in targets:
 			a.awake = true
 			_remember_player(a)
-			var raw := Dice.roll(String(d["damage"]), rng)
+			var raw := Dice.roll(String(d["damage"]), rng) + flask_bonus
 			var mit := Combat.mitigate(raw, a, dtype)
 			log_msg("The %s blasts the %s for %d (%s)." % [d["name"], a.name, int(mit["damage"]), dtype], "combat")
 			apply_damage(a, int(mit["damage"]), player.name, dtype)
@@ -797,8 +799,9 @@ func _throw_consumable(it: Item, index: int, d: Dictionary, target_pos: Vector2i
 			if not res["hit"]:
 				log_msg("Your %s misses the %s." % [d["name"], foe.name], "combat")
 			else:
-				log_msg("Your %s strikes the %s for %d%s." % [d["name"], foe.name, int(res["damage"]), _combat_note(res)], "combat")
-				apply_damage(foe, int(res["damage"]), player.name, dtype)
+				var hit_d := int(res["damage"]) + flask_bonus
+				log_msg("Your %s strikes the %s for %d%s." % [d["name"], foe.name, hit_d, _combat_note(res)], "combat")
+				apply_damage(foe, hit_d, player.name, dtype)
 				if foe.is_alive() and d.has("status"):
 					apply_status(foe, String(d["status"]))
 	it.quantity -= 1
@@ -868,10 +871,18 @@ func _cast_scroll(it: Item, index: int, d: Dictionary, target_pos: Vector2i) -> 
 		"unbind":
 			var n := unbind_curses(false)
 			log_msg("Cold iron locks snap open (%d unbound)." % n if n > 0 else "No curses bound you.", "good")
+	_trigger_ritual_cadence()
 	it.quantity -= 1
 	if it.quantity <= 0:
 		player.inventory.remove_at(index)
 	return _finish_player_action(COST_ITEM)
+
+
+func _trigger_ritual_cadence() -> void:
+	if player.has_trait("ritual_cadence"):
+		player.resource = mini(player.max_resource(), player.resource + 4)
+		apply_status(player, "braced")
+		log_msg("Your ritual cadence steadies breath and guard (+4 Resonance, Braced).", "good")
 
 
 func _best_blink_tile(m: FloorMap, max_range: int) -> Vector2i:
@@ -924,6 +935,9 @@ func player_work_relic(index: int) -> bool:
 		subjugation = 0
 	if sid == "almoners_grace":
 		player.resource = mini(player.max_resource(), player.resource + 4)
+	if player.has_trait("penance_vigor"):
+		player.resource = mini(player.max_resource(), player.resource + 2)
+		player.hp = mini(player.stat("max_hp"), player.hp + 1)
 	update_fov()
 	var msg := "You work the %s (-%d HP)." % [d["name"], cost] if cost > 0 else "You work the %s." % d["name"]
 	log_msg(msg, "good")
@@ -1212,6 +1226,9 @@ func player_use_talent(tid: String, target_pos: Vector2i = Vector2i(-1, -1)) -> 
 	var max_cd := int(td.get("cooldown", 0))
 	if max_cd > 0:
 		player.cooldowns[tid] = max_cd
+	var eff_name := String(td.get("effect", tid))
+	if player.has_trait("chain_binder") and eff_name in ["hex_sigil", "chain_shackle", "unmake_record", "crippling_shot", "warden_challenge", "alchemical_bomb", "frost_tincture", "pinning_volley", "sunder_strike"]:
+		subjugation = maxi(0, subjugation - 1)
 	return _finish_player_action(action_cost)
 
 
@@ -1496,6 +1513,195 @@ func _run_talent_effect(eff: String, td: Dictionary, target: Actor, target_pos: 
 			if target.is_alive():
 				_attack(player, target)
 			return COST_ATTACK
+		"warden_bash":
+			var r := Combat.resolve(player, target, rng)
+			target.awake = true
+			_remember_player(target)
+			if r["hit"]:
+				var dmg := int(r["damage"]) + 2
+				log_msg("Bastion Bash strikes the %s for %d!" % [target.name, dmg], "combat")
+				apply_damage(target, dmg, player.name, String(r["type"]))
+				if target.is_alive():
+					apply_status(target, "sundered")
+					var push_to := target.pos + Grid.sign_vec(target.pos - player.pos)
+					if m.can_step(target.pos, push_to) and m.actor_at(push_to) == null:
+						target.pos = push_to
+						_on_actor_enter_tile(target, push_to)
+			else:
+				log_msg("Your bash misses the %s." % target.name, "combat")
+			return COST_ATTACK
+		"threshold_hold":
+			_remove_status(player, "pinned")
+			_remove_status(player, "bleeding")
+			apply_status(player, "braced")
+			log_msg("You anchor the threshold and shake free of shackles.", "good")
+			return COST_WAIT
+		"bulwark_slam":
+			var dice := player.damage_dice()
+			var raw := Dice.roll(dice, rng) + 4 + player.stat("defense") + player.stat("damage_bonus")
+			var b_dtype := player.melee_damage_type()
+			var mit := Combat.mitigate(raw, target, b_dtype, 1 if player.has_trait("infernal_blood") else 0)
+			target.awake = true
+			_remember_player(target)
+			log_msg("Threshold Slam crushes the %s for %d!" % [target.name, int(mit["damage"])], "combat")
+			apply_damage(target, int(mit["damage"]), player.name, b_dtype)
+			if target.is_alive():
+				apply_status(target, "sundered")
+			return COST_ATTACK
+		"warden_challenge":
+			var pull_to := target.pos + Grid.sign_vec(player.pos - target.pos)
+			if m.can_step(target.pos, pull_to) and m.actor_at(pull_to) == null and pull_to != player.pos:
+				target.pos = pull_to
+				_on_actor_enter_tile(target, pull_to)
+			target.awake = true
+			_remember_player(target)
+			if target.is_alive():
+				apply_status(target, "sundered")
+			log_msg("You haul the %s forward and break their guard!" % target.name, "combat")
+			return COST_ATTACK
+		"piercing_bolt", "barbed_quarrel", "beacon_shot", "execution_bolt":
+			var max_r := int(td.get("range", 6)) + (1 if player.has_trait("steady_aim") else 0)
+			var tr := projectile_trace(player.pos, target.pos, max_r)
+			var foe: Actor = tr["hit_actor"] if tr["hit_actor"] != null else target
+			if tr["blocked"] and tr["hit_actor"] == null:
+				log_msg("Your line of fire is blocked.", "info")
+				return -1
+			var w := player.equipped("ranged")
+			var wd := w.def(db) if w != null else {}
+			var dice := String(wd.get("damage", "1d6"))
+			var acc := int(wd.get("accuracy", 1)) + 2
+			var crit_b := int(wd.get("crit", 5)) + (100 if eff == "execution_bolt" else 0)
+			var s_dtype := dtype if eff == "beacon_shot" else String(wd.get("damage_type", "physical"))
+			var res := Combat.resolve_ranged(player, foe, Grid.chebyshev(player.pos, foe.pos), dice, acc, crit_b, s_dtype, rng)
+			foe.awake = true
+			_remember_player(foe)
+			if not res["hit"]:
+				log_msg("%s misses the %s." % [td["name"], foe.name], "combat")
+				return COST_ATTACK
+			var dmg := int(res["damage"])
+			if eff == "piercing_bolt":
+				dmg = maxi(dmg, Dice.roll(dice, rng) + maxi(0, player.stat("agility") / 2))
+			elif eff == "barbed_quarrel":
+				dmg += 2
+			elif eff == "execution_bolt" and (foe.has_status("bleeding") or foe.has_status("sundered") or foe.has_status("chilled")):
+				dmg += 4
+			log_msg("%s strikes the %s for %d%s!" % [td["name"], foe.name, dmg, _combat_note(res)], "combat")
+			apply_damage(foe, dmg, player.name, s_dtype)
+			if foe.is_alive():
+				var st_map := {"piercing_bolt": "sundered", "barbed_quarrel": "bleeding", "beacon_shot": "exposure"}
+				if st_map.has(eff):
+					apply_status(foe, String(st_map[eff]))
+			return COST_ATTACK
+		"twin_quarrel":
+			var w := player.equipped("ranged")
+			var wd := w.def(db) if w != null else {}
+			var dice := String(wd.get("damage", "1d6"))
+			var s_dtype := String(wd.get("damage_type", "physical"))
+			for _shot in 2:
+				if not target.is_alive():
+					break
+				var res := Combat.resolve_ranged(player, target, Grid.chebyshev(player.pos, target.pos), dice, int(wd.get("accuracy", 1)), int(wd.get("crit", 0)), s_dtype, rng)
+				target.awake = true
+				_remember_player(target)
+				if res["hit"]:
+					var dmg := int(res["damage"])
+					log_msg("Twin Quarrel hits the %s for %d." % [target.name, dmg], "combat")
+					apply_damage(target, dmg, player.name, s_dtype)
+				else:
+					log_msg("Twin Quarrel misses the %s." % target.name, "combat")
+			return COST_ATTACK
+		"pinning_volley":
+			var hits := 0
+			for a in visible_hostiles():
+				if Grid.chebyshev(player.pos, a.pos) <= int(td.get("range", 5)):
+					a.awake = true
+					_remember_player(a)
+					var mit := Combat.mitigate(Dice.roll("1d6", rng) + maxi(0, player.stat("agility") / 2), a, "physical")
+					apply_damage(a, int(mit["damage"]), player.name, "physical")
+					if a.is_alive():
+						apply_status(a, "chilled")
+					hits += 1
+			if hits == 0:
+				return -1
+			log_msg("Suppression Volley strikes %d foe%s!" % [hits, "" if hits == 1 else "s"], "combat")
+			return COST_ATTACK
+		"hex_sigil", "radiant_rebuke", "chain_shackle":
+			var base_d := (5 if eff == "radiant_rebuke" else (4 if eff == "hex_sigil" else 3)) + will_v + cambion_bonus
+			var mit := Combat.mitigate(base_d, target, dtype)
+			var dmg := int(mit["damage"])
+			target.awake = true
+			_remember_player(target)
+			log_msg("%s strikes the %s for %d (%s)!" % [td["name"], target.name, dmg, dtype], "combat")
+			apply_damage(target, dmg, player.name, dtype)
+			if target.is_alive():
+				var st_id := "exposure" if eff == "radiant_rebuke" else ("hexed" if eff == "hex_sigil" else "pinned")
+				apply_status(target, st_id)
+			return COST_ATTACK
+		"summon_ward_sigil":
+			var existing := m.feature_at(player.pos)
+			if not existing.is_empty():
+				log_msg("Something already occupies this tile.", "info")
+				return -1
+			m.features.append({"kind": "ward_sigil", "sub": "ophite", "x": player.pos.x, "y": player.pos.y, "revealed": true, "used": false, "turns": 8})
+			log_msg("You inscribe a humming Ophite Ward-Sigil underfoot.", "good")
+			return COST_WAIT
+		"place_snare":
+			var existing := m.feature_at(player.pos)
+			if not existing.is_empty():
+				log_msg("Something already occupies this tile.", "info")
+				return -1
+			m.features.append({"kind": "trap", "sub": "snare", "x": player.pos.x, "y": player.pos.y, "revealed": true, "used": false})
+			log_msg("You set an unrecorded Ophite snare underfoot.", "good")
+			return COST_WAIT
+		"unmaking_chorus", "thermal_catalysis":
+			var base_a := (5 if eff == "thermal_catalysis" else 4) + will_v + cambion_bonus
+			var hits := 0
+			for a in visible_hostiles():
+				if Grid.chebyshev(player.pos, a.pos) <= int(td.get("range", 3)):
+					a.awake = true
+					_remember_player(a)
+					var mit := Combat.mitigate(base_a, a, dtype)
+					apply_damage(a, int(mit["damage"]), player.name, dtype)
+					if a.is_alive():
+						apply_status(a, "sundered")
+					hits += 1
+			if hits == 0:
+				return -1
+			log_msg("%s erupts across %d foe%s!" % [td["name"], hits, "" if hits == 1 else "s"], "combat")
+			return COST_ATTACK
+		"sanctify_ground":
+			if m.get_tile(player.pos) == Tiles.FLOOR:
+				m.set_tile(player.pos, Tiles.SANCTUARY_FLOOR)
+			var heal := 4 + will_v / 2
+			player.hp = mini(player.stat("max_hp"), player.hp + heal)
+			log_msg("You consecrate the flagstones and mend %d health." % heal, "good")
+			return COST_WAIT
+		"alchemical_bomb", "frost_tincture":
+			var blast_dtype := "fire" if eff == "alchemical_bomb" else "cold"
+			var blast_st := "burning" if eff == "alchemical_bomb" else "chilled"
+			var hits := 0
+			for a in m.actors:
+				if not a.is_player and a.is_alive() and Grid.chebyshev(target.pos, a.pos) <= 1:
+					a.awake = true
+					_remember_player(a)
+					var mit := Combat.mitigate(4 + will_v + cambion_bonus, a, blast_dtype)
+					apply_damage(a, int(mit["damage"]), player.name, blast_dtype)
+					if a.is_alive():
+						apply_status(a, blast_st)
+					hits += 1
+			log_msg("%s bursts across %d foe%s (%s)!" % [td["name"], hits, "" if hits == 1 else "s", blast_dtype], "combat")
+			return COST_ATTACK
+		"volatile_salve":
+			for sid in ["bleeding", "burning", "chilled"]:
+				_remove_status(player, sid)
+			var heal := 6 + will_v
+			player.hp = mini(player.stat("max_hp"), player.hp + heal)
+			log_msg("Compound Salve mends %d health and steadies your humors." % heal, "good")
+			return COST_WAIT
+		"philosophers_loan":
+			apply_status(player, "false_light")
+			log_msg("Measured Gold brightens your hand without waking the Architect's eye.", "good")
+			return COST_WAIT
 	return -1
 
 
@@ -1544,11 +1750,40 @@ func _begin_player_turn() -> void:
 	_natural_regen()
 	_passive_detect()
 	_tick_subjugation()
+	_tick_wards()
 	_update_allegiance()
 	update_fov()
 
 
+func _tick_wards() -> void:
+	if turns <= 0 or state != State.PLAYING:
+		return
+	var m := current_floor()
+	var will_v := maxi(0, player.stat("will"))
+	for f in m.features:
+		if String(f.get("kind", "")) != "ward_sigil" or bool(f.get("used", false)):
+			continue
+		var wp := Vector2i(int(f["x"]), int(f["y"]))
+		var struck := false
+		for a in m.actors:
+			if not a.is_player and a.is_alive() and Grid.chebyshev(wp, a.pos) <= 1:
+				var raw := Dice.roll("1d5", rng) + will_v / 2
+				var mit := Combat.mitigate(raw, a, "void")
+				log_msg("The Ophite Ward-Sigil strikes the %s for %d (void)!" % [a.name, int(mit["damage"])], "combat")
+				apply_damage(a, int(mit["damage"]), "Ophite Ward-Sigil", "void")
+				struck = true
+				break
+		var rem := int(f.get("turns", 1)) - 1
+		f["turns"] = rem
+		if rem <= 0:
+			f["used"] = true
+			if not struck:
+				log_msg("An Ophite Ward-Sigil fades into chalk.", "info")
+
+
 func _has_keen_sight() -> bool:
+	if player.has_trait("liminal_sight"):
+		return true
 	var amu := player.equipped("amulet")
 	if amu != null and amu.template_id == "eye_of_lilith":
 		return true
@@ -1571,12 +1806,15 @@ func _passive_detect() -> void:
 
 
 func chain_limit() -> int:
-	return SUBJUGATION_LIMIT + (2 if way_return - way_serpent >= 2 else 0)
+	return SUBJUGATION_LIMIT + (2 if way_return - way_serpent >= 2 else 0) + (1 if player.has_trait("ledger_forged") else 0)
 
 
 ## A chain lands on the player: apply its status, then advance the Subjugation clock.
 ## Masks, Relics, False Light, Apotheosis and the Two Ways all bend the clock.
 func _chain_hit(sid: String) -> void:
+	if sid == "perception_fog" and player.has_trait("liminal_sight"):
+		log_msg("Your veil-touched sight ignores the narrowing fog.", "good")
+		return
 	if sid == "perception_fog" and player.has_trait("mask_stances") and player.mask == "lilith":
 		log_msg("Lilith's Eye sees through the narrowing litany.", "good")
 		return
@@ -1586,6 +1824,9 @@ func _chain_hit(sid: String) -> void:
 	if sid == "false_light" and (player.has_status("false_light") or player.has_status("reckoning")):
 		return
 	apply_status(player, sid)
+	if player.has_trait("penance_vigor"):
+		player.resource = mini(player.max_resource(), player.resource + 2)
+		player.hp = mini(player.stat("max_hp"), player.hp + 1)
 	if player.has_status("entangled"):
 		return
 	var gain := 1
@@ -1781,21 +2022,24 @@ func _on_actor_enter_tile(actor: Actor, pos: Vector2i) -> void:
 		if alerted > 0:
 			log_msg("The iron grate clangs underfoot, alerting nearby foes!", "danger")
 	if Tiles.is_hazard(t):
-		var h: Dictionary = Ecology.HAZARDS[t]
-		var htype := String(h["damage_type"])
-		var mit := Combat.mitigate(2, actor, htype)
-		var dmg := int(mit["damage"])
-		if actor.is_player:
-			log_msg("The %s sears you for %d (%s)." % [h["name"], dmg, htype], "danger")
-		elif m.is_visible(pos):
-			log_msg("The %s sears the %s for %d (%s)." % [h["name"], actor.name, dmg, htype], "combat")
-		apply_damage(actor, dmg, String(h["name"]), htype)
-		if actor.is_alive() and rng.chance_pct(45):
-			apply_status(actor, String(h["status"]))
+		if t == Tiles.ASH_EMBER and actor.is_player and actor.has_trait("cinder_born"):
+			pass
+		else:
+			var h: Dictionary = Ecology.HAZARDS[t]
+			var htype := String(h["damage_type"])
+			var mit := Combat.mitigate(2, actor, htype)
+			var dmg := int(mit["damage"])
+			if actor.is_player:
+				log_msg("The %s sears you for %d (%s)." % [h["name"], dmg, htype], "danger")
+			elif m.is_visible(pos):
+				log_msg("The %s sears the %s for %d (%s)." % [h["name"], actor.name, dmg, htype], "combat")
+			apply_damage(actor, dmg, String(h["name"]), htype)
+			if actor.is_alive() and rng.chance_pct(45):
+				apply_status(actor, String(h["status"]))
 	if not actor.is_alive():
 		return
 	var f := m.feature_at(pos)
-	if f.get("kind", "") == "trap" and not bool(f.get("used", false)):
+	if f.get("kind", "") == "trap" and not bool(f.get("used", false)) and not (actor.is_player and String(f.get("sub", "")) == "snare"):
 		var tdef: Dictionary = Ecology.TRAPS.get(String(f.get("sub", "spike")), Ecology.TRAPS["spike"])
 		f["revealed"] = true
 		f["used"] = true
@@ -1835,6 +2079,7 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 				player.resource = player.max_resource()
 				f["used"] = true
 				log_msg("You tithe blood outside the ledger (+2 max HP, full resource, -apotheosis).", "good")
+				_trigger_ritual_cadence()
 				return _finish_player_action(COST_ITEM)
 			else:
 				if player.hp <= 3:
@@ -1848,6 +2093,7 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 				f["used"] = true
 				log_msg("The altar snaps iron bonds free (%d cleansed, +Way of Return)." % n, "good")
 				_contract_event("cleanse")
+				_trigger_ritual_cadence()
 				return _finish_player_action(COST_ITEM)
 		"shrine":
 			if choice == "steal":
@@ -1856,6 +2102,7 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 				way_serpent += 1
 				f["used"] = true
 				log_msg("You claim the Eye's sight as your own (+1 Will, +apotheosis).", "lore")
+				_trigger_ritual_cadence()
 				return _finish_player_action(COST_ITEM)
 			else:
 				var nid := identify_pack()
@@ -1865,6 +2112,7 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 				f["used"] = true
 				update_fov()
 				log_msg("The Shrine witnesses the floor (%d identified, all traps & secrets revealed)." % nid, "good")
+				_trigger_ritual_cadence()
 				return _finish_player_action(COST_ITEM)
 		"ritual_circle":
 			if choice == "attest":
@@ -1875,6 +2123,7 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 				f["used"] = true
 				log_msg("You attest your oath before the Geometry.", "lore")
 				_advance_contract()
+				_trigger_ritual_cadence()
 				return _finish_player_action(COST_ITEM)
 			if choice == "drain":
 				var heal := maxi(4, player.stat("max_hp") / 2)
@@ -1883,6 +2132,7 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 				player.cooldowns.clear()
 				f["used"] = true
 				log_msg("The circle drinks your strain (+%d HP, cooldowns & Mask risk cleared)." % heal, "good")
+				_trigger_ritual_cadence()
 				return _finish_player_action(COST_ITEM)
 			else:
 				if player.hp <= 4:
@@ -1927,6 +2177,7 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 			if choice.begins_with("sign:"):
 				if not player_sign_contract(choice.substr(5)):
 					return false
+				_trigger_ritual_cadence()
 				return _finish_player_action(COST_ITEM)
 			return false
 		"vault_gate":
@@ -2141,13 +2392,16 @@ func _tick_statuses(a: Actor) -> void:
 		if regen > 0:
 			a.hp = clampi(a.hp + regen, 1, a.stat("max_hp"))
 		elif regen < 0:
-			var tick_dmg := -regen
-			if sid == "burning" and a.is_player and a.has_trait("infernal_blood"):
-				tick_dmg = maxi(1, tick_dmg / 2)
-			var dtype := String(sd.get("damage_type", "physical"))
-			apply_damage(a, tick_dmg, String(sd["name"]).to_lower(), dtype)
-			if not a.is_alive():
-				return
+			if sid == "burning" and a.is_player and a.has_trait("cinder_born"):
+				a.hp = clampi(a.hp + 1, 1, a.stat("max_hp"))
+			else:
+				var tick_dmg := -regen
+				if sid == "burning" and a.is_player and a.has_trait("infernal_blood"):
+					tick_dmg = maxi(1, tick_dmg / 2)
+				var dtype := String(sd.get("damage_type", "physical"))
+				apply_damage(a, tick_dmg, String(sd["name"]).to_lower(), dtype)
+				if not a.is_alive():
+					return
 		s["turns"] = int(s["turns"]) - 1
 		if int(s["turns"]) <= 0:
 			expired.append(sid)
@@ -2164,6 +2418,9 @@ func _tick_statuses(a: Actor) -> void:
 func apply_status(a: Actor, sid: String) -> void:
 	if sid == "bleeding" and a.is_player and a.has_trait("deathless"):
 		log_msg("Your dead veins do not bleed.", "info")
+		return
+	if sid == "pinned" and a.is_player and a.has_trait("ledger_forged"):
+		log_msg("Your iron vows refuse the shackle.", "info")
 		return
 	if sid == "burning" and a.has_status("chilled"):
 		_remove_status(a, "chilled")
@@ -2189,8 +2446,11 @@ func apply_status(a: Actor, sid: String) -> void:
 	if a.is_player:
 		if sid == "perception_fog" and a.talent_rank("clear_witness") > 0:
 			dur = maxi(2, dur / 2)
-		elif sid == "reckoning" and a.talent_rank("alchemical_restraint") > 0:
-			dur = maxi(8, dur - 8 * a.talent_rank("alchemical_restraint"))
+		elif sid == "reckoning":
+			if a.talent_rank("alchemical_restraint") > 0:
+				dur = maxi(8, dur - 8 * a.talent_rank("alchemical_restraint"))
+			if a.has_trait("alchemical_potency"):
+				dur = maxi(8, dur - 10)
 	for s in a.statuses:
 		if s["id"] == sid:
 			s["turns"] = maxi(int(s["turns"]), dur)
@@ -2237,6 +2497,8 @@ func _monster_turn(mon: Actor) -> int:
 		var ue := player.talent_rank("unseen_edge")
 		if ue > 0:
 			notice_pct = maxi(10, notice_pct - 15 * ue)
+		if player.has_trait("unfiled"):
+			notice_pct = maxi(10, notice_pct - 20)
 		if _monster_sees_player(m, mon) and dist <= perc and rng.chance_pct(notice_pct):
 			mon.awake = true
 			_remember_player(mon)
@@ -2540,6 +2802,8 @@ func apply_damage(target: Actor, amount: int, source: String, dmg_type: String =
 				break
 	if dmg_type == "cold" and amount > 0 and current_floor().get_tile(target.pos) == Tiles.WATER_SHALLOW:
 		amount = maxi(1, int(roundf(float(amount) * 1.25)))
+	if target.is_player and target.has_trait("bulwark_stance") and amount > 1 and (target.has_status("braced") or int(target.flags.get("wait_turn", -1)) == turns):
+		amount = maxi(1, amount * 3 / 4)
 	amount = _apply_damage_combos(target, amount, dmg_type)
 	target.hp -= amount
 	if target.hp > 0:
@@ -2655,7 +2919,8 @@ func _consume(a: Actor, it: Item, index: int) -> void:
 	match String(d["effect"]):
 		"heal":
 			var sp := db.get_def("species", a.species_id) if a.is_player else {}
-			var amount := maxi(1, int(roundf(Dice.roll(String(d["heal"]), rng) * float(sp.get("heal_mult", 1.0)))))
+			var alch_mult := 1.35 if (a.is_player and a.has_trait("alchemical_potency")) else 1.0
+			var amount := maxi(1, int(roundf(Dice.roll(String(d["heal"]), rng) * float(sp.get("heal_mult", 1.0)) * alch_mult)))
 			var before := a.hp
 			a.hp = mini(a.stat("max_hp"), a.hp + amount)
 			log_msg("You use the %s and recover %d health." % [d["name"], a.hp - before], "good")

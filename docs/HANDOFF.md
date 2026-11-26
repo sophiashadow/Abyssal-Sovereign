@@ -5,14 +5,14 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 ## State as of 2026-11-26
 
 - **Branch:** `main` (default branch on `origin`, github.com/sophiashadow/Abyssal-Sovereign), preserving full commit history from `ccr-c6f8b898-fu2jtp`.
-- **Milestones:** M0–M5 (`fac51e8`, Depth Pass complete), **M6.1** (Atlas: 28 floors, save v9), **M6.2 (The Inhabitants)** — `76` monster archetypes across `10` families, `15` named bosses/guardians (`12` new regional bosses), `9` new tactical AI specials, `8` elite mutations, and room encounter squads.
-- **Last verified (local, Linux, M6.2):**
-  - `tools/verify.sh` (M6.2):
-    - `tools/test.sh`: `115` tests, `115` passed, `0` failed, `2130` checks (`0` engine errors).
+- **Milestones:** M0–M5 (`fac51e8`, Depth Pass complete), **M6.1** (Atlas: 28 floors, save v9), **M6.2** (Inhabitants: 76 archetypes, 15 bosses/guardians), **M6.3 (Origins and Callings)** — `8` origins, `8` callings, `104` talents across `24` trees, `10` new origin/calling traits, `ward_sigil`/`snare` tactical features, compact Android-readable character creation UI.
+- **Last verified (local, Linux, M6.3):**
+  - `tools/verify.sh` (M6.3):
+    - `tools/test.sh`: `118` tests, `118` passed, `0` failed, `2178` checks (`0` engine errors).
     - `tools/ui_smoke.gd` at `1280×720` and `2340×1080`: `21` steps, `0` failures each.
-  - `tools/soak.gd --seeds=15 --salt=heldout` (M6.2): bot wins `77%` (`104/135` runs, mean `717` turns).
-  - *Prior M4 exports (`build/`)*: `tools/export.sh all` refreshed Linux/Windows/Web/Android-debug exports at v0.4 (`apksigner verify` SHA-256 `a0000912831e593cdea65be68bda40f99f0d0e4d779332fff711199eb578a279`); exports have not yet been rebuilt after M5.1–M6.2.
-- **NOT_RUN:** Post-M5.1–M6.2 platform exports, Windows runtime, Web browser `user://` persistence test, physical Android device install/test (no device attached to `adb`), release-signed Android APK, M5.2–M6.2 human playtest. There is no CI.
+  - `tools/soak.gd --seeds=2 --salt=heldout` (M6.3): bot wins `69%` (`88/128` runs across all `64` pairs, mean `918` turns; `rite_weaver` bot survivability noted for M6.10 bot capability & M7 balance review).
+  - *Prior M4 exports (`build/`)*: `tools/export.sh all` refreshed Linux/Windows/Web/Android-debug exports at v0.4 (`apksigner verify` SHA-256 `a0000912831e593cdea65be68bda40f99f0d0e4d779332fff711199eb578a279`); exports have not yet been rebuilt after M5.1–M6.3.
+- **NOT_RUN:** Post-M5.1–M6.3 platform exports, Windows runtime, Web browser `user://` persistence test, physical Android device install/test (no device attached to `adb`), release-signed Android APK, M5.2–M6.3 human playtest. There is no CI.
 
 ## Setup
 
@@ -40,7 +40,8 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 
 - **M6.1 (The Atlas of Terra Tenebrae):** Done (2026-11-26).
 - **M6.2 (The Inhabitants):** Done (2026-11-26).
-- **Next:** **M6.3 (Origins and Callings)** — expand to 8 origins and 8 callings (preserving Human, Revenant, Cambion, Fallen Knight, Occultist, Assassin) with ~100–120 talents and Android-readable character creation. Then proceed incrementally through M6.4–M6.10 per `docs/M6_SPEC.md`.
+- **M6.3 (Origins and Callings):** Done (2026-11-26).
+- **Next:** **M6.4 (The Armory and Treasury)** — expand `items.json` to ~160–170 base items, ~46 affixes, 12 equipment sets, ~26 unique artifacts, and 16 relics (Work vs Transmute). Then proceed incrementally through M6.5–M6.10 per `docs/M6_SPEC.md`.
 - **Platform verification (M3 / M6.10):** Rebuild exports after M6 tranches (`tools/export.sh`), test physical Android device / Windows / Web when available, and configure release signing with an owner-created keystore outside the repo.
 
 Smaller known defects (fixed 2026-11-26):

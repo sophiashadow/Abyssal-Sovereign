@@ -13,6 +13,16 @@ const KNOWN := {
 	"infernal_blood": "Your attacks ignore 1 point of the target's defense.",
 	"mask_stances": "Wear the Masks as stances (Bare Face, Nyx, Eris, Lilith), switching for 1 turn.",
 	"adaptable": "Starts with +1 attribute point and gains a bonus talent point at levels 3 and 6.",
+	"cinder_born": "Immune to smoldering embers; burning mends +1 health per turn instead of searing, and fire attacks deal +1 damage.",
+	"liminal_sight": "Immune to Monopolized Sight and automatically detects nearby hidden traps and secret doors.",
+	"ledger_forged": "Immune to Pinned and gains +1 Subjugation threshold before becoming Entangled.",
+	"unfiled": "Hostile attacks suffer -10% hit chance and unaware foes notice 20% less easily.",
+	"penance_vigor": "Working a Relic or suffering a Chain restores +2 class resource and +1 health.",
+	"bulwark_stance": "Waiting or braced reduces incoming ranged and special damage by 25% and grants +1 defense while Braced.",
+	"steady_aim": "Ranged weapons and thrown projectiles gain +2 accuracy, +1 range, and ignore 1 defense.",
+	"ritual_cadence": "Reading any scroll or using an altar, shrine, or ritual circle restores +4 Resonance and grants Braced.",
+	"alchemical_potency": "Healing items and thrown flasks are +35% stronger, and Reckoning lasts 10 fewer turns.",
+	"chain_binder": "Active talents that apply debuffs also reduce Subjugation by 1.",
 }
 
 

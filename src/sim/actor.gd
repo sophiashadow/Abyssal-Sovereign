@@ -151,6 +151,8 @@ func stat(stat_name: String) -> int:
 			var oath_ok := hp * 20 < stat("max_hp") * 13 if talent_rank("tempered_plate") > 0 else hp * 2 < stat("max_hp")
 			if has_trait("iron_oath") and oath_ok:
 				d += 2
+			if has_trait("bulwark_stance") and has_status("braced"):
+				d += 1
 			return maxi(0, d)
 		"damage_bonus":
 			return stat("might") + _mod_sum("damage") + int(base.get("bonus_damage", 0))
