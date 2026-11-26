@@ -50,7 +50,7 @@
      "description": "Sunken cartways running under the wardens' tax-roads, slick with seepage and hoarfrost.",
      "width": 54, "height": 32, "rooms_min": 6, "rooms_max": 9,
      "monsters_min": 6, "monsters_max": 9, "items_min": 5, "items_max": 7,
-     "monster_table": [{"id": "ossuary_arbalest", "weight": 2}, {"id": "confessor_hound", "weight": 3}, {"id": "mire_lurker", "weight": 2}, {"id": "rime_slime", "weight": 2}, {"id": "oath_debtor", "weight": 2}],
+     "monster_table": [{"id": "ossuary_arbalest", "weight": 2}, {"id": "confessor_hound", "weight": 3}, {"id": "mire_lurker", "weight": 2}, {"id": "rime_slime", "weight": 2}, {"id": "oath_debtor", "weight": 2}, {"id": "blind_mole_brute", "weight": 2}],
      "item_table": [{"id": "bone_tincture", "weight": 2}, {"id": "healing_salve", "weight": 3}, {"id": "dominion_arbalest", "weight": 1}, {"id": "tithe_spear", "weight": 1}, {"id": "ossuary_rime_vial", "weight": 2}, {"id": "snare_bolas", "weight": 1}, {"id": "vault_key", "weight": 2}, {"id": "ophite_key", "weight": 1}, {"id": "salt_hourglass", "weight": 1}],
      "exit": "branch_end"},
     {"id": "unrecorded_market_seams", "depth": 2, "sphere": "Mercury", "region_kind": "settlement", "branch": "The Unrecorded Market", "parent": "tithe_vaults", "terrain": "standard", "hazard": "none", "sites": ["merchant", "merchant", "contract_lectern"], "provenance": "canon_derived", "name": "The Unrecorded Market Seams",

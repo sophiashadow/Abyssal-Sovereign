@@ -4,15 +4,38 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 
 ## State as of 2026-11-26
 
-- **Branch:** `main` (default branch on `origin`, github.com/sophiashadow/Abyssal-Sovereign), preserving full commit history from `ccr-c6f8b898-fu2jtp`.
-- **Milestones:** M0–M5 (`fac51e8`, Depth Pass complete), **M6.1** (Atlas: 28 floors, save v9), **M6.2** (Inhabitants: 76 archetypes, 15 bosses/guardians), **M6.3** (Origins & Callings: 8×8, 104 talents), **M6.4** (Armory & Treasury: 165 items, 46 affixes, 12 sets, 26 artifacts, 16 relics), **M6.5** (People & Institutions: 18 NPCs, 8 factions, save v10), **M6.6** (Threads: 24 threads, save v11), **M6.7** (Dungeon Variety: 10 room archetypes, 4 emergent sites), **M6.8** (Codex & Run History: `user://codex.json`), **M6.9 (Portable Worldbuilding Manifest)** — `content/lore/world_manifest.json` (`schema_version: 1`, `28` places, `8` institutions, `18` people, `16` relics, `24` threads, `78` edges, provenance tags, clean lore/mechanics separation).
-- **Last verified (local, Linux, M6.9):**
-  - `tools/verify.sh` (M6.9):
-    - `tools/test.sh`: `130` tests, `130` passed, `0` failed, `3436` checks (`0` engine errors).
+- **Branch:** `main` (default branch on `origin`, github.com/sophiashadow/Abyssal-Sovereign), preserving full commit history from `ccr-c6f8b898-fu2jtp` and `fac51e8`.
+- **Milestones:** M0–M5 (`fac51e8`, Depth Pass complete), **M6 Breadth Pass (M6.1–M6.10 COMPLETE, save v11):**
+  - **M6.1** Atlas of Terra Tenebrae (`28` floors across 7 Spheres, regional terrain & portals, save v9).
+  - **M6.2** The Inhabitants (`76` monster archetypes, `15` named bosses/guardians, 10 tactical AI behaviors, 8 elite mutations, squad grouping).
+  - **M6.3** Origins & Callings (`8` origins, `8` callings, `104` talents across 24 trees, 10 traits, Android-readable creation UI).
+  - **M6.4** The Armory and Treasury (`165` base items, `46` affixes, `12` sets with `subjugation_cap_bonus`, `26` unique artifacts, `16` Work-vs-Transmute relics, distributed loot pools).
+  - **M6.5** People, Institutions & Allegiances (`18` recurring NPCs across `8` two-minded institutions, standing `-2..+3`, no good/evil scalar, save v10).
+  - **M6.6** Threads Beneath the Record (`24` multi-stage threads, seeded 8-thread per-run pool, goal/sacrifice/refusal/abandonment resolution paths, delayed aftermath scheduler, Thread Journal `j`, save v11).
+  - **M6.7** Dungeon Variety & Emergent Encounters (`10` composable `RoomArchetypes` preserving 100% connectivity + `rune_puzzle`, `abandoned_rite`, `sanctuary_hearth`, `echo_cache`).
+  - **M6.8** Discovery, Codex & Run History (`user://codex.json`, knowledge-only, zero power, zero spoilers, Codex overlay `k`, enriched end-of-run summaries).
+  - **M6.9** Portable Worldbuilding Manifest (`content/lore/world_manifest.json` `schema_version: 1` + `docs/WORLD_MANIFEST.md` + validator).
+  - **M6.10** Integration, Reachability (`tests/test_reachability.gd`), Final Held-Out Validation Soak, Platform Exports (`tools/export.sh all`), & M7 Handoff.
+- **Last verified (local, Linux, M6.10):**
+  - `tools/verify.sh` (M6.10):
+    - `tools/test.sh`: `131` tests, `131` passed, `0` failed, `3883` checks, `142.7s` (`0` engine errors).
     - `tools/ui_smoke.gd` at `1280×720` and `2340×1080`: `21` steps, `0` failures each.
-  - `tools/soak.gd --seeds=2 --salt=heldout` (M6.3): bot wins `69%` (`88/128` runs across all `64` pairs, mean `918` turns).
-  - *Prior M4 exports (`build/`)*: `tools/export.sh all` refreshed Linux/Windows/Web/Android-debug exports at v0.4 (`apksigner verify` SHA-256 `a0000912831e593cdea65be68bda40f99f0d0e4d779332fff711199eb578a279`); exports have not yet been rebuilt after M5.1–M6.9.
-- **NOT_RUN:** Post-M5.1–M6.9 platform exports, Windows runtime, Web browser `user://` persistence test, physical Android device install/test (no device attached to `adb`), release-signed Android APK, M5.2–M6.9 human playtest. There is no CI.
+  - Fresh held-out final validation soak (`godot --headless --path . --script res://tools/soak.gd -- --seeds=3 --salt=m6_final_validation`, `192` runs across all `64` pairs, `497.6s`):
+    - Overall: `144 / 192` wins (`75%`), mean `870` turns.
+    - Origins (`24` each): `ashborn 22/24`, `human 19/24`, `ironbound_ward 19/24`, `cambion 18/24`, `penitent 18/24`, `revenant 17/24`, `unrecorded 16/24`, `veilkin 15/24`.
+    - Callings (`24` each): `false_light_alchemist 22/24`, `occultist 21/24`, `preliator_warden 21/24`, `assassin 19/24`, `fallen_knight 18/24`, `tithe_marksman 17/24`, `ophite_binder 16/24`, `rite_weaver 10/24`.
+    - Telemetry: `avg_talents=7.16`, `avg_npcs=0.22`, `avg_threads_seen=0.64`, `avg_threads_settled=0.00`, `branch_visits=0` (`AutoPlayer` follows spine exits directly).
+  - Platform exports (`tools/export.sh all`):
+    - Linux release: `build/linux/abyssal-sovereign.x86_64` (`71M`, `--audio-driver Dummy --quit-after 30` exited `0` cleanly, `0` script/content errors).
+    - Android debug APK: `build/android/abyssal-sovereign-debug.apk` (`56M`, `177` files, `apksigner verify` SHA-256 `777545a61a5baa73f685da7d04c543ab18bbb2a4bb7d6dc266a20546787a00e5`).
+    - Windows export: `build/windows/abyssal-sovereign.exe` (`105M`); Web export: `build/web/index.html` (`5.5K`).
+- **NOT_RUN:** Windows runtime execution, Web browser `user://` IndexedDB persistence check, physical Android device install/playtest (no `adb` device connected), release-signed Android APK (no owner keystore outside repo), and M5.2–M6.10 human playtesting. There is no CI.
+
+## Known-Defect & Observation Register (for M7)
+
+1. **`rite_weaver` calling win-rate trails peers (`10/24` in `m6_final_validation`; `penitent/rite_weaver` and `revenant/rite_weaver` `0/3`, plus `veilkin/ophite_binder` `0/3`):** Review `rite_weaver` durability/early Resonance economy and active talent usage (`Rite Cantor` lacks early physical mitigation compared to `Bastion Warden` / `Seam Alchemist`).
+2. **`d2 The Vault Enumerator` early mortality spike (`11` of `48` total deaths in `m6_final_validation`):** Evaluate Depth 2 spine boss stat/accuracy/telegraph tuning relative to level 2–3 builds.
+3. **Bot coverage scope (`branch_visits=0`, `avg_threads_settled=0.00` in `soak.gd`):** `AutoPlayer` paths directly to main-spine `down_pos`/`exit_pos`, so branch floors, alt-routes, and active thread goal chasing are verified by targeted unit tests (`test_atlas`, `test_threads`, `test_reachability`) rather than end-to-end soak traversal.
 
 ## Setup
 
@@ -23,44 +46,22 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 
 ## Where things are
 
-- `ARCHITECTURE.md`: layers, determinism, saves, decisions D1–D8.
-- `DESIGN.md`: rules, numbers, balance table.
-- `ROADMAP.md`: known defects and the next milestones.
-- `docs/LORE.md`: every lore element tagged Canon / Interpretation / Proposed, plus excluded material and open owner decisions.
-- `docs/CONTENT_SCHEMA.md`: the JSON content format. A test checks that it matches the code.
+- `ARCHITECTURE.md`: layers, determinism, saves (`SAVE_VERSION := 11`), decisions D1–D8.
+- `DESIGN.md`: rules, numbers, balance tables (`m6_final_validation` recorded).
+- `ROADMAP.md`: Milestone summary and M7 next work.
+- `docs/LORE.md`: every lore element tagged Canon / Canon-derived / Interpretation / Proposed, plus excluded material.
+- `docs/WORLD_MANIFEST.md` & `content/lore/world_manifest.json`: portable setting manifest (`schema_version: 1`).
+- `docs/CONTENT_SCHEMA.md`: the JSON content format enforced by `tests/test_content.gd`.
 
-## Milestone 2 (done 2026-11-26)
+## Next assignment: Milestone 7 — Balance & Refinement (Not Started)
 
-1. ~~**Masks as stances**~~ (`Masks`, `mask_stances` trait on Occultist, `SAVE_VERSION := 2` with v1→v2 migration, HUD/`m` key/overlay, `tests/test_masks.gd`).
-2. ~~**Two Eight Chains enemy abilities**~~ (`chain_isolation` on `false_sun_cultist` and `chain_fog` / `perception_fog` on `preliator_sentinel`, tests in `tests/test_ai.gd`).
-3. ~~**Relics, worked or transmuted**~~ (`kind: "relic"` schema + `Confessor's Glass`, `Ophite Key`, `Broken Halo` in `items.json` / `floors.json`, `player_work_relic` / `player_transmute_relic` in `World`, UI buttons in `main.gd`, tests in `tests/test_items.gd`).
-4. ~~**Named losses**~~ (`World.named_loss()` classifying `Gilded`, `Fluent`, and `Catalogued` on the death screen, tests in `tests/test_turns.gd`).
-
-## Next assignment: Milestone 6 Breadth Pass (`docs/M6_SPEC.md`)
-
-- **M6.1 (The Atlas of Terra Tenebrae):** Done (2026-11-26).
-- **M6.2 (The Inhabitants):** Done (2026-11-26).
-- **M6.3 (Origins and Callings):** Done (2026-11-26).
-- **M6.4 (The Armory and Treasury):** Done (2026-11-26).
-- **M6.5 (People, Institutions and Allegiances):** Done (2026-11-26).
-- **M6.6 (Threads Beneath the Record):** Done (2026-11-26).
-- **M6.7 (Dungeon Variety and Emergent Encounters):** Done (2026-11-26).
-- **M6.8 (Discovery, Codex and Run History):** Done (2026-11-26).
-- **M6.9 (Portable Worldbuilding Manifest):** Done (2026-11-26).
-- **Next:** **M6.10 (Integration, Verification, Platform Exports & M7 Handoff)** — `tests/test_reachability.gd`, expanded `AutoPlayer` + `tools/soak.gd`, fresh `--salt=m6_final_validation` soak (`192` runs), `./tools/export.sh all`, Linux binary & APK checks, and structured M7 Balance & Refinement handoff.
-- **Platform verification (M3 / M6.10):** Rebuild exports after M6 tranches (`tools/export.sh`), test physical Android device / Windows / Web when available, and configure release signing with an owner-created keystore outside the repo.
-
-Smaller known defects (fixed 2026-11-26):
-
-- ~~Awake monsters are omniscient: add last-known-position tracking.~~ (Fixed: monsters pursue last-seen position and lose awareness once they check it and still don't see the player.)
-- ~~The player starts on the up stairs, so the `@` hides the `<`.~~ (Fixed: depth 1 spawns the player adjacent to `<`.)
-- ~~Text scale at phone resolution is unverified: inject `user://settings.cfg` before the smoke and check the screenshots.~~ (Verified at `2340x1080` with `text_scale_index=2`, `tile_size_index=4`, `touch_controls=true`: 21/21 smoke steps passed; HUD, inventory, settings, and map render cleanly, with the character creation screen's bottom action row slightly below the fold in its scroll container.)
+- Address the M6.10 Known-Defect & Observation Register (`rite_weaver` durability, `The Vault Enumerator` Depth 2 spike, optional branch/thread `AutoPlayer` heuristics if desired for deeper soak coverage).
+- Conduct human playtest review across all 8×8 builds, desktop (`1280×720`) and phone (`2340×1080`) layouts, physical Android device install (`adb`), Windows & Web smoke verification, and release-keystore signing when ready.
 
 ## Owner decisions still open
 
-- Android SDK license acceptance and a release keystore. The owner creates the keystore and keeps it outside the repo.
-
-*(Resolved 2026-11-26: Apotheosis can be a win; the Unwritten Door is canon; origins and callings are canon. Recorded in `docs/LORE.md`.)*
+- Release Android keystore creation (owner creates outside the repo).
+- Formal canon promotion review for `Proposed` M6 entities (PR #300 locations/people/institutions/threads remain `Proposed`).
 
 ## Do not
 

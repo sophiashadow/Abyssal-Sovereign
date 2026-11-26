@@ -68,6 +68,11 @@ func is_explored(p: Vector2i) -> bool:
 	return in_bounds(p) and explored[idx(p)] == 1
 
 
+func set_explored(p: Vector2i) -> void:
+	if in_bounds(p):
+		explored[idx(p)] = 1
+
+
 ## A diagonal step may not squeeze between two blocking orthogonal tiles.
 func can_step(from: Vector2i, to: Vector2i) -> bool:
 	if not is_walkable(to) or Grid.chebyshev(from, to) != 1:

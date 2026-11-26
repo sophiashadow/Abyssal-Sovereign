@@ -109,4 +109,14 @@ M5 (The Depth Pass: M5.1–M5.5) is complete.
 
 1. **Setting Manifest & Validator:** Added `content/lore/world_manifest.json` (`schema_version: 1`), `docs/WORLD_MANIFEST.md`, and `tests/test_manifest.gd`.
 
-Remaining M6 submilestone tracks M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.
+## Milestone 6.10: Integration, Reachability & Exports (done 2026-11-26)
+
+1. **Reachability, Validation Soak & Exports:** Added `tests/test_reachability.gd` (zero dead content), `FloorMap.set_explored()`, documented `AutoPlayer` + expanded `tools/soak.gd` telemetry (`144/192 = 75%` held-out validation across all 64 pairs), verified `./tools/export.sh all` (`linux`, `windows`, `web`, `android` debug APK), Linux binary launch, and APK signature.
+
+M6 (The Breadth Pass: M6.1–M6.10) is complete.
+
+## Next: Milestone 7 — Balance & Refinement
+
+1. Tune early-depth spikes (`d2 The Vault Enumerator` 11/192 soak deaths) and lagging pairings (`rite_weaver` 10/24 overall; `penitent/rite_weaver` and `revenant/rite_weaver` 0/3; `veilkin/ophite_binder` 0/3).
+2. Add optional branch-routing heuristics to `AutoPlayer` if automated branch/thread settlement telemetry should be exercised beyond main-spine runs.
+3. Complete Milestone 3 platform verification on physical hardware (Android device via `adb`, Windows, Web browser IndexedDB, release keystore signing, and human playtesting).

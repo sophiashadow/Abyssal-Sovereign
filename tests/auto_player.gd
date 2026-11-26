@@ -5,9 +5,13 @@ extends RefCounted
 ## run can be replayed, saved and resumed. It knows the exit's location (a
 ## cheat the player does not get), which keeps soak runs short.
 ##
-## Priorities: heal when low; fight an adjacent hostile; take stairs it stands
-## on; equip better gear it carries; pick up what it stands on; walk toward
-## the nearest visible hostile, else toward the exit.
+## Priorities: allocate stat & talent points along primary calling resource; heal
+## when below 33% HP; manage Mask risk; engage adjacent/visible foes with
+## combat/ranged talents, projectiles, or ranged weapons; unbind/identify;
+## equip higher-scoring upgrades; transmute spare relics; pick up loot; interact
+## opportunistically with Vaults, Shrines, Circles, Altars, NPCs, and emergent
+## M6.7 sites when standing on them; walk toward the nearest visible hostile or exit.
+## Note: heuristic parameters are fixed and never tuned against held-out salts.
 
 var world: World
 var _exit_map := PackedInt32Array()
@@ -78,7 +82,7 @@ func step() -> bool:
 	var feat := m.revealed_feature_at(p.pos)
 	if Ecology.is_interactive(feat):
 		var fk := String(feat.get("kind", ""))
-		if fk == "vault_gate" and (_has_item("vault_key") or _has_item("ophite_key")):
+		if fk == "vault_gate" and (_has_key() or _has_item("ophite_key")):
 			if world.player_interact(p.pos, "key"):
 				return true
 		elif fk == "shrine":
@@ -87,6 +91,19 @@ func step() -> bool:
 			return world.player_interact(p.pos, "drain")
 		elif fk == "altar" and _has_cursed_equipped() and p.hp > 4:
 			return world.player_interact(p.pos, "cleanse")
+		elif fk == "npc" and not bool(feat.get("used", false)):
+			var nid := String(feat.get("sub", ""))
+			if not world.npcs_met.has(nid):
+				return world.player_interact(p.pos, "talk")
+			return world.player_interact(p.pos, "service")
+		elif fk == "sanctuary_hearth" and p.hp * 10 < p.stat("max_hp") * 8:
+			return world.player_interact(p.pos, "rest_quiet")
+		elif fk == "abandoned_rite":
+			return world.player_interact(p.pos, "dismantle")
+		elif fk == "echo_cache":
+			return world.player_interact(p.pos, "read")
+		elif fk == "rune_puzzle":
+			return world.player_interact(p.pos, "solve_order")
 	var target := _nearest_visible_hostile()
 	if target != null:
 		if target.is_elite or target.unique or target.tags.has("boss"):
@@ -153,6 +170,13 @@ func _has_cursed_equipped() -> bool:
 func _has_item(tid: String) -> bool:
 	for it in world.player.inventory:
 		if it.template_id == tid:
+			return true
+	return false
+
+
+func _has_key() -> bool:
+	for it in world.player.inventory:
+		if String(it.def(world.db).get("kind", "")) == "key":
 			return true
 	return false
 

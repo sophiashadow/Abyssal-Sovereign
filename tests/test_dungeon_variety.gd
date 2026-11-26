@@ -69,6 +69,11 @@ func test_emergent_interactive_sites() -> void:
 		m.features.append({"kind": s["kind"], "sub": s["sub"], "x": p.x, "y": p.y, "revealed": true, "used": false})
 		w.player.pos = p
 		ok(w.player_interact(p, s["choice"]), "interacted with emergent site %s" % s["kind"])
+	# Also verify echo_cache 'read' marks nearby explored tiles without errors.
+	m.features.append({"kind": "echo_cache", "sub": "echo_cache", "x": 6, "y": 1, "revealed": true, "used": false})
+	w.player.pos = Vector2i(6, 1)
+	ok(w.player_interact(Vector2i(6, 1), "read"), "echo_cache read reveals nearby survey")
+	ok(m.is_explored(Vector2i(7, 2)), "echo_cache read marked nearby tile explored")
 	ok(w.subjugation <= 1, "abandoned_rite & sanctuary_hearth reduced Subjugation (%d)" % w.subjugation)
 	ok(w.player.hp > hp_before - 5, "sanctuary_hearth restored health")
 	ok(m.items.size() >= 1, "echo_cache produced salvage")

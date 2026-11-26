@@ -215,3 +215,14 @@ M6.7 layers `10` composable interior room archetypes onto dungeon chambers (`pil
 ## M6.8 — Discovery, Codex and Run History
 
 M6.8 tracks cross-run discovery and run outcomes offline in `user://codex.json` strictly separated from permadeath run saves (`user://run.save.json`). The Codex confers zero gameplay stats or RNG influence and never spoils unseen creatures, branches, items, or threads.
+
+## M6.10 — Final M6 Validation & Telemetry (`--salt=m6_final_validation`)
+
+M6.10 adds `tests/test_reachability.gd` (445 checks verifying zero dead content across all `28` floors, `76` monsters, `104` talents, `165` items, `12` sets, `18` NPCs, `8` factions, and `24` threads), wires `blind_mole_brute` into `tithe_road_tunnels`, adds `FloorMap.set_explored()`, documents `AutoPlayer` heuristics (fixed policy, never tuned to held-out salts), and records fresh held-out balance telemetry (`192` runs across all `64` origin×calling pairs × `3` seeds, `elapsed 497.6s`):
+
+| Scope | Wins / Runs | Mean Turns | Notes |
+|---|---:|---:|---|
+| Overall | `144 / 192` (`75%`) | `870` | Telemetry: `avg_talents=7.16`, `avg_npcs=0.22`, `avg_threads_seen=0.64`, `branch_visits=0` (spine-direct bot pathing) |
+| Origins (`24` each) | — | — | `ashborn 22/24`, `human 19/24`, `ironbound_ward 19/24`, `cambion 18/24`, `penitent 18/24`, `revenant 17/24`, `unrecorded 16/24`, `veilkin 15/24` |
+| Callings (`24` each) | — | — | `Alchemist 22/24`, `Occultist 21/24`, `Warden 21/24`, `Assassin 19/24`, `Knight 18/24`, `Arbalester 17/24`, `Ophite Binder 16/24`, `Rite Cantor 10/24` |
+| Top Mortalities | — | — | `d2 The Vault Enumerator` (`11`), `d4 ossuary wight` (`4`), `d3 Choir Cantor Prime` (`3`) |

@@ -144,3 +144,8 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 ## M6.9 Additions (Portable Worldbuilding Manifest)
 
 - **Lore Manifest:** Added `content/lore/world_manifest.json` (`schema_version: 1`, kept outside `content/core/` so `ContentDB` loads only game data cleanly) and `docs/WORLD_MANIFEST.md`, validated by `tests/test_manifest.gd` for cross-references, provenance enums, lore/mechanics separation, and exclusion guards.
+
+## M6.10 Additions (Reachability & Telemetry)
+
+- **Sim & Reachability:** Added `FloorMap.set_explored(p)`, wired `blind_mole_brute` into `content/core/floors.json`, and added `tests/test_reachability.gd` validating zero unreachable floors, monsters, items, artifacts, sets, talents, NPCs, or factions.
+- **Verification Tooling:** Updated `tests/auto_player.gd` with documented deterministic heuristic policy (handling NPCs, emergent sites, and generic keys without tuning to held-out salts) and expanded `tools/soak.gd` telemetry (`distinct_floors`, `branch_visits`, `avg_npcs`, `avg_threads_seen`, `avg_talents`, per-origin and per-calling breakdowns).
