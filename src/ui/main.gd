@@ -192,7 +192,7 @@ func _show_title() -> void:
 	col.add_child(_btn("Settings", func() -> void: _show_settings(_show_title)))
 	if not OS.has_feature("web"):
 		col.add_child(_btn("Quit", func() -> void: get_tree().quit()))
-	var foot := _label("Set in the world of FALSE LIGHT. v0.5 (M5.4 Dungeon Ecology)", Palette.TEXT_DIM, 0.75)
+	var foot := _label("Set in the world of FALSE LIGHT. v0.5 (M5.5 Metaphysical Depth)", Palette.TEXT_DIM, 0.75)
 	foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(foot)
 
@@ -470,6 +470,17 @@ func _update_hud() -> void:
 		t.append("Ranged: %s (%s, rng %d)" % [world.item_name(rw), rwd["damage"], int(rwd["range"])])
 	if p.has_trait("mask_stances"):
 		t.append("Mask: [color=%s]%s[/color] (risk %d/%d)" % [Masks.color(p.mask), Masks.label(p.mask), p.mask_risk, World.MASK_RISK_MAX])
+	if world.subjugation > 0:
+		var clim := world.chain_limit()
+		var scol := Palette.ALERT.to_html(false) if world.subjugation >= clim - 1 else Palette.FALSE_SUN.to_html(false)
+		t.append("[color=#%s]Subjugation %d/%d[/color]" % [scol, world.subjugation, clim])
+	if world.contract != "":
+		var cdef: Dictionary = db.get_def("contracts", world.contract)
+		t.append("[color=%s]Contract: %s (%d/%d)[/color]" % ["#c77dff", String(cdef.get("name", world.contract)), world.contract_progress, int(cdef.get("floors", 2))])
+	if p.has_status("return_oriented"):
+		t.append("[color=#7ce8b0]Way: Return[/color]")
+	elif p.has_status("serpents_seam"):
+		t.append("[color=#c77dff]Way: Serpent[/color]")
 	for s in p.statuses:
 		var sd := db.get_def("statuses", s["id"])
 		t.append("[color=%s]%s (%d)[/color]" % [String(sd.get("color", "#eee5d3")), sd["name"], int(s["turns"])])
@@ -977,6 +988,36 @@ func _show_feature(feat: Dictionary) -> void:
 				_close_overlay()
 				world.player_interact(pos, "drain")
 				_after_action()))
+			if world.contract != "":
+				var cdef: Dictionary = db.get_def("contracts", world.contract)
+				col.add_child(_btn("Attest %s (-3 HP, advances oath)" % String(cdef.get("name", world.contract)), func() -> void:
+					_close_overlay()
+					world.player_interact(pos, "attest")
+					_after_action()))
+		"contract_lectern":
+			for cid in db.ids("contracts"):
+				var cdef: Dictionary = db.get_def("contracts", cid)
+				var way_label := "Way of Return" if String(cdef.get("way", "return")) == "return" else "Serpent's Way"
+				var tag := ""
+				if world.contract == cid:
+					tag = " [Active]"
+				elif world.contract_log.has(cid):
+					tag = " [Kept]" if String(world.contract_log[cid]) == "fulfilled" else " [Broken]"
+				var cname := String(cdef.get("name", cid))
+				var req_floors := int(cdef.get("floors", 2))
+				var b := _btn("%s (%s, %d floors)%s" % [cname, way_label, req_floors, tag], func() -> void:
+					_close_overlay()
+					world.player_interact(pos, "sign:%s" % cid)
+					_after_action())
+				if world.contract != "" or world.contract_log.has(cid):
+					b.disabled = true
+				col.add_child(b)
+				col.add_child(_label("%s  Oath: %s" % [String(cdef.get("description", "")), String(cdef.get("oath_text", ""))], Palette.TEXT_DIM, 0.78))
+			if world.contract != "":
+				col.add_child(_btn("Forsake active contract (Forsworn)", func() -> void:
+					_close_overlay()
+					world.player_interact(pos, "forsake")
+					_after_action()))
 		"vault_gate":
 			col.add_child(_btn("Unlock with vault key or Ophite Key", func() -> void:
 				_close_overlay()

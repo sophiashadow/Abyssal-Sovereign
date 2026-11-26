@@ -22,15 +22,15 @@ const SPHERE_PROFILES := {
 	1: {"hazard": Tiles.ASH_EMBER, "h_min": 3, "h_max": 6, "traps": ["spike", "rime"],
 		"sites": [{"kind": "shrine", "sub": "eye"}, {"kind": "altar", "sub": "unbinding"}]},
 	2: {"hazard": Tiles.RIME_ICE, "h_min": 4, "h_max": 7, "traps": ["spike", "shackle"],
-		"sites": [{"kind": "vault_gate", "sub": "locked_vault"}, {"kind": "merchant", "sub": "broker"}]},
+		"sites": [{"kind": "vault_gate", "sub": "locked_vault"}, {"kind": "merchant", "sub": "broker"}, {"kind": "contract_lectern", "sub": "rites"}]},
 	3: {"hazard": Tiles.SOLAR_GLARE, "h_min": 4, "h_max": 8, "traps": ["cinder", "shackle"],
 		"sites": [{"kind": "altar", "sub": "unbinding"}, {"kind": "ritual_circle", "sub": "geometry"}, {"kind": "challenge", "sub": "trial_bell"}]},
 	4: {"hazard": Tiles.SOLAR_GLARE, "h_min": 5, "h_max": 9, "traps": ["cinder", "shackle"],
-		"sites": [{"kind": "shrine", "sub": "eye"}, {"kind": "vault_gate", "sub": "locked_vault"}, {"kind": "merchant", "sub": "broker"}]},
+		"sites": [{"kind": "shrine", "sub": "eye"}, {"kind": "vault_gate", "sub": "locked_vault"}, {"kind": "merchant", "sub": "broker"}, {"kind": "contract_lectern", "sub": "rites"}]},
 	5: {"hazard": Tiles.ASH_EMBER, "h_min": 5, "h_max": 9, "traps": ["spike", "cinder", "shackle"],
 		"sites": [{"kind": "ritual_circle", "sub": "geometry"}, {"kind": "vault_gate", "sub": "locked_vault"}, {"kind": "challenge", "sub": "trial_bell"}]},
 	6: {"hazard": Tiles.MIASMA, "h_min": 5, "h_max": 10, "traps": ["rime", "shackle", "cinder"],
-		"sites": [{"kind": "altar", "sub": "unbinding"}, {"kind": "merchant", "sub": "broker"}, {"kind": "vault_gate", "sub": "locked_vault"}]},
+		"sites": [{"kind": "altar", "sub": "unbinding"}, {"kind": "merchant", "sub": "broker"}, {"kind": "vault_gate", "sub": "locked_vault"}, {"kind": "contract_lectern", "sub": "rites"}]},
 	7: {"hazard": Tiles.MIASMA, "h_min": 6, "h_max": 10, "traps": ["shackle", "rime", "spike"],
 		"sites": [{"kind": "shrine", "sub": "eye"}, {"kind": "ritual_circle", "sub": "geometry"}, {"kind": "challenge", "sub": "trial_bell"}]},
 }
@@ -58,6 +58,8 @@ static func glyph(feat: Dictionary) -> String:
 			return "'" if bool(feat.get("used", false)) else "="
 		"merchant":
 			return "$"
+		"contract_lectern":
+			return "%"
 		"challenge":
 			return "!"
 	return "?"
@@ -81,6 +83,8 @@ static func color(feat: Dictionary) -> String:
 			return "#f2c35c"
 		"merchant":
 			return "#f2c35c"
+		"contract_lectern":
+			return "#c77dff"
 		"challenge":
 			return "#ff7a33"
 	return "#eee5d3"
@@ -103,6 +107,8 @@ static func label(feat: Dictionary) -> String:
 			return "Locked Audit Vault" + (" (opened)" if bool(feat.get("used", false)) else "")
 		"merchant":
 			return "Wandering Debt-Broker"
+		"contract_lectern":
+			return "Lectern of Rites"
 		"challenge":
 			return "Trial Bell Monolith" + (" (rung)" if bool(feat.get("used", false)) else "")
 	return "feature"
@@ -124,6 +130,8 @@ static func description(feat: Dictionary) -> String:
 			return "Heavy black-iron audit bars sealing untouched salvage inside."
 		"merchant":
 			return "A hooded clerk from the lower seams trading salvage for blood or spare goods."
+		"contract_lectern":
+			return "A black-lacquered lectern open to the rites of the Two Ways. Sign a divine contract: a boon now, an oath to keep, a reward if you do."
 		"challenge":
 			return "An iron bell inscribed 'RING TO PROVE WORTH'. Summons an ambush for elite plunder and growth."
 	return ""

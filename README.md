@@ -2,19 +2,19 @@
 
 An original turn-based traditional roguelike set beneath Terra Tenebrae, in the cosmology of FALSE LIGHT. It is built with Godot 4 and typed GDScript, and plays fully offline.
 
-**Status: v0.5-dev (Milestones 0–4 and M5.1–M5.4 implemented).** It has a title screen, character creation (3 origins × 3 callings), and a seeded seven-sphere descent (Moon through Saturn). Gameplay covers:
+**Status: v0.5-dev (Milestones 0–4 and M5.1–M5.5 implemented — M5 Depth Pass complete).** It has a title screen, character creation (3 origins × 3 callings), and a seeded seven-sphere descent (Moon through Saturn). Gameplay covers:
 
-- Field of view with exploration memory, **Search (`s`) / disarm traps / secret caches**, and **interactive dungeon sites (`e`)** (Altars, Shrines, Ritual Circles, Locked Vaults, Debt-Brokers, Trial Bells, and Sphere hazards).
+- Field of view with exploration memory, **Search (`s`) / disarm traps / secret caches**, and **interactive dungeon sites (`e`)** (Altars, Shrines, Ritual Circles, Lecterns of Rites, Locked Vaults, Debt-Brokers, Trial Bells, and Sphere hazards).
 - Melee and **ranged combat** (`f` / Fire), thrown flasks/projectiles, occult scrolls, XP, levels, **attribute allocation**, and **30 calling talents across 9 trees**.
 - **Physical, elemental & metaphysical damage types** (`physical`, `fire`, `cold`, `radiant`, `void`) with resistances, vulnerabilities, and emergent status combos (*Thermal Shock*, *Scalding Steam*, *Cauterize*, *Hemorrhage*).
 - **Procedural affixes, sets, identification & BUC**: `Uncommon`/`Rare`/`Artifact` drops, run-shuffled unidentified consumables & gear, `Blessed`/`Cursed` equipment, 3 equipment sets, and 6 **Relics** (*Work* for power with a cost, or *Transmute* for permanent stats & unbinding).
 - **Class resources & cooldowns**: `Stamina` (Fallen Knight), `Resonance` (Occultist), and `Poise` (Assassin).
 - **Masks as stances** (`m` key / Mask button for Occultists: Bare Face, Nyx, Eris, Lilith) with risk accrual, elemental/void resistances, and seizures.
 - The **False Light** status: relief, then the Reckoning.
-- **Eight Chains** enemy abilities, **enemy specials**, deterministic **mutated elites**, and **Sphere mid-bosses** (*Choir Cantor Prime*, *Iron Auditor*).
+- **Eight Chains & Subjugation clock**, **enemy specials**, deterministic **mutated elites**, **Sphere mid-bosses** (*Choir Cantor Prime*, *Iron Auditor*), **Divine Contracts** (*The Fast*, *Vow of Poverty*, *The Taken Name*, *The Crown Taken*), and **Way allegiances**.
 - **Sphere Gates** between Spheres (`Stormed`, `Serpent's Key`, `Given Back`, `By Name`) and the **Apotheosis Guard**.
 - The Preliator Sentinel guardian, **Named losses** (Catalogued, Fluent, Gilded), and four victory outcomes (Unwritten Door, The Serpent's Way, The Way of Return, and Victory: By Decree).
-- Permadeath with atomic save/resume (`save_version` 7, migrating v1–v6 saves).
+- Permadeath with atomic save/resume (`save_version` 8, migrating v1–v7 saves).
 
 Android, Windows and Web builds can be exported via `tools/export.sh` (see [ROADMAP.md](ROADMAP.md); Windows runtime, Web browser `user://` persistence, and physical Android device runtime tests have not run yet). Any distributed export must ship Godot's license notices.
 

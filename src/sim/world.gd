@@ -10,7 +10,19 @@ extends RefCounted
 ## id 1, so the player wins ties. Player actions return true if they spent
 ## time; the world then runs monsters until it is the player's turn again.
 
-const SAVE_VERSION := 7
+const SAVE_VERSION := 8
+const SUBJUGATION_LIMIT := 6
+## Eight Chains grammar: monster tag -> status laid on the player and chance per hit.
+## (chain_fog is delivered by the litany in _monster_turn.)
+const CHAIN_TAGS := {
+	"chain_isolation": {"status": "isolation", "pct": 35},
+	"chain_debility": {"status": "debility", "pct": 30},
+	"chain_threat": {"status": "dread", "pct": 30},
+	"chain_indulgence": {"status": "false_light", "pct": 20},
+	"chain_omnipotence": {"status": "exposure", "pct": 25},
+	"chain_degradation": {"status": "degradation", "pct": 30},
+	"chain_trivial": {"status": "demanded", "pct": 30},
+}
 const PLAYER_ID := 1
 const COST_MOVE := 100
 const COST_ATTACK := 100
@@ -41,6 +53,12 @@ var death_cause: String = ""
 var apotheosis: int = 0
 var way_serpent: int = 0
 var way_return: int = 0
+## Subjugation clock: every chain that lands advances it; at the limit you are Entangled.
+var subjugation: int = 0
+var contract: String = ""
+var contract_progress: int = 0
+## contract id -> "fulfilled" | "broken"
+var contract_log: Dictionary = {}
 var next_entity_id: int = 2
 var id_known: Dictionary = {}
 var id_aliases: Dictionary = {}
@@ -787,6 +805,9 @@ func player_work_relic(index: int) -> bool:
 		var n := identify_pack()
 		if n > 0:
 			log_msg("Its light lays bare %d hidden item%s." % [n, "" if n == 1 else "s"], "good")
+	if sid == "crown_decree":
+		_remove_status(player, "entangled")
+		subjugation = 0
 	if sid == "almoners_grace":
 		player.resource = mini(player.max_resource(), player.resource + 4)
 	update_fov()
@@ -803,10 +824,7 @@ func player_transmute_relic(index: int) -> bool:
 	if String(d["kind"]) != "relic":
 		return false
 	var mods: Dictionary = d.get("transmute_mods", {})
-	for k in mods:
-		player.base[k] = int(player.base.get(k, 0)) + int(mods[k])
-	if mods.has("max_hp") and int(mods["max_hp"]) > 0:
-		player.hp = mini(player.stat("max_hp"), player.hp + int(mods["max_hp"]))
+	_grant_permanent(mods)
 	player.inventory.remove_at(index)
 	var freed := unbind_curses(true)
 	if freed > 0:
@@ -883,6 +901,9 @@ func player_descend_gate(method: String) -> bool:
 			"by_name":
 				apotheosis = maxi(0, apotheosis - 1)
 				log_msg("You speak your own name to the gate; something below hears it.", "lore")
+	if first_visit:
+		_contract_event("gate:" + method)
+		_contract_event("descend")
 	_enter_floor(depth + 1, true)
 	if first_visit and method == "by_name":
 		var nearest: Actor = null
@@ -1120,6 +1141,8 @@ func _run_talent_effect(eff: String, td: Dictionary, target: Actor, target_pos: 
 			for sid in ["isolation", "perception_fog", "bleeding", "pinned"]:
 				_remove_status(player, sid)
 			unbind_curses(true)
+			subjugation = 0
+			_remove_status(player, "entangled")
 			apply_status(player, "apostate_focus")
 			update_fov()
 			log_msg("You shatter the chains upon you.", "good")
@@ -1207,6 +1230,7 @@ func _run_talent_effect(eff: String, td: Dictionary, target: Actor, target_pos: 
 			for sid in ["reckoning", "isolation", "dissolution", "exposure", "hexed"]:
 				_remove_status(player, sid)
 			unbind_curses(true)
+			subjugation = maxi(0, subjugation - 3)
 			var heal := 6 + will_v
 			player.hp = mini(player.stat("max_hp"), player.hp + heal)
 			log_msg("You transmute pain into %d health." % heal, "good")
@@ -1366,6 +1390,8 @@ func _begin_player_turn() -> void:
 	_tick_mask()
 	_natural_regen()
 	_passive_detect()
+	_tick_subjugation()
+	_update_allegiance()
 	update_fov()
 
 
@@ -1389,6 +1415,151 @@ func _passive_detect() -> void:
 		if Grid.chebyshev(player.pos, fp) <= 2 and rng.chance_pct(pct):
 			f["revealed"] = true
 			log_msg("You spot a %s!" % Ecology.label(f), "info")
+
+
+func chain_limit() -> int:
+	return SUBJUGATION_LIMIT + (2 if way_return - way_serpent >= 2 else 0)
+
+
+## A chain lands on the player: apply its status, then advance the Subjugation clock.
+## Masks, Relics, False Light, Apotheosis and the Two Ways all bend the clock.
+func _chain_hit(sid: String) -> void:
+	if sid == "perception_fog" and player.has_trait("mask_stances") and player.mask == "lilith":
+		log_msg("Lilith's Eye sees through the narrowing litany.", "good")
+		return
+	if player.has_status("halo_aegis"):
+		log_msg("The Broken Halo turns the chain aside.", "good")
+		return
+	if sid == "false_light" and (player.has_status("false_light") or player.has_status("reckoning")):
+		return
+	apply_status(player, sid)
+	if player.has_status("entangled"):
+		return
+	var gain := 1
+	if apotheosis >= 4 and apotheosis < APOTHEOSIS_THRESHOLD:
+		gain += 1
+	if player.has_status("false_light"):
+		gain -= 1
+	if player.has_status("reckoning"):
+		gain += 1
+	if player.has_trait("mask_stances") and player.mask == "nyx":
+		gain -= 1
+	if gain <= 0:
+		return
+	subjugation += gain
+	if subjugation >= chain_limit():
+		_entangle()
+
+
+func _entangle() -> void:
+	subjugation = chain_limit() / 2
+	if player.has_status("crown_decree"):
+		log_msg("The Severed Crown refuses the chain's last link.", "good")
+		return
+	apply_status(player, "entangled")
+	log_msg("The chains close: you are Entangled.", "danger")
+
+
+func _tick_subjugation() -> void:
+	if turns <= 0 or subjugation <= 0 or turns % 10 != 0:
+		return
+	if player.has_trait("mask_stances") and player.mask == "eris":
+		return
+	subjugation -= 1
+
+
+## Keeps allegiance, apotheosis and contract statuses in step with the run.
+func _update_allegiance() -> void:
+	var lean := way_return - way_serpent
+	var want := "return_oriented" if lean >= 2 else ("serpents_seam" if lean <= -2 else "")
+	for sid in ["return_oriented", "serpents_seam"]:
+		if sid != want:
+			_remove_status(player, sid)
+	if want != "":
+		apply_status(player, want)
+	if apotheosis >= 4 and apotheosis < APOTHEOSIS_THRESHOLD:
+		apply_status(player, "sovereign_mark")
+	else:
+		_remove_status(player, "sovereign_mark")
+	if contract != "" and db.has("contracts", contract):
+		apply_status(player, String(db.get_def("contracts", contract)["boon_status"]))
+
+
+func _grant_permanent(mods: Dictionary) -> void:
+	for k in mods:
+		var key := "bonus_damage" if String(k) == "damage" else String(k)
+		player.base[key] = int(player.base.get(key, 0)) + int(mods[k])
+	if int(mods.get("max_hp", 0)) > 0:
+		player.hp = mini(player.stat("max_hp"), player.hp + int(mods["max_hp"]))
+
+
+func player_sign_contract(cid: String) -> bool:
+	if state != State.PLAYING or not db.has("contracts", cid):
+		return false
+	if contract != "":
+		log_msg("You are already bound by a contract.", "info")
+		return false
+	if contract_log.has(cid):
+		log_msg("That rite has already been decided.", "info")
+		return false
+	var cd := db.get_def("contracts", cid)
+	contract = cid
+	contract_progress = 0
+	apotheosis = maxi(0, apotheosis + int(cd.get("apotheosis", 0)))
+	log_msg("You sign %s. Oath: %s" % [cd["name"], cd["oath_text"]], "lore")
+	return true
+
+
+func _contract_event(ev: String) -> void:
+	if contract == "" or not db.has("contracts", contract):
+		return
+	var breach := false
+	match String(db.get_def("contracts", contract)["oath"]):
+		"no_healing_items":
+			breach = ev == "heal_item"
+		"light_pack":
+			breach = ev == "descend" and player.inventory.size() > 6
+		"no_return_rites":
+			breach = ev == "gate:given_back" or ev == "cleanse"
+		"no_by_name":
+			breach = ev == "gate:by_name" or ev == "gate:given_back"
+	if breach:
+		_breach_contract("You break your oath.")
+	elif ev == "descend":
+		_advance_contract()
+
+
+func _advance_contract() -> void:
+	if contract == "" or not db.has("contracts", contract):
+		return
+	contract_progress += 1
+	var cd := db.get_def("contracts", contract)
+	if contract_progress >= int(cd["floors"]):
+		_grant_permanent(cd["reward_mods"])
+		if String(cd["way"]) == "serpent":
+			way_serpent += 1
+		else:
+			way_return += 1
+		contract_log[contract] = "fulfilled"
+		_remove_status(player, String(cd["boon_status"]))
+		log_msg("%s is fulfilled; its reward stays with you." % cd["name"], "lore")
+		contract = ""
+		contract_progress = 0
+	else:
+		log_msg("%s: the oath holds (%d/%d)." % [cd["name"], contract_progress, int(cd["floors"])], "info")
+
+
+func _breach_contract(reason: String) -> void:
+	if contract == "" or not db.has("contracts", contract):
+		return
+	var cd := db.get_def("contracts", contract)
+	_remove_status(player, String(cd["boon_status"]))
+	apply_status(player, "forsworn")
+	apotheosis += 1
+	contract_log[contract] = "broken"
+	log_msg("%s %s is void; you are Forsworn." % [reason, cd["name"]], "danger")
+	contract = ""
+	contract_progress = 0
 
 
 func player_search() -> bool:
@@ -1503,8 +1674,10 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 				apotheosis = maxi(0, apotheosis - 1)
 				way_return += 1
 				var n := unbind_curses(false)
+				subjugation = maxi(0, subjugation - 3)
 				f["used"] = true
 				log_msg("The altar snaps iron bonds free (%d cleansed, +Way of Return)." % n, "good")
+				_contract_event("cleanse")
 				return _finish_player_action(COST_ITEM)
 		"shrine":
 			if choice == "steal":
@@ -1524,6 +1697,15 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 				log_msg("The Shrine witnesses the floor (%d identified, all traps & secrets revealed)." % nid, "good")
 				return _finish_player_action(COST_ITEM)
 		"ritual_circle":
+			if choice == "attest":
+				if contract == "" or player.hp <= 3:
+					log_msg("There is no oath to attest (or too little blood).", "info")
+					return false
+				player.hp -= 3
+				f["used"] = true
+				log_msg("You attest your oath before the Geometry.", "lore")
+				_advance_contract()
+				return _finish_player_action(COST_ITEM)
 			if choice == "drain":
 				var heal := maxi(4, player.stat("max_hp") / 2)
 				player.hp = mini(player.stat("max_hp"), player.hp + heal)
@@ -1566,6 +1748,17 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 				f["used"] = true
 				log_msg("You inscribe '%s' upon your %s." % [Affixes.label(picked), item_name(gear)], "lore")
 				return _finish_player_action(COST_ITEM)
+		"contract_lectern":
+			if choice == "forsake":
+				if contract == "":
+					return false
+				_breach_contract("You forsake the contract.")
+				return _finish_player_action(COST_WAIT)
+			if choice.begins_with("sign:"):
+				if not player_sign_contract(choice.substr(5)):
+					return false
+				return _finish_player_action(COST_ITEM)
+			return false
 		"vault_gate":
 			var key_idx := -1
 			var has_ophite := false
@@ -1701,6 +1894,8 @@ func _tick_cooldowns() -> void:
 		for tid in done:
 			player.cooldowns.erase(tid)
 	var rk := player.resource_kind()
+	if player.has_status("demanded"):
+		return
 	if rk == "poise" and turns % 2 == 0:
 		player.resource = mini(player.max_resource(), player.resource + 1)
 	elif rk != "" and turns % 3 == 0:
@@ -1886,7 +2081,7 @@ func _monster_turn(mon: Actor) -> int:
 		mon.flags["spec_cd"] = spec_cd - 1
 	if mon.tags.has("chain_fog") and sees and fog_cd <= 0 and not player.has_status("perception_fog") and Grid.chebyshev(mon.pos, player.pos) <= 5 and rng.chance_pct(50):
 		mon.flags["fog_cd"] = 8
-		apply_status(player, "perception_fog")
+		_chain_hit("perception_fog")
 		update_fov()
 		log_msg("The %s recites a narrowing litany; the dark closes in." % mon.name, "danger")
 		return COST_WAIT
@@ -2023,8 +2218,11 @@ func _attack(attacker: Actor, defender: Actor) -> void:
 			if st != "":
 				apply_status(defender, st)
 	if not attacker.is_player and defender.is_player and defender.is_alive():
-		if attacker.tags.has("chain_isolation") and not defender.has_status("isolation") and rng.chance_pct(35):
-			apply_status(defender, "isolation")
+		for ctag in CHAIN_TAGS:
+			if attacker.tags.has(ctag):
+				var csid := String(CHAIN_TAGS[ctag]["status"])
+				if not defender.has_status(csid) and rng.chance_pct(int(CHAIN_TAGS[ctag]["pct"])):
+					_chain_hit(csid)
 		if attacker.specials.has("leech_bite") and rng.chance_pct(35):
 			attacker.hp = mini(attacker.stat("max_hp"), attacker.hp + 2)
 			apply_status(defender, "bleeding")
@@ -2181,6 +2379,8 @@ func _consume(a: Actor, it: Item, index: int) -> void:
 			var before := a.hp
 			a.hp = mini(a.stat("max_hp"), a.hp + amount)
 			log_msg("You use the %s and recover %d health." % [d["name"], a.hp - before], "good")
+			if a.is_player:
+				_contract_event("heal_item")
 		"status":
 			log_msg("You drink the %s." % d["name"], "info")
 			if String(d["status"]) == "false_light":
@@ -2326,6 +2526,8 @@ func to_dict() -> Dictionary:
 		"apotheosis": apotheosis, "way_serpent": way_serpent, "way_return": way_return,
 		"next_id": next_entity_id,
 		"id_known": id_known.duplicate(true),
+		"subjugation": subjugation, "contract": contract,
+		"contract_progress": contract_progress, "contract_log": contract_log.duplicate(true),
 		"id_aliases": id_aliases.duplicate(true),
 		"uniques": spawned_uniques.duplicate(),
 		"rng": rng.get_state_string(),
@@ -2427,6 +2629,13 @@ static func _migrate(d: Dictionary) -> Dictionary:
 				var fl = out["floors"][k]
 				if typeof(fl) == TYPE_DICTIONARY and not fl.has("features"):
 					fl["features"] = []
+		ver = 7
+	if ver == 7:
+		out["save_version"] = 8
+		out["subjugation"] = int(out.get("subjugation", 0))
+		out["contract"] = String(out.get("contract", ""))
+		out["contract_progress"] = int(out.get("contract_progress", 0))
+		out["contract_log"] = out.get("contract_log", {})
 	return out
 
 
@@ -2494,6 +2703,12 @@ static func from_dict(content: ContentDB, d: Dictionary, errors: PackedStringArr
 	w.next_entity_id = int(d["next_id"])
 	w.id_known = d.get("id_known", {}).duplicate(true)
 	w.id_aliases = d.get("id_aliases", {}).duplicate(true)
+	w.subjugation = int(d.get("subjugation", 0))
+	w.contract = String(d.get("contract", ""))
+	w.contract_progress = int(d.get("contract_progress", 0))
+	w.contract_log = d.get("contract_log", {}).duplicate(true)
+	if w.contract != "" and not content.has("contracts", w.contract):
+		w.contract = ""
 	for u in d.get("uniques", []):
 		w.spawned_uniques.append(String(u))
 	w.rng = Rng.new(0)

@@ -131,7 +131,24 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 | `mods` | mods | no | passive stat modifiers per rank |
 | `effect` | string | no | active/passive rule key |
 
+## contracts
+
+Divine contracts (rites of the Two Ways). One may be held at a time; the oath is enforced by code (`src/sim/world.gd`).
+
+| Field | Type | Req | Notes |
+|---|---|---|---|
+| `id`, `name`, `description` | | yes | |
+| `way` | enum: serpent, return | yes | which Way's tally rises when the contract is fulfilled |
+| `oath` | enum: no_healing_items, light_pack, no_return_rites, no_by_name | yes | the restriction; breaking it voids the contract |
+| `oath_text` | text | yes | player-facing oath summary |
+| `boon_status` | ref:statuses | yes | status held while the contract is active |
+| `reward_mods` | mods | yes | permanent stat changes on fulfilment |
+| `floors` | int ≥ 1 | yes | new floors descended with the oath intact to fulfil it |
+| `apotheosis` | int | no | change to Apotheosis when signed |
+
 ## monsters
+
+Monster `tags` that drive the Eight Chains grammar: `chain_isolation`, `chain_fog`, `chain_debility`, `chain_threat`, `chain_indulgence`, `chain_omnipotence`, `chain_degradation`, `chain_trivial`. Each hit on the player may apply that chain; every chain advances the Subjugation clock.
 
 | Field | Type | Req | Notes |
 |---|---|---|---|

@@ -86,3 +86,10 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 - **Save schema:** `World.SAVE_VERSION := 7` with migration `v6 -> v7` backfilling `features` on serialized floors (`SaveCheck.FLOOR_KEYS` updated).
 - **World APIs:** `World.player_search()`, `World.player_interact(pos, choice)`, `_on_actor_enter_tile()`, `_passive_detect()`, and `_open_secret_door()`.
 - **UI:** `Palette` hazard visuals, `MapView` revealed feature rendering, `Main` `Srch` (`s`), `Use` (`e`), travel hazard/trap stops, and `_show_feature()` interactive overlays.
+
+## M5.5 Additions (Metaphysical Depth)
+
+- **Content & Schema:** Added `"contracts"` kind in `ContentSchema` (`content/core/contracts.json`), expanded `statuses.json` with chain/contract/allegiance/apotheosis statuses, and tagged monsters across all 8 `chain_*` abilities.
+- **Core, Sim & Ecology:** Added `contract_lectern` (`SPHERE_PROFILES[2, 4, 6]`), `Actor.stat("damage_bonus")` `bonus_damage` support, `World.CHAIN_TAGS`, `World.SUBJUGATION_LIMIT := 6`, `World.chain_limit()`, `_chain_hit()`, `_entangle()`, `_tick_subjugation()`, `_update_allegiance()`, `World.player_sign_contract()`, `_contract_event()`, `_advance_contract()`, `_breach_contract()`, and `ritual_circle` `"attest"` interaction.
+- **Save schema:** `World.SAVE_VERSION := 8` with migration `v7 -> v8` backfilling `subjugation`, `contract`, `contract_progress`, and `contract_log` (validated in `SaveCheck.problems()`).
+- **UI:** Live Subjugation meter, active Contract tracker, and Way allegiance status in HUD, plus Lectern of Rites signing/forsaking and Ritual Circle oath attestation in `_show_feature()`.

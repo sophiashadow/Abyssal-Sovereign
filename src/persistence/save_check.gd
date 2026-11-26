@@ -35,6 +35,8 @@ static func problems(d: Dictionary, db: ContentDB) -> PackedStringArray:
 		out.append("random state is malformed")
 	if typeof(d.get("id_known")) != TYPE_DICTIONARY or typeof(d.get("id_aliases")) != TYPE_DICTIONARY or typeof(d.get("uniques")) != TYPE_ARRAY:
 		out.append("discovery state is malformed")
+	if typeof(d.get("contract")) != TYPE_STRING or typeof(d.get("contract_log")) != TYPE_DICTIONARY or int(d.get("subjugation", -1)) < 0 or int(d.get("contract_progress", -1)) < 0:
+		out.append("contract or subjugation state is malformed")
 	return out
 
 

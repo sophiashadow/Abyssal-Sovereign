@@ -136,3 +136,24 @@ M5.4 transforms every Sphere into a distinct mechanical ecology rather than bare
 | `human` | `41 / 45` (`91%`) | — | `assassin` 15/15, `occultist` 14/15, `fallen_knight` 12/15 |
 | `cambion` | `40 / 45` (`89%`) | — | `assassin` 15/15, `occultist` 14/15, `fallen_knight` 11/15 |
 | `revenant` | `39 / 45` (`87%`) | — | `fallen_knight` 14/15, `occultist` 14/15, `assassin` 11/15 |
+
+## M5.5 — Metaphysical Depth
+
+M5.5 weaves the cosmology directly into tactical play across every enemy family, ritual site, relic, Mask, and path out:
+
+- **Complete Eight Chains Grammar & Subjugation Clock:** Every Dominion and grave-chain ability maps into `World.CHAIN_TAGS` (`chain_isolation` → `isolation`, `chain_fog` → `perception_fog`, `chain_debility` → `debility`, `chain_threat` → `dread`, `chain_indulgence` → `false_light`, `chain_omnipotence` → `exposure`, `chain_degradation` → `degradation`, `chain_trivial` → `demanded`, which halts passive resource recovery). Landing a chain advances `subjugation` toward `chain_limit()` (`SUBJUGATION_LIMIT := 6`), culminating in `entangled` (speed, evasion, and accuracy penalty) before stepping the clock back to half limit.
+- **Metaphysical Interactions (Masks, Relics, False Light, Apotheosis, Two Ways):**
+  - *Masks:* `nyx` cushions chain `subjugation` gain (`-1`), `lilith` blocks `chain_fog` (`perception_fog`), and `eris` prevents passive `subjugation` decay every `10` turns.
+  - *Relics:* *Broken Halo*'s `halo_aegis` turns incoming chain statuses aside; *Severed Crown*'s `crown_decree` refuses `entangled`, and working the Crown clears existing `entangled` and resets `subjugation` to `0`.
+  - *False Light & Apotheosis:* Active `false_light` cushions `subjugation` gain (`-1`), whereas `reckoning` (`+1`) and mid-to-high `apotheosis` (`4..7`, granting `sovereign_mark`: `+2` damage, `+1` accuracy, and `+1` chain gain) accelerate the Subjugation clock.
+  - *Two Ways:* Sustained leaning (`|way_return - way_serpent| >= 2`) bestows `return_oriented` (`+2` `chain_limit()`, `+1` defense, `+4` max HP, `+15%` Radiant resist) or `serpents_seam` (`+8%` crit, `+1` evasion, `+15%` Void resist).
+- **Divine Contracts & Lectern of Rites:** *Lecterns of Rites* (`contract_lectern`) in Spheres `2`, `4`, and `6` offer four oath-bound contracts (`contracts.json`: *The Fast*, *Vow of Poverty*, *The Taken Name*, *The Crown Taken*). Signing grants an active boon (`boon_*`) until the required `floors` are kept (or attested at a *Geometric Ritual Circle* for `-3` HP) to win permanent `reward_mods` and a Way increment; breaking the oath or forsaking strips the boon and inflicts `forsworn`.
+
+### Measured Balance (M5.5 held-out soak, `tools/soak.gd --seeds=15 --salt=heldout`, `135` runs)
+
+| Scope | Wins / Runs | Mean Turns | Notes |
+|---|---:|---:|---|
+| Overall | `110 / 135` (`81%`) | `718` | Eight Chains & Subjugation pressure tightened win rate (`Knight 29/45`, `Occultist 40/45`, `Assassin 41/45`) |
+| `human` | `39 / 45` (`87%`) | — | `assassin` 14/15, `occultist` 14/15, `fallen_knight` 11/15 |
+| `cambion` | `34 / 45` (`76%`) | — | `assassin` 14/15, `occultist` 13/15, `fallen_knight` 7/15 |
+| `revenant` | `37 / 45` (`82%`) | — | `assassin` 13/15, `occultist` 13/15, `fallen_knight` 11/15 |

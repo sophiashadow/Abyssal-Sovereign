@@ -62,4 +62,11 @@ Owner decisions resolved 2026-11-26 (see [docs/LORE.md](docs/LORE.md)): Apotheos
 1. **Traps & secret doors:** Added `spike`/`cinder`/`rime`/`shackle` traps, `secret_door` caches, passive keen-sight detection, `Search` (`s` / disarm +5 XP), and revealed secret passages opening into guaranteed magical loot.
 2. **Environmental hazards:** Added walkable `ASH_EMBER`, `RIME_ICE`, `MIASMA`, and `SOLAR_GLARE` tiles interacting cleanly with M5.2 damage resistances and status combos, with safe tap-to-travel stops.
 3. **Interactive dungeon sites & Sphere profiles:** Added *Altars of Unbinding*, *Shrines of the Unblinking Eye*, *Geometric Ritual Circles*, *Locked Audit Vaults* (`vault_key` + reusable `ophite_key`), *Wandering Debt-Brokers* (blood/barter), *Trial Bell Monoliths*, Sphere-specific `SPHERE_PROFILES`, and `SAVE_VERSION := 7`.
-4. **Next (M5.5):** Metaphysical depth (complete Eight Chains enemy ability grammar, expanded ritual mechanics/divine contracts/allegiances, deep interactions between Masks, Relics, False Light, Apotheosis, and the Two Ways).
+
+## Milestone 5.5: metaphysical depth (done 2026-11-26)
+
+1. **Eight Chains enemy grammar & Subjugation clock:** Completed all eight chain tags (`isolation`, `fog`, `debility`, `threat`, `indulgence`, `omnipotence`, `degradation`, `trivial`), `demanded` resource-regen block, and the `subjugation` clock culminating in `entangled`.
+2. **Masks, Relics, False Light, Apotheosis & Two Ways interactions:** Wired live clock modifiers across Masks (`nyx`/`lilith`/`eris`), Relics (`Broken Halo`/`Severed Crown`), `false_light`/`reckoning`, `apotheosis` (`sovereign_mark`), and sustained Way orientations (`return_oriented`, `serpents_seam`).
+3. **Divine contracts & Lectern of Rites:** Added `contracts.json` (*The Fast*, *Vow of Poverty*, *The Taken Name*, *The Crown Taken*), `contract_lectern` sites, `ritual_circle` oath attestation, permanent `reward_mods`, `forsworn` oath breaches, and `SAVE_VERSION := 8`.
+
+M5 (The Depth Pass: M5.1–M5.5) is complete. Remaining work tracks Milestone 3 platform verification and human playtest polish.

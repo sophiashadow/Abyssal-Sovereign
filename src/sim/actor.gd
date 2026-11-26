@@ -153,7 +153,7 @@ func stat(stat_name: String) -> int:
 				d += 2
 			return maxi(0, d)
 		"damage_bonus":
-			return stat("might") + _mod_sum("damage")
+			return stat("might") + _mod_sum("damage") + int(base.get("bonus_damage", 0))
 		"crit":
 			return 5 + int(base.get("crit", 0)) + maxi(0, stat("agility")) * 2 + _item_field("weapon", "crit") + _mod_sum("crit")
 		"speed":

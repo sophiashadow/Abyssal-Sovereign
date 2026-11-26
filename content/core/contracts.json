@@ -1,0 +1,22 @@
+{
+  "schema": "contracts",
+  "version": 1,
+  "entries": [
+    {"id": "the_fast", "name": "The Fast", "way": "return",
+     "description": "A Way of Return rite: go hungry of every remedy and the Geometry lends you clear sight.",
+     "oath": "no_healing_items", "oath_text": "Drink no healing salve or tincture while the Fast holds.",
+     "boon_status": "boon_fast", "reward_mods": {"will": 1, "max_hp": 3}, "floors": 2, "apotheosis": -1},
+    {"id": "vow_of_poverty", "name": "Vow of Poverty", "way": "return",
+     "description": "A Way of Return rite: carry little and the record loses its grip on you.",
+     "oath": "light_pack", "oath_text": "Carry no more than 6 items when you descend.",
+     "boon_status": "boon_poverty", "reward_mods": {"defense": 1, "max_hp": 4}, "floors": 2, "apotheosis": -1},
+    {"id": "the_taken_name", "name": "The Taken Name", "way": "serpent",
+     "description": "A Serpent's Way rite: take a name of your own and strike where the ledger is blind.",
+     "oath": "no_by_name", "oath_text": "Never cross a Sphere Gate By Name or Given Back.",
+     "boon_status": "boon_taken_name", "reward_mods": {"agility": 1, "crit": 3}, "floors": 2, "apotheosis": 1},
+    {"id": "the_crown_taken", "name": "The Crown Taken", "way": "serpent",
+     "description": "A Serpent's Way rite: seize the sovereign's authority, and answer for it.",
+     "oath": "no_return_rites", "oath_text": "Never cleanse at an Altar or cross a Gate Given Back.",
+     "boon_status": "boon_crown_taken", "reward_mods": {"might": 1, "damage": 1}, "floors": 3, "apotheosis": 2}
+  ]
+}

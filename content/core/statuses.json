@@ -178,6 +178,32 @@
       "regen": 2,
       "mods": {"evasion": 2},
       "color": "#c6aa70"
-    }
+    },
+    {"id": "debility", "name": "Induced Debility", "description": "The chain saps strength and aim.", "duration": 8,
+     "mods": {"accuracy": -2, "damage": -2}, "color": "#9b8aa6"},
+    {"id": "dread", "name": "Dread", "description": "A threat lands; every motion flinches.", "duration": 6,
+     "mods": {"evasion": -2, "accuracy": -1}, "color": "#e05a47"},
+    {"id": "degradation", "name": "Degraded", "description": "Worn down and marked as lesser; guard and vigor fray.", "duration": 10,
+     "mods": {"defense": -2, "max_hp": -4}, "color": "#a89d8c"},
+    {"id": "demanded", "name": "Trivial Demand", "description": "A petty order consumes your focus; resource will not recover.", "duration": 6,
+     "color": "#d3bea0"},
+    {"id": "entangled", "name": "Entangled", "description": "The Subjugation clock closes: slowed, exposed, and bound.", "duration": 8,
+     "mods": {"speed": -30, "evasion": -2, "accuracy": -1}, "color": "#ff4d6d"},
+    {"id": "forsworn", "name": "Forsworn", "description": "A broken oath; the Geometry withdraws its favor.", "duration": 40,
+     "mods": {"accuracy": -2, "evasion": -2}, "color": "#ff4d6d"},
+    {"id": "return_oriented", "name": "Return-Oriented", "description": "Your steps lean toward the Way of Return: chains tighten more slowly.", "duration": 3,
+     "mods": {"defense": 1, "max_hp": 4}, "resists": {"radiant": 15}, "color": "#78bea7"},
+    {"id": "serpents_seam", "name": "Serpent's Seam", "description": "Your steps lean toward the Serpent's Way: you strike through seams in the ledger.", "duration": 3,
+     "mods": {"crit": 8, "evasion": 1}, "resists": {"void": 15}, "color": "#8f7ae0"},
+    {"id": "sovereign_mark", "name": "Sovereign's Mark", "description": "Unchecked power sharpens you, and the order of Rex Mundi marks you for it.", "duration": 3,
+     "mods": {"damage": 2, "accuracy": 1}, "color": "#f2c35c"},
+    {"id": "boon_fast", "name": "Boon of the Fast", "description": "Clear-eyed from fasting.", "duration": 3,
+     "mods": {"will": 1, "evasion": 1}, "resists": {"void": 15}, "color": "#78bea7"},
+    {"id": "boon_poverty", "name": "Boon of Poverty", "description": "Unburdened and hard to hold.", "duration": 3,
+     "mods": {"defense": 1, "max_hp": 6}, "color": "#c6aa70"},
+    {"id": "boon_taken_name", "name": "Boon of the Taken Name", "description": "A name nobody wrote down.", "duration": 3,
+     "mods": {"crit": 8, "accuracy": 1}, "resists": {"void": 20}, "color": "#8f7ae0"},
+    {"id": "boon_crown_taken", "name": "Boon of the Crown Taken", "description": "Borrowed sovereignty hardens the hand.", "duration": 3,
+     "mods": {"damage": 2, "accuracy": 1}, "color": "#ff4d6d"}
   ]
 }

@@ -19,7 +19,7 @@ extends RefCounted
 ##   table:<kind>  array of {"id": ref:<kind>, "weight": int > 0}
 ##   trait         a trait id implemented in src/sim/traits.gd
 
-const KINDS: Array[String] = ["statuses", "items", "species", "classes", "talents", "monsters", "floors"]
+const KINDS: Array[String] = ["statuses", "items", "species", "classes", "talents", "contracts", "monsters", "floors"]
 
 ## Stats that equipment, statuses and species may modify.
 const MOD_STATS: Array[String] = [
@@ -116,6 +116,18 @@ const FIELDS := {
 		"description": {"type": "text", "required": true},
 		"mods": {"type": "mods", "required": false},
 		"effect": {"type": "string", "required": false},
+	},
+	"contracts": {
+		"id": {"type": "id", "required": true},
+		"name": {"type": "string", "required": true},
+		"description": {"type": "text", "required": true},
+		"way": {"type": "enum:serpent|return", "required": true},
+		"oath": {"type": "enum:no_healing_items|light_pack|no_return_rites|no_by_name", "required": true},
+		"oath_text": {"type": "text", "required": true},
+		"boon_status": {"type": "ref:statuses", "required": true},
+		"reward_mods": {"type": "mods", "required": true},
+		"floors": {"type": "int", "required": true, "min": 1},
+		"apotheosis": {"type": "int", "required": false},
 	},
 	"monsters": {
 		"id": {"type": "id", "required": true},
