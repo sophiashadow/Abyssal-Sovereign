@@ -146,3 +146,8 @@ Surface locations from FALSE LIGHT PR #300 (`BREADTH_PASS.md`) inform undergroun
 ## M6.7 Dungeon Variety & Emergent Encounters Provenance
 
 - **10 Room Archetypes & 4 Emergent Sites** (`Proposed` tactical geometry and non-linear chamber features): *Pillared Hall*, *Cross Vault*, *Sanctuary Alcove*, *Ambush Choke*, *Ritual Chamber*, *Flooded Cistern*, *Archive Stacks*, *Gauntlet Corridor*, *Settlement Court*, and *Broken Cloister*, alongside *Unsealed Rune Locks*, *Abandoned Chalk Circles*, *Shuttered Sanctuary Hearths*, and *Wall-Hollow Echoes*.
+
+## M6.9 Portable Worldbuilding Manifest
+
+- Exported structured setting manifest at `content/lore/world_manifest.json` (`schema_version: 1`, documented in `docs/WORLD_MANIFEST.md`), separating shared canon/derived/proposed FALSE LIGHT worldbuilding (`cosmology`, `28` places, `8` institutions, `18` people, `16` relics, `24` threads, and typed `relationships`) from Abyssal Sovereign mechanics (`game_ref`).
+- Proposed additions—including PR #300 people/places/institutions—remain tagged `proposed` inside the manifest and are never promoted to shared canon automatically.

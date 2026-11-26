@@ -140,3 +140,7 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 - **Sim & Persistence:** Added `src/sim/codex.gd` (`Codex`: knowledge-only persistent catalog across creatures, visited places, identified items/relics, met NPCs, institutions, threads, contracts, and last 50 runs) and `src/persistence/codex_io.gd` (`CodexIO`: atomic `user://codex.json` writes strictly separate from `user://run.save.json`).
 - **Determinism isolation:** `World` never reads `Codex`; `Main` records one-way via `codex.record_from_world(world)` during `_autosave()` and `codex.record_run_end(world)` in `_show_end()`.
 - **UI:** Added Codex overlay (`k` / Title / Pause) with zero spoilers for unseen entries, and enriched end-of-run summaries in `_show_end()`.
+
+## M6.9 Additions (Portable Worldbuilding Manifest)
+
+- **Lore Manifest:** Added `content/lore/world_manifest.json` (`schema_version: 1`, kept outside `content/core/` so `ContentDB` loads only game data cleanly) and `docs/WORLD_MANIFEST.md`, validated by `tests/test_manifest.gd` for cross-references, provenance enums, lore/mechanics separation, and exclusion guards.

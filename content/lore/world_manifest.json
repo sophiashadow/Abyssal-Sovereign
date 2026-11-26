@@ -1,0 +1,1813 @@
+{
+  "schema_version": 1,
+  "world": "FALSE LIGHT / Terra Tenebrae",
+  "source_game": "Abyssal Sovereign",
+  "provenance_levels": [
+    "canon",
+    "canon_derived",
+    "interpretation",
+    "proposed"
+  ],
+  "exclusions": [
+    "private_edition_rules_or_lore",
+    "rulebook_13_tier_1_2_real_world_threats",
+    "personal_biographical_material",
+    "persona_and_voice_documents"
+  ],
+  "cosmology": {
+    "spheres": [
+      {
+        "id": "sphere_1_moon",
+        "name": "Moon",
+        "depth": 1,
+        "provenance": "canon",
+        "theme": "Threshold almshouses, cellar pantries, and unfiled tunnels."
+      },
+      {
+        "id": "sphere_2_mercury",
+        "name": "Mercury",
+        "depth": 2,
+        "provenance": "canon",
+        "theme": "Counting rooms, tithe stalls, and confiscated stair archives."
+      },
+      {
+        "id": "sphere_3_venus",
+        "name": "Venus",
+        "depth": 3,
+        "provenance": "canon_derived",
+        "theme": "False-sun choirs, brass smelteries, and shuttered assemblies."
+      },
+      {
+        "id": "sphere_4_sun",
+        "name": "Sun",
+        "depth": 4,
+        "provenance": "canon_derived",
+        "theme": "Processional avenues above, grated conduits and furnaces below."
+      },
+      {
+        "id": "sphere_5_mars",
+        "name": "Mars",
+        "depth": 5,
+        "provenance": "canon_derived",
+        "theme": "Iron scriptoria, closed stacks, cisterns, and armed-church posts."
+      },
+      {
+        "id": "sphere_6_jupiter",
+        "name": "Jupiter",
+        "depth": 6,
+        "provenance": "canon_derived",
+        "theme": "Chamber of Decrees, seal forges, debt vaults, and Ophite seams."
+      },
+      {
+        "id": "sphere_7_saturn",
+        "name": "Saturn",
+        "depth": 7,
+        "provenance": "canon_derived",
+        "theme": "The Sealed Stair, unrecorded margins, oubliettes, and the Unwritten Door."
+      }
+    ],
+    "two_ways": [
+      {
+        "id": "way_of_return",
+        "name": "The Way of Return",
+        "provenance": "canon",
+        "summary": "Voluntary refusal of unchecked apotheosis and orientation back through humility and restitution."
+      },
+      {
+        "id": "serpents_way",
+        "name": "The Serpent's Way",
+        "provenance": "canon",
+        "summary": "Cutting seams through the Dominion's ledger and wielding borrowed sovereignty without joining Rex Mundi's throne."
+      }
+    ],
+    "masks": [
+      {
+        "id": "nyx",
+        "name": "Mask of Nyx",
+        "provenance": "canon_derived",
+        "summary": "Silence and withdrawal from the Dominion's gaze."
+      },
+      {
+        "id": "eris",
+        "name": "Mask of Eris",
+        "provenance": "canon_derived",
+        "summary": "Sharp severance that turns Dominion precision back upon itself."
+      },
+      {
+        "id": "lilith",
+        "name": "Mask of Lilith",
+        "provenance": "canon_derived",
+        "summary": "Unblinking witness that pierces perceptual fog."
+      }
+    ],
+    "eight_chains": [
+      {
+        "id": "chain_isolation",
+        "name": "Chain of Isolation",
+        "provenance": "canon_derived"
+      },
+      {
+        "id": "chain_fog",
+        "name": "Chain of Perceptual Fog",
+        "provenance": "canon_derived"
+      },
+      {
+        "id": "chain_debility",
+        "name": "Chain of Induced Debility",
+        "provenance": "canon_derived"
+      },
+      {
+        "id": "chain_threat",
+        "name": "Chain of Threat",
+        "provenance": "canon_derived"
+      },
+      {
+        "id": "chain_indulgence",
+        "name": "Chain of Indulgence",
+        "provenance": "canon_derived"
+      },
+      {
+        "id": "chain_omnipotence",
+        "name": "Chain of Omnipotence",
+        "provenance": "canon_derived"
+      },
+      {
+        "id": "chain_degradation",
+        "name": "Chain of Degradation",
+        "provenance": "canon_derived"
+      },
+      {
+        "id": "chain_trivial",
+        "name": "Chain of Trivial Demand",
+        "provenance": "canon_derived"
+      }
+    ]
+  },
+  "places": [
+    {
+      "id": "place_ossuary_warrens",
+      "name": "The Ossuary Warrens",
+      "sphere": "Moon",
+      "region_kind": "spine",
+      "branch": "Main Descent",
+      "lore": "Beneath the almshouses the dead are stacked by tithe number. Something is eating the ledger.",
+      "provenance": "interpretation",
+      "game_ref": {
+        "floor_id": "ossuary_warrens"
+      }
+    },
+    {
+      "id": "place_back_courts_undercroft",
+      "name": "The Back Courts Undercroft",
+      "sphere": "Moon",
+      "region_kind": "branch",
+      "branch": "The Back Courts",
+      "lore": "Flooded courtyard cellars beneath the outer alleys where rainwater washes away chalked tallies.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "floor_id": "back_courts_undercroft"
+      }
+    },
+    {
+      "id": "place_shut_chapel_crypt",
+      "name": "The Shut Chapel Crypt",
+      "sphere": "Moon",
+      "region_kind": "sanctuary",
+      "branch": "The Shut Chapel",
+      "lore": "Foundation flagstones beneath a tolerant chapel. A low drain leads onward toward the Tithe Road tunnels.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "floor_id": "shut_chapel_crypt"
+      }
+    },
+    {
+      "id": "place_day_house_cellars",
+      "name": "The Day-House Cellars",
+      "sphere": "Moon",
+      "region_kind": "settlement",
+      "branch": "The Day-Houses",
+      "lore": "Cool pantries under the day-houses of the registered poor\u2014cots, broth cauldrons, and whispered barter.",
+      "provenance": "canon",
+      "game_ref": {
+        "floor_id": "day_house_cellars"
+      }
+    },
+    {
+      "id": "place_tithe_vaults",
+      "name": "The Tithe Vaults",
+      "sphere": "Mercury",
+      "region_kind": "spine",
+      "branch": "Main Descent",
+      "lore": "Counting-rooms of the armed church, sealed and forgotten. The false sun is painted on every lintel.",
+      "provenance": "interpretation",
+      "game_ref": {
+        "floor_id": "tithe_vaults"
+      }
+    },
+    {
+      "id": "place_tithe_road_tunnels",
+      "name": "The Tithe Road Tunnels",
+      "sphere": "Mercury",
+      "region_kind": "branch",
+      "branch": "The Tithe Roads",
+      "lore": "Sunken cartways running under the wardens' tax-roads, slick with seepage and hoarfrost.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "floor_id": "tithe_road_tunnels"
+      }
+    },
+    {
+      "id": "place_unrecorded_market_seams",
+      "name": "The Unrecorded Market Seams",
+      "sphere": "Mercury",
+      "region_kind": "settlement",
+      "branch": "The Unrecorded Market",
+      "lore": "Lantern-lit stalls tucked behind false masonry where brokers weigh oaths and salvage without stamps.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "floor_id": "unrecorded_market_seams"
+      }
+    },
+    {
+      "id": "place_archive_stair_annex",
+      "name": "The Archive Stair Annex",
+      "sphere": "Mercury",
+      "region_kind": "vault",
+      "branch": "The Archive Stair",
+      "lore": "A cold stone stairwell lined with iron pigeonholes of confiscated papers and sealed ledgers.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "floor_id": "archive_stair_annex"
+      }
+    },
+    {
+      "id": "place_gilded_choir",
+      "name": "The Gilded Choir",
+      "sphere": "Venus",
+      "region_kind": "spine",
+      "branch": "Main Descent",
+      "lore": "A gallery of brass censers and false-sun hymnal galleries. The air tastes of copper and old vows.",
+      "provenance": "proposed",
+      "game_ref": {
+        "floor_id": "gilded_choir"
+      }
+    },
+    {
+      "id": "place_hidden_assembly_catacomb",
+      "name": "The Hidden Assembly Catacomb",
+      "sphere": "Venus",
+      "region_kind": "sanctuary",
+      "branch": "The Hidden Assemblies",
+      "lore": "Chalk-marked vaults below the choir galleries where uncounted witnesses met by shuttered lamp.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "floor_id": "hidden_assembly_catacomb"
+      }
+    },
+    {
+      "id": "place_censer_foundry",
+      "name": "The Censer Foundry",
+      "sphere": "Venus",
+      "region_kind": "branch",
+      "branch": "The Sun-Houses",
+      "lore": "Smelters casting brass thuribles for the Sun-Houses above. Slag glows along the trenchways.",
+      "provenance": "proposed",
+      "game_ref": {
+        "floor_id": "censer_foundry"
+      }
+    },
+    {
+      "id": "place_velvet_ossuary",
+      "name": "The Velvet Ossuary",
+      "sphere": "Venus",
+      "region_kind": "vault",
+      "branch": "Gilded Reliquaries",
+      "lore": "Porphyry alcoves draped in rotting velvet where confiscated relics wait for appraisal.",
+      "provenance": "proposed",
+      "game_ref": {
+        "floor_id": "velvet_ossuary"
+      }
+    },
+    {
+      "id": "place_false_solar_court",
+      "name": "The False Solar Court",
+      "sphere": "Sun",
+      "region_kind": "spine",
+      "branch": "Main Descent",
+      "lore": "Lanterns burn without oil over dry flagstones. Cantors keep the cadence of Prosay's wheel.",
+      "provenance": "proposed",
+      "game_ref": {
+        "floor_id": "false_solar_court"
+      }
+    },
+    {
+      "id": "place_processional_underway",
+      "name": "The Processional Underway",
+      "sphere": "Sun",
+      "region_kind": "stronghold",
+      "branch": "The Processional District",
+      "lore": "Iron grates beneath the Dominion's processional avenue. Every boot-step rings down the corridor.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "floor_id": "processional_underway"
+      }
+    },
+    {
+      "id": "place_sun_house_furnaces",
+      "name": "The Sun-House Furnaces",
+      "sphere": "Sun",
+      "region_kind": "branch",
+      "branch": "The Sun-Houses",
+      "lore": "Subterranean flues venting the Sun-Houses' perpetual lamps. Ash drifts ankle-deep across the tiles.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "floor_id": "sun_house_furnaces"
+      }
+    },
+    {
+      "id": "place_gilded_cloister",
+      "name": "The Gilded Cloister",
+      "sphere": "Sun",
+      "region_kind": "sanctuary",
+      "branch": "The Cloister of Breath",
+      "lore": "A quiet arcade walled off behind false-sun frescoes where deserters mend broken gear.",
+      "provenance": "proposed",
+      "game_ref": {
+        "floor_id": "gilded_cloister"
+      }
+    },
+    {
+      "id": "place_iron_scriptorium",
+      "name": "The Iron Scriptorium",
+      "sphere": "Mars",
+      "region_kind": "spine",
+      "branch": "Main Descent",
+      "lore": "Black-iron desks bolted to bedrock; every wall is ruled in columns of names and penalties.",
+      "provenance": "proposed",
+      "game_ref": {
+        "floor_id": "iron_scriptorium"
+      }
+    },
+    {
+      "id": "place_closed_stacks_vault",
+      "name": "The Closed Stacks Vault",
+      "sphere": "Mars",
+      "region_kind": "vault",
+      "branch": "The Closed Stacks",
+      "lore": "Locked aisles of chained codices and heretical margins beneath the forbidden library.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "floor_id": "closed_stacks_vault"
+      }
+    },
+    {
+      "id": "place_audit_cisterns",
+      "name": "The Audit Cisterns",
+      "sphere": "Mars",
+      "region_kind": "branch",
+      "branch": "The Flooded Ledger",
+      "lore": "Freezing runoff pooling under the Scriptorium floor. Ink-dark water slows every step.",
+      "provenance": "proposed",
+      "game_ref": {
+        "floor_id": "audit_cisterns"
+      }
+    },
+    {
+      "id": "place_preliator_garrison",
+      "name": "The Preliator Garrison",
+      "sphere": "Mars",
+      "region_kind": "stronghold",
+      "branch": "The Armed Church",
+      "lore": "Armory grates and muster-halls of the armed church. Iron echoes betray every trespasser.",
+      "provenance": "proposed",
+      "game_ref": {
+        "floor_id": "preliator_garrison"
+      }
+    },
+    {
+      "id": "place_chamber_of_decrees",
+      "name": "The Chamber of Decrees",
+      "sphere": "Jupiter",
+      "region_kind": "spine",
+      "branch": "Main Descent",
+      "lore": "A vaulted hall of stamped seals and unappealable judgments. Nothing descends past here unrecorded.",
+      "provenance": "proposed",
+      "game_ref": {
+        "floor_id": "chamber_of_decrees"
+      }
+    },
+    {
+      "id": "place_seal_foundry_deep",
+      "name": "The Seal Foundry Deep",
+      "sphere": "Jupiter",
+      "region_kind": "stronghold",
+      "branch": "The Office of Seals",
+      "lore": "Forges stamping black-iron seals for the Chamber of Decrees. Sparks rain through grated catwalks.",
+      "provenance": "proposed",
+      "game_ref": {
+        "floor_id": "seal_foundry_deep"
+      }
+    },
+    {
+      "id": "place_debts_cathedral",
+      "name": "The Debts Cathedral",
+      "sphere": "Jupiter",
+      "region_kind": "vault",
+      "branch": "The Almoner's Vault",
+      "lore": "Columns of leaden debt-tokens stacked to the ceiling. Brokers trade quietly among the shadows.",
+      "provenance": "proposed",
+      "game_ref": {
+        "floor_id": "debts_cathedral"
+      }
+    },
+    {
+      "id": "place_ophite_seam_hollow",
+      "name": "The Ophite Seam Hollow",
+      "sphere": "Jupiter",
+      "region_kind": "sanctuary",
+      "branch": "The Ophite Current",
+      "lore": "A crack in the Geometry's foundations where the Eye's quiet light holds back the Chains.",
+      "provenance": "proposed",
+      "game_ref": {
+        "floor_id": "ophite_seam_hollow"
+      }
+    },
+    {
+      "id": "place_sealed_stair",
+      "name": "The Sealed Stair",
+      "sphere": "Saturn",
+      "region_kind": "spine",
+      "branch": "Main Descent",
+      "lore": "The lowest record. Past the Sentinel is a door the Architect never wrote down.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "floor_id": "sealed_stair"
+      }
+    },
+    {
+      "id": "place_unwritten_margin",
+      "name": "The Unwritten Margin",
+      "sphere": "Saturn",
+      "region_kind": "branch",
+      "branch": "The Unwritten Margin",
+      "lore": "Raw uncatalogued stone beside Saturn's foundation, where the Architect's ink never dried.",
+      "provenance": "proposed",
+      "game_ref": {
+        "floor_id": "unwritten_margin"
+      }
+    },
+    {
+      "id": "place_cage_oubliette",
+      "name": "The Cage Oubliette",
+      "sphere": "Saturn",
+      "region_kind": "stronghold",
+      "branch": "The Cage",
+      "lore": "Rusted lock-cells suspended over an abyss of iron grates. Nothing enters without clanging the wards.",
+      "provenance": "proposed",
+      "game_ref": {
+        "floor_id": "cage_oubliette"
+      }
+    },
+    {
+      "id": "place_witness_hermitage",
+      "name": "The Witness Hermitage",
+      "sphere": "Saturn",
+      "region_kind": "sanctuary",
+      "branch": "The Witness's Edge",
+      "lore": "A narrow cell of clean flagstones beside the seventh threshold, kept clear for those who still refuse the chair.",
+      "provenance": "proposed",
+      "game_ref": {
+        "floor_id": "witness_hermitage"
+      }
+    }
+  ],
+  "institutions": [
+    {
+      "id": "inst_inquisition_two_minds",
+      "name": "The Inquisition's Two Minds",
+      "lore": "Inside the inquisitorial halls two habits argue endlessly without a schism: file every unquiet witness, or burn the page cleanly before the stairs.",
+      "poles": [
+        {
+          "id": "keep_on_file",
+          "label": "Keep It on File"
+        },
+        {
+          "id": "burn_it",
+          "label": "Burn the Record"
+        }
+      ],
+      "provenance": "proposed",
+      "game_ref": {
+        "faction_id": "inquisition_two_minds"
+      }
+    },
+    {
+      "id": "inst_office_of_seals",
+      "name": "The Office of Seals",
+      "lore": "Wardens and clerks of the stamped writ split between stamping only what stands true and stamping whatever keeps passage open.",
+      "poles": [
+        {
+          "id": "stamps_true",
+          "label": "Stamp What Is True"
+        },
+        {
+          "id": "stamps_useful",
+          "label": "Stamp What Is Useful"
+        }
+      ],
+      "provenance": "proposed",
+      "game_ref": {
+        "faction_id": "office_of_seals"
+      }
+    },
+    {
+      "id": "inst_readers_circles",
+      "name": "The Readers' Circles",
+      "lore": "Cellar study-groups copying torn marginalia; half urge wide sharing across sanctuaries, half keep the leaves locked under oath.",
+      "poles": [
+        {
+          "id": "share_widely",
+          "label": "Share the Marginalia"
+        },
+        {
+          "id": "keep_close",
+          "label": "Keep the Text Close"
+        }
+      ],
+      "provenance": "proposed",
+      "game_ref": {
+        "faction_id": "readers_circles"
+      }
+    },
+    {
+      "id": "inst_guild_and_ring",
+      "name": "The Guild and the Ring",
+      "lore": "Artisans, smelters, and Back-Court repairers weighing whether honest brass weights can survive false-sun taxation.",
+      "poles": [
+        {
+          "id": "honest_weights",
+          "label": "Keep Honest Weights"
+        },
+        {
+          "id": "short_weights",
+          "label": "Trim for Survival"
+        }
+      ],
+      "provenance": "proposed",
+      "game_ref": {
+        "faction_id": "guild_and_ring"
+      }
+    },
+    {
+      "id": "inst_cellar_and_street",
+      "name": "The Cellar and the Street",
+      "lore": "Guides of unrecorded tunnels divided over keeping out of the census forever versus standing seen on the upper threshold.",
+      "poles": [
+        {
+          "id": "stay_hidden",
+          "label": "Stay Below Sight"
+        },
+        {
+          "id": "stand_seen",
+          "label": "Stand Seen Above"
+        }
+      ],
+      "provenance": "proposed",
+      "game_ref": {
+        "faction_id": "cellar_and_street"
+      }
+    },
+    {
+      "id": "inst_day_house_almoners",
+      "name": "The Day-House Almoners",
+      "lore": "Broth-keepers and ration clerks torn between feeding anyone at the back step or demanding a clean ration ticket first.",
+      "poles": [
+        {
+          "id": "feed_unfiled",
+          "label": "Feed the Unfiled"
+        },
+        {
+          "id": "audit_ration",
+          "label": "Issue Ledgered Rations"
+        }
+      ],
+      "provenance": "proposed",
+      "game_ref": {
+        "faction_id": "day_house_almoners"
+      }
+    },
+    {
+      "id": "inst_choir_disaffected",
+      "name": "The Mute Cantors",
+      "lore": "Former false-sun choristers who slipped down below: some keep the old cadence in secret, others seek to break the pitch for good.",
+      "poles": [
+        {
+          "id": "preserve_hymn",
+          "label": "Keep the Old Cadence"
+        },
+        {
+          "id": "unmake_tune",
+          "label": "Break the Cadence"
+        }
+      ],
+      "provenance": "proposed",
+      "game_ref": {
+        "faction_id": "choir_disaffected"
+      }
+    },
+    {
+      "id": "inst_ophite_witnesses",
+      "name": "Witnesses of the Seam",
+      "lore": "Runners and binders along the Ophite seam arguing whether to wait quietly unseen or cut the Dominion stamp open directly.",
+      "poles": [
+        {
+          "id": "wait_unseen",
+          "label": "Wait in the Seam"
+        },
+        {
+          "id": "strike_stamp",
+          "label": "Cut the Stamp Open"
+        }
+      ],
+      "provenance": "proposed",
+      "game_ref": {
+        "faction_id": "ophite_witnesses"
+      }
+    }
+  ],
+  "people": [
+    {
+      "id": "person_uc_the_stitcher",
+      "name": "Uc",
+      "role": "Back-Court Stitcher",
+      "institution_id": "inst_guild_and_ring",
+      "pole": "honest_weights",
+      "place_ids": [
+        "place_back_courts_undercroft",
+        "place_unrecorded_market_seams",
+        "place_ossuary_warrens"
+      ],
+      "lore": "Lay your belt and boots on the bench. No Guild stamp, no ledger fee\u2014only honest needlework.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "uc_the_stitcher"
+      }
+    },
+    {
+      "id": "person_clerk_anselm",
+      "name": "Clerk Anselm",
+      "role": "Day-House Clerk",
+      "institution_id": "inst_inquisition_two_minds",
+      "pole": "keep_on_file",
+      "place_ids": [
+        "place_archive_stair_annex",
+        "place_tithe_vaults"
+      ],
+      "lore": "If I write it on loose paper instead of the bound volume, the Scriptorium sees nothing\u2014and you know what you carry.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "clerk_anselm"
+      }
+    },
+    {
+      "id": "person_tibors",
+      "name": "Tibors",
+      "role": "Tanner-Witness",
+      "institution_id": "inst_cellar_and_street",
+      "pole": "stay_hidden",
+      "place_ids": [
+        "place_day_house_cellars",
+        "place_ossuary_warrens"
+      ],
+      "lore": "Keep your lantern low by the lime-vats. The Eight Chains follow anyone walking upright under a painted lintel.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "tibors"
+      }
+    },
+    {
+      "id": "person_peyre",
+      "name": "Peyre",
+      "role": "Censer-Smelter",
+      "institution_id": "inst_guild_and_ring",
+      "pole": "short_weights",
+      "place_ids": [
+        "place_censer_foundry",
+        "place_sun_house_furnaces"
+      ],
+      "lore": "Brass weights mean one thing at Prosay's door and another by the slag-chute. Trade what you will not carry past Mars.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "peyre"
+      }
+    },
+    {
+      "id": "person_mirande",
+      "name": "Mirande",
+      "role": "Margin Reader",
+      "institution_id": "inst_readers_circles",
+      "pole": "share_widely",
+      "place_ids": [
+        "place_closed_stacks_vault",
+        "place_hidden_assembly_catacomb"
+      ],
+      "lore": "The ink in the margins is louder than the text. Let me read your phials and scrolls before you test them.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "mirande"
+      }
+    },
+    {
+      "id": "person_orable",
+      "name": "Orable",
+      "role": "Scribe's Kin",
+      "institution_id": "inst_readers_circles",
+      "pole": "keep_close",
+      "place_ids": [
+        "place_archive_stair_annex",
+        "place_audit_cisterns"
+      ],
+      "lore": "Speak plainly\u2014are you turning back toward the Return, or cutting loose along the Serpent's seam?",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "orable"
+      }
+    },
+    {
+      "id": "person_hesper",
+      "name": "Hesper",
+      "role": "Procession Marshal",
+      "institution_id": "inst_office_of_seals",
+      "pole": "stamps_true",
+      "place_ids": [
+        "place_processional_underway",
+        "place_chamber_of_decrees"
+      ],
+      "lore": "Even beneath the avenue a blade ought to carry an honest edge. Keep step cleanly and I will oil your guard.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "hesper"
+      }
+    },
+    {
+      "id": "person_brother_calix",
+      "name": "Brother Calix",
+      "role": "Lamp-Keeper",
+      "institution_id": "inst_choir_disaffected",
+      "pole": "preserve_hymn",
+      "place_ids": [
+        "place_sun_house_furnaces",
+        "place_shut_chapel_crypt"
+      ],
+      "lore": "Sit by the shuttered oil-lamp. We still sing without the brass wheel, and we still bind burns.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "brother_calix"
+      }
+    },
+    {
+      "id": "person_wren",
+      "name": "Wren",
+      "role": "Door-Keeper",
+      "institution_id": "inst_cellar_and_street",
+      "pole": "stand_seen",
+      "place_ids": [
+        "place_hidden_assembly_catacomb",
+        "place_witness_hermitage"
+      ],
+      "lore": "Some say hide in the limestone forever; I say walk clean to the seventh sill and let them see the door open.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "wren"
+      }
+    },
+    {
+      "id": "person_almoner_dessa",
+      "name": "Almoner Dessa",
+      "role": "Broth-Keeper",
+      "institution_id": "inst_day_house_almoners",
+      "pole": "feed_unfiled",
+      "place_ids": [
+        "place_day_house_cellars",
+        "place_debts_cathedral"
+      ],
+      "lore": "No ration ticket needed down here. Drink while the pot stays hot, and spare your blood for deeper stairs.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "almoner_dessa"
+      }
+    },
+    {
+      "id": "person_ferrant",
+      "name": "Ferrant",
+      "role": "The Binder",
+      "institution_id": "inst_ophite_witnesses",
+      "pole": "strike_stamp",
+      "place_ids": [
+        "place_closed_stacks_vault",
+        "place_velvet_ossuary"
+      ],
+      "lore": "A binding can cut either way. Give me a knotted hilt or cursed iron and I will strip its stamp clean.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "ferrant"
+      }
+    },
+    {
+      "id": "person_odo",
+      "name": "Odo",
+      "role": "Night-Cart Driver",
+      "institution_id": "inst_cellar_and_street",
+      "pole": "stay_hidden",
+      "place_ids": [
+        "place_tithe_road_tunnels",
+        "place_unwritten_margin"
+      ],
+      "lore": "The night-cart rolls only while the lamps stay shuttered. Swap spare iron or vials before I pull out.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "odo"
+      }
+    },
+    {
+      "id": "person_sister_vesper",
+      "name": "Sister Vesper",
+      "role": "Shut-Chapel Verger",
+      "institution_id": "inst_choir_disaffected",
+      "pole": "unmake_tune",
+      "place_ids": [
+        "place_shut_chapel_crypt",
+        "place_gilded_cloister"
+      ],
+      "lore": "We stopped the false-sun chime at dusk. Leave the weight on the sill and let your armor rest uncursed.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "sister_vesper"
+      }
+    },
+    {
+      "id": "person_tallyman_corvin",
+      "name": "Tallyman Corvin",
+      "role": "Deserter Tallyman",
+      "institution_id": "inst_office_of_seals",
+      "pole": "stamps_useful",
+      "place_ids": [
+        "place_tithe_vaults",
+        "place_iron_scriptorium"
+      ],
+      "lore": "A seal can hold a gate open as easily as shut. Hold an oath below, and I can shave one notch off its tally.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "tallyman_corvin"
+      }
+    },
+    {
+      "id": "person_keeper_sable",
+      "name": "Keeper Sable",
+      "role": "Cistern Salvager",
+      "institution_id": "inst_ophite_witnesses",
+      "pole": "wait_unseen",
+      "place_ids": [
+        "place_back_courts_undercroft",
+        "place_audit_cisterns",
+        "place_ophite_seam_hollow"
+      ],
+      "lore": "Everything dropped through the grates washes into the cold catch-basins sooner or later.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "keeper_sable"
+      }
+    },
+    {
+      "id": "person_precentor_jule",
+      "name": "Precentor Jule",
+      "role": "Burned Choir-Master",
+      "institution_id": "inst_inquisition_two_minds",
+      "pole": "burn_it",
+      "place_ids": [
+        "place_gilded_choir",
+        "place_false_solar_court"
+      ],
+      "lore": "Burn every choir sheet\u2014then decide which Way you mean to stand on when the Sentinel breaks.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "precentor_jule"
+      }
+    },
+    {
+      "id": "person_almoner_bram",
+      "name": "Brother Bram",
+      "role": "Market Almoner",
+      "institution_id": "inst_day_house_almoners",
+      "pole": "audit_ration",
+      "place_ids": [
+        "place_unrecorded_market_seams",
+        "place_seal_foundry_deep"
+      ],
+      "lore": "Measure twice, sign once. If you bear a divine contract, I know how to steady your pace without breaking form.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "almoner_bram"
+      }
+    },
+    {
+      "id": "person_warden_tomas",
+      "name": "Warden Tomas",
+      "role": "Retired Gatekeeper",
+      "institution_id": "inst_inquisition_two_minds",
+      "pole": "keep_on_file",
+      "place_ids": [
+        "place_preliator_garrison",
+        "place_cage_oubliette",
+        "place_sealed_stair"
+      ],
+      "lore": "Forty years locking iron doors down here teaches you how to slip a chain before the Sentinel hears the bolt.",
+      "provenance": "proposed",
+      "game_ref": {
+        "npc_id": "warden_tomas"
+      }
+    }
+  ],
+  "relics": [
+    {
+      "id": "relic_confessors_glass",
+      "name": "Confessor's Glass",
+      "lore": "A lensground pane from an old confessional. Looking through it hurts the eyes and leaves nothing hidden.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "item_id": "confessors_glass"
+      }
+    },
+    {
+      "id": "relic_ophite_key",
+      "name": "Ophite Key",
+      "lore": "A cold bronze key bitten by green salt. It turns in locks that have no door.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "item_id": "ophite_key"
+      }
+    },
+    {
+      "id": "relic_broken_halo",
+      "name": "Broken Halo",
+      "lore": "Half a crown of gilt iron, snapped clean across the brow.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "item_id": "broken_halo"
+      }
+    },
+    {
+      "id": "relic_severed_crown",
+      "name": "Severed Crown",
+      "lore": "An iron circlet cleft cleanly through the sovereign seal.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "item_id": "severed_crown"
+      }
+    },
+    {
+      "id": "relic_ward_keepers_lamp",
+      "name": "Ward-Keeper's Lamp",
+      "lore": "A shuttered oil lantern that still remembers who walked the corridor first.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "item_id": "ward_keepers_lamp"
+      }
+    },
+    {
+      "id": "relic_almoners_purse",
+      "name": "Almoner's Purse",
+      "lore": "A salt-stained leather pouch heavy with leaden debt-tokens.",
+      "provenance": "canon_derived",
+      "game_ref": {
+        "item_id": "almoners_purse"
+      }
+    },
+    {
+      "id": "relic_penitents_scourge",
+      "name": "Penitent's Brass Scourge",
+      "lore": "Tarnished discipline cord from the Shut Chapel; cuts hard when worked in blood.",
+      "provenance": "proposed",
+      "game_ref": {
+        "item_id": "penitents_scourge"
+      }
+    },
+    {
+      "id": "relic_archive_lens",
+      "name": "Archive Index Lens",
+      "lore": "Brass-rimmed reading glass from the Closed Stacks that spots hidden seams and ink.",
+      "provenance": "proposed",
+      "game_ref": {
+        "item_id": "archive_lens"
+      }
+    },
+    {
+      "id": "relic_ash_reliquary_box",
+      "name": "Sanctuary Ash Reliquary",
+      "lore": "Copper box filled with cool furnace cinders from a razed parish.",
+      "provenance": "proposed",
+      "game_ref": {
+        "item_id": "ash_reliquary_box"
+      }
+    },
+    {
+      "id": "relic_rime_handbell",
+      "name": "Velvet-Clapper Rime Bell",
+      "lore": "Bronze handbell damp with ossuary frost; one mute toll stills close pursuers.",
+      "provenance": "proposed",
+      "game_ref": {
+        "item_id": "rime_handbell"
+      }
+    },
+    {
+      "id": "relic_unwritten_ledger_leaf",
+      "name": "Unwritten Margin Leaf",
+      "lore": "Heavy linen sheet cut out before a decree was stamped; deflects the Chains.",
+      "provenance": "proposed",
+      "game_ref": {
+        "item_id": "unwritten_ledger_leaf"
+      }
+    },
+    {
+      "id": "relic_counterfeit_sun_coin",
+      "name": "Counterfeit Sun Sovereign",
+      "lore": "Lead-core coin washed in false gilt; mocks Dominion seals cleanly.",
+      "provenance": "proposed",
+      "game_ref": {
+        "item_id": "counterfeit_sun_coin"
+      }
+    },
+    {
+      "id": "relic_salt_hourglass",
+      "name": "Cellar Salt-Glass",
+      "lore": "Timed with brine-salt instead of sand; buys steps when pursuit closes.",
+      "provenance": "proposed",
+      "game_ref": {
+        "item_id": "salt_hourglass"
+      }
+    },
+    {
+      "id": "relic_cantors_fork",
+      "name": "Cantor's Brass Tuning-Fork",
+      "lore": "Rings below speech; breaks dissonance in choir ambushes.",
+      "provenance": "proposed",
+      "game_ref": {
+        "item_id": "cantors_fork"
+      }
+    },
+    {
+      "id": "relic_warden_portcullis_seal",
+      "name": "Preliator Gatekeeper Seal",
+      "lore": "Heavy iron stamp taken from a collapsed post; anchors the carrier in narrow doors.",
+      "provenance": "proposed",
+      "game_ref": {
+        "item_id": "warden_portcullis_seal"
+      }
+    },
+    {
+      "id": "relic_witness_pocket_mirror",
+      "name": "Pocket Mirror of the Eye",
+      "lore": "Silvered pocket glass cracked down the corner; strips perceptual fog on sight.",
+      "provenance": "proposed",
+      "game_ref": {
+        "item_id": "witness_pocket_mirror"
+      }
+    }
+  ],
+  "threads": [
+    {
+      "id": "thread_loose_stitch_back_courts",
+      "name": "The Unrecorded Tally in the Drain",
+      "lore": "Uc worries that rats in the Back Courts Undercroft will gnaw clean through an old debt-sheet before dawn.",
+      "person_id": "person_uc_the_stitcher",
+      "institution_id": "inst_guild_and_ring",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "loose_stitch_back_courts"
+      }
+    },
+    {
+      "id": "thread_unfiled_census_leaf",
+      "name": "Loose Leaf Below the Stair",
+      "lore": "Clerk Anselm slipped a Day-House tally sheet loose of its binding; reaching the Archive Stair keeps it uncatalogued.",
+      "person_id": "person_clerk_anselm",
+      "institution_id": "inst_inquisition_two_minds",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "unfiled_census_leaf"
+      }
+    },
+    {
+      "id": "thread_hide_from_procession",
+      "name": "Tanner's Cold Mark",
+      "lore": "Tibors offers to score an unfiled pass-tag on your palm\u2014either spill a little blood now or refuse his knife.",
+      "person_id": "person_tibors",
+      "institution_id": "inst_cellar_and_street",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "hide_from_procession"
+      }
+    },
+    {
+      "id": "thread_foundry_slag_debt",
+      "name": "Short Brass at the Flues",
+      "lore": "Peyre suspects the Sun-House Furnaces hold salvaged alloy untouched by Prosay's assay stamp.",
+      "person_id": "person_peyre",
+      "institution_id": "inst_guild_and_ring",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "foundry_slag_debt"
+      }
+    },
+    {
+      "id": "thread_marginalia_of_the_shut",
+      "name": "Carrying the Margin Word",
+      "lore": "Mirande wants word carried down to Orable so the Readers' Circles know a page survived the audit.",
+      "person_id": "person_mirande",
+      "institution_id": "inst_readers_circles",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "marginalia_of_the_shut"
+      }
+    },
+    {
+      "id": "thread_readers_locked_chest",
+      "name": "Testing the Lent Glass",
+      "lore": "Orable asks you to work a Relic by quiet flame rather than surrender it to Dominion custody.",
+      "person_id": "person_orable",
+      "institution_id": "inst_readers_circles",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "readers_locked_chest"
+      }
+    },
+    {
+      "id": "thread_honest_blade_inspection",
+      "name": "The Grate Marshal's Reckoning",
+      "lore": "Beneath the Processional Underway, Marshal Krell drills troops on short stamps; Hesper wants the post broken.",
+      "person_id": "person_hesper",
+      "institution_id": "inst_office_of_seals",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "honest_blade_inspection"
+      }
+    },
+    {
+      "id": "thread_shuttered_lamp_oil",
+      "name": "Clean Oil for the Shut Chapel",
+      "lore": "Brother Calix seeks refuge in the Shut Chapel Crypt after leaving the Sun-House flues behind.",
+      "person_id": "person_brother_calix",
+      "institution_id": "inst_choir_disaffected",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "shuttered_lamp_oil"
+      }
+    },
+    {
+      "id": "thread_unopened_door_wren",
+      "name": "Witness at the Seventh Sill",
+      "lore": "Wren believes the Preliator Sentinel must fall before anyone speaks cleanly on the surface.",
+      "person_id": "person_wren",
+      "institution_id": "inst_cellar_and_street",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "unopened_door_wren"
+      }
+    },
+    {
+      "id": "thread_dayhouse_soup_kettle",
+      "name": "Broth for the Unfiled",
+      "lore": "Almoner Dessa rations thin broth by hand\u2014give a measure of vigor now or guard your own reserves.",
+      "person_id": "person_almoner_dessa",
+      "institution_id": "inst_day_house_almoners",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "dayhouse_soup_kettle"
+      }
+    },
+    {
+      "id": "thread_cut_stamp_closed_stacks",
+      "name": "Snapping the Wax Stamp",
+      "lore": "Ferrant urges transmuting a Relic cleanly instead of keeping its sealed weight intact.",
+      "person_id": "person_ferrant",
+      "institution_id": "inst_ophite_witnesses",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "cut_stamp_closed_stacks"
+      }
+    },
+    {
+      "id": "thread_night_cart_detour",
+      "name": "Frost on the Tithe Axle",
+      "lore": "Odo dropped an unrecorded axle-pin somewhere along the Tithe Road Tunnels.",
+      "person_id": "person_odo",
+      "institution_id": "inst_cellar_and_street",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "night_cart_detour"
+      }
+    },
+    {
+      "id": "thread_mute_choir_rehearsal",
+      "name": "Silencing the Brass Key",
+      "lore": "Sister Vesper asks that the Choir Cantor Prime be silenced before false music fills the Cloister.",
+      "person_id": "person_sister_vesper",
+      "institution_id": "inst_choir_disaffected",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "mute_choir_rehearsal"
+      }
+    },
+    {
+      "id": "thread_tallyman_erased_row",
+      "name": "Counter-Signed Obligation",
+      "lore": "Whenever you bear a divine contract, Tallyman Corvin watches whether you attest it before stone rather than flee.",
+      "person_id": "person_tallyman_corvin",
+      "institution_id": "inst_office_of_seals",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "tallyman_erased_row"
+      }
+    },
+    {
+      "id": "thread_cistern_catch_basin",
+      "name": "Ink-Stained Cistern Sluice",
+      "lore": "Runoff beneath the Iron Scriptorium carries torn seal-parchment down into the Audit Cisterns.",
+      "person_id": "person_keeper_sable",
+      "institution_id": "inst_ophite_witnesses",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "cistern_catch_basin"
+      }
+    },
+    {
+      "id": "thread_ash_canticle_embers",
+      "name": "After the Furnace Falls",
+      "lore": "Smelter Prosay's collapse leaves Cantor Helios Prime exposed in the False Solar Court.",
+      "person_id": "person_precentor_jule",
+      "institution_id": "inst_inquisition_two_minds",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "ash_canticle_embers"
+      }
+    },
+    {
+      "id": "thread_market_short_measure",
+      "name": "Leaden Weights Below",
+      "lore": "Brother Bram suspects debtors' tokens from the Unrecorded Market are heaped in the Debts Cathedral.",
+      "person_id": "person_almoner_bram",
+      "institution_id": "inst_day_house_almoners",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "market_short_measure"
+      }
+    },
+    {
+      "id": "thread_oubliette_key_weight",
+      "name": "The Seventh Keyholder",
+      "lore": "Old Warden Tomas warns that the Jailer of the Seventh still locks chains over the bottom stairwell.",
+      "person_id": "person_warden_tomas",
+      "institution_id": "inst_inquisition_two_minds",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "oubliette_key_weight"
+      }
+    },
+    {
+      "id": "thread_binder_malakor_codex",
+      "name": "Chained Folio in the Stacks",
+      "lore": "Inside the Closed Stacks Vault, Binder Malakor keeps unindexed codices nailed shut.",
+      "person_id": "person_mirande",
+      "institution_id": "inst_readers_circles",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "binder_malakor_codex"
+      }
+    },
+    {
+      "id": "thread_velvet_appraiser_seal",
+      "name": "Through Confessor's Glass",
+      "lore": "Holding the Confessor's Glass makes confiscated reliquaries in the Velvet Ossuary stand out sharply.",
+      "person_id": "person_ferrant",
+      "institution_id": "inst_ophite_witnesses",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "velvet_appraiser_seal"
+      }
+    },
+    {
+      "id": "thread_forge_cyrus_hammer",
+      "name": "Quenching the Great Die",
+      "lore": "At the Seal Foundry Deep, Forge-Warden Cyrus stamps fresh iron collars for the Decrees above.",
+      "person_id": "person_hesper",
+      "institution_id": "inst_office_of_seals",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "forge_cyrus_hammer"
+      }
+    },
+    {
+      "id": "thread_ophite_hollow_vigil",
+      "name": "Where Bronze Keys Turn",
+      "lore": "The Ophite Key resonates beside green salt fractures deep beneath Jupiter.",
+      "person_id": "person_keeper_sable",
+      "institution_id": "inst_ophite_witnesses",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "ophite_hollow_vigil"
+      }
+    },
+    {
+      "id": "thread_margin_unwritten_scroll",
+      "name": "Beyond the Ruled Column",
+      "lore": "From the Chamber of Decrees, runners speak of raw unruled stone off the seventh stair.",
+      "person_id": "person_odo",
+      "institution_id": "inst_cellar_and_street",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "margin_unwritten_scroll"
+      }
+    },
+    {
+      "id": "thread_hermitage_silent_vow",
+      "name": "Clean Flagstones at Saturn",
+      "lore": "Beside the Sealed Stair lies a quiet hermitage where no chair or ledger stands.",
+      "person_id": "person_wren",
+      "institution_id": "inst_cellar_and_street",
+      "provenance": "proposed",
+      "game_ref": {
+        "thread_id": "hermitage_silent_vow"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "from": "person_uc_the_stitcher",
+      "to": "inst_guild_and_ring",
+      "relation": "leans:honest_weights",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_uc_the_stitcher",
+      "to": "place_back_courts_undercroft",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_uc_the_stitcher",
+      "to": "place_unrecorded_market_seams",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_uc_the_stitcher",
+      "to": "place_ossuary_warrens",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_clerk_anselm",
+      "to": "inst_inquisition_two_minds",
+      "relation": "leans:keep_on_file",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_clerk_anselm",
+      "to": "place_archive_stair_annex",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_clerk_anselm",
+      "to": "place_tithe_vaults",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_tibors",
+      "to": "inst_cellar_and_street",
+      "relation": "leans:stay_hidden",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_tibors",
+      "to": "place_day_house_cellars",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_tibors",
+      "to": "place_ossuary_warrens",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_peyre",
+      "to": "inst_guild_and_ring",
+      "relation": "leans:short_weights",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_peyre",
+      "to": "place_censer_foundry",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_peyre",
+      "to": "place_sun_house_furnaces",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_mirande",
+      "to": "inst_readers_circles",
+      "relation": "leans:share_widely",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_mirande",
+      "to": "place_closed_stacks_vault",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_mirande",
+      "to": "place_hidden_assembly_catacomb",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_orable",
+      "to": "inst_readers_circles",
+      "relation": "leans:keep_close",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_orable",
+      "to": "place_archive_stair_annex",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_orable",
+      "to": "place_audit_cisterns",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_hesper",
+      "to": "inst_office_of_seals",
+      "relation": "leans:stamps_true",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_hesper",
+      "to": "place_processional_underway",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_hesper",
+      "to": "place_chamber_of_decrees",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_brother_calix",
+      "to": "inst_choir_disaffected",
+      "relation": "leans:preserve_hymn",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_brother_calix",
+      "to": "place_sun_house_furnaces",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_brother_calix",
+      "to": "place_shut_chapel_crypt",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_wren",
+      "to": "inst_cellar_and_street",
+      "relation": "leans:stand_seen",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_wren",
+      "to": "place_hidden_assembly_catacomb",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_wren",
+      "to": "place_witness_hermitage",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_almoner_dessa",
+      "to": "inst_day_house_almoners",
+      "relation": "leans:feed_unfiled",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_almoner_dessa",
+      "to": "place_day_house_cellars",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_almoner_dessa",
+      "to": "place_debts_cathedral",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_ferrant",
+      "to": "inst_ophite_witnesses",
+      "relation": "leans:strike_stamp",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_ferrant",
+      "to": "place_closed_stacks_vault",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_ferrant",
+      "to": "place_velvet_ossuary",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_odo",
+      "to": "inst_cellar_and_street",
+      "relation": "leans:stay_hidden",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_odo",
+      "to": "place_tithe_road_tunnels",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_odo",
+      "to": "place_unwritten_margin",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_sister_vesper",
+      "to": "inst_choir_disaffected",
+      "relation": "leans:unmake_tune",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_sister_vesper",
+      "to": "place_shut_chapel_crypt",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_sister_vesper",
+      "to": "place_gilded_cloister",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_tallyman_corvin",
+      "to": "inst_office_of_seals",
+      "relation": "leans:stamps_useful",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_tallyman_corvin",
+      "to": "place_tithe_vaults",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_tallyman_corvin",
+      "to": "place_iron_scriptorium",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_keeper_sable",
+      "to": "inst_ophite_witnesses",
+      "relation": "leans:wait_unseen",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_keeper_sable",
+      "to": "place_back_courts_undercroft",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_keeper_sable",
+      "to": "place_audit_cisterns",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_keeper_sable",
+      "to": "place_ophite_seam_hollow",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_precentor_jule",
+      "to": "inst_inquisition_two_minds",
+      "relation": "leans:burn_it",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_precentor_jule",
+      "to": "place_gilded_choir",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_precentor_jule",
+      "to": "place_false_solar_court",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_almoner_bram",
+      "to": "inst_day_house_almoners",
+      "relation": "leans:audit_ration",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_almoner_bram",
+      "to": "place_unrecorded_market_seams",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_almoner_bram",
+      "to": "place_seal_foundry_deep",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_warden_tomas",
+      "to": "inst_inquisition_two_minds",
+      "relation": "leans:keep_on_file",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_warden_tomas",
+      "to": "place_preliator_garrison",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_warden_tomas",
+      "to": "place_cage_oubliette",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "person_warden_tomas",
+      "to": "place_sealed_stair",
+      "relation": "frequents",
+      "provenance": "proposed"
+    },
+    {
+      "from": "place_back_courts_undercroft",
+      "to": "place_ossuary_warrens",
+      "relation": "branches_from",
+      "provenance": "canon_derived"
+    },
+    {
+      "from": "place_shut_chapel_crypt",
+      "to": "place_ossuary_warrens",
+      "relation": "branches_from",
+      "provenance": "canon_derived"
+    },
+    {
+      "from": "place_day_house_cellars",
+      "to": "place_ossuary_warrens",
+      "relation": "branches_from",
+      "provenance": "canon"
+    },
+    {
+      "from": "place_tithe_road_tunnels",
+      "to": "place_tithe_vaults",
+      "relation": "branches_from",
+      "provenance": "canon_derived"
+    },
+    {
+      "from": "place_unrecorded_market_seams",
+      "to": "place_tithe_vaults",
+      "relation": "branches_from",
+      "provenance": "canon_derived"
+    },
+    {
+      "from": "place_archive_stair_annex",
+      "to": "place_tithe_vaults",
+      "relation": "branches_from",
+      "provenance": "canon_derived"
+    },
+    {
+      "from": "place_hidden_assembly_catacomb",
+      "to": "place_gilded_choir",
+      "relation": "branches_from",
+      "provenance": "canon_derived"
+    },
+    {
+      "from": "place_censer_foundry",
+      "to": "place_gilded_choir",
+      "relation": "branches_from",
+      "provenance": "proposed"
+    },
+    {
+      "from": "place_velvet_ossuary",
+      "to": "place_gilded_choir",
+      "relation": "branches_from",
+      "provenance": "proposed"
+    },
+    {
+      "from": "place_processional_underway",
+      "to": "place_false_solar_court",
+      "relation": "branches_from",
+      "provenance": "canon_derived"
+    },
+    {
+      "from": "place_sun_house_furnaces",
+      "to": "place_false_solar_court",
+      "relation": "branches_from",
+      "provenance": "canon_derived"
+    },
+    {
+      "from": "place_gilded_cloister",
+      "to": "place_false_solar_court",
+      "relation": "branches_from",
+      "provenance": "proposed"
+    },
+    {
+      "from": "place_closed_stacks_vault",
+      "to": "place_iron_scriptorium",
+      "relation": "branches_from",
+      "provenance": "canon_derived"
+    },
+    {
+      "from": "place_audit_cisterns",
+      "to": "place_iron_scriptorium",
+      "relation": "branches_from",
+      "provenance": "proposed"
+    },
+    {
+      "from": "place_preliator_garrison",
+      "to": "place_iron_scriptorium",
+      "relation": "branches_from",
+      "provenance": "proposed"
+    },
+    {
+      "from": "place_seal_foundry_deep",
+      "to": "place_chamber_of_decrees",
+      "relation": "branches_from",
+      "provenance": "proposed"
+    },
+    {
+      "from": "place_debts_cathedral",
+      "to": "place_chamber_of_decrees",
+      "relation": "branches_from",
+      "provenance": "proposed"
+    },
+    {
+      "from": "place_ophite_seam_hollow",
+      "to": "place_chamber_of_decrees",
+      "relation": "branches_from",
+      "provenance": "proposed"
+    },
+    {
+      "from": "place_unwritten_margin",
+      "to": "place_sealed_stair",
+      "relation": "branches_from",
+      "provenance": "proposed"
+    },
+    {
+      "from": "place_cage_oubliette",
+      "to": "place_sealed_stair",
+      "relation": "branches_from",
+      "provenance": "proposed"
+    },
+    {
+      "from": "place_witness_hermitage",
+      "to": "place_sealed_stair",
+      "relation": "branches_from",
+      "provenance": "proposed"
+    }
+  ]
+}

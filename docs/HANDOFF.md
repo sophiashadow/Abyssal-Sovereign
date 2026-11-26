@@ -5,14 +5,14 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 ## State as of 2026-11-26
 
 - **Branch:** `main` (default branch on `origin`, github.com/sophiashadow/Abyssal-Sovereign), preserving full commit history from `ccr-c6f8b898-fu2jtp`.
-- **Milestones:** M0–M5 (`fac51e8`, Depth Pass complete), **M6.1** (Atlas: 28 floors, save v9), **M6.2** (Inhabitants: 76 archetypes, 15 bosses/guardians), **M6.3** (Origins & Callings: 8×8, 104 talents), **M6.4** (Armory & Treasury: 165 items, 46 affixes, 12 sets, 26 artifacts, 16 relics), **M6.5** (People & Institutions: 18 NPCs, 8 factions, save v10), **M6.6** (Threads: 24 threads, save v11), **M6.7** (Dungeon Variety: 10 room archetypes, 4 emergent sites), **M6.8 (Discovery, Codex and Run History)** — offline knowledge-only `Codex` (`user://codex.json`, zero power, zero spoilers), Codex overlay (`k` / Title / Pause), and enriched Victory/Death run summaries.
-- **Last verified (local, Linux, M6.8):**
-  - `tools/verify.sh` (M6.8):
-    - `tools/test.sh`: `129` tests, `129` passed, `0` failed, `2663` checks (`0` engine errors).
+- **Milestones:** M0–M5 (`fac51e8`, Depth Pass complete), **M6.1** (Atlas: 28 floors, save v9), **M6.2** (Inhabitants: 76 archetypes, 15 bosses/guardians), **M6.3** (Origins & Callings: 8×8, 104 talents), **M6.4** (Armory & Treasury: 165 items, 46 affixes, 12 sets, 26 artifacts, 16 relics), **M6.5** (People & Institutions: 18 NPCs, 8 factions, save v10), **M6.6** (Threads: 24 threads, save v11), **M6.7** (Dungeon Variety: 10 room archetypes, 4 emergent sites), **M6.8** (Codex & Run History: `user://codex.json`), **M6.9 (Portable Worldbuilding Manifest)** — `content/lore/world_manifest.json` (`schema_version: 1`, `28` places, `8` institutions, `18` people, `16` relics, `24` threads, `78` edges, provenance tags, clean lore/mechanics separation).
+- **Last verified (local, Linux, M6.9):**
+  - `tools/verify.sh` (M6.9):
+    - `tools/test.sh`: `130` tests, `130` passed, `0` failed, `3436` checks (`0` engine errors).
     - `tools/ui_smoke.gd` at `1280×720` and `2340×1080`: `21` steps, `0` failures each.
   - `tools/soak.gd --seeds=2 --salt=heldout` (M6.3): bot wins `69%` (`88/128` runs across all `64` pairs, mean `918` turns).
-  - *Prior M4 exports (`build/`)*: `tools/export.sh all` refreshed Linux/Windows/Web/Android-debug exports at v0.4 (`apksigner verify` SHA-256 `a0000912831e593cdea65be68bda40f99f0d0e4d779332fff711199eb578a279`); exports have not yet been rebuilt after M5.1–M6.8.
-- **NOT_RUN:** Post-M5.1–M6.8 platform exports, Windows runtime, Web browser `user://` persistence test, physical Android device install/test (no device attached to `adb`), release-signed Android APK, M5.2–M6.8 human playtest. There is no CI.
+  - *Prior M4 exports (`build/`)*: `tools/export.sh all` refreshed Linux/Windows/Web/Android-debug exports at v0.4 (`apksigner verify` SHA-256 `a0000912831e593cdea65be68bda40f99f0d0e4d779332fff711199eb578a279`); exports have not yet been rebuilt after M5.1–M6.9.
+- **NOT_RUN:** Post-M5.1–M6.9 platform exports, Windows runtime, Web browser `user://` persistence test, physical Android device install/test (no device attached to `adb`), release-signed Android APK, M5.2–M6.9 human playtest. There is no CI.
 
 ## Setup
 
@@ -46,7 +46,8 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 - **M6.6 (Threads Beneath the Record):** Done (2026-11-26).
 - **M6.7 (Dungeon Variety and Emergent Encounters):** Done (2026-11-26).
 - **M6.8 (Discovery, Codex and Run History):** Done (2026-11-26).
-- **Next:** **M6.9 (Portable Worldbuilding Manifest)** — `content/lore/world_manifest.json` (`schema_version: 1`) + `docs/WORLD_MANIFEST.md` + `tests/test_manifest.gd`, cleanly separating shared FALSE LIGHT/Terra Tenebrae lore & provenance from Abyssal Sovereign mechanics. Then M6.10 per `docs/M6_SPEC.md`.
+- **M6.9 (Portable Worldbuilding Manifest):** Done (2026-11-26).
+- **Next:** **M6.10 (Integration, Verification, Platform Exports & M7 Handoff)** — `tests/test_reachability.gd`, expanded `AutoPlayer` + `tools/soak.gd`, fresh `--salt=m6_final_validation` soak (`192` runs), `./tools/export.sh all`, Linux binary & APK checks, and structured M7 Balance & Refinement handoff.
 - **Platform verification (M3 / M6.10):** Rebuild exports after M6 tranches (`tools/export.sh`), test physical Android device / Windows / Web when available, and configure release signing with an owner-created keystore outside the repo.
 
 Smaller known defects (fixed 2026-11-26):

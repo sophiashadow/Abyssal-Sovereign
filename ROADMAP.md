@@ -105,4 +105,8 @@ M5 (The Depth Pass: M5.1–M5.5) is complete.
 
 1. **Knowledge-Only Codex (`user://codex.json`):** Added `Codex`, `CodexIO` (atomic, zero-spoiler, zero-power), Codex overlay (`k` / Title / Pause), and enriched end-of-run Victory/Death summaries.
 
-Remaining M6 submilestones track M6.9–M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.
+## Milestone 6.9: Portable Worldbuilding Manifest (done 2026-11-26)
+
+1. **Setting Manifest & Validator:** Added `content/lore/world_manifest.json` (`schema_version: 1`), `docs/WORLD_MANIFEST.md`, and `tests/test_manifest.gd`.
+
+Remaining M6 submilestone tracks M6.10 per `docs/M6_SPEC.md`, plus Milestone 3 platform verification and human playtest polish.
