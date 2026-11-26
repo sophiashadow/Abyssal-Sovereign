@@ -447,7 +447,8 @@ func _update_hud() -> void:
 	t.append("%s %s, level %d" % [db.get_def("species", p.species_id)["name"], db.get_def("classes", p.class_id)["name"], p.level])
 	t.append("Health [color=#%s]%d / %d[/color]" % [hp_col.to_html(false), p.hp, mx])
 	t.append("XP %d / %d" % [p.xp, World.xp_for_level(p.level + 1)])
-	t.append("Depth %d: %s" % [world.depth, fd.get("name", "")])
+	var sphere := String(fd.get("sphere", ""))
+	t.append("Depth %d (%s): %s" % [world.depth, sphere, fd.get("name", "")] if sphere != "" else "Depth %d: %s" % [world.depth, fd.get("name", "")])
 	t.append("Attack %+d  Defense %d  Evasion %+d" % [p.stat("accuracy"), p.stat("defense"), p.stat("evasion")])
 	var w := p.equipped("weapon")
 	t.append("Wielding: %s (%s)" % [w.display_name(db), p.damage_dice()] if w != null else "Wielding: bare hands (1d2)")
@@ -456,6 +457,8 @@ func _update_hud() -> void:
 	for s in p.statuses:
 		var sd := db.get_def("statuses", s["id"])
 		t.append("[color=%s]%s (%d)[/color]" % [String(sd.get("color", "#eee5d3")), sd["name"], int(s["turns"])])
+	if world.apotheosis >= World.APOTHEOSIS_THRESHOLD:
+		t.append("[color=#%s]Apotheosis guard active[/color]" % Palette.FALSE_SUN.to_html(false))
 	var foes := world.visible_hostiles()
 	if not foes.is_empty():
 		t.append("[color=#%s]In view: %d[/color]" % [Palette.ALERT.to_html(false), foes.size()])
@@ -507,8 +510,11 @@ func _act_pickup() -> void:
 
 func _act_stairs() -> void:
 	if overlay == null:
-		world.player_stairs()
-		_after_action()
+		if world.needs_gate_to_descend():
+			_show_gate()
+		else:
+			world.player_stairs()
+			_after_action()
 
 
 func _act_rest() -> void:
@@ -648,6 +654,35 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 # ================================================================ overlays
+
+func _show_gate() -> void:
+	if not world.needs_gate_to_descend() or overlay != null:
+		return
+	var next_fd := db.floor_for_depth(world.depth + 1)
+	var sphere := String(next_fd.get("sphere", "the next sphere"))
+	var col := _open_overlay("Sphere Gate: %s" % sphere, Palette.FALSE_SUN)
+	col.add_child(_label("Choose how to cross into %s:" % next_fd.get("name", sphere), Palette.TEXT_DIM, 0.85))
+	var choices := [
+		["stormed", "Stormed", "Force the gate (-3 HP, +apotheosis)."],
+		["serpents_key", "Serpent's Key", "Slip the seam (-2 HP, Serpent's Way, +apotheosis)."],
+		["given_back", "Given Back", "Surrender 1 consumable (or 3 HP); Way of Return, -apotheosis."],
+		["by_name", "By Name", "Speak your name (-apotheosis; alerts the nearest foe below)."],
+	]
+	var first: Button = null
+	for ch in choices:
+		var method: String = ch[0]
+		var b := _btn(ch[1], func() -> void:
+			_close_overlay()
+			if world.player_descend_gate(method):
+				_after_action())
+		col.add_child(b)
+		col.add_child(_label(ch[2], Palette.TEXT_DIM, 0.78))
+		if first == null:
+			first = b
+	col.add_child(_btn("Cancel", _close_overlay))
+	if first != null:
+		first.call_deferred("grab_focus")
+
 
 func _show_masks() -> void:
 	if not world.player.has_trait("mask_stances") or overlay != null:
@@ -874,14 +909,16 @@ func _show_item(it: Item, index: int, slot: String) -> void:
 
 func _show_end() -> void:
 	var won := world.state == World.State.WON
+	var vic := world.victory_kind() if won else {}
 	var loss := {} if won else world.named_loss()
-	var title := "You passed through the Unwritten Door." if won else "Loss: %s" % String(loss["title"])
-	var col := _open_overlay(title, Palette.GOOD if won else Palette.ALERT)
+	var title := String(vic["title"]) if won else "Loss: %s" % String(loss["title"])
+	var title_col := (Palette.FALSE_SUN if String(vic.get("id", "")) == "by_decree" else Palette.GOOD) if won else Palette.ALERT
+	var col := _open_overlay(title, title_col)
 	screen = Screen.END
 	var p := world.player
 	var fd := db.floor_for_depth(world.depth)
 	if won:
-		col.add_child(_label("The Sentinel is unmade and the door the Architect never wrote down stands behind you. Beyond it is a dark that is yours.", Palette.LORE))
+		col.add_child(_label(String(vic["epitaph"]), Palette.LORE))
 	else:
 		col.add_child(_label(String(loss["epitaph"]), Palette.LORE))
 		col.add_child(_label("Slain by %s in %s." % [world.death_cause, fd.get("name", "the dark")], Palette.TEXT))

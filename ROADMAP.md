@@ -32,6 +32,8 @@ Owner decisions resolved 2026-11-26 (see [docs/LORE.md](docs/LORE.md)): Apotheos
 3. **Release signing:** Needs a keystore the owner creates and keeps outside the repo.
 4. **Windows and Web exports:** Done (`build/windows/abyssal-sovereign.exe`, `build/web/index.html`; Windows runtime and Web browser `user://` persistence `NOT_RUN`).
 
-## Milestone 4: depth
+## Milestone 4: depth (done 2026-11-26)
 
-More floors (the Seven Spheres as depth bands with gates), the two Ways as victory families, and the Apotheosis guard.
+1. **Seven Spheres** (Moon through Saturn, depths 1–7) with **Sphere Gates** (`Stormed`, `Serpent's Key`, `Given Back`, `By Name`) and deeper Dominion enemies (`Inquisition Cantor`, `Tithe Inquisitor`).
+2. **Two Ways** (`The Serpent's Way`, `The Way of Return`) as alternative victory families.
+3. **Apotheosis guard** and the hollow **"By Decree"** victory.

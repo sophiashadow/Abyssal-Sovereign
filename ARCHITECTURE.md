@@ -31,7 +31,7 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 
 ## Saves
 
-- **Format.** `user://run.save.json`, holding a `save_version` (currently 2; v1 saves migrate automatically), run state, all visited floors, and the log. Terrain and exploration are base64 byte arrays.
+- **Format.** `user://run.save.json`, holding a `save_version` (currently 3; v1 and v2 saves migrate automatically), run state, all visited floors, and the log. Terrain and exploration are base64 byte arrays.
 - **Writes are atomic:** the save goes to `.tmp`, then is renamed.
 - **Loading.**
   1. Parse the JSON.

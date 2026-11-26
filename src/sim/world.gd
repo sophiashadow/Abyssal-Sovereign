@@ -10,7 +10,7 @@ extends RefCounted
 ## id 1, so the player wins ties. Player actions return true if they spent
 ## time; the world then runs monsters until it is the player's turn again.
 
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
 const PLAYER_ID := 1
 const COST_MOVE := 100
 const COST_ATTACK := 100
@@ -19,6 +19,8 @@ const COST_ITEM := 100
 const COST_STAIRS := 100
 const NOTICE_PCT := 60
 const MASK_RISK_MAX := 12
+const APOTHEOSIS_THRESHOLD := 8
+const GATE_METHODS: Array[String] = ["stormed", "serpents_key", "given_back", "by_name"]
 const LOG_LIMIT := 300
 ## The player recovers 1 health every this many turns (scaled by the
 ## species' heal_mult: a revenant mends at half speed).
@@ -36,6 +38,9 @@ var time: int = 0
 var turns: int = 0 # player actions taken
 var state: State = State.PLAYING
 var death_cause: String = ""
+var apotheosis: int = 0
+var way_serpent: int = 0
+var way_return: int = 0
 var next_entity_id: int = 2
 var messages: Array[Dictionary] = []
 ## Bumped whenever messages change, so the UI can redraw lazily.
@@ -322,6 +327,7 @@ func player_work_relic(index: int) -> bool:
 		log_msg("You lack the blood to work the %s." % d["name"], "danger")
 		return false
 	player.hp -= cost
+	apotheosis += 1
 	apply_status(player, sid)
 	if sid == "confessors_clarity" and player.has_status("perception_fog"):
 		_remove_status(player, "perception_fog")
@@ -345,6 +351,8 @@ func player_transmute_relic(index: int) -> bool:
 	if mods.has("max_hp") and int(mods["max_hp"]) > 0:
 		player.hp = mini(player.stat("max_hp"), player.hp + int(mods["max_hp"]))
 	player.inventory.remove_at(index)
+	apotheosis += 2
+	way_serpent += 1
 	update_fov()
 	log_msg("You transmute the %s; its power stays with you." % d["name"], "lore")
 	return _finish_player_action(COST_ITEM)
@@ -366,17 +374,79 @@ func player_unequip(slot: String) -> bool:
 	return _finish_player_action(COST_ITEM)
 
 
+func needs_gate_to_descend() -> bool:
+	return state == State.PLAYING and current_floor().get_tile(player.pos) == Tiles.STAIRS_DOWN and not floors.has(depth + 1)
+
+
+func player_descend_gate(method: String) -> bool:
+	if state != State.PLAYING:
+		return false
+	if current_floor().get_tile(player.pos) != Tiles.STAIRS_DOWN:
+		log_msg("There are no stairs here.")
+		return false
+	if not GATE_METHODS.has(method):
+		return false
+	var first_visit := not floors.has(depth + 1)
+	if first_visit:
+		match method:
+			"stormed":
+				var cost := mini(3, maxi(0, player.hp - 1))
+				player.hp -= cost
+				apotheosis += 2
+				log_msg("You force the Sphere Gate open.", "danger")
+			"serpents_key":
+				var cost := mini(2, maxi(0, player.hp - 1))
+				player.hp -= cost
+				way_serpent += 1
+				apotheosis += 1
+				log_msg("You slip the Serpent's Key into the seam of the gate.", "lore")
+			"given_back":
+				var cidx := -1
+				for i in player.inventory.size():
+					if String(player.inventory[i].def(db)["kind"]) == "consumable":
+						cidx = i
+						break
+				if cidx >= 0:
+					var cit := player.inventory[cidx]
+					cit.quantity -= 1
+					if cit.quantity <= 0:
+						player.inventory.remove_at(cidx)
+				else:
+					player.hp -= mini(3, maxi(0, player.hp - 1))
+				way_return += 1
+				apotheosis = maxi(0, apotheosis - 2)
+				log_msg("You lay down leverage at the threshold and pass.", "good")
+			"by_name":
+				apotheosis = maxi(0, apotheosis - 1)
+				log_msg("You speak your own name to the gate; something below hears it.", "lore")
+	_enter_floor(depth + 1, true)
+	if first_visit and method == "by_name":
+		var nearest: Actor = null
+		var best_d := 1 << 30
+		for a in current_floor().actors:
+			if not a.is_player and a.is_alive():
+				var d_m := Grid.chebyshev(a.pos, player.pos)
+				if d_m < best_d:
+					best_d = d_m
+					nearest = a
+		if nearest != null:
+			nearest.awake = true
+			_remember_player(nearest)
+	var fd := db.floor_for_depth(depth)
+	var sphere := String(fd.get("sphere", ""))
+	var fname := "%s (%s)" % [fd.get("name", "the next floor"), sphere] if sphere != "" else String(fd.get("name", "the next floor"))
+	log_msg("You descend to %s." % fname, "lore")
+	log_msg(String(fd.get("description", "")), "lore")
+	return _finish_player_action(COST_STAIRS)
+
+
 ## Takes the stairs under the player, if any.
 func player_stairs() -> bool:
 	if state != State.PLAYING:
 		return false
 	var t := current_floor().get_tile(player.pos)
 	if t == Tiles.STAIRS_DOWN:
-		_enter_floor(depth + 1, true)
-		var fd := db.floor_for_depth(depth)
-		log_msg("You descend to %s." % fd.get("name", "the next floor"), "lore")
-		log_msg(String(fd.get("description", "")), "lore")
-		return _finish_player_action(COST_STAIRS)
+		return player_descend_gate("stormed")
 	if t == Tiles.STAIRS_UP:
 		if depth == 1:
 			log_msg("Above is the Architect's daylight. You did not come down here to go back.")
@@ -686,6 +756,11 @@ static func xp_for_level(lvl: int) -> int:
 func gain_xp(amount: int) -> void:
 	if amount <= 0:
 		return
+	if apotheosis >= APOTHEOSIS_THRESHOLD:
+		if not player.flags.has("apotheosis_warned"):
+			player.flags["apotheosis_warned"] = 1
+			log_msg("The record no longer measures you; you have begun to write it.", "lore")
+		return
 	player.xp += amount
 	while player.xp >= xp_for_level(player.level + 1):
 		player.level += 1
@@ -729,6 +804,8 @@ func _consume(a: Actor, it: Item, index: int) -> void:
 			log_msg("You use the %s and recover %d health." % [d["name"], a.hp - before], "good")
 		"status":
 			log_msg("You drink the %s." % d["name"], "info")
+			if String(d["status"]) == "false_light":
+				apotheosis += 2
 			apply_status(a, String(d["status"]))
 	it.quantity -= 1
 	if it.quantity <= 0:
@@ -783,7 +860,37 @@ func _describe_floor_here() -> void:
 func _win() -> void:
 	turns += 1
 	state = State.WON
-	log_msg("You step through the Unwritten Door, into a dark the Architect never mapped.", "lore")
+	var vic := victory_kind()
+	if String(vic["id"]) == "by_decree":
+		log_msg("The Unwritten Door opens and accepts your seal. You won. That is the problem.", "lore")
+	else:
+		log_msg("You step through the Unwritten Door, into a dark the Architect never mapped.", "lore")
+
+
+func victory_kind() -> Dictionary:
+	if apotheosis >= APOTHEOSIS_THRESHOLD:
+		return {
+			"id": "by_decree",
+			"title": "Victory: By Decree",
+			"epitaph": "You won. That's the problem. The Unwritten Door opens and accepts your seal; a smaller Rex Mundi wears your face.",
+		}
+	if way_serpent > way_return:
+		return {
+			"id": "serpent",
+			"title": "Victory: The Serpent's Way",
+			"epitaph": "You leave by the Serpent's seam—carrying the stolen key, uncounted and unanswered.",
+		}
+	if way_return > way_serpent:
+		return {
+			"id": "return",
+			"title": "Victory: The Way of Return",
+			"epitaph": "You leave by the Way of Return—empty-handed, oriented, and outside the ledger.",
+		}
+	return {
+		"id": "unwritten",
+		"title": "You passed through the Unwritten Door.",
+		"epitaph": "The Sentinel is unmade and the door the Architect never wrote down stands behind you. Beyond it is a dark that is yours.",
+	}
 
 
 func named_loss() -> Dictionary:
@@ -818,6 +925,7 @@ func to_dict() -> Dictionary:
 		"seed": str(run_seed),
 		"depth": depth, "time": time, "turns": turns,
 		"state": int(state), "cause": death_cause,
+		"apotheosis": apotheosis, "way_serpent": way_serpent, "way_return": way_return,
 		"next_id": next_entity_id,
 		"rng": rng.get_state_string(),
 		"player": player.to_dict(),
@@ -827,9 +935,9 @@ func to_dict() -> Dictionary:
 
 
 static func _migrate(d: Dictionary) -> Dictionary:
-	var ver := int(d.get("save_version", -1))
+	var out := d.duplicate(true)
+	var ver := int(out.get("save_version", -1))
 	if ver == 1:
-		var out := d.duplicate(true)
 		out["save_version"] = 2
 		if typeof(out.get("player")) == TYPE_DICTIONARY:
 			out["player"]["mask"] = out["player"].get("mask", "bare_face")
@@ -842,8 +950,13 @@ static func _migrate(d: Dictionary) -> Dictionary:
 						if typeof(a) == TYPE_DICTIONARY:
 							a["mask"] = a.get("mask", "bare_face")
 							a["mask_risk"] = int(a.get("mask_risk", 0))
-		return out
-	return d
+		ver = 2
+	if ver == 2:
+		out["save_version"] = 3
+		out["apotheosis"] = int(out.get("apotheosis", 0))
+		out["way_serpent"] = int(out.get("way_serpent", 0))
+		out["way_return"] = int(out.get("way_return", 0))
+	return out
 
 
 ## Rebuilds a run from to_dict() output. Returns null and fills `errors`
@@ -873,6 +986,9 @@ static func from_dict(content: ContentDB, d: Dictionary, errors: PackedStringArr
 	w.turns = int(d["turns"])
 	w.state = int(d["state"]) as State
 	w.death_cause = String(d.get("cause", ""))
+	w.apotheosis = int(d.get("apotheosis", 0))
+	w.way_serpent = int(d.get("way_serpent", 0))
+	w.way_return = int(d.get("way_return", 0))
 	w.next_entity_id = int(d["next_id"])
 	w.rng = Rng.new(0)
 	w.rng.set_state_string(String(d["rng"]))

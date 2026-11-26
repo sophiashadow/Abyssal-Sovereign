@@ -119,6 +119,7 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 |---|---|---|---|
 | `id`, `name`, `description` | | yes | |
 | `depth` | int ≥ 1 | yes | depths must run 1..N with no gaps |
+| `sphere` | string | no | Sphere name (Moon..Saturn) |
 | `width` ≥ 20, `height` ≥ 15 | int | yes | map size |
 | `rooms_min`, `rooms_max` | int ≥ 2 | yes | |
 | `monsters_min`, `monsters_max` | int ≥ 0 | yes | |

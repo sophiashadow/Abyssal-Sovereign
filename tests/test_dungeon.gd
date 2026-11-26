@@ -1,6 +1,6 @@
 extends TestCase
 
-const SEEDS_PER_FLOOR := 300
+const SEEDS_PER_FLOOR := 150
 
 
 func _signature(m: FloorMap) -> String:

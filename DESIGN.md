@@ -51,6 +51,7 @@ A vial gives 20 turns of +2 accuracy, +2 damage and +2 HP per turn. It is then f
 | 2026-11-26 | M2.1 Masks as stances (`mask_stances` on Occultist: Bare Face, Nyx, Eris, Lilith) | n/a | **37% (180 runs; Occultist 15/60 vs. 8/60 prior)** |
 | 2026-11-26 | M2.2 Eight Chains enemy abilities (`chain_isolation` on cultist, `chain_fog` on Sentinel) | n/a | **35% (180 runs)** |
 | 2026-11-26 | M2.3–M2.4 Relics (Work or Transmute) and Named losses (Catalogued, Fluent, Gilded) | n/a | **39% (180 runs)** |
+| 2026-11-26 | M4 Seven Spheres (depths 1–7), Sphere Gates, Two Ways, Apotheosis Guard, Cantor & Inquisitor | 18% (135 runs, pre-tune) | **40% (180 runs, post-tune)** |
 
 Known imbalance: the Occultist improved from 8/60 to 15/60 held-out wins with Masks as stances (against 37/60 for the Knight), and the bot only uses Eris/Bare Face. Further M2/M4 kits (rites, relics) will round out the gap.
 

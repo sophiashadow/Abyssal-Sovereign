@@ -46,6 +46,8 @@ func step() -> bool:
 	if m.get_tile(p.pos) == Tiles.STAIRS_DOWN:
 		if world.can_rest():
 			return world.player_rest(200) > 0
+		if world.needs_gate_to_descend():
+			return world.player_descend_gate("given_back" if world.apotheosis >= World.APOTHEOSIS_THRESHOLD - 2 else "by_name")
 		return world.player_stairs()
 	if p.hp * 10 < p.stat("max_hp") * 7 and world.can_rest():
 		return world.player_rest(50) > 0

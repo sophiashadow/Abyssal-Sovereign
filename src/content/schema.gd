@@ -107,6 +107,7 @@ const FIELDS := {
 	"floors": {
 		"id": {"type": "id", "required": true},
 		"depth": {"type": "int", "required": true, "min": 1},
+		"sphere": {"type": "string", "required": false},
 		"name": {"type": "string", "required": true},
 		"description": {"type": "text", "required": true},
 		"width": {"type": "int", "required": true, "min": 20},

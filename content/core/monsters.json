@@ -14,9 +14,15 @@
     {"id": "ghoul", "name": "ghoul", "glyph": "g", "color": "#9fb38a",
      "description": "What the ossuaries make of the hungry. Slow, patient, and very strong.",
      "hp": 20, "damage": "1d8+1", "accuracy": 1, "evasion": 0, "defense": 1, "speed": 90, "xp": 15, "perception": 6, "tags": ["undead"]},
+    {"id": "inquisition_cantor", "name": "Inquisition Cantor", "glyph": "C", "color": "#f2c35c",
+     "description": "Chants the Dominion's chains in steady cadence until sight and solace both narrow.",
+     "hp": 20, "damage": "1d6+1", "accuracy": 2, "evasion": 1, "defense": 1, "speed": 100, "xp": 22, "perception": 9, "tags": ["human", "dominion", "chain_isolation", "chain_fog"]},
+    {"id": "tithe_inquisitor", "name": "Tithe Inquisitor", "glyph": "I", "color": "#df7186",
+     "description": "Armoured in black iron to audit the deeper vaults. Strikes slow and sure.",
+     "hp": 24, "damage": "1d8+1", "accuracy": 2, "evasion": 0, "defense": 2, "speed": 95, "xp": 28, "perception": 8, "tags": ["human", "dominion"]},
     {"id": "preliator_sentinel", "name": "Preliator Sentinel", "glyph": "P", "color": "#ff4d6d",
      "description": "The warden of the Sealed Stair, black iron and imperial purple. Measured, tireless, sure it is holy.",
-     "hp": 45, "damage": "1d10+1", "accuracy": 3, "evasion": 1, "defense": 2, "speed": 100, "xp": 100, "perception": 12,
+     "hp": 50, "damage": "1d10+1", "accuracy": 4, "evasion": 1, "defense": 2, "speed": 100, "xp": 150, "perception": 12,
      "tags": ["guardian", "dominion", "chain_fog"], "unique": true}
   ]
 }

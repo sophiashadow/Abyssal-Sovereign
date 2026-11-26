@@ -35,6 +35,26 @@ func test_v1_save_migrates_to_v2() -> void:
 	if w2 != null:
 		eq(w2.player.mask, "bare_face", "default mask applied")
 		eq(w2.player.mask_risk, 0, "default mask_risk applied")
+		eq(w2.apotheosis, 0, "default apotheosis applied")
+		eq(w2.way_serpent, 0, "default way_serpent applied")
+		eq(w2.way_return, 0, "default way_return applied")
+
+
+func test_v2_save_migrates_to_v3() -> void:
+	var w := World.new_run(db(), 4242, "human", "assassin", "Mig2")
+	var d := _through_json(w)
+	d["save_version"] = 2
+	d.erase("apotheosis")
+	d.erase("way_serpent")
+	d.erase("way_return")
+	var errors: PackedStringArray = []
+	var w2 := World.from_dict(db(), d, errors)
+	eq(errors.size(), 0, "v2 save migrates cleanly: %s" % ", ".join(errors))
+	ok(w2 != null, "migrated v2 world loaded")
+	if w2 != null:
+		eq(w2.apotheosis, 0, "default apotheosis")
+		eq(w2.way_serpent, 0, "default way_serpent")
+		eq(w2.way_return, 0, "default way_return")
 
 
 func test_round_trip_is_exact() -> void:

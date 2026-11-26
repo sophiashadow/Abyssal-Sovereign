@@ -23,7 +23,7 @@ func test_core_content_is_valid() -> void:
 	eq(d.warnings.size(), 0, "no warnings in core content: %s" % str(d.warnings))
 	for kind in ContentSchema.KINDS:
 		ok(d.ids(kind).size() > 0, "%s has entries" % kind)
-	eq(d.max_depth(), 3, "three floors")
+	eq(d.max_depth(), 7, "seven spheres")
 
 
 func test_required_content_present() -> void:

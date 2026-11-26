@@ -50,6 +50,9 @@ The expansions already label some of their own content as proposals. Where they 
 | **Eight Chains enemy abilities** (`chain_isolation`, `chain_fog`) | Canon-derived | Rulebook §14 (Isolation and Monopolization of Perception). Dominion foes inflict Isolation (suppresses rest, regen and soul siphon) and Monopolized Sight (fog shrinking FOV). |
 | **Relics: Work or Transmute** (Confessor's Glass, Ophite Key, Broken Halo) | Proposed (in game) | Names and Work-or-Transmute frame from EXODUS; specific effects are Proposed. |
 | **Named losses** (Catalogued, Fluent, Gilded) | Proposed (in game) | Names from EXODUS; death screen classifies how the record claimed the run. |
+| **Seven Spheres & Sphere Gates** (Moon through Saturn; Stormed, Serpent's Key, Given Back, By Name) | Proposed (in game) | Expansion (OCCULT) depth-band frame. Gate methods are choices with distinct costs and inclinations, not tiers. |
+| **Two Ways out** (Serpent's Way, Way of Return) | Proposed (in game) | Expansion (OCCULT, EXODUS). Walking between them is allowed and neither account is declared true. |
+| **Apotheosis Guard & "By Decree" victory** | Canon-derived | Rulebook §10.4 ("a smaller Rex Mundi wearing your face") & EXODUS "By Decree", accepted as a hollow win by owner decision (2026-11-26). |
 | Palette: void, Lux magenta, record parchment, false-sun gold, mask hues | Canon (visual) | FALSE LIGHT visual identity. Colours are used only as hex values. |
 
 ## Candidates for later milestones (not built; not canon)
