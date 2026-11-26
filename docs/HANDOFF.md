@@ -31,6 +31,23 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
     - Windows export: `build/windows/abyssal-sovereign.exe` (`105M`); Web export: `build/web/index.html` (`5.5K`).
 - **NOT_RUN:** Windows runtime execution, Web browser `user://` IndexedDB persistence check, physical Android device install/playtest (no `adb` device connected), release-signed Android APK (no owner keystore outside repo), and M5.2–M6.10 human playtesting. There is no CI.
 
+## M7 Refinement Pass: in progress (branch `ccr-4b7d6997-36eyn5`, draft PR #1)
+
+Spec: `docs/M7_SPEC.md`. Owner authorized a push after each task (2026-11-26); no merge, release or publish.
+
+- **M7.1 Instrumented Abyss: implemented and tested locally.** `src/sim/telemetry.gd` (local observer), `tests/policy_player.gd` (8 policies), `tools/m7_soak.gd`, `tools/m7_report.gd`, `tools/m7_run.sh`, `balance/validation_ledger.txt`. `tools/test.sh`: 137 tests, 137 passed, 3917 checks. No validation salt spent; dev salt `m7dev`.
+- **Datasets (bot play, dev seeds, not human play):** `balance/b1_summary.md` (1248 runs, all policies), `balance/b2_summary.md` (384 runs; specialist, explorer and narrative re-run after bot fixes and mask discipline), `balance/mk1_summary.md` (occultist mask-discipline probe). Reproduce: `tools/m7_run.sh TAG --seeds=N [--policies=...]`. Raw JSONL is gitignored.
+- **Findings so far:**
+  - Rite Cantor and Occultist weakness under generic bots was a bot-competence gap (specialist rite_weaver wins 16/16 in b2; occultist with mask discipline rose from 50% to 79% in mk1, n=24).
+  - d2 mortality is largely dive pace (specialist enters d2 at level 1.6).
+  - Veil-Touched and Unrecorded trail by 15 to 20 points under generic play; radiant is 20.7% of damage taken and void 7.4%, so Veil-Touched's void +35 is near-worthless while its radiant -25 bites.
+  - Ophite Binder is weakest in explorer (31%).
+  - 14 active talents were never used by any policy in b2 (backstep, chain_reversal, cleanse_vapor, fade_to_ash, philosophers_loan, quiet_absolution, rite_blink, slip_the_margin, transmute_pain, unbroken_wall, unwork_chains, unyielding_march, vault_step, volatile_salve).
+  - `the_taken_name` contract: 21 broken vs 2 fulfilled in narrative and explorer runs; to be read in M7.6.
+  - Threads silently auto-abandon after 350 turns at depth 5 or deeper.
+- **Next:** M7.2 origin and calling changes, each logged in `balance/CHANGES.md` with dev re-measure; then M7.3 to M7.6, M7.7 to M7.9, M7.10 final gate.
+- **NOT_RUN:** UI smoke, exports, validation soak (all M7.10).
+
 ## Known-Defect & Observation Register (for M7)
 
 1. **`rite_weaver` calling win-rate trails peers (`10/24` in `m6_final_validation`; `penitent/rite_weaver` and `revenant/rite_weaver` `0/3`, plus `veilkin/ophite_binder` `0/3`):** Review `rite_weaver` durability/early Resonance economy and active talent usage (`Rite Cantor` lacks early physical mitigation compared to `Bastion Warden` / `Seam Alchemist`).
