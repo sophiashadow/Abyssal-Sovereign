@@ -1,6 +1,6 @@
 # Agent instructions: ABYSSAL SOVEREIGN
 
-This is the canonical instruction file. `CLAUDE.md` points here.
+This is the canonical instruction file. `CLAUDE.md` and `GEMINI.md` point here. Current state and the next assignment are in `docs/HANDOFF.md`; update it at every stop.
 
 ## Boundaries
 

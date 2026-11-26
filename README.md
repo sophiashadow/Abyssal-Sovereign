@@ -52,6 +52,7 @@ Text size, tile size, travel speed and on-screen controls are under Settings.
 - [docs/LORE.md](docs/LORE.md): canon / interpretation / proposed ledger.
 - [docs/CONTENT_SCHEMA.md](docs/CONTENT_SCHEMA.md): JSON content format.
 - [AGENTS.md](AGENTS.md): rules for coding agents.
+- [docs/HANDOFF.md](docs/HANDOFF.md): current state and next assignment for the next agent.
 
 ## Rights
 
