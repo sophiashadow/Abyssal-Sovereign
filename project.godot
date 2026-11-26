@@ -1,0 +1,31 @@
+; Engine configuration file.
+; Pinned to Godot 4.7.2 stable (see ARCHITECTURE.md, decision D1).
+
+config_version=5
+
+[application]
+
+config/name="Abyssal Sovereign"
+config/description="An original traditional roguelike set beneath Terra Tenebrae."
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/size/window_width_override=1280
+window/size/window_height_override=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=4
+
+[input_devices]
+
+pointing/emulate_mouse_from_touch=true
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.0313726, 0.0235294, 0.0352941, 1)

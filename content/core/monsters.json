@@ -1,0 +1,22 @@
+{
+  "schema": "monsters",
+  "version": 1,
+  "entries": [
+    {"id": "warren_rat", "name": "warren rat", "glyph": "r", "color": "#b79555",
+     "description": "Fat on alms-bread and worse. Quick, and never alone for long.",
+     "hp": 4, "damage": "1d3", "accuracy": 0, "evasion": 1, "defense": 0, "speed": 130, "xp": 2, "perception": 6, "tags": ["vermin"]},
+    {"id": "catalogued_dead", "name": "catalogued dead", "glyph": "s", "color": "#d3bea0",
+     "description": "A skeleton with a tithe number stamped into its skull. It still keeps the appointment.",
+     "hp": 10, "damage": "1d6", "accuracy": 0, "evasion": 0, "defense": 1, "speed": 100, "xp": 6, "perception": 7, "tags": ["undead"]},
+    {"id": "false_sun_cultist", "name": "cultist of the false sun", "glyph": "c", "color": "#f2c35c",
+     "description": "A devotee of the hooked wheel. Believes your suffering is a holy duty, theirs to perform.",
+     "hp": 12, "damage": "1d6+1", "accuracy": 1, "evasion": 1, "defense": 0, "speed": 100, "xp": 9, "perception": 8, "tags": ["human", "dominion"]},
+    {"id": "ghoul", "name": "ghoul", "glyph": "g", "color": "#9fb38a",
+     "description": "What the ossuaries make of the hungry. Slow, patient, and very strong.",
+     "hp": 20, "damage": "1d8+1", "accuracy": 1, "evasion": 0, "defense": 1, "speed": 90, "xp": 15, "perception": 6, "tags": ["undead"]},
+    {"id": "preliator_sentinel", "name": "Preliator Sentinel", "glyph": "P", "color": "#ff4d6d",
+     "description": "The warden of the Sealed Stair, black iron and imperial purple. Measured, tireless, sure it is holy.",
+     "hp": 60, "damage": "2d6+1", "accuracy": 3, "evasion": 1, "defense": 3, "speed": 100, "xp": 100, "perception": 12,
+     "tags": ["guardian", "dominion"], "unique": true}
+  ]
+}

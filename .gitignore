@@ -1,0 +1,10 @@
+# Godot
+.godot/
+*.import
+export/
+build/
+*.translation
+# Local tools and saves
+.tools
+*.tmp
+test-results/
