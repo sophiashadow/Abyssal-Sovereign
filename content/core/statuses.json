@@ -75,6 +75,46 @@
       "duration": 12,
       "mods": {"defense": 3, "damage": 1},
       "color": "#f2c35c"
+    },
+    {
+      "id": "sundered",
+      "name": "Sundered",
+      "description": "Armor split along the seam; blows bite deeper.",
+      "duration": 6,
+      "mods": {"defense": -2},
+      "color": "#e05a47"
+    },
+    {
+      "id": "braced",
+      "name": "Braced",
+      "description": "Stance anchored against the worst.",
+      "duration": 5,
+      "mods": {"defense": 3, "evasion": 1},
+      "color": "#a8b4d9"
+    },
+    {
+      "id": "apostate_focus",
+      "name": "Apostate Focus",
+      "description": "Unfettered from the wheel; every stroke lands harder.",
+      "duration": 5,
+      "mods": {"accuracy": 2, "damage": 2},
+      "color": "#f2c35c"
+    },
+    {
+      "id": "veiled",
+      "name": "Veiled",
+      "description": "Step and silhouette slip out of the eye.",
+      "duration": 4,
+      "mods": {"evasion": 4},
+      "color": "#8f7ae0"
+    },
+    {
+      "id": "bleeding",
+      "name": "Bleeding",
+      "description": "An arterial cut drains vitality every turn.",
+      "duration": 5,
+      "regen": -2,
+      "color": "#ff4d6d"
     }
   ]
 }

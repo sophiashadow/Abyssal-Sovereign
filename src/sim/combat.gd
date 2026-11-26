@@ -22,6 +22,9 @@ static func resolve(attacker: Actor, defender: Actor, rng: Rng) -> Dictionary:
 		return result
 	result["hit"] = true
 	var crit_pct := attacker.stat("crit") + (50 if sneak else 0)
+	var exec_rank := attacker.talent_rank("executioners_vow")
+	if exec_rank > 0 and defender.hp * 2 < defender.stat("max_hp"):
+		crit_pct += 5 * exec_rank
 	var crit := rng.d100() <= crit_pct
 	result["crit"] = crit
 	var dice := attacker.damage_dice()
@@ -29,6 +32,13 @@ static func resolve(attacker: Actor, defender: Actor, rng: Rng) -> Dictionary:
 	if crit:
 		raw += Dice.roll(dice, rng)
 	raw += attacker.stat("damage_bonus")
+	if sneak:
+		raw += 2 * attacker.talent_rank("unseen_edge")
+	if exec_rank > 0 and defender.hp * 2 < defender.stat("max_hp"):
+		raw += 2 * exec_rank
+	var wb_rank := attacker.talent_rank("ward_breaker")
+	if wb_rank > 0 and (defender.tags.has("dominion") or defender.tags.has("guardian")):
+		raw += 2 * wb_rank
 	var def := defender.stat("defense")
 	if attacker.has_trait("infernal_blood"):
 		def = maxi(0, def - 1)

@@ -6,16 +6,16 @@
      "description": "Once sworn to the Dominion of the Preliator. The oath broke; the training did not. Hardens when wounded.",
      "attributes": {"might": 2, "agility": 0, "will": 0}, "hp": 16, "hp_per_level": 5, "accuracy": 1,
      "starting_equipment": ["notched_longsword", "chain_hauberk"], "starting_items": ["healing_salve"],
-     "traits": ["iron_oath"]},
+     "resource": "stamina", "traits": ["iron_oath"]},
     {"id": "occultist", "name": "Occultist",
      "description": "A reader of the Eye hidden in the Dominion's own letters. Draws breath from every death they cause.",
      "attributes": {"might": 0, "agility": 1, "will": 2}, "hp": 12, "hp_per_level": 4,
      "starting_equipment": ["ritual_knife", "ash_robe"], "starting_items": ["healing_salve", "vial_of_false_light", "vial_of_false_light"],
-     "traits": ["soul_siphon", "mask_stances"]},
+     "resource": "resonance", "traits": ["soul_siphon", "mask_stances"]},
     {"id": "assassin", "name": "Assassin",
      "description": "A shade of the tithe-alleys. Strikes against the unaware land true and land hard.",
      "attributes": {"might": 1, "agility": 2, "will": 0}, "hp": 12, "hp_per_level": 4, "accuracy": 1, "evasion": 1,
      "starting_equipment": ["stiletto", "leather_jerkin"], "starting_items": ["healing_salve", "healing_salve"],
-     "traits": ["sneak_attack"]}
+     "resource": "poise", "traits": ["sneak_attack"]}
   ]
 }

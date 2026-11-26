@@ -3,8 +3,8 @@
   "version": 1,
   "entries": [
     {"id": "human", "name": "Human",
-     "description": "The registered living of the Warrens. No gift but adaptability: humans learn faster from what tries to kill them.",
-     "attributes": {"might": 1, "agility": 1, "will": 1}, "hp": 4, "hp_per_level": 1, "xp_mult": 1.25},
+     "description": "The registered living of the Warrens. Adaptable: +25% XP, +1 starting attribute point, and bonus talent points at levels 3 and 6.",
+     "attributes": {"might": 1, "agility": 1, "will": 1}, "hp": 4, "hp_per_level": 1, "xp_mult": 1.25, "traits": ["adaptable"]},
     {"id": "revenant", "name": "Revenant",
      "description": "One of the catalogued dead who refused the record. Hard to kill twice, slow to mend: healing works at half strength.",
      "attributes": {"might": 2, "agility": 0, "will": 1}, "hp": 6, "hp_per_level": 2, "heal_mult": 0.5, "traits": ["deathless"]},

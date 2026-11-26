@@ -10,7 +10,7 @@ extends RefCounted
 ## id 1, so the player wins ties. Player actions return true if they spent
 ## time; the world then runs monsters until it is the player's turn again.
 
-const SAVE_VERSION := 3
+const SAVE_VERSION := 4
 const PLAYER_ID := 1
 const COST_MOVE := 100
 const COST_ATTACK := 100
@@ -101,6 +101,9 @@ func _make_player(species_id: String, class_id: String, hero_name: String) -> Ac
 	for tid in cl.get("starting_items", []):
 		_add_to_inventory(a, _new_item(String(tid)))
 	a.hp = a.stat("max_hp")
+	a.stat_points = 2 if a.has_trait("adaptable") else 1
+	a.talent_points = 1
+	a.resource = a.max_resource()
 	a.awake = true
 	return a
 
@@ -320,6 +323,8 @@ func player_work_relic(index: int) -> bool:
 		return false
 	var sid := String(d["work_status"])
 	var cost := int(d.get("work_cost_hp", 0))
+	if cost > 0 and player.has_trait("infernal_blood"):
+		cost = maxi(1, cost - 1)
 	if player.has_status(sid):
 		log_msg("The %s is already active." % d["name"])
 		return false
@@ -470,7 +475,299 @@ func player_switch_mask(mask_id: String) -> bool:
 	else:
 		log_msg("You put on %s." % Masks.label(mask_id), "good")
 	update_fov()
-	return _finish_player_action(COST_WAIT)
+	var cost := COST_WAIT / 2 if player.talent_rank("quick_shift") > 0 else COST_WAIT
+	return _finish_player_action(cost)
+
+
+func player_spend_stat(attr: String) -> bool:
+	if state != State.PLAYING or player.stat_points <= 0 or not ContentSchema.ATTRIBUTES.has(attr):
+		return false
+	player.base[attr] = int(player.base.get(attr, 0)) + 1
+	player.stat_points -= 1
+	if attr == "might":
+		player.hp = mini(player.stat("max_hp"), player.hp + 2)
+	player.resource = mini(player.max_resource(), player.resource + 2)
+	log_msg("Your %s rises to %d." % [attr.capitalize(), player.stat(attr)], "good")
+	return true
+
+
+func can_learn_talent(tid: String) -> String:
+	if state != State.PLAYING:
+		return "Run has ended."
+	if not db.has("talents", tid):
+		return "Unknown talent."
+	var td := db.get_def("talents", tid)
+	if String(td["class_id"]) != player.class_id:
+		return "Not your calling."
+	if player.talent_points <= 0:
+		return "No talent points."
+	var rank := player.talent_rank(tid)
+	if rank >= int(td["max_rank"]):
+		return "Already mastered."
+	if int(td["tier"]) >= 3 and player.level < 3:
+		return "Requires level 3."
+	var prereq := String(td.get("prereq", ""))
+	if prereq != "" and player.talent_rank(prereq) <= 0:
+		return "Requires %s." % db.get_def("talents", prereq)["name"]
+	return ""
+
+
+func player_learn_talent(tid: String) -> bool:
+	var reason := can_learn_talent(tid)
+	if reason != "":
+		log_msg(reason, "info")
+		return false
+	player.talents[tid] = player.talent_rank(tid) + 1
+	player.talent_points -= 1
+	update_fov()
+	var td := db.get_def("talents", tid)
+	log_msg("Learned %s (rank %d/%d)." % [td["name"], player.talent_rank(tid), int(td["max_rank"])], "good")
+	return true
+
+
+func nearest_visible_hostile(max_range: int = 99) -> Actor:
+	var m := current_floor()
+	var best: Actor = null
+	var best_d := 1 << 30
+	for a in m.actors:
+		if not a.is_player and a.is_alive() and m.is_visible(a.pos):
+			var d := Grid.chebyshev(player.pos, a.pos)
+			if d <= max_range and d < best_d:
+				best = a
+				best_d = d
+	return best
+
+
+func learned_active_talents() -> Array[String]:
+	var out: Array[String] = []
+	for tid in db.ids("talents"):
+		if player.talent_rank(tid) > 0 and String(db.get_def("talents", tid)["kind"]) == "active":
+			out.append(tid)
+	return out
+
+
+func player_use_talent(tid: String) -> bool:
+	if state != State.PLAYING or not db.has("talents", tid):
+		return false
+	var td := db.get_def("talents", tid)
+	if String(td["kind"]) != "active" or player.talent_rank(tid) <= 0:
+		return false
+	var cd := player.cooldown(tid)
+	if cd > 0:
+		log_msg("%s is on cooldown (%d turns)." % [td["name"], cd], "info")
+		return false
+	var cost := int(td.get("cost", 0))
+	if player.resource < cost:
+		log_msg("Not enough %s for %s." % [player.resource_label().to_lower(), td["name"]], "danger")
+		return false
+	var rng_max := int(td.get("range", 0))
+	var target: Actor = nearest_visible_hostile(rng_max) if rng_max > 0 else null
+	if rng_max > 0 and target == null:
+		log_msg("No target in range for %s." % td["name"], "info")
+		return false
+	var action_cost := _run_talent_effect(String(td.get("effect", tid)), td, target)
+	if action_cost < 0:
+		return false
+	player.resource -= cost
+	var max_cd := int(td.get("cooldown", 0))
+	if max_cd > 0:
+		player.cooldowns[tid] = max_cd
+	return _finish_player_action(action_cost)
+
+
+func _run_talent_effect(eff: String, _td: Dictionary, target: Actor) -> int:
+	var m := current_floor()
+	var will_v := maxi(0, player.stat("will"))
+	var might_v := maxi(0, player.stat("might"))
+	var cambion_bonus := 1 if (player.has_trait("infernal_blood") and apotheosis > 0) else 0
+	match eff:
+		"sunder_strike":
+			var r := Combat.resolve(player, target, rng)
+			target.awake = true
+			_remember_player(target)
+			if r["hit"]:
+				var dmg := int(r["damage"]) + 2
+				log_msg("You sunder the %s for %d!" % [target.name, dmg], "combat")
+				apply_damage(target, dmg, player.name)
+				if target.is_alive():
+					apply_status(target, "sundered")
+			else:
+				log_msg("Your sunder misses the %s." % target.name, "combat")
+			return COST_ATTACK
+		"iron_cleave":
+			var foes: Array[Actor] = []
+			for d in Grid.DIRS_8:
+				var a := m.actor_at(player.pos + d)
+				if a != null and not a.is_player and a.is_alive() and m.can_step(player.pos, a.pos):
+					foes.append(a)
+			if foes.is_empty():
+				log_msg("No adjacent foes to cleave.", "info")
+				return -1
+			for a in foes:
+				_attack(player, a)
+			return COST_ATTACK
+		"shield_brace":
+			apply_status(player, "braced")
+			log_msg("You brace behind your guard.", "good")
+			return COST_WAIT
+		"unyielding_march":
+			var heal := 6 + might_v
+			player.hp = mini(player.stat("max_hp"), player.hp + heal)
+			apply_status(player, "braced")
+			log_msg("You march unbroken, mending %d health." % heal, "good")
+			return COST_WAIT
+		"break_the_chain":
+			for sid in ["isolation", "perception_fog", "bleeding"]:
+				_remove_status(player, sid)
+			apply_status(player, "apostate_focus")
+			update_fov()
+			log_msg("You shatter the chains upon you.", "good")
+			return COST_WAIT
+		"defiant_decree":
+			var base_d := 4 + might_v / 2 + cambion_bonus
+			var hits := 0
+			for a in visible_hostiles():
+				if Grid.chebyshev(player.pos, a.pos) <= 3:
+					a.awake = true
+					_remember_player(a)
+					var dmg := maxi(1, base_d - a.stat("defense") / 2)
+					apply_damage(a, dmg, player.name)
+					if a.is_alive():
+						apply_status(a, "sundered")
+					hits += 1
+			if hits == 0:
+				return -1
+			log_msg("Your decree strikes %d foe%s!" % [hits, "" if hits == 1 else "s"], "combat")
+			return COST_ATTACK
+		"sovereign_vent":
+			var risk := player.mask_risk
+			var dmg := 4 + risk / 2 + will_v + cambion_bonus
+			var hits := 0
+			for a in visible_hostiles():
+				if Grid.chebyshev(player.pos, a.pos) <= 3:
+					a.awake = true
+					_remember_player(a)
+					apply_damage(a, dmg, player.name)
+					hits += 1
+			if hits == 0:
+				return -1
+			player.mask_risk = 0
+			log_msg("You vent %d Mask risk across %d foe%s for %d!" % [risk, hits, "" if hits == 1 else "s", dmg], "combat")
+			return COST_ATTACK
+		"gaze_of_lilith":
+			_remove_status(player, "perception_fog")
+			update_fov()
+			var base_d := 5 if (player.has_trait("mask_stances") and player.mask == "lilith") else 3
+			var dmg := maxi(1, base_d + will_v + cambion_bonus - target.stat("defense") / 2)
+			target.awake = true
+			_remember_player(target)
+			log_msg("The Eye unblinks at the %s for %d!" % [target.name, dmg], "combat")
+			apply_damage(target, dmg, player.name)
+			return COST_ATTACK
+		"unmake_record":
+			var dmg := maxi(1, 5 + will_v + cambion_bonus - target.stat("defense") / 2)
+			target.awake = true
+			_remember_player(target)
+			log_msg("You unmake the %s's record for %d!" % [target.name, dmg], "combat")
+			apply_damage(target, dmg, player.name)
+			if target.is_alive():
+				apply_status(target, "sundered")
+			return COST_ATTACK
+		"siphon_surge":
+			var dmg := maxi(1, 3 + will_v + cambion_bonus - target.stat("defense") / 2)
+			target.awake = true
+			_remember_player(target)
+			apply_damage(target, dmg, player.name)
+			var heal := maxi(1, dmg / 2)
+			player.hp = mini(player.stat("max_hp"), player.hp + heal)
+			log_msg("You drain %d from the %s, mending %d." % [dmg, target.name, heal], "good")
+			return COST_ATTACK
+		"transmute_pain":
+			for sid in ["reckoning", "isolation", "dissolution", "exposure"]:
+				_remove_status(player, sid)
+			var heal := 6 + will_v
+			player.hp = mini(player.stat("max_hp"), player.hp + heal)
+			log_msg("You transmute pain into %d health." % heal, "good")
+			return COST_WAIT
+		"fade_to_ash":
+			apply_status(player, "veiled")
+			for a in m.actors:
+				if not a.is_player and a.is_alive() and Grid.chebyshev(a.pos, player.pos) > 1:
+					_forget_player(a)
+			log_msg("You slip into ash and vanish from distant eyes.", "good")
+			return COST_WAIT
+		"shadow_step":
+			var spot := _adjacent_free(m, target.pos)
+			if spot == target.pos and not Grid.is_adjacent(player.pos, target.pos):
+				log_msg("No space beside the %s." % target.name, "info")
+				return -1
+			var old_pos := player.pos
+			if not Grid.is_adjacent(player.pos, target.pos):
+				player.pos = spot
+			var was_awake := target.awake
+			if Grid.chebyshev(old_pos, target.pos) > 1:
+				target.awake = false
+			_attack(player, target)
+			if target.is_alive() and was_awake:
+				target.awake = true
+			update_fov()
+			return COST_ATTACK
+		"arterial_cut":
+			_attack(player, target)
+			if target.is_alive():
+				apply_status(target, "bleeding")
+				log_msg("The %s bleeds freely." % target.name, "combat")
+			return COST_ATTACK
+		"coup_de_grace":
+			var dice := player.damage_dice()
+			var raw := Dice.roll(dice, rng) + Dice.roll(dice, rng) + player.stat("damage_bonus")
+			if target.has_status("bleeding") or target.has_status("sundered"):
+				raw += 4
+			var def := target.stat("defense")
+			if player.has_trait("infernal_blood"):
+				def = maxi(0, def - 1)
+			var dmg := maxi(1, raw - def)
+			target.awake = true
+			_remember_player(target)
+			log_msg("Coup de Grace! You strike the %s for %d!" % [target.name, dmg], "combat")
+			apply_damage(target, dmg, player.name)
+			return COST_ATTACK
+		"backstep":
+			var foe := nearest_visible_hostile(1)
+			if foe == null:
+				apply_status(player, "veiled")
+				log_msg("You tumble backward into shadow.", "good")
+				return COST_WAIT
+			var step_dir := Grid.sign_vec(player.pos - foe.pos)
+			var moved := false
+			for _s in 2:
+				var next := player.pos + step_dir
+				if m.can_step(player.pos, next) and m.actor_at(next) == null:
+					player.pos = next
+					moved = true
+				else:
+					break
+			if not moved:
+				var best := player.pos
+				var best_d := 1
+				for d in Grid.DIRS_8:
+					var q := player.pos + d
+					if m.can_step(player.pos, q) and m.actor_at(q) == null:
+						var dist_f := Grid.chebyshev(q, foe.pos)
+						if dist_f > best_d:
+							best_d = dist_f
+							best = q
+				player.pos = best
+			apply_status(player, "veiled")
+			update_fov()
+			log_msg("You vault back out of reach.", "good")
+			return COST_WAIT
+		"flurry":
+			_attack(player, target)
+			if target.is_alive():
+				_attack(player, target)
+			return COST_ATTACK
+	return -1
 
 
 func _finish_player_action(cost: int) -> bool:
@@ -512,20 +809,43 @@ func _next_actor() -> Actor:
 
 
 func _begin_player_turn() -> void:
+	_tick_cooldowns()
 	_tick_statuses(player)
 	_tick_mask()
 	_natural_regen()
 	update_fov()
 
 
+func _tick_cooldowns() -> void:
+	if turns <= 0:
+		return
+	if not player.cooldowns.is_empty():
+		var done: Array[String] = []
+		for tid in player.cooldowns:
+			var rem := int(player.cooldowns[tid]) - 1
+			if rem <= 0:
+				done.append(String(tid))
+			else:
+				player.cooldowns[tid] = rem
+		for tid in done:
+			player.cooldowns.erase(tid)
+	var rk := player.resource_kind()
+	if rk == "poise" and turns % 2 == 0:
+		player.resource = mini(player.max_resource(), player.resource + 1)
+	elif rk != "" and turns % 3 == 0:
+		player.resource = mini(player.max_resource(), player.resource + 1)
+
+
 func _tick_mask() -> void:
 	if turns <= 0 or not player.has_trait("mask_stances"):
 		return
 	if player.mask == "bare_face":
-		player.mask_risk = maxi(0, player.mask_risk - 2)
+		var cool := 2 + player.talent_rank("quick_shift")
+		player.mask_risk = maxi(0, player.mask_risk - cool)
 		return
 	player.mask_risk += 1
-	if player.mask_risk >= MASK_RISK_MAX:
+	var risk_max := MASK_RISK_MAX + 2 * player.talent_rank("crowned_frequency")
+	if player.mask_risk >= risk_max:
 		var old_mask := player.mask
 		var sid := Masks.seizure_status(old_mask)
 		player.mask = "bare_face"
@@ -546,11 +866,12 @@ func _natural_regen() -> void:
 		player.hp += 1
 
 
-## True when resting is safe: no hostile in view, not isolated, and health not full.
+## True when resting is safe: no hostile in view, not isolated, and health or resource not full.
 func can_rest() -> bool:
 	if state != State.PLAYING or player.has_status("isolation"):
 		return false
-	return visible_hostiles().is_empty() and player.hp < player.stat("max_hp")
+	var need := player.hp < player.stat("max_hp") or player.resource < player.max_resource()
+	return visible_hostiles().is_empty() and need
 
 
 ## Waits repeatedly until health is full, a hostile comes into view, or
@@ -578,8 +899,12 @@ func _tick_statuses(a: Actor) -> void:
 	for s in a.statuses:
 		var sd := db.get_def("statuses", s["id"])
 		var regen := int(sd.get("regen", 0))
-		if regen != 0:
+		if regen > 0:
 			a.hp = clampi(a.hp + regen, 1, a.stat("max_hp"))
+		elif regen < 0:
+			apply_damage(a, -regen, String(sd["name"]).to_lower())
+			if not a.is_alive():
+				return
 		s["turns"] = int(s["turns"]) - 1
 		if int(s["turns"]) <= 0:
 			expired.append(String(s["id"]))
@@ -594,14 +919,23 @@ func _tick_statuses(a: Actor) -> void:
 
 
 func apply_status(a: Actor, sid: String) -> void:
+	if sid == "bleeding" and a.is_player and a.has_trait("deathless"):
+		log_msg("Your dead veins do not bleed.", "info")
+		return
 	var sd := db.get_def("statuses", sid)
+	var dur := int(sd["duration"])
+	if a.is_player:
+		if sid == "perception_fog" and a.talent_rank("clear_witness") > 0:
+			dur = maxi(2, dur / 2)
+		elif sid == "reckoning" and a.talent_rank("alchemical_restraint") > 0:
+			dur = maxi(8, dur - 8 * a.talent_rank("alchemical_restraint"))
 	for s in a.statuses:
 		if s["id"] == sid:
-			s["turns"] = maxi(int(s["turns"]), int(sd["duration"]))
+			s["turns"] = maxi(int(s["turns"]), dur)
 			return
-	a.statuses.append({"id": sid, "turns": int(sd["duration"])})
+	a.statuses.append({"id": sid, "turns": dur})
 	if a.is_player:
-		log_msg("%s: %s" % [sd["name"], sd["description"]], "danger" if sid == "reckoning" else "good")
+		log_msg("%s: %s" % [sd["name"], sd["description"]], "danger" if sid in ["reckoning", "bleeding", "isolation", "perception_fog", "sundered"] else "good")
 
 
 func _remove_status(a: Actor, sid: String) -> void:
@@ -638,6 +972,9 @@ func _monster_turn(mon: Actor) -> int:
 				perc += 2
 			elif player.mask == "nyx":
 				notice_pct = NOTICE_PCT / 2
+		var ue := player.talent_rank("unseen_edge")
+		if ue > 0:
+			notice_pct = maxi(10, notice_pct - 15 * ue)
 		if _monster_sees_player(m, mon) and dist <= perc and rng.chance_pct(notice_pct):
 			mon.awake = true
 			_remember_player(mon)
@@ -702,6 +1039,8 @@ func _attack(attacker: Actor, defender: Actor) -> void:
 		verb = "strike unseen at" if attacker.is_player else "strikes unseen at"
 	var crit_note := " A grievous wound!" if r["crit"] else ""
 	log_msg("%s %s %s for %d.%s" % [who, verb, whom, r["damage"], crit_note], "danger" if defender.is_player else "combat")
+	if attacker.is_player and attacker.resource_kind() == "poise" and (bool(r["crit"]) or bool(r["sneak"])):
+		attacker.resource = mini(attacker.max_resource(), attacker.resource + 1)
 	apply_damage(defender, int(r["damage"]), attacker.name)
 	if not attacker.is_player and defender.is_player and defender.is_alive() and attacker.tags.has("chain_isolation") and not defender.has_status("isolation") and rng.chance_pct(35):
 		apply_status(defender, "isolation")
@@ -710,11 +1049,16 @@ func _attack(attacker: Actor, defender: Actor) -> void:
 func apply_damage(target: Actor, amount: int, source: String) -> void:
 	target.hp -= amount
 	if target.hp > 0:
+		if target.is_player and target.resource_kind() == "stamina":
+			target.resource = mini(target.max_resource(), target.resource + 1)
 		return
 	if target.is_player:
 		if target.has_trait("deathless") and not _deathless_spent(target):
 			target.flags["deathless_" + str(depth)] = 1
 			target.hp = 1
+			for sid in ["bleeding", "isolation", "perception_fog"]:
+				_remove_status(target, sid)
+			target.statuses.append({"id": "braced", "turns": 3})
 			log_msg("Death reaches for you and finds you already filed. You stand back up.", "good")
 			return
 		target.hp = 0
@@ -736,8 +1080,10 @@ func _kill_monster(mon: Actor) -> void:
 	var sp := db.get_def("species", player.species_id)
 	gain_xp(int(roundf(mon.xp_value * float(sp.get("xp_mult", 1.0)))))
 	if player.has_trait("soul_siphon") and not player.has_status("isolation"):
-		var heal := 1 + maxi(0, player.stat("will"))
+		var heal := 1 + maxi(0, player.stat("will")) + player.talent_rank("alchemical_restraint")
 		player.hp = mini(player.stat("max_hp"), player.hp + heal)
+	if player.resource_kind() == "resonance":
+		player.resource = mini(player.max_resource(), player.resource + 2)
 	if mon.tags.has("guardian") and m.exit_pos.x >= 0 and m.get_tile(m.exit_pos) == Tiles.DOOR_SEALED:
 		m.set_tile(m.exit_pos, Tiles.DOOR_OPEN)
 		log_msg("The Sentinel falls. Somewhere a seal that was never written down gives way.", "lore")
@@ -769,8 +1115,13 @@ func gain_xp(amount: int) -> void:
 		player.base["max_hp"] = int(player.base["max_hp"]) + gain
 		if player.level % 2 == 1:
 			player.base["accuracy"] = int(player.base["accuracy"]) + 1
+		player.stat_points += 1
+		player.talent_points += 1
+		if player.has_trait("adaptable") and (player.level == 3 or player.level == 6):
+			player.talent_points += 1
+		player.resource = player.max_resource()
 		player.hp = mini(player.stat("max_hp"), player.hp + gain + player.stat("max_hp") / 4)
-		log_msg("You reach level %d. (+%d max health%s)" % [player.level, gain, ", +1 accuracy" if player.level % 2 == 1 else ""], "good")
+		log_msg("You reach level %d. (+%d max health%s, +1 stat, +1 talent)" % [player.level, gain, ", +1 accuracy" if player.level % 2 == 1 else ""], "good")
 
 
 # ---------------------------------------------------------------- items
@@ -958,6 +1309,30 @@ static func _migrate(d: Dictionary) -> Dictionary:
 		out["apotheosis"] = int(out.get("apotheosis", 0))
 		out["way_serpent"] = int(out.get("way_serpent", 0))
 		out["way_return"] = int(out.get("way_return", 0))
+		ver = 3
+	if ver == 3:
+		out["save_version"] = 4
+		if typeof(out.get("player")) == TYPE_DICTIONARY:
+			var p: Dictionary = out["player"]
+			p["stat_points"] = int(p.get("stat_points", 0))
+			p["talent_points"] = int(p.get("talent_points", 1))
+			p["resource"] = int(p.get("resource", 10))
+			p["talents"] = p.get("talents", {})
+			p["cooldowns"] = p.get("cooldowns", {})
+			if String(p.get("species", "")) == "human" and typeof(p.get("traits")) == TYPE_ARRAY:
+				if not p["traits"].has("adaptable"):
+					p["traits"].append("adaptable")
+		if typeof(out.get("floors")) == TYPE_DICTIONARY:
+			for k in out["floors"]:
+				var fl = out["floors"][k]
+				if typeof(fl) == TYPE_DICTIONARY and typeof(fl.get("actors")) == TYPE_ARRAY:
+					for a in fl["actors"]:
+						if typeof(a) == TYPE_DICTIONARY:
+							a["stat_points"] = int(a.get("stat_points", 0))
+							a["talent_points"] = int(a.get("talent_points", 0))
+							a["resource"] = int(a.get("resource", 0))
+							a["talents"] = a.get("talents", {})
+							a["cooldowns"] = a.get("cooldowns", {})
 	return out
 
 

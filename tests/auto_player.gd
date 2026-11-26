@@ -24,6 +24,13 @@ func step() -> bool:
 		return false
 	var p := world.player
 	var m := world.current_floor()
+	while p.stat_points > 0:
+		var attr := "might" if p.class_id == "fallen_knight" else ("will" if p.class_id == "occultist" else "agility")
+		if not world.player_spend_stat(attr):
+			break
+	while p.talent_points > 0:
+		if not _learn_next_talent():
+			break
 	if p.hp * 3 < p.stat("max_hp"):
 		var heal := _find_consumable("heal")
 		if heal >= 0:
@@ -40,6 +47,8 @@ func step() -> bool:
 					return world.player_use(vial)
 			if p.has_trait("mask_stances") and p.mask != "eris" and p.mask_risk < World.MASK_RISK_MAX - 3 and not p.has_status("isolation"):
 				return world.player_switch_mask("eris")
+			if _try_combat_talent(a):
+				return true
 			return world.player_move(d)
 	if p.has_trait("mask_stances") and p.mask != "bare_face" and world.visible_hostiles().is_empty():
 		return world.player_switch_mask("bare_face")
@@ -61,6 +70,8 @@ func step() -> bool:
 		return world.player_pickup()
 	var target := _nearest_visible_hostile()
 	if target != null:
+		if _try_ranged_talent(target):
+			return true
 		var d := Pathing.distance_map(m, target.pos)
 		var s := Pathing.step_down(m, d, p.pos, func(q: Vector2i) -> bool: return m.actor_at(q) != null and q != target.pos)
 		if s != p.pos:
@@ -131,3 +142,50 @@ func _nearest_visible_hostile() -> Actor:
 			best = a
 			best_d = d
 	return best
+
+
+func _learn_next_talent() -> bool:
+	var p := world.player
+	var best_id := ""
+	var best_tier := 99
+	for tid in world.db.ids("talents"):
+		var td := world.db.get_def("talents", tid)
+		if String(td["class_id"]) == p.class_id and world.can_learn_talent(tid) == "":
+			var t := int(td["tier"])
+			if t < best_tier:
+				best_tier = t
+				best_id = tid
+	if best_id != "":
+		return world.player_learn_talent(best_id)
+	return false
+
+
+func _can_use_talent(tid: String) -> bool:
+	var p := world.player
+	if p.talent_rank(tid) <= 0 or p.cooldown(tid) > 0:
+		return false
+	return p.resource >= int(world.db.get_def("talents", tid).get("cost", 0))
+
+
+func _try_combat_talent(foe: Actor) -> bool:
+	var p := world.player
+	if (p.has_status("isolation") or p.has_status("perception_fog") or p.has_status("bleeding")) and _can_use_talent("break_the_chain"):
+		return world.player_use_talent("break_the_chain")
+	if p.has_status("reckoning") and p.hp * 2 < p.stat("max_hp") and _can_use_talent("transmute_pain"):
+		return world.player_use_talent("transmute_pain")
+	if p.hp * 2 < p.stat("max_hp"):
+		for def_tid in ["unyielding_march", "shield_brace"]:
+			if _can_use_talent(def_tid):
+				return world.player_use_talent(def_tid)
+	for off_tid in ["coup_de_grace", "flurry", "arterial_cut", "sunder_strike", "iron_cleave", "gaze_of_lilith", "siphon_surge", "unmake_record", "defiant_decree"]:
+		if _can_use_talent(off_tid):
+			return world.player_use_talent(off_tid)
+	return false
+
+
+func _try_ranged_talent(foe: Actor) -> bool:
+	var dist := Grid.chebyshev(world.player.pos, foe.pos)
+	for tid in ["unmake_record", "gaze_of_lilith", "siphon_surge", "shadow_step", "defiant_decree"]:
+		if _can_use_talent(tid) and dist <= int(world.db.get_def("talents", tid).get("range", 0)):
+			return world.player_use_talent(tid)
+	return false

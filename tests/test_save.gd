@@ -59,8 +59,36 @@ func test_v2_save_migrates_to_v3() -> void:
 		eq(w2.way_return, 0, "default way_return")
 
 
+func test_v3_save_migrates_to_v4() -> void:
+	var w := World.new_run(db(), 4242, "human", "fallen_knight", "Mig3")
+	var d := _through_json(w)
+	d["save_version"] = 3
+	d["player"].erase("stat_points")
+	d["player"].erase("talent_points")
+	d["player"].erase("resource")
+	d["player"].erase("talents")
+	d["player"].erase("cooldowns")
+	d["player"]["traits"].erase("adaptable")
+	for k in d["floors"]:
+		for a in d["floors"][k]["actors"]:
+			a.erase("stat_points")
+			a.erase("talent_points")
+			a.erase("resource")
+			a.erase("talents")
+			a.erase("cooldowns")
+	var errors: PackedStringArray = []
+	var w2 := World.from_dict(db(), d, errors)
+	eq(errors.size(), 0, "v3 save migrates cleanly: %s" % ", ".join(errors))
+	ok(w2 != null, "migrated v3 world loaded")
+	if w2 != null:
+		eq(w2.player.talent_points, 1, "default talent_points applied")
+		ok(w2.player.has_trait("adaptable"), "human receives adaptable trait")
+
+
 func test_round_trip_is_exact() -> void:
 	var w := World.new_run(db(), 4242, "cambion", "occultist", "Rt")
+	w.player_spend_stat("will")
+	w.player_learn_talent("gaze_of_lilith")
 	AutoPlayer.new(w).play(60)
 	var w2 := _reload(w)
 	eq(JSON.stringify(w2.to_dict()), JSON.stringify(w.to_dict()), "serializes identically after load")

@@ -19,7 +19,7 @@ extends RefCounted
 ##   table:<kind>  array of {"id": ref:<kind>, "weight": int > 0}
 ##   trait         a trait id implemented in src/sim/traits.gd
 
-const KINDS: Array[String] = ["statuses", "items", "species", "classes", "monsters", "floors"]
+const KINDS: Array[String] = ["statuses", "items", "species", "classes", "talents", "monsters", "floors"]
 
 ## Stats that equipment, statuses and species may modify.
 const MOD_STATS: Array[String] = [
@@ -85,7 +85,24 @@ const FIELDS := {
 		"evasion": {"type": "int", "required": false},
 		"starting_equipment": {"type": "list:ref:items", "required": true},
 		"starting_items": {"type": "list:ref:items", "required": false},
+		"resource": {"type": "enum:stamina|resonance|poise", "required": false},
 		"traits": {"type": "list:trait", "required": false},
+	},
+	"talents": {
+		"id": {"type": "id", "required": true},
+		"name": {"type": "string", "required": true},
+		"class_id": {"type": "ref:classes", "required": true},
+		"tree": {"type": "string", "required": true},
+		"tier": {"type": "int", "required": true, "min": 1},
+		"kind": {"type": "enum:passive|active", "required": true},
+		"max_rank": {"type": "int", "required": true, "min": 1},
+		"prereq": {"type": "ref:talents", "required": false},
+		"cost": {"type": "int", "required": false, "min": 0},
+		"cooldown": {"type": "int", "required": false, "min": 0},
+		"range": {"type": "int", "required": false, "min": 0},
+		"description": {"type": "text", "required": true},
+		"mods": {"type": "mods", "required": false},
+		"effect": {"type": "string", "required": false},
 	},
 	"monsters": {
 		"id": {"type": "id", "required": true},

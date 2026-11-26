@@ -388,10 +388,10 @@ func _build_game_screen() -> void:
 	actions.columns = 2 if settings.touch_controls else 3
 	actions.add_theme_constant_override("h_separation", int(6 * s))
 	actions.add_theme_constant_override("v_separation", int(6 * s))
-	var action_specs: Array = [["Get", _act_pickup], ["Bag", _show_inventory], ["Stairs", _act_stairs],
-			["Rest", _act_rest], ["Look", _toggle_look], ["Menu", _show_pause]]
+	var action_specs: Array = [["Get", _act_pickup], ["Bag", _show_inventory], ["Build", _show_build], ["Act", _show_abilities],
+			["Stairs", _act_stairs], ["Rest", _act_rest], ["Look", _toggle_look], ["Menu", _show_pause]]
 	if world.player.has_trait("mask_stances"):
-		action_specs.insert(2, ["Mask", _show_masks])
+		action_specs.insert(4, ["Mask", _show_masks])
 	for spec in action_specs:
 		var b := _btn(spec[0], spec[1])
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -420,7 +420,7 @@ func _build_game_screen() -> void:
 		side.add_child(pad_center)
 	else:
 		var mask_hint := "   Mask: m" if world.player.has_trait("mask_stances") else ""
-		side.add_child(_label("Move: arrows, numpad or hjklyubn\nWait: . or 5   Get: g   Bag: i%s\nStairs: Enter   Rest: r   Look: x\nTap a known tile to travel; hold or right-click to inspect. Menu: Esc" % mask_hint, Palette.TEXT_DIM, 0.7))
+		side.add_child(_label("Move: arrows, numpad or hjklyubn\nWait: . or 5   Get: g   Bag: i%s\nBuild: c   Act: a (or 1-6)\nStairs: Enter   Rest: r   Look: x\nTap a known tile to travel; hold or right-click to inspect. Menu: Esc" % mask_hint, Palette.TEXT_DIM, 0.7))
 	_refresh()
 
 
@@ -452,7 +452,11 @@ func _update_hud() -> void:
 	t.append("[b][color=#%s]%s[/color][/b]" % [Palette.LUX.to_html(false), _escape(p.name)])
 	t.append("%s %s, level %d" % [db.get_def("species", p.species_id)["name"], db.get_def("classes", p.class_id)["name"], p.level])
 	t.append("Health [color=#%s]%d / %d[/color]" % [hp_col.to_html(false), p.hp, mx])
+	if p.resource_label() != "":
+		t.append("%s %d / %d" % [p.resource_label(), p.resource, p.max_resource()])
 	t.append("XP %d / %d" % [p.xp, World.xp_for_level(p.level + 1)])
+	if p.stat_points > 0 or p.talent_points > 0:
+		t.append("[color=#%s]Unspent: %d stat, %d talent (Build)[/color]" % [Palette.FALSE_SUN.to_html(false), p.stat_points, p.talent_points])
 	var sphere := String(fd.get("sphere", ""))
 	t.append("Depth %d (%s): %s" % [world.depth, sphere, fd.get("name", "")] if sphere != "" else "Depth %d: %s" % [world.depth, fd.get("name", "")])
 	t.append("Attack %+d  Defense %d  Evasion %+d" % [p.stat("accuracy"), p.stat("defense"), p.stat("evasion")])
@@ -658,9 +662,96 @@ func _unhandled_input(event: InputEvent) -> void:
 		_toggle_look()
 	elif k.keycode == KEY_M:
 		_show_masks()
+	elif k.keycode == KEY_C:
+		_show_build()
+	elif k.keycode == KEY_A:
+		_show_abilities()
+	elif k.keycode >= KEY_1 and k.keycode <= KEY_6:
+		var idx := k.keycode - KEY_1
+		var acts := world.learned_active_talents()
+		if idx < acts.size() and world.player_use_talent(acts[idx]):
+			_after_action()
 
 
 # ================================================================ overlays
+
+func _show_build() -> void:
+	if world == null or world.state != World.State.PLAYING:
+		return
+	var p := world.player
+	var col := _open_overlay("Character Build")
+	col.add_child(_label("Stat points: %d   Talent points: %d   Level %d" % [p.stat_points, p.talent_points, p.level], Palette.FALSE_SUN, 0.9))
+	col.add_child(_label("Attributes (Might %d, Agility %d, Will %d)" % [p.stat("might"), p.stat("agility"), p.stat("will")], Palette.GOLD, 0.9))
+	var attr_row := HBoxContainer.new()
+	attr_row.add_theme_constant_override("separation", 8)
+	for attr in ContentSchema.ATTRIBUTES:
+		var attr_name: String = attr
+		var b := _btn("+1 %s" % attr_name.capitalize(), func() -> void:
+			if world.player_spend_stat(attr_name):
+				_refresh()
+				_show_build())
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.disabled = p.stat_points <= 0
+		attr_row.add_child(b)
+	col.add_child(attr_row)
+
+	var by_tree := {}
+	for tid in db.ids("talents"):
+		var td := db.get_def("talents", tid)
+		if String(td["class_id"]) != p.class_id:
+			continue
+		var tname := String(td["tree"])
+		if not by_tree.has(tname):
+			by_tree[tname] = []
+		by_tree[tname].append(td)
+	for tname in by_tree:
+		col.add_child(_label(String(tname), Palette.GOLD, 1.0))
+		var list: Array = by_tree[tname]
+		list.sort_custom(func(a, b): return int(a["tier"]) < int(b["tier"]))
+		for td in list:
+			var tid := String(td["id"])
+			var rank := p.talent_rank(tid)
+			var max_r := int(td["max_rank"])
+			var reason := world.can_learn_talent(tid)
+			var tag := "Active (%d %s, %dcd)" % [int(td.get("cost", 0)), p.resource_label(), int(td.get("cooldown", 0))] if String(td["kind"]) == "active" else "Passive"
+			var label_txt := "%s [%d/%d] — %s" % [td["name"], rank, max_r, tag]
+			var b := _btn(label_txt, func() -> void:
+				if world.player_learn_talent(tid):
+					_refresh()
+					_show_build())
+			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			b.disabled = reason != ""
+			col.add_child(b)
+			var desc := String(td["description"]) if reason == "" or rank >= max_r else "%s (%s)" % [td["description"], reason]
+			col.add_child(_label(desc, Palette.TEXT_DIM, 0.78))
+	col.add_child(_btn("Close", _close_overlay))
+
+
+func _show_abilities() -> void:
+	if world == null or world.state != World.State.PLAYING:
+		return
+	var p := world.player
+	var acts := world.learned_active_talents()
+	var col := _open_overlay("Abilities (%s %d/%d)" % [p.resource_label(), p.resource, p.max_resource()])
+	if acts.is_empty():
+		col.add_child(_label("No active talents learned yet. Open Build to spend talent points.", Palette.TEXT_DIM))
+	for i in acts.size():
+		var tid := acts[i]
+		var td := db.get_def("talents", tid)
+		var cost := int(td.get("cost", 0))
+		var cd := p.cooldown(tid)
+		var key_tag := "[%d] " % (i + 1) if i < 6 else ""
+		var status_tag := "CD %d" % cd if cd > 0 else ("%d %s" % [cost, p.resource_label()])
+		var b := _btn("%s%s (%s)" % [key_tag, td["name"], status_tag], func() -> void:
+			_close_overlay()
+			if world.player_use_talent(tid):
+				_after_action())
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.disabled = cd > 0 or p.resource < cost
+		col.add_child(b)
+		col.add_child(_label(String(td["description"]), Palette.TEXT_DIM, 0.78))
+	col.add_child(_btn("Close", _close_overlay))
+
 
 func _show_gate() -> void:
 	if not world.needs_gate_to_descend() or overlay != null:

@@ -60,3 +60,22 @@ Known imbalance: in the 7-sphere soak (`180 runs`, `72 wins / 40%`), Fallen Knig
 ## Where the mythology goes next
 
 Milestones 1–4 implemented Masks as stances, the Seven Spheres with Sphere Gates, the two Ways as victory families, the first two Eight Chains abilities, the Apotheosis guard ("By Decree"), Relics (Work or Transmute), and Named losses. Remaining mythology candidates for future depth include the remaining six Eight Chains abilities, rites/covenants between Spheres, and item identification. Each needs owner review before shipping.
+
+## M5.1 — Character Development
+
+M5.1 expands character building without changing the core turn loop or headless determinism:
+
+- **Talent trees & points:** Each calling now has 3 talent trees (`9` trees total, `27` talents in `content/core/talents.json`) combining active abilities, multi-rank passives, prerequisites (`prereq`), and tier/level gates (tier 2 requires level `2`, tier 3 requires level `4`). Players gain `+1` talent point per level from level `2`, plus `+1` attribute point (`Might`, `Agility`, `Will`) on odd levels (`3, 5, 7, ...`).
+- **Class resources & cooldowns:** Each calling uses a distinct resource (`classes.resource`, pool `10`): **Fallen Knight** uses `Stamina` (`+1` when taking a hit, `+1` every `3` turns), **Occultist** uses `Resonance` (`+2` on kill, `+1` every `3` turns), and **Assassin** uses `Poise` (`+1` on crit or sneak strike, `+1` every `2` turns). Active abilities spend resource and enter per-talent cooldowns.
+- **Attribute scaling & species interactions:** Every positive point of `Might` also adds `+2` max HP for the player, and `Agility` adds `+2%` crit chance. **Humans** gain the `adaptable` trait (`+1` extra attribute point at levels `2` and `5`, `+1` extra talent point at levels `3` and `6`). **Revenants** are immune to `bleeding` and gain `Braced` when `deathless` triggers. **Cambions** pay `-1` HP when working Relics and deal `+2` damage with active talents while at `>= 2` `infernal_blood`.
+
+### Measured Balance (M5.1 held-out soak, `tools/soak.gd --seeds=15 --salt=heldout`, `135` runs)
+
+| Scope | Wins / Runs | Mean Turns | Notes |
+|---|---:|---:|---|
+| Overall | `101 / 135` (`75%`) | `795` | Deaths: Spheres 2–7 (`warren` -> `preliator`) |
+| `human` | `36 / 45` (`80%`) | — | `fallen_knight` 14/15, `assassin` 14/15, `occultist` 8/15 |
+| `cambion` | `34 / 45` (`76%`) | — | `fallen_knight` 14/15, `assassin` 14/15, `occultist` 6/15 |
+| `revenant` | `31 / 45` (`69%`) | — | `fallen_knight` 14/15, `assassin` 10/15, `occultist` 7/15 |
+
+*(Occultist lags behind Knight and Assassin under deterministic bot play due to Mask risk management; upcoming M5.2 combat depth and enemy special attacks will further re-balance depth progression.)*

@@ -2,17 +2,18 @@
 
 An original turn-based traditional roguelike set beneath Terra Tenebrae, in the cosmology of FALSE LIGHT. It is built with Godot 4 and typed GDScript, and plays fully offline.
 
-**Status: v0.4 (Milestones 0–4 implemented, export presets & builds ready on Linux).** It has a title screen, character creation (3 origins × 3 callings), and a seeded seven-sphere descent (Moon through Saturn). Gameplay covers:
+**Status: v0.5-dev (Milestones 0–4 and M5.1 Character Development implemented).** It has a title screen, character creation (3 origins × 3 callings), and a seeded seven-sphere descent (Moon through Saturn). Gameplay covers:
 
 - Field of view with exploration memory.
-- Melee combat, XP and levels.
+- Melee combat, XP, levels, **attribute allocation**, and **3 talent trees per calling** (`27` active and passive talents).
+- **Class resources & cooldowns**: `Stamina` (Fallen Knight), `Resonance` (Occultist), and `Poise` (Assassin).
 - Equipment, consumables, and Relics (Work for temporary power with a cost, or Transmute for permanent stats).
 - **Masks as stances** (`m` key / Mask button for Occultists: Bare Face, Nyx, Eris, Lilith) with risk accrual and seizures.
 - The **False Light** status: relief, then the Reckoning.
 - **Eight Chains** enemy abilities (Isolation and Monopolized Sight fog).
 - **Sphere Gates** between Spheres (`Stormed`, `Serpent's Key`, `Given Back`, `By Name`) and the **Apotheosis Guard**.
 - The Preliator Sentinel guardian, **Named losses** (Catalogued, Fluent, Gilded), and four victory outcomes (Unwritten Door, The Serpent's Way, The Way of Return, and Victory: By Decree).
-- Permadeath with atomic save/resume (`save_version` 3, migrating v1/v2 saves).
+- Permadeath with atomic save/resume (`save_version` 4, migrating v1/v2/v3 saves).
 
 Android, Windows and Web builds can be exported via `tools/export.sh` (see [ROADMAP.md](ROADMAP.md); Windows runtime, Web browser `user://` persistence, and physical Android device runtime tests have not run yet). Any distributed export must ship Godot's license notices.
 
@@ -45,6 +46,8 @@ xvfb-run -a godot --path . --audio-driver Dummy --script res://tools/ui_smoke.gd
 | Stairs | Enter `>` `<` | Stairs, or tap yourself on stairs |
 | Rest | `r` | Rest |
 | Inventory | `i` | Bag |
+| Character build & talents | `c` | Build |
+| Active talents | `a` or `1`–`6` | Act |
 | Masks (Occultist) | `m` | Mask |
 | Inspect | `x`, then tap | Look, long-press or right-click |
 | Menu | Esc | Menu, Android back |

@@ -12,6 +12,7 @@ const KNOWN := {
 	"deathless": "Once per floor, a killing blow leaves you at 1 health instead.",
 	"infernal_blood": "Your attacks ignore 1 point of the target's defense.",
 	"mask_stances": "Wear the Masks as stances (Bare Face, Nyx, Eris, Lilith), switching for 1 turn.",
+	"adaptable": "Starts with +1 attribute point and gains a bonus talent point at levels 3 and 6.",
 }
 
 

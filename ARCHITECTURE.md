@@ -58,3 +58,10 @@ JSON packs are validated against `ContentSchema` at load. The validator reports 
 - **Linux:** run from source with Godot 4.7.2 or exported via `tools/export.sh linux` (`build/linux/abyssal-sovereign.x86_64` verified launching cleanly).
 - **Android:** landscape sensor orientation is set, and `import_etc2_astc` is enabled in `project.godot`. Touch controls default on for touch devices. The back button opens the menu and closes overlays. Autosave on pause covers process kills. Debug APK builds via `tools/export.sh android` (`build/android/abyssal-sovereign-debug.apk`); physical device testing and release signing remain `NOT_RUN`.
 - **Windows / Web:** no platform-specific code. Exported via `tools/export.sh windows web` (`build/windows/abyssal-sovereign.exe` and `build/web/index.html`). On Web, Quit is hidden, and `user://` maps to IndexedDB (browser runtime/persistence `NOT_RUN`; Windows runtime `NOT_RUN`).
+
+## M5.1 Additions (Character Development)
+
+- **Content:** `content/core/talents.json` (validated under `Schema.KINDS` `"talents"`) and `classes.resource` (`stamina`, `resonance`, `poise`); `statuses.json` adds `sundered`, `braced`, `apostate_focus`, `veiled`, `bleeding`; `traits.gd` adds `adaptable`.
+- **Save schema:** `World.SAVE_VERSION := 4` with deterministic migration `v1 -> v2 -> v3 -> v4` adding `stat_points`, `talent_points`, `resource`, `talents`, and `cooldowns` to serialized actors (`SaveCheck.ACTOR_KEYS` updated).
+- **World APIs:** `player_spend_stat(stat_name)`, `can_learn_talent(talent_id)`, `player_learn_talent(talent_id)`, `learned_active_talents()`, `nearest_visible_hostile(max_range)`, and `player_use_talent(talent_id)`.
+- **UI:** `src/ui/main.gd` exposes `Build` (`c`, attribute allocation + 3 talent trees) and `Act` (`a` / `1`–`6`, active abilities) overlays plus class resource and unspent point counters in the HUD.

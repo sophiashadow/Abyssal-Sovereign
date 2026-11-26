@@ -36,3 +36,11 @@ Owner decisions resolved 2026-11-26 (see [docs/LORE.md](docs/LORE.md)): Apotheos
 1. **Seven Spheres** (Moon through Saturn, depths 1–7) with **Sphere Gates** (`Stormed`, `Serpent's Key`, `Given Back`, `By Name`) and deeper Dominion enemies (`Inquisition Cantor`, `Tithe Inquisitor`).
 2. **Two Ways** (`The Serpent's Way`, `The Way of Return`) as alternative victory families.
 3. **Apotheosis guard** and the hollow **"By Decree"** victory.
+
+## Milestone 5.1: character development (done 2026-11-26)
+
+1. **Talent trees & progression:** 3 talent trees per calling (`27` talents total in `content/core/talents.json`) with active and passive abilities, prerequisites, and tier/level gates.
+2. **Attribute allocation:** Players gain attribute points on odd levels and talent points every level from 2; `Might` increases max HP (`+2/pt`), `Agility` increases crit chance (`+2%/pt`), and `Will` scales Occultist abilities and healing.
+3. **Class resources & cooldowns:** `Stamina` (Fallen Knight), `Resonance` (Occultist), and `Poise` (Assassin), with tactical active cooldowns and Build (`c`) / Act (`a` / `1`–`6`) UI panels.
+4. **Species differentiation:** Humans gain `adaptable` (extra attribute points at levels 2/5 and talent points at levels 3/6); Revenants ignore `bleeding` and gain `Braced` on `deathless` triggers; Cambions pay `-1` HP when working Relics and deal `+2` damage with active talents while at `>= 2` `infernal_blood`.
+5. **Next (M5.2–M5.5):** Combat depth (ranged projectiles, elemental/metaphysical types, resistances, elite enemies), equipment affixes/ID/sets, dungeon ecology, and full Eight Chains/metaphysical depth.

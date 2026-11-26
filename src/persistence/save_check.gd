@@ -6,7 +6,8 @@ extends RefCounted
 
 const ACTOR_KEYS := ["id", "t", "name", "glyph", "color", "player", "x", "y", "hp", "base",
 	"level", "xp", "xpv", "next", "statuses", "inv", "eq", "traits", "tags", "awake",
-	"unique", "species", "class", "mask", "mask_risk", "flags"]
+	"unique", "species", "class", "mask", "mask_risk",
+	"stat_points", "talent_points", "resource", "talents", "cooldowns", "flags"]
 const ITEM_KEYS := ["id", "t", "q", "x", "y"]
 const FLOOR_KEYS := ["depth", "w", "h", "tiles", "explored", "up", "down", "exit", "actors", "items"]
 
@@ -69,6 +70,16 @@ static func _actor(v: Variant, db: ContentDB, where: String, out: PackedStringAr
 		out.append("%s has unknown mask '%s'" % [where, str(v["mask"])])
 	if int(v["mask_risk"]) < 0:
 		out.append("%s has negative mask risk" % where)
+	if int(v["stat_points"]) < 0 or int(v["talent_points"]) < 0 or int(v["resource"]) < 0:
+		out.append("%s has negative points or resource" % where)
+	if typeof(v["talents"]) != TYPE_DICTIONARY or typeof(v["cooldowns"]) != TYPE_DICTIONARY:
+		out.append("%s has malformed talents or cooldowns" % where)
+		return
+	for tid in v["talents"]:
+		if not db.has("talents", String(tid)):
+			out.append("%s refers to unknown talent '%s'" % [where, str(tid)])
+		elif int(v["talents"][tid]) < 1:
+			out.append("%s has non-positive rank for talent '%s'" % [where, str(tid)])
 	if bool(v["player"]):
 		if not db.has("species", String(v["species"])) or not db.has("classes", String(v["class"])):
 			out.append("%s has unknown species or class" % where)

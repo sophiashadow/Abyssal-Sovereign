@@ -1,0 +1,68 @@
+{
+  "schema": "talents",
+  "version": 1,
+  "entries": [
+    {"id": "sunder_strike", "name": "Sunder Strike", "class_id": "fallen_knight", "tree": "Oathbreaker", "tier": 1, "kind": "active", "max_rank": 1, "cost": 3, "cooldown": 6, "range": 1,
+     "description": "Strike an adjacent foe with weapon damage +2 and inflict Sundered (-2 defense for 6 turns).", "effect": "sunder_strike"},
+    {"id": "iron_cleave", "name": "Iron Cleave", "class_id": "fallen_knight", "tree": "Oathbreaker", "tier": 2, "kind": "active", "max_rank": 1, "prereq": "sunder_strike", "cost": 4, "cooldown": 7, "range": 1,
+     "description": "Sweep all adjacent foes with your weapon.", "effect": "iron_cleave"},
+    {"id": "executioners_vow", "name": "Executioner's Vow", "class_id": "fallen_knight", "tree": "Oathbreaker", "tier": 3, "kind": "passive", "max_rank": 3, "prereq": "iron_cleave",
+     "description": "Passive: against foes below half health, gain +5% crit and +2 damage per rank."},
+
+    {"id": "shield_brace", "name": "Shield Brace", "class_id": "fallen_knight", "tree": "Preliator Bulwark", "tier": 1, "kind": "active", "max_rank": 1, "cost": 3, "cooldown": 5, "range": 0,
+     "description": "Anchor your guard: gain Braced (+3 defense, +1 evasion) for 5 turns.", "effect": "shield_brace"},
+    {"id": "tempered_plate", "name": "Tempered Plate", "class_id": "fallen_knight", "tree": "Preliator Bulwark", "tier": 2, "kind": "passive", "max_rank": 3, "prereq": "shield_brace", "mods": {"defense": 1},
+     "description": "Passive: +1 defense per rank, and Iron Oath triggers below 65% health."},
+    {"id": "unyielding_march", "name": "Unyielding March", "class_id": "fallen_knight", "tree": "Preliator Bulwark", "tier": 3, "kind": "active", "max_rank": 1, "prereq": "tempered_plate", "cost": 5, "cooldown": 8, "range": 0,
+     "description": "Mend 6 + Might health and gain Braced for 5 turns.", "effect": "unyielding_march"},
+
+    {"id": "break_the_chain", "name": "Break the Chain", "class_id": "fallen_knight", "tree": "Dominion Apostate", "tier": 1, "kind": "active", "max_rank": 1, "cost": 3, "cooldown": 6, "range": 0,
+     "description": "Shatter Isolation, Monopolized Sight, and Bleeding, and gain Apostate Focus for 5 turns.", "effect": "break_the_chain"},
+    {"id": "ward_breaker", "name": "Ward Breaker", "class_id": "fallen_knight", "tree": "Dominion Apostate", "tier": 2, "kind": "passive", "max_rank": 3, "prereq": "break_the_chain",
+     "description": "Passive: +2 damage per rank against Dominion foes and guardians."},
+    {"id": "defiant_decree", "name": "Defiant Decree", "class_id": "fallen_knight", "tree": "Dominion Apostate", "tier": 3, "kind": "active", "max_rank": 1, "prereq": "ward_breaker", "cost": 5, "cooldown": 9, "range": 3,
+     "description": "Deal 4 + Might/2 damage (reduced by half defense) to visible foes within 3 tiles and inflict Sundered.", "effect": "defiant_decree"},
+
+    {"id": "quick_shift", "name": "Quick Shift", "class_id": "occultist", "tree": "Mask Governance", "tier": 1, "kind": "passive", "max_rank": 3,
+     "description": "Passive: switching Masks takes half a turn, and Bare Face cools +1 extra risk per rank."},
+    {"id": "sovereign_vent", "name": "Sovereign Vent", "class_id": "occultist", "tree": "Mask Governance", "tier": 2, "kind": "active", "max_rank": 1, "prereq": "quick_shift", "cost": 4, "cooldown": 7, "range": 3,
+     "description": "Spend accumulated Mask risk to blast visible foes within 3 tiles for 4 + risk/2 + Will damage.", "effect": "sovereign_vent"},
+    {"id": "crowned_frequency", "name": "Crowned Frequency", "class_id": "occultist", "tree": "Mask Governance", "tier": 3, "kind": "passive", "max_rank": 3, "prereq": "sovereign_vent",
+     "description": "Passive: +2 max Mask risk threshold per rank, and +1 to your active Mask's primary stat per rank."},
+
+    {"id": "gaze_of_lilith", "name": "Gaze of Lilith", "class_id": "occultist", "tree": "The Eye Unblinking", "tier": 1, "kind": "active", "max_rank": 1, "cost": 3, "cooldown": 5, "range": 5,
+     "description": "Strike a visible foe within 5 tiles for 3 + Will damage (5 + Will in Lilith) and clear fog.", "effect": "gaze_of_lilith"},
+    {"id": "clear_witness", "name": "Clear Witness", "class_id": "occultist", "tree": "The Eye Unblinking", "tier": 2, "kind": "passive", "max_rank": 3, "prereq": "gaze_of_lilith", "mods": {"sight": 1, "accuracy": 1},
+     "description": "Passive: +1 sight and +1 accuracy per rank; halves Monopolized Sight duration."},
+    {"id": "unmake_record", "name": "Unmake Record", "class_id": "occultist", "tree": "The Eye Unblinking", "tier": 3, "kind": "active", "max_rank": 1, "prereq": "clear_witness", "cost": 5, "cooldown": 9, "range": 5,
+     "description": "Deal 5 + Will damage (reduced by half defense) to a visible foe within 5 tiles and inflict Sundered.", "effect": "unmake_record"},
+
+    {"id": "siphon_surge", "name": "Siphon Surge", "class_id": "occultist", "tree": "Alchemy of False Light", "tier": 1, "kind": "active", "max_rank": 1, "cost": 4, "cooldown": 8, "range": 4,
+     "description": "Drain 3 + Will health (reduced by half defense) from a visible foe within 4 tiles, healing for half.", "effect": "siphon_surge"},
+    {"id": "alchemical_restraint", "name": "Alchemical Restraint", "class_id": "occultist", "tree": "Alchemy of False Light", "tier": 2, "kind": "passive", "max_rank": 3, "prereq": "siphon_surge",
+     "description": "Passive: Soul Siphon heals +1 per rank and Reckoning fades 8 turns sooner per rank."},
+    {"id": "transmute_pain", "name": "Transmute Pain", "class_id": "occultist", "tree": "Alchemy of False Light", "tier": 3, "kind": "active", "max_rank": 1, "prereq": "alchemical_restraint", "cost": 5, "cooldown": 8, "range": 0,
+     "description": "Clear Reckoning, Isolation, Dissolution, and Exposure, and heal 6 + Will health.", "effect": "transmute_pain"},
+
+    {"id": "fade_to_ash", "name": "Fade to Ash", "class_id": "assassin", "tree": "Tithe-Alley Shadow", "tier": 1, "kind": "active", "max_rank": 1, "cost": 3, "cooldown": 6, "range": 0,
+     "description": "Gain Veiled (+4 evasion for 4 turns) and drop pursuit of awake foes outside melee.", "effect": "fade_to_ash"},
+    {"id": "unseen_edge", "name": "Unseen Edge", "class_id": "assassin", "tree": "Tithe-Alley Shadow", "tier": 2, "kind": "passive", "max_rank": 3, "prereq": "fade_to_ash",
+     "description": "Passive: +2 sneak attack damage per rank and foes notice 15% less easily per rank."},
+    {"id": "shadow_step", "name": "Shadow Step", "class_id": "assassin", "tree": "Tithe-Alley Shadow", "tier": 3, "kind": "active", "max_rank": 1, "prereq": "unseen_edge", "cost": 4, "cooldown": 6, "range": 4,
+     "description": "Slip beside a visible foe within 4 tiles and strike unaware if they were not adjacent.", "effect": "shadow_step"},
+
+    {"id": "arterial_cut", "name": "Arterial Cut", "class_id": "assassin", "tree": "Venom & Stiletto", "tier": 1, "kind": "active", "max_rank": 1, "cost": 3, "cooldown": 6, "range": 1,
+     "description": "Strike an adjacent foe and inflict Bleeding (2 damage per turn for 5 turns).", "effect": "arterial_cut"},
+    {"id": "keen_blade", "name": "Keen Blade", "class_id": "assassin", "tree": "Venom & Stiletto", "tier": 2, "kind": "passive", "max_rank": 3, "prereq": "arterial_cut", "mods": {"crit": 6, "accuracy": 1},
+     "description": "Passive: +6% crit chance and +1 accuracy per rank."},
+    {"id": "coup_de_grace", "name": "Coup de Grace", "class_id": "assassin", "tree": "Venom & Stiletto", "tier": 3, "kind": "active", "max_rank": 1, "prereq": "keen_blade", "cost": 5, "cooldown": 9, "range": 1,
+     "description": "Guaranteed critical hit on an adjacent foe (+4 bonus damage if bleeding or sundered).", "effect": "coup_de_grace"},
+
+    {"id": "backstep", "name": "Backstep", "class_id": "assassin", "tree": "Acrobatics", "tier": 1, "kind": "active", "max_rank": 1, "cost": 2, "cooldown": 4, "range": 0,
+     "description": "Spring 2 tiles away from the nearest adjacent foe and gain Veiled for 2 turns.", "effect": "backstep"},
+    {"id": "fleet_foot", "name": "Fleet Foot", "class_id": "assassin", "tree": "Acrobatics", "tier": 2, "kind": "passive", "max_rank": 3, "prereq": "backstep", "mods": {"speed": 5, "evasion": 1},
+     "description": "Passive: +5 speed and +1 evasion per rank."},
+    {"id": "flurry", "name": "Flurry", "class_id": "assassin", "tree": "Acrobatics", "tier": 3, "kind": "active", "max_rank": 1, "prereq": "fleet_foot", "cost": 5, "cooldown": 8, "range": 1,
+     "description": "Make two rapid weapon strikes against an adjacent foe.", "effect": "flurry"}
+  ]
+}

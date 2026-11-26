@@ -82,3 +82,11 @@ Resolved (2026-11-26):
 - **Rulebook §13 Tier 1 and 2 threat archetypes.** They are a real-world safety register, not fantasy content.
 - **The private edition ruleset.** Marked not for publication.
 - **Any biographical detail, persona identity or voice document.** The game bundles none.
+
+## M5.1 Character Development Provenance
+
+- **`adaptable` Human origin trait** (`Interpretation`): grounds Human mechanical flexibility across callings in accelerated attribute and talent growth.
+- **Calling talent trees** (`Canon-derived` names framing `Proposed` tactical mechanics):
+  - *Fallen Knight*: `Oathbreaker`, `Preliator Bulwark`, `Dominion Apostate` (references the Preliators and breaking Dominion Chains).
+  - *Occultist*: `Mask Governance`, `The Eye Unblinking`, `Alchemy of False Light` (references Nyx/Eris/Lilith governance and False Light alchemy).
+  - *Assassin*: `Tithe-Alley Shadow`, `Venom & Stiletto`, `Acrobatics` (references First-Sphere tithe streets and light blades).

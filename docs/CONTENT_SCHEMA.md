@@ -96,7 +96,27 @@ All game content is JSON under a pack directory. The core pack is `content/core/
 | `accuracy`, `evasion` | int | no | base bonuses |
 | `starting_equipment` | list:ref:items | yes | equipped at start |
 | `starting_items` | list:ref:items | no | carried at start |
+| `resource` | enum: stamina, resonance, poise | no | class ability resource |
 | `traits` | list:trait | no | |
+
+## talents
+
+| Field | Type | Req | Notes |
+|---|---|---|---|
+| `id` | id | yes | |
+| `name` | string | yes | |
+| `class_id` | ref:classes | yes | calling that owns this talent |
+| `tree` | string | yes | talent tree name |
+| `tier` | int ≥ 1 | yes | 1..3 (tier 3 requires level 3+) |
+| `kind` | enum: passive, active | yes | |
+| `max_rank` | int ≥ 1 | yes | |
+| `prereq` | ref:talents | no | prerequisite talent |
+| `cost` | int ≥ 0 | no | resource cost for active abilities |
+| `cooldown` | int ≥ 0 | no | cooldown in turns |
+| `range` | int ≥ 0 | no | target range in tiles |
+| `description` | text | yes | |
+| `mods` | mods | no | passive stat modifiers per rank |
+| `effect` | string | no | active/passive rule key |
 
 ## monsters
 
@@ -139,3 +159,4 @@ Traits are behaviour implemented in code. Content may only name these:
 - `deathless`: once per floor, a killing blow leaves you at 1 HP.
 - `infernal_blood`: your blows ignore 1 point of defense.
 - `mask_stances`: wear the Masks as stances (Bare Face, Nyx, Eris, Lilith), switching for 1 turn.
+- `adaptable`: starts with +1 attribute point and gains a bonus talent point at levels 3 and 6.

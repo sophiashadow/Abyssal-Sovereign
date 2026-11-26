@@ -36,8 +36,51 @@ var species_id: String = ""
 var class_id: String = ""
 var mask: String = "bare_face"
 var mask_risk: int = 0
+var stat_points: int = 0
+var talent_points: int = 0
+var resource: int = 0
+## talent_id -> int rank
+var talents: Dictionary = {}
+## talent_id -> int remaining turns
+var cooldowns: Dictionary = {}
 ## Small per-actor rule state (for example, which floors 'deathless' was spent on).
 var flags: Dictionary = {}
+
+
+func talent_rank(tid: String) -> int:
+	return int(talents.get(tid, 0))
+
+
+func cooldown(tid: String) -> int:
+	return int(cooldowns.get(tid, 0))
+
+
+func resource_kind() -> String:
+	if not is_player or class_id == "" or db == null or not db.has("classes", class_id):
+		return ""
+	return String(db.get_def("classes", class_id).get("resource", "stamina"))
+
+
+func resource_label() -> String:
+	match resource_kind():
+		"stamina":
+			return "Stamina"
+		"resonance":
+			return "Resonance"
+		"poise":
+			return "Poise"
+	return ""
+
+
+func max_resource() -> int:
+	match resource_kind():
+		"stamina":
+			return 10 + maxi(0, stat("might")) * 2
+		"resonance":
+			return 10 + maxi(0, stat("will")) * 2
+		"poise":
+			return 10 + maxi(0, stat("agility")) * 2
+	return 0
 
 
 func has_trait(t: String) -> bool:
@@ -56,6 +99,8 @@ func equipped(slot: String) -> Item:
 
 
 func _mod_sum(stat_name: String) -> int:
+	if equipment.is_empty() and statuses.is_empty() and talents.is_empty() and not has_trait("mask_stances"):
+		return 0
 	var total := 0
 	for slot in SLOTS:
 		var it := equipped(slot)
@@ -65,6 +110,18 @@ func _mod_sum(stat_name: String) -> int:
 		total += int(db.get_def("statuses", s["id"]).get("mods", {}).get(stat_name, 0))
 	if has_trait("mask_stances"):
 		total += int(Masks.mods(mask).get(stat_name, 0))
+		var cf := talent_rank("crowned_frequency")
+		if cf > 0:
+			if mask == "nyx" and stat_name == "evasion":
+				total += cf
+			elif mask == "eris" and stat_name == "damage":
+				total += cf
+			elif mask == "lilith" and stat_name == "will":
+				total += cf
+	for tid in talents:
+		var rank := int(talents[tid])
+		if rank > 0 and db.has("talents", String(tid)):
+			total += int(db.get_def("talents", String(tid)).get("mods", {}).get(stat_name, 0)) * rank
 	return total
 
 
@@ -78,20 +135,22 @@ func stat(stat_name: String) -> int:
 		"might", "agility", "will":
 			return int(base.get(stat_name, 0)) + _mod_sum(stat_name)
 		"max_hp":
-			return maxi(1, int(base.get("max_hp", 1)) + _mod_sum("max_hp"))
+			var might_hp := maxi(0, stat("might")) * 2 if is_player else 0
+			return maxi(1, int(base.get("max_hp", 1)) + might_hp + _mod_sum("max_hp"))
 		"accuracy":
 			return int(base.get("accuracy", 0)) + stat("agility") + _item_field("weapon", "accuracy") + _mod_sum("accuracy")
 		"evasion":
 			return int(base.get("evasion", 0)) + stat("agility") + _item_field("armor", "evasion") + _mod_sum("evasion")
 		"defense":
 			var d := int(base.get("defense", 0)) + _item_field("armor", "defense") + _mod_sum("defense")
-			if has_trait("iron_oath") and hp * 2 < stat("max_hp"):
+			var oath_ok := hp * 20 < stat("max_hp") * 13 if talent_rank("tempered_plate") > 0 else hp * 2 < stat("max_hp")
+			if has_trait("iron_oath") and oath_ok:
 				d += 2
 			return maxi(0, d)
 		"damage_bonus":
 			return stat("might") + _mod_sum("damage")
 		"crit":
-			return 5 + int(base.get("crit", 0)) + _item_field("weapon", "crit") + _mod_sum("crit")
+			return 5 + int(base.get("crit", 0)) + maxi(0, stat("agility")) * 2 + _item_field("weapon", "crit") + _mod_sum("crit")
 		"speed":
 			return maxi(25, int(base.get("speed", 100)) + _mod_sum("speed"))
 		"sight":
@@ -135,6 +194,8 @@ func to_dict() -> Dictionary:
 		"inv": inv, "eq": eq, "traits": traits.duplicate(), "tags": tags.duplicate(),
 		"awake": awake, "unique": unique, "species": species_id, "class": class_id,
 		"mask": mask, "mask_risk": mask_risk,
+		"stat_points": stat_points, "talent_points": talent_points, "resource": resource,
+		"talents": talents.duplicate(true), "cooldowns": cooldowns.duplicate(true),
 		"flags": flags.duplicate(true),
 	}
 
@@ -171,6 +232,11 @@ static func from_dict(d: Dictionary, content: ContentDB) -> Actor:
 	a.class_id = String(d["class"])
 	a.mask = String(d.get("mask", "bare_face"))
 	a.mask_risk = int(d.get("mask_risk", 0))
+	a.stat_points = int(d.get("stat_points", 0))
+	a.talent_points = int(d.get("talent_points", 0))
+	a.resource = int(d.get("resource", 0))
+	a.talents = _ints(d.get("talents", {}))
+	a.cooldowns = _ints(d.get("cooldowns", {}))
 	a.flags = _ints(d["flags"])
 	return a
 
