@@ -3525,7 +3525,7 @@ func _attack(attacker: Actor, defender: Actor) -> void:
 	var who := "You" if attacker.is_player else "The %s" % attacker.name
 	var whom := "you" if defender.is_player else "the %s" % defender.name
 	if not r["hit"]:
-		_emit_event("melee_miss", {"from": attacker.pos, "to": defender.pos, "is_player": attacker.is_player})
+		_emit_event("melee_miss", {"actor_id": attacker.id, "from": attacker.pos, "to": defender.pos, "is_player": attacker.is_player})
 		log_msg("%s miss%s %s." % [who, "" if attacker.is_player else "es", whom], "combat")
 		return
 	var verb := "hit" if attacker.is_player else "hits"
@@ -3533,7 +3533,7 @@ func _attack(attacker: Actor, defender: Actor) -> void:
 		verb = "strike unseen at" if attacker.is_player else "strikes unseen at"
 	var dtype := String(r.get("type", "physical"))
 	var hit_dmg := int(r["damage"])
-	_emit_event("melee_hit", {"from": attacker.pos, "to": defender.pos, "amount": hit_dmg, "dmg_type": dtype, "crit": bool(r["crit"]), "is_player": attacker.is_player})
+	_emit_event("melee_hit", {"actor_id": attacker.id, "from": attacker.pos, "to": defender.pos, "amount": hit_dmg, "dmg_type": dtype, "crit": bool(r["crit"]), "is_player": attacker.is_player})
 	var note := _combat_note(r)
 	if not attacker.is_player and attacker.specials.has("ambusher") and not attacker.flags.has("ambush_spent"):
 		attacker.flags["ambush_spent"] = 1

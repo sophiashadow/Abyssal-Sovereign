@@ -1012,6 +1012,7 @@ func _refresh() -> void:
 	map.queue_redraw()
 	_maybe_hint()
 	_update_hud()
+	_sync_mode_bar()
 	if world.log_serial != _log_seen:
 		_log_seen = world.log_serial
 		var lines: PackedStringArray = []
@@ -1113,6 +1114,92 @@ func _update_hud() -> void:
 		t.append("[color=#%s]In view: %d[/color]" % [Palette.ALERT.to_html(false), foes.size()])
 	t.append("[color=#%s]Turn %d[/color]" % [Palette.TEXT_DIM.to_html(false), world.turns])
 	hud.text = "\n".join(t)
+	_update_action_highlights()
+
+
+func _set_btn_accent(key: String, active: bool, col: Color = Palette.FALSE_SUN) -> void:
+	if not _action_btns.has(key):
+		return
+	var b := _action_btns[key] as Button
+	if b == null or not is_instance_valid(b):
+		return
+	if active:
+		b.add_theme_color_override("font_color", col)
+	else:
+		b.remove_theme_color_override("font_color")
+
+
+func _update_action_highlights() -> void:
+	if world == null or _action_btns.is_empty():
+		return
+	var p := world.player
+	var fm := world.current_floor()
+	var me := p.pos
+	var has_loot := fm != null and not fm.items_at(me).is_empty()
+	var has_use := false
+	if fm != null:
+		if Ecology.is_interactive(fm.revealed_feature_at(me)):
+			has_use = true
+		else:
+			for d in Grid.DIRS_8:
+				if Ecology.is_interactive(fm.revealed_feature_at(me + d)):
+					has_use = true
+					break
+	var tile_here := fm.get_tile(me) if fm != null else -1
+	var on_stairs := tile_here in [Tiles.STAIRS_DOWN, Tiles.STAIRS_UP, Tiles.BRANCH_IN, Tiles.BRANCH_OUT, Tiles.DOOR_OPEN]
+	var has_pts := p.stat_points > 0 or p.talent_points > 0
+	var safe_wounded := p.hp < p.stat("max_hp") and world.visible_hostiles().is_empty()
+	var high_risk := p.has_trait("mask_stances") and p.mask_risk >= World.MASK_RISK_MAX - 2
+	_set_btn_accent("Get", has_loot, Palette.FALSE_SUN)
+	_set_btn_accent("Use", has_use, Palette.FALSE_SUN)
+	_set_btn_accent("Stairs", on_stairs, Palette.FALSE_SUN)
+	_set_btn_accent("Build", has_pts, Palette.FALSE_SUN)
+	_set_btn_accent("Rest", safe_wounded, Palette.GOOD)
+	_set_btn_accent("Mask", high_risk, Palette.LUX)
+
+
+func _sync_mode_bar() -> void:
+	if _mode_bar == null or not is_instance_valid(_mode_bar):
+		return
+	for c in _mode_bar.get_children():
+		c.queue_free()
+	var s := settings.text_scale()
+	var bh := 36.0 * s
+	if not aim_mode.is_empty():
+		_mode_bar.visible = true
+		var bn := _btn("Next", _cycle_aim)
+		bn.custom_minimum_size.y = bh
+		bn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var bc := _btn("Confirm", _confirm_aim)
+		bc.custom_minimum_size.y = bh
+		bc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		bc.add_theme_color_override("font_color", Palette.FALSE_SUN)
+		var bx := _btn("Cancel", _cancel_aim)
+		bx.custom_minimum_size.y = bh
+		bx.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		for b in [bn, bc, bx]:
+			b.focus_mode = Control.FOCUS_NONE
+			_mode_bar.add_child(b)
+	elif look_mode:
+		_mode_bar.visible = true
+		var bd := _btn("Done Looking", _toggle_look)
+		bd.custom_minimum_size.y = bh
+		bd.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		bd.focus_mode = Control.FOCUS_NONE
+		_mode_bar.add_child(bd)
+	elif not auto.is_empty() or not travel.is_empty():
+		_mode_bar.visible = true
+		var bs := _btn("Stop", func() -> void:
+			_stop_auto()
+			travel.clear()
+			_sync_mode_bar())
+		bs.custom_minimum_size.y = bh
+		bs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		bs.add_theme_color_override("font_color", Palette.ALERT)
+		bs.focus_mode = Control.FOCUS_NONE
+		_mode_bar.add_child(bs)
+	else:
+		_mode_bar.visible = false
 
 
 ## Called after any player action: redraw, autosave, and end-of-run screens.
@@ -1225,13 +1312,15 @@ func _start_floor_travel(dest: String) -> void:
 func _start_auto(spec: Dictionary) -> void:
 	auto = spec
 	_auto_clock = 0.0
-	_say("Esc or any key interrupts." if not settings.touch_controls else "Tap to interrupt.")
+	_say("Esc or any key interrupts." if not settings.touch_controls else "Tap Stop or map to interrupt.")
+	_sync_mode_bar()
 	if settings.instant_auto:
 		var guard := 0
 		while not auto.is_empty() and guard < 600:
 			guard += 1
 			if not _auto_tick():
 				break
+		_sync_mode_bar()
 
 
 ## One automated step. Returns false when it has stopped (and says why).
@@ -1264,6 +1353,7 @@ func _stop_auto() -> bool:
 		return false
 	auto.clear()
 	_say("Stopped.")
+	_sync_mode_bar()
 	return true
 
 
@@ -1329,6 +1419,7 @@ func _start_aim(kind: String, payload: Dictionary) -> void:
 	else:
 		aim_mode["target"] = world.player.pos
 	_update_aim_visual()
+	_sync_mode_bar()
 
 
 func _cancel_aim() -> void:
@@ -1338,6 +1429,7 @@ func _cancel_aim() -> void:
 		map.aim_path = []
 		map.marker = Vector2i(-1, -1)
 		map.queue_redraw()
+	_sync_mode_bar()
 
 
 func _cycle_aim() -> void:
@@ -1400,6 +1492,7 @@ func _toggle_look() -> void:
 	look_mode = not look_mode
 	look_label.visible = look_mode
 	look_label.text = "Look: tap a tile to inspect it." if look_mode else ""
+	_sync_mode_bar()
 
 
 func _on_tile_inspected(p: Vector2i) -> void:
@@ -1412,6 +1505,7 @@ func _on_tile_inspected(p: Vector2i) -> void:
 	look_label.text = text
 	look_label.visible = true
 	map.queue_redraw()
+	_sync_mode_bar()
 
 
 func _on_tile_tapped(p: Vector2i) -> void:
@@ -1467,6 +1561,7 @@ func _on_tile_tapped(p: Vector2i) -> void:
 	_travel_clock = 0.0
 	map.marker = p
 	map.queue_redraw()
+	_sync_mode_bar()
 
 
 func _process(delta: float) -> void:
@@ -1736,12 +1831,14 @@ func _show_abilities() -> void:
 	col.add_child(_btn("Close", _close_overlay))
 
 
-func _show_feature(feat: Dictionary) -> void:
+func _show_feature(feat: Dictionary, note: String = "") -> void:
 	if world == null or world.state != World.State.PLAYING or overlay != null:
 		return
 	var pos := Vector2i(int(feat["x"]), int(feat["y"]))
 	var kind := String(feat["kind"])
 	var col := _open_overlay(Ecology.label(feat), Color(Ecology.color(feat)))
+	if note != "":
+		col.add_child(_label(note, Palette.FALSE_SUN, 0.88))
 	col.add_child(_label(Ecology.description(feat), Palette.TEXT_DIM, 0.9))
 	match kind:
 		"altar":
@@ -1798,9 +1895,12 @@ func _show_feature(feat: Dictionary) -> void:
 				col.add_child(_label("%s  Oath: %s" % [String(cdef.get("description", "")), String(cdef.get("oath_text", ""))], Palette.TEXT_DIM, 0.78))
 			if world.contract != "":
 				col.add_child(_btn("Forsake active contract (Forsworn)", func() -> void:
-					_close_overlay()
-					world.player_interact(pos, "forsake")
-					_after_action()))
+					_confirm("Forsake active contract?", "Breaking your oath strips its boon immediately and brands you Forsworn.", "Forsake it",
+						func() -> void:
+							_close_overlay()
+							world.player_interact(pos, "forsake")
+							_after_action(),
+						func() -> void: _show_feature(feat))))
 		"vault_gate":
 			col.add_child(_btn("Unlock with vault key or Ophite Key", func() -> void:
 				_close_overlay()
@@ -1824,13 +1924,21 @@ func _show_feature(feat: Dictionary) -> void:
 				var b1 := _btn("Buy %s (-%d HP)" % [item_def["name"], price], func() -> void:
 					_close_overlay()
 					world.player_interact(pos, "buy:%d:blood" % sidx)
-					_after_action())
+					_after_action()
+					var cur_f := world.current_floor().revealed_feature_at(pos)
+					if not cur_f.is_empty() and String(cur_f.get("kind", "")) == "merchant" and not bool(cur_f.get("used", false)):
+						var msg := String(world.messages[-1]["t"]) if not world.messages.is_empty() else ""
+						_show_feature(cur_f, msg))
 				b1.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 				hb.add_child(b1)
 				hb.add_child(_btn("Barter item", func() -> void:
 					_close_overlay()
 					world.player_interact(pos, "buy:%d:barter" % sidx)
-					_after_action()))
+					_after_action()
+					var cur_f := world.current_floor().revealed_feature_at(pos)
+					if not cur_f.is_empty() and String(cur_f.get("kind", "")) == "merchant" and not bool(cur_f.get("used", false)):
+						var msg := String(world.messages[-1]["t"]) if not world.messages.is_empty() else ""
+						_show_feature(cur_f, msg)))
 				col.add_child(hb)
 		"challenge":
 			col.add_child(_btn("Ring the Trial Bell (ambush + elite loot +1 stat pt)", func() -> void:
@@ -1884,7 +1992,12 @@ func _show_feature(feat: Dictionary) -> void:
 				col.add_child(_btn("Speak & ask counsel", func() -> void:
 					_close_overlay()
 					world.player_interact(pos, "talk")
-					_after_action()))
+					_after_action()
+					if world.state == World.State.PLAYING:
+						var msg := String(world.messages[-1]["t"]) if not world.messages.is_empty() else ""
+						var cur_f := world.current_floor().revealed_feature_at(pos)
+						if not cur_f.is_empty():
+							_show_feature(cur_f, msg)))
 				var svc_btn := _btn("Accept help (%s)" % String(ndef["service"]).replace("_", " "), func() -> void:
 					_close_overlay()
 					world.player_interact(pos, "service")
@@ -2585,12 +2698,32 @@ func _fill_carried(box: VBoxContainer) -> Button:
 		var icon := _sprite_rect(registry.item_region(it, db), 28.0 * settings.text_scale()) if registry != null else null
 		if icon != null:
 			row.add_child(icon)
-		var b := _btn(world.item_name(it), func() -> void: _show_item(it, idx, ""))
+		var cmp := Assist.compare_item(world, it)
+		var tags := ""
+		if not world.is_item_identified(it):
+			tags += " [?]"
+		else:
+			if it.buc == "blessed":
+				tags += " [✦]"
+			elif it.buc == "cursed":
+				tags += " [☠]"
+			if String(cmp["slot"]) != "" and not bool(cmp["unknown"]):
+				var has_up := false
+				var has_dn := false
+				for ln in cmp["lines"]:
+					if String(ln).find("+") >= 0:
+						has_up = true
+					elif String(ln).find("-") >= 0:
+						has_dn = true
+				if has_up and not has_dn:
+					tags += " [▲]"
+				elif has_dn and not has_up:
+					tags += " [▼]"
+		var b := _btn(world.item_name(it) + tags, func() -> void: _show_item(it, idx, ""))
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		var tint := Color(it.effective_color(db)) if world.is_item_identified(it) else Color(String(it.def(db)["color"]))
 		b.add_theme_color_override("font_color", tint.lerp(Palette.TEXT, 0.35))
-		var cmp := Assist.compare_item(world, it)
 		if String(cmp["slot"]) != "" and not bool(cmp["unknown"]):
 			b.tooltip_text = "vs %s: %s" % [String(cmp["equipped"]) if String(cmp["equipped"]) != "" else "nothing", ", ".join(cmp["lines"])]
 		row.add_child(b)

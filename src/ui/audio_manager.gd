@@ -22,6 +22,7 @@ var _sfx_cursor: int = 0
 var _ambience_player: AudioStreamPlayer
 var _music_decks: Array[AudioStreamPlayer] = []
 var _active_deck: int = 0
+var _music_tween: Tween
 var _stream_cache: Dictionary = {}
 var _music_manifest: Dictionary = {}
 
@@ -57,6 +58,9 @@ func manifest_contexts() -> Dictionary:
 
 
 func _exit_tree() -> void:
+	if _music_tween != null and _music_tween.is_valid():
+		_music_tween.kill()
+	_music_tween = null
 	for p in _sfx_pool:
 		if is_instance_valid(p):
 			p.stop()
@@ -245,14 +249,17 @@ func play_music_track(context_id: String, res_path: String, fade_sec: float = 1.
 	if not next_deck.is_inside_tree():
 		return false
 	next_deck.stream = stream
+	if _music_tween != null and _music_tween.is_valid():
+		_music_tween.kill()
+	_music_tween = null
 	if prev.playing and fade_sec > 0.05 and is_inside_tree():
 		next_deck.volume_db = -32.0
 		next_deck.play()
-		var tw := create_tween()
-		tw.set_parallel(true)
-		tw.tween_property(next_deck, "volume_db", 0.0, fade_sec)
-		tw.tween_property(prev, "volume_db", -36.0, fade_sec)
-		tw.chain().tween_callback(func() -> void:
+		_music_tween = create_tween()
+		_music_tween.set_parallel(true)
+		_music_tween.tween_property(next_deck, "volume_db", 0.0, fade_sec)
+		_music_tween.tween_property(prev, "volume_db", -36.0, fade_sec)
+		_music_tween.chain().tween_callback(func() -> void:
 			if is_instance_valid(prev) and prev != _music_decks[_active_deck]:
 				prev.stop()
 				prev.volume_db = 0.0)

@@ -13,6 +13,7 @@ var floating_text: bool = true
 var flash_intensity: float = 0.6
 
 var actor_offsets: Dictionary = {} ## actor_id -> {from: Vector2i, to: Vector2i, ttl: float, dur: float}
+var lunges: Dictionary = {} ## actor_id -> {dir: Vector2, ttl: float, dur: float}
 var slashes: Array[Dictionary] = []
 var projectiles: Array[Dictionary] = []
 var rings: Array[Dictionary] = []
@@ -34,6 +35,7 @@ func _init() -> void:
 
 func clear() -> void:
 	actor_offsets.clear()
+	lunges.clear()
 	slashes.clear()
 	projectiles.clear()
 	rings.clear()
@@ -44,7 +46,7 @@ func clear() -> void:
 
 
 func has_active() -> bool:
-	return not actor_offsets.is_empty() or not slashes.is_empty() or not projectiles.is_empty() \
+	return not actor_offsets.is_empty() or not lunges.is_empty() or not slashes.is_empty() or not projectiles.is_empty() \
 		or not rings.is_empty() or not popups.is_empty() or not particles.is_empty() \
 		or shake_ttl > 0.0 or flash_ttl > 0.0
 
@@ -96,12 +98,19 @@ func _handle_event(ev: Dictionary) -> void:
 			var crit := bool(ev.get("crit", false))
 			var col := _dmg_color(String(ev.get("dmg_type", "physical")), not is_p)
 			if not reduced_motion:
+				var aid := int(ev.get("actor_id", 0))
+				if aid > 0:
+					_add_lunge(aid, from_p, to_p)
 				var dur := _dur(0.14)
 				slashes.append({"from": from_p, "to": to_p, "color": col, "ttl": dur, "dur": dur})
 				if screen_shake and (crit or not is_p):
 					_trigger_shake(4.5 if crit else 2.5)
 				_spawn_burst(to_p, col, 6 if crit else 3)
 		"melee_miss":
+			if not reduced_motion:
+				var aid := int(ev.get("actor_id", 0))
+				if aid > 0:
+					_add_lunge(aid, ev.get("from", Vector2i.ZERO), ev.get("to", Vector2i.ZERO))
 			if floating_text:
 				var to_p: Vector2i = ev.get("to", Vector2i.ZERO)
 				_add_popup(to_p, "MISS", Palette.TEXT_DIM)
@@ -165,6 +174,16 @@ func _handle_event(ev: Dictionary) -> void:
 			_trigger_flash(Palette.FALSE_SUN, 0.4)
 
 
+func _add_lunge(actor_id: int, from_p: Vector2i, to_p: Vector2i) -> void:
+	if reduced_motion or instant_actions:
+		return
+	var delta := Vector2(to_p - from_p)
+	if delta.length_squared() <= 0.0:
+		return
+	var dur := _dur(0.09)
+	lunges[actor_id] = {"dir": delta.normalized(), "ttl": dur, "dur": dur}
+
+
 func _add_popup(pos: Vector2i, text: String, col: Color) -> void:
 	var dur := _dur(0.55)
 	popups.append({"pos": pos, "text": text, "color": col, "ttl": dur, "dur": dur})
@@ -206,6 +225,13 @@ func step(delta: float) -> bool:
 			actor_offsets.erase(aid)
 		else:
 			any = true
+	for aid in lunges.keys():
+		var l: Dictionary = lunges[aid]
+		l["ttl"] = float(l["ttl"]) - delta
+		if float(l["ttl"]) <= 0.0:
+			lunges.erase(aid)
+		else:
+			any = true
 	for arr in [slashes, projectiles, rings, popups]:
 		for i in range(arr.size() - 1, -1, -1):
 			arr[i]["ttl"] = float(arr[i]["ttl"]) - delta
@@ -238,12 +264,19 @@ func screen_shake_offset() -> Vector2:
 
 
 func actor_tile_offset(actor_id: int) -> Vector2:
-	if reduced_motion or instant_actions or not actor_offsets.has(actor_id):
+	if reduced_motion or instant_actions:
 		return Vector2.ZERO
-	var e: Dictionary = actor_offsets[actor_id]
-	var t := clampf(float(e["ttl"]) / maxf(0.001, float(e["dur"])), 0.0, 1.0)
-	var delta_tile := Vector2(Vector2i(e["from"]) - Vector2i(e["to"]))
-	return delta_tile * t
+	var off := Vector2.ZERO
+	if actor_offsets.has(actor_id):
+		var e: Dictionary = actor_offsets[actor_id]
+		var t := clampf(float(e["ttl"]) / maxf(0.001, float(e["dur"])), 0.0, 1.0)
+		var delta_tile := Vector2(Vector2i(e["from"]) - Vector2i(e["to"]))
+		off += delta_tile * t
+	if lunges.has(actor_id):
+		var l: Dictionary = lunges[actor_id]
+		var prog := 1.0 - clampf(float(l["ttl"]) / maxf(0.001, float(l["dur"])), 0.0, 1.0)
+		off += Vector2(l["dir"]) * (sin(PI * prog) * 0.30)
+	return off
 
 
 func draw_effects(canvas: CanvasItem, origin: Vector2i, offset: Vector2, px: int, font: Font, fsize: int, canvas_size: Vector2) -> void:
@@ -271,8 +304,11 @@ func draw_effects(canvas: CanvasItem, origin: Vector2i, offset: Vector2, px: int
 	for pp in popups:
 		var prog := 1.0 - clampf(float(pp["ttl"]) / maxf(0.001, float(pp["dur"])), 0.0, 1.0)
 		var p := offset + (Vector2(Vector2i(pp["pos"]) - origin) + Vector2(0.1, 0.2 - prog * 0.55)) * px
-		var col := Color(pp["color"], 1.0 - prog * 0.6)
-		canvas.draw_string(font, p, String(pp["text"]), HORIZONTAL_ALIGNMENT_LEFT, -1, maxi(10, int(fsize * 0.68)), col)
+		var a := 1.0 - prog * 0.6
+		var col := Color(pp["color"], a)
+		var ps := maxi(10, int(fsize * 0.68))
+		canvas.draw_string(font, p + Vector2(1, 1), String(pp["text"]), HORIZONTAL_ALIGNMENT_LEFT, -1, ps, Color(Palette.VOID, a * 0.9))
+		canvas.draw_string(font, p, String(pp["text"]), HORIZONTAL_ALIGNMENT_LEFT, -1, ps, col)
 	if flash_ttl > 0.0 and flash_color.a > 0.0:
 		var alpha := flash_color.a * (flash_ttl / maxf(0.001, flash_dur))
 		canvas.draw_rect(Rect2(Vector2.ZERO, canvas_size), Color(flash_color.r, flash_color.g, flash_color.b, alpha))
