@@ -55,7 +55,7 @@ func test_audio_provenance_complete_and_valid() -> void:
 
 	for e in by_id.values():
 		ok(not String(e.get("license_status", "")).is_empty(), "license_status set on %s" % String(e.get("asset_id", "")))
-		ok(String(e.get("approval_status", "")) in ["provisional_m8_asset", "placeholder_liturgical_temp", "approved"],
+		ok(String(e.get("approval_status", "")) in ["provisional_m8_asset", "provisional_m9_asset", "placeholder_liturgical_temp", "approved"],
 			"honest approval status on %s" % String(e.get("asset_id", "")))
 
 

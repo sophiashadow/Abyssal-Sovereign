@@ -8,12 +8,13 @@
       "source": "Abyssal Sovereign internal procedural generator",
       "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "sphere:moon"
       ],
       "modification_history": [
-        "Generated M8.4 complete atlas: Sphere 1 (moon) 32x32 tiles & features"
+        "Generated M8.4 atlas: Sphere 1 (moon) 32x32 tiles & features",
+        "Elevated M9.1 shading, silhouettes & woodcut detail: Sphere 1 (moon) 32x32 tiles & features"
       ]
     },
     {
@@ -22,12 +23,13 @@
       "source": "Abyssal Sovereign internal procedural generator",
       "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "sphere:mercury"
       ],
       "modification_history": [
-        "Generated M8.4 complete atlas: Sphere 2 (mercury) 32x32 tiles & features"
+        "Generated M8.4 atlas: Sphere 2 (mercury) 32x32 tiles & features",
+        "Elevated M9.1 shading, silhouettes & woodcut detail: Sphere 2 (mercury) 32x32 tiles & features"
       ]
     },
     {
@@ -36,12 +38,13 @@
       "source": "Abyssal Sovereign internal procedural generator",
       "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "sphere:venus"
       ],
       "modification_history": [
-        "Generated M8.4 complete atlas: Sphere 3 (venus) 32x32 tiles & features"
+        "Generated M8.4 atlas: Sphere 3 (venus) 32x32 tiles & features",
+        "Elevated M9.1 shading, silhouettes & woodcut detail: Sphere 3 (venus) 32x32 tiles & features"
       ]
     },
     {
@@ -50,12 +53,13 @@
       "source": "Abyssal Sovereign internal procedural generator",
       "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "sphere:sun"
       ],
       "modification_history": [
-        "Generated M8.4 complete atlas: Sphere 4 (sun) 32x32 tiles & features"
+        "Generated M8.4 atlas: Sphere 4 (sun) 32x32 tiles & features",
+        "Elevated M9.1 shading, silhouettes & woodcut detail: Sphere 4 (sun) 32x32 tiles & features"
       ]
     },
     {
@@ -64,12 +68,13 @@
       "source": "Abyssal Sovereign internal procedural generator",
       "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "sphere:mars"
       ],
       "modification_history": [
-        "Generated M8.4 complete atlas: Sphere 5 (mars) 32x32 tiles & features"
+        "Generated M8.4 atlas: Sphere 5 (mars) 32x32 tiles & features",
+        "Elevated M9.1 shading, silhouettes & woodcut detail: Sphere 5 (mars) 32x32 tiles & features"
       ]
     },
     {
@@ -78,12 +83,13 @@
       "source": "Abyssal Sovereign internal procedural generator",
       "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "sphere:jupiter"
       ],
       "modification_history": [
-        "Generated M8.4 complete atlas: Sphere 6 (jupiter) 32x32 tiles & features"
+        "Generated M8.4 atlas: Sphere 6 (jupiter) 32x32 tiles & features",
+        "Elevated M9.1 shading, silhouettes & woodcut detail: Sphere 6 (jupiter) 32x32 tiles & features"
       ]
     },
     {
@@ -92,12 +98,13 @@
       "source": "Abyssal Sovereign internal procedural generator",
       "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "sphere:saturn"
       ],
       "modification_history": [
-        "Generated M8.4 complete atlas: Sphere 7 (saturn) 32x32 tiles & features"
+        "Generated M8.4 atlas: Sphere 7 (saturn) 32x32 tiles & features",
+        "Elevated M9.1 shading, silhouettes & woodcut detail: Sphere 7 (saturn) 32x32 tiles & features"
       ]
     },
     {
@@ -106,14 +113,15 @@
       "source": "Abyssal Sovereign internal procedural generator",
       "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "species",
         "classes",
         "masks"
       ],
       "modification_history": [
-        "Generated M8.4 complete atlas: 8 origins, 8 callings, 5 Masks"
+        "Generated M8.4 atlas: 8 origins, 8 callings, 5 Masks",
+        "Elevated M9.1 shading, silhouettes & woodcut detail: 8 origins, 8 callings, 5 Masks"
       ]
     },
     {
@@ -122,12 +130,13 @@
       "source": "Abyssal Sovereign internal procedural generator",
       "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "monsters"
       ],
       "modification_history": [
-        "Generated M8.4 complete atlas: 10 families, 15 bespoke bosses, 86 monster entries"
+        "Generated M8.4 atlas: 10 families, 15 bespoke bosses, 86 monster entries",
+        "Elevated M9.1 shading, silhouettes & woodcut detail: 10 families, 15 bespoke bosses, 86 monster entries"
       ]
     },
     {
@@ -136,12 +145,13 @@
       "source": "Abyssal Sovereign internal procedural generator",
       "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "npcs"
       ],
       "modification_history": [
-        "Generated M8.4 complete atlas: 18 recurring NPCs"
+        "Generated M8.4 atlas: 18 recurring NPCs",
+        "Elevated M9.1 shading, silhouettes & woodcut detail: 18 recurring NPCs"
       ]
     },
     {
@@ -150,14 +160,15 @@
       "source": "Abyssal Sovereign internal procedural generator",
       "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "items",
         "relics",
         "artifacts"
       ],
       "modification_history": [
-        "Generated M8.4 complete atlas: 165 items, 16 bespoke relics, 26 unique artifacts"
+        "Generated M8.4 atlas: 165 items, 16 bespoke relics, 26 unique artifacts",
+        "Elevated M9.1 shading, silhouettes & woodcut detail: 165 items, 16 bespoke relics, 26 unique artifacts"
       ]
     },
     {
@@ -166,14 +177,15 @@
       "source": "Abyssal Sovereign internal procedural generator",
       "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "statuses",
         "talents",
         "contracts"
       ],
       "modification_history": [
-        "Generated M8.4 complete atlas: 51 statuses, 24 talent trees, 8 elites, Eight Chains, contracts"
+        "Generated M8.4 atlas: 51 statuses, 24 talent trees, 8 elites, Eight Chains, contracts",
+        "Elevated M9.1 shading, silhouettes & woodcut detail: 51 statuses, 24 talent trees, 8 elites, Eight Chains, contracts"
       ]
     },
     {
@@ -182,14 +194,113 @@
       "source": "Abyssal Sovereign internal procedural generator",
       "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "factions",
         "spheres",
         "endings"
       ],
       "modification_history": [
-        "Generated M8.4 complete atlas: 64x64 woodcut emblems (Title, 7 Spheres, 8 Institutions, Endings, Losses)"
+        "Generated M8.4 atlas: 24 unique 64x64 woodcut emblems",
+        "Elevated M9.1 shading, silhouettes & woodcut detail: 24 unique 64x64 woodcut emblems"
+      ]
+    },
+    {
+      "asset_id": "icon_512",
+      "path": "res://assets/icons/icon_512.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (Title Crest icon renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m9_asset",
+      "associated_entities": [
+        "application:icon"
+      ],
+      "modification_history": [
+        "Generated M9.1 512x512 application icon"
+      ]
+    },
+    {
+      "asset_id": "icon_192",
+      "path": "res://assets/icons/icon_192.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (Title Crest icon renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m9_asset",
+      "associated_entities": [
+        "application:icon"
+      ],
+      "modification_history": [
+        "Generated M9.1 192x192 application icon"
+      ]
+    },
+    {
+      "asset_id": "icon_180",
+      "path": "res://assets/icons/icon_180.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (Title Crest icon renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m9_asset",
+      "associated_entities": [
+        "application:icon"
+      ],
+      "modification_history": [
+        "Generated M9.1 180x180 application icon"
+      ]
+    },
+    {
+      "asset_id": "icon_144",
+      "path": "res://assets/icons/icon_144.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (Title Crest icon renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m9_asset",
+      "associated_entities": [
+        "application:icon"
+      ],
+      "modification_history": [
+        "Generated M9.1 144x144 application icon"
+      ]
+    },
+    {
+      "asset_id": "icon_128",
+      "path": "res://assets/icons/icon_128.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (Title Crest icon renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m9_asset",
+      "associated_entities": [
+        "application:icon"
+      ],
+      "modification_history": [
+        "Generated M9.1 128x128 application icon"
+      ]
+    },
+    {
+      "asset_id": "adaptive_fg",
+      "path": "res://assets/icons/adaptive_fg.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (Adaptive icon renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m9_asset",
+      "associated_entities": [
+        "application:android_adaptive_icon"
+      ],
+      "modification_history": [
+        "Generated M9.1 Android adaptive foreground 432x432"
+      ]
+    },
+    {
+      "asset_id": "adaptive_bg",
+      "path": "res://assets/icons/adaptive_bg.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (Adaptive icon renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m9_asset",
+      "associated_entities": [
+        "application:android_adaptive_icon"
+      ],
+      "modification_history": [
+        "Generated M9.1 Android adaptive background 432x432"
       ]
     },
     {

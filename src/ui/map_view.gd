@@ -215,7 +215,7 @@ func _draw() -> void:
 								_draw_actor_overlays(arect, a)
 								drew_top = true
 					if decorative_lighting and vis:
-						_draw_lighting_tile(rect, tile_id, feat, dist)
+						_queue_or_draw_tile_glow(rect, tile_id, feat)
 					if drew_top or feat.is_empty() or not actors.has(p):
 						continue
 				# Fall through to glyph fallback if any atlas/region is missing.
@@ -269,6 +269,8 @@ func _draw() -> void:
 		var mc := off + Vector2(marker - o) * px
 		var mcol := Palette.color_for_mode(Palette.FALSE_SUN, "gold", color_mode, high_contrast)
 		draw_rect(Rect2(mc, Vector2(px, px)), mcol, false, 2.0)
+	if decorative_lighting:
+		_draw_player_lantern(o, off, px, sight)
 	vfx.draw_effects(self, o, off, px, _font, fsize, size)
 
 
@@ -360,13 +362,27 @@ func _draw_actor_overlays(rect: Rect2, a: Actor) -> void:
 		draw_circle(p + Vector2(4, 12), 1.2, warn)
 
 
-func _draw_lighting_tile(rect: Rect2, tile_id: int, feat: Dictionary, dist: int) -> void:
-	if dist <= 1:
-		draw_rect(rect, Color(Palette.FALSE_SUN, 0.06))
-	elif tile_id == Tiles.ASH_EMBER or String(feat.get("kind", "")) == "sanctuary_hearth":
-		draw_rect(rect, Color(Color("#ff7a33"), 0.10))
+func _queue_or_draw_tile_glow(rect: Rect2, tile_id: int, feat: Dictionary) -> void:
+	var ctr := rect.get_center()
+	var r := rect.size.x * 0.72
+	if tile_id == Tiles.ASH_EMBER or String(feat.get("kind", "")) == "sanctuary_hearth":
+		draw_circle(ctr, r, Color(Color("#ff7a33"), 0.055))
+		draw_circle(ctr, r * 0.55, Color(Palette.FALSE_SUN, 0.055))
 	elif tile_id == Tiles.SOLAR_GLARE:
-		draw_rect(rect, Color(Palette.FALSE_SUN, 0.09))
+		draw_circle(ctr, r, Color(Palette.FALSE_SUN, 0.06))
+	elif String(feat.get("kind", "")) in ["altar", "shrine", "ritual_circle"] and not bool(feat.get("used", false)):
+		var gcol := Palette.LUX if String(feat.get("kind", "")) == "ritual_circle" else Palette.GOLD
+		draw_circle(ctr, r * 0.75, Color(gcol, 0.05))
+
+
+func _draw_player_lantern(origin: Vector2i, off: Vector2, px: int, sight: int) -> void:
+	if world == null:
+		return
+	var pctr := off + (Vector2(world.player.pos - origin) + Vector2(0.5, 0.5)) * px
+	var rad := float(px) * clampf(float(sight) * 0.42, 1.4, 2.8)
+	draw_circle(pctr, rad, Color(Palette.GOLD, 0.032))
+	draw_circle(pctr, rad * 0.62, Color(Palette.FALSE_SUN, 0.042))
+	draw_circle(pctr, rad * 0.30, Color(Palette.IVORY, 0.035))
 
 
 func _glyph(cell: Vector2, glyph: String, col: Color, fsize: int, px: int) -> void:

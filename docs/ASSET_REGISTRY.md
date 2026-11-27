@@ -27,7 +27,7 @@ Every file in `assets/` must have an entry recording:
 - `source`: Origin of the asset.
 - `author_or_method`: Creator or deterministic generator command.
 - `license_status`: Verified license or internal placeholder status (`project-original-cc0-equivalent`, `project-original-placeholder`).
-- `approval_status`: `provisional_m8_asset`, `placeholder_liturgical_temp`, or `owner_approved`.
+- `approval_status`: `provisional_m8_asset`, `provisional_m9_asset`, `placeholder_liturgical_temp`, or `owner_approved`.
 - `associated_entities`: Content IDs or subsystems mapped to this asset.
 - `modification_history`: Ordered audit log of edits.
 

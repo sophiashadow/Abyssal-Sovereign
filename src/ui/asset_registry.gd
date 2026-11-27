@@ -12,6 +12,8 @@ const PROVENANCE_PATH := "res://content/presentation/asset_provenance.json"
 var data: Dictionary = {}
 var provenance: Dictionary = {}
 var _atlases: Dictionary = {} ## atlas_id -> Texture2D or null
+var _region_cache: Dictionary = {} ## "section|key" -> cached region Dict
+var _tile_cache: Dictionary = {} ## (sp << 12) | (tile_id << 4) | variant -> cached region Dict
 var _load_errors: Array[String] = []
 
 
@@ -23,6 +25,8 @@ func load_manifests(reg_path: String = REGISTRY_PATH, prov_path: String = PROVEN
 	data.clear()
 	provenance.clear()
 	_atlases.clear()
+	_region_cache.clear()
+	_tile_cache.clear()
 	_load_errors.clear()
 	if FileAccess.file_exists(reg_path):
 		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(reg_path))
@@ -63,41 +67,55 @@ func get_atlas(atlas_id: String) -> Texture2D:
 
 
 func _region_entry(section: String, key: String) -> Dictionary:
+	var ck := section + "|" + key
+	if _region_cache.has(ck):
+		return _region_cache[ck]
 	var sec: Variant = data.get(section, {})
 	if not (sec is Dictionary) or not (sec as Dictionary).has(key):
+		_region_cache[ck] = {}
 		return {}
 	var e: Variant = (sec as Dictionary)[key]
 	if not (e is Dictionary):
+		_region_cache[ck] = {}
 		return {}
 	var d := e as Dictionary
 	var atlas_id := String(d.get("atlas", ""))
-	if atlas_id == "" or get_atlas(atlas_id) == null:
+	var tex := get_atlas(atlas_id) if atlas_id != "" else null
+	if tex == null:
+		_region_cache[ck] = {}
 		return {}
 	var r: Array = d.get("rect", [])
 	if r.size() != 4:
+		_region_cache[ck] = {}
 		return {}
-	return {
+	var out := {
 		"atlas": atlas_id,
-		"texture": get_atlas(atlas_id),
+		"texture": tex,
 		"rect": Rect2(float(r[0]), float(r[1]), float(r[2]), float(r[3])),
 	}
+	_region_cache[ck] = out
+	return out
 
 
 func tile_region(sphere: int, tile_id: int, variant: int = 0) -> Dictionary:
 	var sp := clampi(sphere, 1, 7)
-	var keys: Array[String] = []
+	var v := posmod(variant, 4)
+	var tkey := (sp << 12) | ((tile_id & 0xFF) << 4) | v
+	if _tile_cache.has(tkey):
+		return _tile_cache[tkey]
+	var res := {}
 	if tile_id == Tiles.FLOOR or tile_id == Tiles.WALL:
-		keys.append("s%d:%d:%d" % [sp, tile_id, posmod(variant, 4)])
-		keys.append("s%d:%d:0" % [sp, tile_id])
-		keys.append("s1:%d:%d" % [tile_id, posmod(variant, 4)])
+		res = _region_entry("tiles", "s%d:%d:%d" % [sp, tile_id, v])
+		if res.is_empty():
+			res = _region_entry("tiles", "s%d:%d:0" % [sp, tile_id])
+		if res.is_empty():
+			res = _region_entry("tiles", "s1:%d:%d" % [tile_id, v])
 	else:
-		keys.append("s%d:%d" % [sp, tile_id])
-		keys.append("s1:%d" % tile_id)
-	for k in keys:
-		var res := _region_entry("tiles", k)
-		if not res.is_empty():
-			return res
-	return {}
+		res = _region_entry("tiles", "s%d:%d" % [sp, tile_id])
+		if res.is_empty():
+			res = _region_entry("tiles", "s1:%d" % tile_id)
+	_tile_cache[tkey] = res
+	return res
 
 
 func feature_region(sphere: int, kind: String, used: bool = false) -> Dictionary:
