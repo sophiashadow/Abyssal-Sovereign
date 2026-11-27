@@ -1,73 +1,61 @@
-# ABYSSAL SOVEREIGN
+# Abyssal Sovereign (`v1.0.0-rc.1`)
 
-An original turn-based traditional roguelike set beneath Terra Tenebrae, in the cosmology of FALSE LIGHT. It is built with Godot 4 and typed GDScript, and plays fully offline.
+**An original turn-based traditional roguelike set in a sealed, seven-layered labyrinth beneath Terra Tenebrae.**
 
-**Status: v0.5-dev (Milestones 0–4 and M5.1–M5.5 implemented — M5 Depth Pass complete).** It has a title screen, character creation (3 origins × 3 callings), and a seeded seven-sphere descent (Moon through Saturn). Gameplay covers:
+Abyssal Sovereign combines classical deterministic dungeon crawling, occult-medieval Gnostic theology, multi-faction contracts, and dual graphical/ASCII presentation — built to run **100% offline** with zero accounts, ads, subscriptions, or telemetry.
 
-- Field of view with exploration memory, **Search (`s`) / disarm traps / secret caches**, and **interactive dungeon sites (`e`)** (Altars, Shrines, Ritual Circles, Lecterns of Rites, Locked Vaults, Debt-Brokers, Trial Bells, and Sphere hazards).
-- Melee and **ranged combat** (`f` / Fire), thrown flasks/projectiles, occult scrolls, XP, levels, **attribute allocation**, and **30 calling talents across 9 trees**.
-- **Physical, elemental & metaphysical damage types** (`physical`, `fire`, `cold`, `radiant`, `void`) with resistances, vulnerabilities, and emergent status combos (*Thermal Shock*, *Scalding Steam*, *Cauterize*, *Hemorrhage*).
-- **Procedural affixes, sets, identification & BUC**: `Uncommon`/`Rare`/`Artifact` drops, run-shuffled unidentified consumables & gear, `Blessed`/`Cursed` equipment, 3 equipment sets, and 6 **Relics** (*Work* for power with a cost, or *Transmute* for permanent stats & unbinding).
-- **Class resources & cooldowns**: `Stamina` (Fallen Knight), `Resonance` (Occultist), and `Poise` (Assassin).
-- **Masks as stances** (`m` key / Mask button for Occultists: Bare Face, Nyx, Eris, Lilith) with risk accrual, elemental/void resistances, and seizures.
-- The **False Light** status: relief, then the Reckoning.
-- **Eight Chains & Subjugation clock**, **enemy specials**, deterministic **mutated elites**, **Sphere mid-bosses** (*Choir Cantor Prime*, *Iron Auditor*), **Divine Contracts** (*The Fast*, *Vow of Poverty*, *The Taken Name*, *The Crown Taken*), and **Way allegiances**.
-- **Sphere Gates** between Spheres (`Stormed`, `Serpent's Key`, `Given Back`, `By Name`) and the **Apotheosis Guard**.
-- The Preliator Sentinel guardian, **Named losses** (Catalogued, Fluent, Gilded), and four victory outcomes (Unwritten Door, The Serpent's Way, The Way of Return, and Victory: By Decree).
-- Permadeath with atomic save/resume (`save_version` 8, migrating v1–v7 saves).
+> **Release Candidate Status:** `v1.0.0-rc.1` is feature-complete locally on `main` and packaged for external review and human playtesting (`docs/PLAYTEST.md`). Windows runtime, Web IndexedDB persistence, physical Android hardware testing, human playtest rounds, external commissioned art (`provisional_m9_asset`), and original VENEFICA LUX soundtrack stems (`placeholder_liturgical_temp`) remain pending before final `v1.0.0` release.
 
-Android, Windows and Web builds can be exported via `tools/export.sh` (see [ROADMAP.md](ROADMAP.md); Windows runtime, Web browser `user://` persistence, and physical Android device runtime tests have not run yet). Any distributed export must ship Godot's license notices.
+---
 
-## Run it
+## Core Features
 
-The game requires Godot **4.7.2** (standard build, not .NET).
+- **Deep Character Creation:** 8 Origins × 8 Callings (`64` combinations) and `104` talents across `24` talent trees, including Veil-Touched affinities and Mask stances.
+- **Seven Planetary Spheres (`28` Floors):** Descend from *Sphere 1 — Moon* through *Saturn*, spanning `86` monsters (including `15` Sphere guardians and bosses) and side branches.
+- **Occult Ars Moriendi & Gear:** `165` base items, `46` affixes, `12` equipment sets, `26` named artifacts, and `16` interactive Relics with repeatable Relic Work and permanent Transmutation.
+- **Living Labyrinth & Contracts:** `18` persistent NPCs, `8` competing institutions, `24` quest/narrative threads, consequential Contracts (with vows and breaking penalties), and four distinct Victory endings alongside permanent death.
+- **Four Difficulty Profiles:** **Initiate**, **Exile** (canonical baseline), **Adversary**, and **Sovereign** — adjusting enemy density, elite pressure, and item cadence without artificial stat multipliers.
+- **Dual Presentation & Accessibility:**
+  - Switch live between **Tiles** mode (`13` pixel-art atlases, `24` woodcut emblems, radial lantern lighting) and **Glyph** mode (`CP437`-inspired traditional ASCII/symbol rendering).
+  - Supports desktop keyboard/mouse, dedicated zero-scroll mobile **Portrait** and **Landscape** touch docks (optional **Left-Handed** swap), collapsible `Stats ▾` drawer, Android Back routing, text/tile scaling, camera zoom, **Reduced Motion**, **Instant Actions**, **High Contrast**, and **Deutan/Protan** + **Tritan** color filters.
+- **Offline Liturgical Soundscape:** `47` mastered offline audio assets across 6 independent volume buses (`Master`, `Music`, `Ambience`, `Combat`, `Interface`, `Narrative`), playable at 100% silent mute.
+- **Save Reliability:** Deterministic turn simulation with Save Version `12` and backwards-compatible `v1`–`v12` save migrations (`docs/INSTALL.md`).
+
+---
+
+## Quick Start (Players & Playtesters)
+
+- **Install & Launch:** See [`docs/INSTALL.md`](docs/INSTALL.md) for Linux, Windows, Android APK, and Web instructions, OS `user://` save paths, backup/recovery, and offline details.
+- **Human Playtest Guide:** See [`docs/PLAYTEST.md`](docs/PLAYTEST.md) for controls, tactical advice, accessibility testing matrix, bug reporting, and playtest questionnaire.
+- **Release Materials:** See [`docs/release/`](docs/release/) (`RELEASE_NOTES.md`, `PRODUCT_KIT.md`, `PRIVACY.md`, `CREDITS_AND_LICENSES.md`).
+
+---
+
+## Building, Testing & Packaging from Source (Godot `4.7.2`)
+
+Requires **Godot 4.7.2 stable** (GL Compatibility renderer). All tools work completely offline:
 
 ```sh
-godot --path .                 # play
-tools/test.sh                  # headless test suite (exit 0 = all passed)
-tools/test.sh test_save        # one test file
-tools/verify.sh                # full local regression gate (tests + desktop/phone UI smoke)
-tools/verify.sh --exports      # also refresh all 4 platform exports and verify outputs
-tools/export.sh                # export Linux, Windows, and Web builds into build/
-tools/export.sh all            # also export Android debug APK into build/android/
-godot --headless --path . --script res://tools/soak.gd -- --seeds=20            # balance soak
-xvfb-run -a godot --path . --audio-driver Dummy --script res://tools/ui_smoke.gd # UI smoke (needs a display)
+# Run the full automated unit, determinism, save-migration, content, audio, & asset test suite
+./tools/test.sh
+
+# Run full regression + UI smoke across 1280x720, 2340x1080, and 720x1280 + exports
+./tools/verify.sh --exports
+
+# Export and package portable RC1 archives + SHA256SUMS into build/release/
+./tools/package_rc.sh v1.0.0-rc.1
 ```
 
-`tools/test.sh` finds Godot from `$GODOT`, then `godot` on `PATH`, then `./.tools/godot`. A failed test that used random seeds prints the seed so it can be replayed.
+Optional tooling in `tools/`:
+- `python3 tools/gen_sprites.py` — regenerate sprite atlases, woodcut emblems, and launcher icons.
+- `python3 tools/gen_audio.py` — regenerate RMS-mastered offline `.ogg` SFX, ambience loops, and temporary music stems.
+- `./tools/m7_run.sh` / `tools/m8_perf_bench.gd` / `tools/ui_smoke.gd` — deterministic balance soaks, benchmarks, and multi-viewport UI verification.
 
-## Controls
+---
 
-| Action | Keyboard | Touch / mouse |
-|---|---|---|
-| Move / attack | arrows, numpad, `hjklyubn` | d-pad, or tap an adjacent tile |
-| Travel | | tap a remembered tile (stops when a new enemy appears) |
-| Wait | `.` `5` space | centre of the d-pad, or tap yourself |
-| Pick up | `g` `,` | Get, or tap yourself |
-| Stairs | Enter `>` `<` | Stairs, or tap yourself on stairs |
-| Search & disarm traps | `s` | Srch |
-| Use altar / site / secret | `e` | tap adjacent or underfoot site |
-| Rest | `r` | Rest |
-| Inventory | `i` | Bag |
-| Character build & talents | `c` | Build |
-| Active talents | `a` or `1`–`6` | Act |
-| Fire ranged weapon | `f` (`Tab` cycles, `Enter`/tap confirms) | Fire |
-| Masks (Occultist) | `m` | Mask |
-| Inspect | `x`, then tap | Look, long-press or right-click |
-| Menu | Esc | Menu, Android back |
+## Documentation Index
 
-Text size, tile size, travel speed and on-screen controls are under Settings.
-
-## Documents
-
-- [DESIGN.md](DESIGN.md): what the game is and how the mythology becomes mechanics.
-- [ARCHITECTURE.md](ARCHITECTURE.md): code layout, layering and decisions.
-- [ROADMAP.md](ROADMAP.md): milestones and known defects.
-- [docs/LORE.md](docs/LORE.md): canon / interpretation / proposed ledger.
-- [docs/CONTENT_SCHEMA.md](docs/CONTENT_SCHEMA.md): JSON content format.
-- [AGENTS.md](AGENTS.md): rules for coding agents.
-- [docs/HANDOFF.md](docs/HANDOFF.md): current state and next assignment for the next agent.
-
-## Rights
-
-The code is original to this project. FALSE LIGHT names, lore and palette are the owner's own creative property and are used by the owner's authorization. The project includes no third-party code or assets beyond the Godot engine, whose license notices must ship with any exported build. All rights reserved; no license is granted.
+- `ARCHITECTURE.md` — Layered codebase isolation (`core`, `content`, `gen`, `sim`, `persistence`, `ui`), save schema decisions
+- `DESIGN.md` — Gameplay mechanics, Sphere structure, combat math, and soak findings
+- `ROADMAP.md` — Milestones M0 through M9
+- `docs/M9_REPORT.md` & `docs/RELEASE_CHECKLIST.md` — RC1 verification report and open human/owner gates

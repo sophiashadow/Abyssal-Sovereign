@@ -171,6 +171,12 @@ Spec: `docs/M8_SPEC.md`.
 - Created `tools/package_rc.sh` and updated `tools/verify.sh` (adding `720x1280` portrait UI smoke and APK zero-leak hygiene check); verified `./tools/package_rc.sh` produces all 4 portable packages in `build/release/` (`linux-x86_64.tar.gz`, `windows-x86_64.zip`, `web.zip`, `android-debug.apk`) + `SHA256SUMS.txt` with zero leaked dev/lore/doc files. Godot's exporter signed (`Signed` + `Verifying APK...`) and bundled `META-INF/ANDROIDD.{RSA,SF}` (standalone `apksigner verify` on shell PATH requires `java`, not in default `PATH`).
 - Created `docs/INSTALL.md` covering install/uninstall, OS `user://` save paths, backup/recovery, `v1`–`v12` save upgrade compatibility, 100% offline guarantee, and external owner keystore signing. Resolved `P0-1` in `docs/M9_DEFECT_REGISTER.md`.
 
+### M9.9 — Product Identity and Release Materials (done; resolves P2-5)
+
+- Replaced stale `v0.5-dev` `README.md` with accurate `v1.0.0-rc.1` overview, verified baseline counts, accessibility highlights, and build/test commands.
+- Created `docs/release/PRODUCT_KIT.md`, `docs/release/RELEASE_NOTES.md`, `docs/release/PRIVACY.md`, and `docs/release/CREDITS_AND_LICENSES.md` (with Godot 4.7.2 MIT license notice, measured package sizes, `provisional_m9_asset` / `placeholder_liturgical_temp` provenance, zero telemetry/account guarantees, and explicit open human/external gates).
+- Resolved `P2-5` in `docs/M9_DEFECT_REGISTER.md`.
+
 ## Do not
 
 - Modify FALSE LIGHT, Sovereign-Ops or any other repository. FALSE LIGHT documents are read-only sources.
