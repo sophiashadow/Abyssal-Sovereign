@@ -96,7 +96,9 @@ Spec: `docs/M8_SPEC.md`.
   - Post-fix dev check (`m8_diag_post`, 12 runs across `explorer`, `narrative`, `specialist` on `human/veilkin × occultist/assassin`): 0 unfinished runs (`explorer` 4/4 mean 5135 turns, `narrative` 4/4 mean 4002 turns, `specialist` 3/4 mean 514 turns), 82 Relic Work calls recorded.
   - Added pure-observer Sphere mechanical identity (`sphere_turns`, `sphere_damage_taken`, `sphere_actions`, `sphere_statuses`) and relic usage (`relic_work`, `relic_transmute`) telemetry to `src/sim/telemetry.gd`, `src/sim/world.gd`, and `tools/m7_report.gd`.
   - Added `tests/test_m8_telemetry.gd` (3 tests, 14 checks).
-- **Next submilestone:** M8.1 — The Visual Codex (`docs/ART_DIRECTION.md`).
+- **M8.1 The Visual Codex (complete):**
+  - Authored `docs/ART_DIRECTION.md`: Gnostic/occult-medieval visual identity, 8-color foundational palette (`VOID`, `IRON`, `PORPHYRY`, `GOLD`, `FALSE_SUN`, `IVORY`, `LUX`, `SILVER`, `BLOOD`), functional color meanings + mandatory non-color signifiers, Deuteranopia/Protanopia/Tritanopia/High-Contrast modes, 32×32 tile grid & 16×16/64×64 specs, 8px spacing / 48px touch targets, lighting/FOV & 60–180ms animation rules, asset naming/provenance schema, and the Ossuary Warrens vertical-slice treatment.
+- **Next submilestone:** M8.2 — The Dual Rendering Architecture (`Palette`, `GameSettings`, `AssetRegistry`, vertical-slice sprites, `MapView` dual tile/glyph renderer, `tests/test_m8_renderer.gd`).
 
 ## Owner decisions still open
 
