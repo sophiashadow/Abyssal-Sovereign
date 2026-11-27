@@ -3,3 +3,4 @@
 balance|historical|default tools/soak.gd salt, used for tuning through M6
 heldout|historical|held-out confirmation salt through M6.9
 m6_final_validation|historical|M6.10 final validation; baseline reference only, not an optimization target
+m7_final_validation|claimed|2026-11-27T00:13:43
