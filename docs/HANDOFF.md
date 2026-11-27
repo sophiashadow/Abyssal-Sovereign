@@ -154,6 +154,12 @@ Spec: `docs/M8_SPEC.md`.
 - Release Android keystore creation (owner creates outside the repo) and external VENEFICA LUX soundtrack authorization/swap.
 - Formal canon promotion review for `Proposed` M6 entities (PR #300 locations/people/institutions/threads remain `Proposed`).
 
+### M9.6 — Final Gameplay Integrity (done)
+
+- Executed 4×32-run dev profile sweeps (`m9dev_prof_{initiate,exile,adversary,sovereign}`: monotonic win rates `75.0% -> 68.8% -> 65.6% -> 56.2%`, `0-3` capped runs) and 256-run 64-pair dev matrix (`m9dev_matrix`: `211` won `82.4%`, `39` dead, `6` capped; `86/86` monsters, `28/28` floors, `24/24` threads; `suspects: []`).
+- Claimed fresh salt `m9_rc1_validation` in `balance/validation_ledger.txt` and ran `v9_rc1_exile` (`256` runs: `219` won `85.5%`, `35` dead, `2` capped; `0` capped across `explorer`/`narrative`/`specialist`; Veil-Touched `25/32` `78.1%` vs Human `26/32` `81.2%`; `1,534` Relic Work, `246` Transmute; all 4 victory endings reached).
+- Recorded non-tuned integrity verdicts in `balance/CHANGES.md` and `DESIGN.md`; Depth 2 Vault Enumerator pressure and Occultist/Ophite Binder early frailty remain flagged for human playtest (`docs/PLAYTEST.md`).
+
 ## Do not
 
 - Modify FALSE LIGHT, Sovereign-Ops or any other repository. FALSE LIGHT documents are read-only sources.

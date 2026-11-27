@@ -257,3 +257,12 @@ M8 transforms the M7 alpha into an offline, accessible, visually coherent occult
 - **Bot Resolution & Pure Identity Telemetry (`m8_final_check`, dev salt, 32 runs):** Resolving M7 bot navigation stalls and adding Relic Work coverage in `PolicyPlayer` yielded `0` unfinished runs on `explorer` (`8/8`), `narrative` (`8/8`), and `specialist` (`8/8`), with `baseline` (`AutoPlayer`) at `6/8` won (`1` death, `1` action-capped). Sphere identity telemetry confirmed distinct elemental, pressure, and tactical signatures across Spheres 1–7 (`Sun` radiant peak `432`, `Mars` fire + `sundered`, `Jupiter` `hexed` + decrees, `Saturn` cold/void), alongside `229` Relic Work + `32` Transmute events.
 - **Audio, Motion & Narrative Framing:** Adds restrained VFX (`VfxLayer`), 6-bus offline SFX + Sphere ambience (`AudioManager`), 16 placeholder liturgical soundtrack contexts ready for VENEFICA LUX stem swap, and non-blocking `loc_key`-indexed narrative banners respecting Canon/Proposed tags. Human playtest rounds (`docs/PLAYTEST.md`) and balance profile finalization remain open prior to release. See `docs/M8_REPORT.md`.
 
+
+
+## M9.6 — Final Gameplay Integrity (`m9dev_*`, `m9_rc1_validation`)
+
+Without altering M7 gameplay math or `SAVE_VERSION := 12`, M9.6 verified M8.0's pathing/Relic-Work fixes and profile separation across `384` dev runs (`m9dev_prof_{initiate,exile,adversary,sovereign}` and `m9dev_matrix`) and a fresh `256`-run held-out validation soak (`salt=m9_rc1_validation`, `v9_rc1_exile`):
+
+- **Profile separation (`m9dev_profiles`, 32 runs each):** Initiate `24/32` (`75.0%`, 8 dead, 0 capped) -> Exile `22/32` (`68.8%`, 9 dead, 1 capped) -> Adversary `21/32` (`65.6%`, 11 dead, 0 capped) -> Sovereign `18/32` (`56.2%`, 11 dead, 3 capped).
+- **Held-out validation (`m9_rc1_validation`, Exile, 256 runs):** `219` won (`85.5%`), `35` died (`13.7%`), `2` hit action cap (`0.8%`, both on `baseline`; `0` capped across all `192` `explorer`/`narrative`/`specialist` runs). Veil-Touched won `25/32` (`78.1%`) vs Human `26/32` (`81.2%`); all `86/86` monsters killed, `28/28` floors visited, `24/24` threads accepted, all four victory endings reached, `1,534` Relic Work + `246` Transmute uses.
+- **No tuning without human playtest:** No speculative numerical rebalance was applied against validation seeds; Depth 2 `The Vault Enumerator` spikes in dev (`10` kills) and early `occultist`/`ophite_binder` vulnerability remain flagged for human playtesting in `docs/PLAYTEST.md`. See `balance/CHANGES.md`.

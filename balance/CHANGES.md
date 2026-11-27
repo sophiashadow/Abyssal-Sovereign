@@ -63,3 +63,42 @@ Every row: finding, dev-seed evidence, change, dev-seed re-measure. All numbers 
 
 - **Reading.** Wins fall monotonically with the profile, 14 points from Initiate to Sovereign, and deaths nearly double from Exile to Sovereign. Adjacent profiles are within noise at this n (one standard error is about 3 points), so only the ends are separated. Capped runs are bots that ran out of actions, not deaths, which is why deaths are the cleaner signal.
 - **Not concluded.** Bot play cannot say whether Initiate is gentle enough for a first-time player or Sovereign demanding enough for an experienced one. No profile was tuned against these numbers and no validation salt was spent. Human playtest (docs/PLAYTEST.md) decides the parameters and the names.
+
+
+## 6. M9.6 Final Gameplay Integrity Audit & Fresh Validation (`m9dev_*`, `m9_rc1_validation`)
+
+No mechanics or stat tables were changed after `m7_final_validation` (`SAVE_VERSION := 12` preserved); M8.0 resolved bot navigation stalls and added Relic Work/Transmutation bot coverage (`tools/m7_soak.gd`, `src/sim/assist.gd`). M9.6 measured profile separation on fresh dev seeds (`m9dev_profiles`), full 64-pair coverage on dev seeds (`m9dev_matrix`), and held-out validation on newly claimed salt `m9_rc1_validation` (`v9_rc1_exile`, 256 runs).
+
+### Dev Profile Separation (`salt=m9dev_profiles`, 32 runs/profile: Human & Cambion × 4 callings × 4 policies)
+
+| Profile | Runs | Wins | Deaths | Capped (turn limit) | Mean Deaths Depth 1–2 | Output |
+|---|---:|---:|---:|---:|---:|---|
+| Initiate | 32 | 24 (75.0%) | 8 | 0 | 3 | `balance/m9dev_prof_initiate_summary.md` |
+| Exile | 32 | 22 (68.8%) | 9 | 1 | 6 | `balance/m9dev_prof_exile_summary.md` |
+| Adversary | 32 | 21 (65.6%) | 11 | 0 | 7 | `balance/m9dev_prof_adversary_summary.md` |
+| Sovereign | 32 | 18 (56.2%) | 11 | 3 | 6 | `balance/m9dev_prof_sovereign_summary.md` |
+
+### Dev 64-Pair Matrix (`salt=m9dev_matrix`, Exile, 256 runs: 64 pairs × 4 policies)
+
+- **Outcomes:** `211 won (82.4%)`, `39 dead (15.2%)`, `6 capped (2.3%)` — `baseline 38/64 (59.4%)`, `explorer 57/64 (89.1%)`, `narrative 61/64 (95.3%)`, `specialist 55/64 (85.9%)`.
+- **Coverage:** `86/86` monsters killed, `28/28` floors visited, `24/24` narrative threads accepted, `suspects: []`.
+- **Veil-Touched (`veilkin`):** `24/32 (75.0%)` overall (`explorer 7/8`, `narrative 8/8`, `specialist 6/8`, `baseline 3/8`).
+- **Depth 2 Deaths (dev):** `20/39` total deaths occurred at depth 2 (`The Vault Enumerator: 10`).
+
+### Held-Out Validation (`salt=m9_rc1_validation`, Exile, 256 runs: 64 pairs × 4 policies)
+
+Claimed once (`balance/validation_ledger.txt`); nothing was tuned against these runs.
+
+| Policy | Runs | Won | Dead | Capped | Mean Depth | Mean Turns |
+|---|---:|---:|---:|---:|---:|---:|
+| `baseline` | 64 | 51 (79.7%) | 11 | 2 | 6.47 | 783 |
+| `explorer` | 64 | 54 (84.4%) | 10 | 0 | 6.34 | 5005 |
+| `narrative` | 64 | 59 (92.2%) | 5 | 0 | 6.73 | 3895 |
+| `specialist` | 64 | 55 (85.9%) | 9 | 0 | 6.45 | 652 |
+| **Total** | **256** | **219 (85.5%)** | **35** | **2** | — | — |
+
+- **Origins (`v9_rc1_exile`, 32 runs each):** `ashborn 29/32 (90.6%, 3d)`, `ironbound_ward 29/32 (90.6%, 3d)`, `cambion 28/32 (87.5%, 4d)`, `revenant 28/32 (87.5%, 4d)`, `penitent 27/32 (84.4%, 5d)`, `unrecorded 27/32 (84.4%, 5d)`, `human 26/32 (81.2%, 5d, 1c)`, `veilkin 25/32 (78.1%, 6d, 1c)`.
+- **Callings (`v9_rc1_exile`, 32 runs each):** `occultist 19/32 (59.4%)` and `ophite_binder 22/32 (68.8%)` had the highest early vulnerability; the other six callings won `75%–100%` per policy (`preliator_warden 31/32`, `false_light_alchemist 31/32`, `assassin 30/32`, `fallen_knight 30/32`, `tithe_marksman 30/32`, `rite_weaver 26/32`).
+- **Deaths & Endings:** Deaths across depths `{d1:7, d2:5, d3:9, d4:5, d5:3, d6:2, d7:4}`; classes `{attrition:18, no_healing_available:7, healing_unused_or_too_slow:6, false_light_window:3, underlevelled:1}`. Victories across all four endings (`by_decree:76, unwritten:68, serpent:47, return:28`).
+- **Relic Work & Coverage:** `1,534` Relic Work uses + `246` Transmutations; `86/86` monsters killed, `28/28` floors visited, `24/24` threads accepted, `102/104` talents learned (`49/104` active used; remaining 13 active talents not triggered by heuristics).
+- **Verdict:** M8.0 bot fixes eliminated nearly all action-cap stalls (`0/192` capped across `explorer`/`narrative`/`specialist`; `2/256` overall vs `91/512` in M7). Profile win rates decrease monotonically (`75.0% -> 68.8% -> 65.6% -> 56.2%`). Veil-Touched performs within normal bot-play variance (`78.1%` vs Human `81.2%`). Two points remain open for human playtesting (`docs/PLAYTEST.md`): whether Depth 2 `The Vault Enumerator` pressure (`10` kills in `m9dev_matrix`, `3` in `v9_rc1_exile`) and Occultist/Ophite Binder early frailty feel fair to human players, and whether `explorer` mean run length (~5,005 turns) reflects exhaustive auto-clearing rather than manual pacing.
