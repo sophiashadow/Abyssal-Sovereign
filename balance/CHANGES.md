@@ -48,3 +48,18 @@ Every row: finding, dev-seed evidence, change, dev-seed re-measure. All numbers 
 - **Sphere Gates.** Four methods, each with a cost and a direction: Stormed (-3 HP, +2 Apotheosis, toward By Decree), Serpent's Key (-2 HP, +1 Apotheosis, Serpent's Way), Given Back (a consumable or 3 HP, Way of Return, -2 Apotheosis), By Name (free, -1 Apotheosis, wakes the nearest foe below). By Name is the cheap neutral option and its cost is positional (an awake foe at the arrival point), which is real at deeper Spheres. No method is strictly dominated once the ending it serves is counted.
 - **Contract `the_taken_name`.** 21 broken against 2 fulfilled in b2 because bots always crossed By Name, which its oath forbids. Keepable by design (Serpent's Key and Stormed remain). Bots now cross with the Serpent's Key while it is active. Re-measure (c1, narrative, 128 runs, same seeds as b2): 15 signed in both; broken 12 to 0, fulfilled 2 to 11 (the other 4 unresolved at run end), 18 Serpent's Key crossings; wins 80 to 79 of 128, so keeping the oath is not a power tax the bot notices.
 - **Endings (bot-reached, so read as reachability, not preference).** b2 victories: Serpent 145, Unwritten 90, Return 31, By Decree 11. Bots follow fixed rules, so this says each ending is reachable by some route, not which a player would choose. A forced-route check per ending exists from M6.10 (`tests/test_reachability.gd`); human playtest must judge whether the choices read as understandable.
+
+## M7.8 Run profiles: same-seed measurement, no tuning
+
+- **Design.** Initiate, Exile, Adversary, Sovereign (names provisional, owner review pending). Parameters live in `content/core/difficulty.json`: foes per floor, squad tightness, elite count, items per floor, healing-loot weight, starting salves. No stat multipliers; the combat rules and permadeath are identical. Exile is neutral and generates exactly what earlier versions did (`tests/test_m7_difficulty.gd`).
+- **Measurement (p8, dev salt `m7dev`, bot play).** 192 runs per profile, identical seeds across profiles: Human and Cambion x 8 callings x baseline, explorer, specialist x 4 seeds. Reproduce: `tools/m7_run.sh p8_PROFILE --seeds=4 --policies=baseline,explorer,specialist --species=human,cambion --profile=PROFILE`.
+
+| Profile | Wins | Deaths | Capped (action limit) | Deaths at depth 1-2 |
+|---|---|---|---|---|
+| Initiate | 156 (81%) | 19 | 17 | 12 |
+| Exile | 144 (75%) | 18 | 30 | 11 |
+| Adversary | 135 (70%) | 26 | 31 | 11 |
+| Sovereign | 129 (67%) | 34 | 29 | 17 |
+
+- **Reading.** Wins fall monotonically with the profile, 14 points from Initiate to Sovereign, and deaths nearly double from Exile to Sovereign. Adjacent profiles are within noise at this n (one standard error is about 3 points), so only the ends are separated. Capped runs are bots that ran out of actions, not deaths, which is why deaths are the cleaner signal.
+- **Not concluded.** Bot play cannot say whether Initiate is gentle enough for a first-time player or Sovereign demanding enough for an experienced one. No profile was tuned against these numbers and no validation salt was spent. Human playtest (docs/PLAYTEST.md) decides the parameters and the names.
