@@ -2,7 +2,7 @@
 
 For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENTS.md` first; its rules win over this file. Update this file at every stop.
 
-## State as of 2026-11-27 (M7 merged to `main`; see below)
+## State as of 2026-11-27 (M8 Incarnation Pass complete locally on `main`; awaiting owner review & human playtest)
 
 - **Branch:** `main` (default branch on `origin`, github.com/sophiashadow/Abyssal-Sovereign), preserving full commit history from `ccr-c6f8b898-fu2jtp` and `fac51e8`.
 - **Milestones:** M0–M5 (`fac51e8`, Depth Pass complete), **M6 Breadth Pass (M6.1–M6.10 COMPLETE, save v11):**
@@ -131,13 +131,20 @@ Spec: `docs/M8_SPEC.md`.
   - Created `content/presentation/narrative_frames.json` (`localization_ready: true`, `loc_key` keys for Opening Descent, all 7 Spheres, Boss Sightings, Gate Threshold, Contract Pact, and Mask Aspect, preserving Canon tagging without promoting `Proposed` lore) and `src/ui/narrative_frames.gd` (`NarrativeFrames`).
   - Added non-blocking, click/tap-dismissible, reduced-motion-safe Opening Descent, Sphere Transition, and Boss Sighting framing banners plus Gate/Mask atmospheric framing and the `Narrative framing: on/off` preference (`GameSettings.narrative_banners`) in `src/ui/main.gd`.
   - Added `tests/test_m8_narrative.gd` and verified `test_m8_narrative`, `test_m7_settings`, and `tools/ui_smoke.gd`.
-- **Next submilestone:** M8.10 — Performance, Portability & Internal Beta Gate (asset packaging hygiene, performance/memory benchmark, multi-viewport screenshots & mode smoke, full test suite, fresh dev soak, 4-target exports, `docs/M8_REPORT.md`).
+- **M8.10 Performance, Portability & Internal Beta Gate (complete, verified locally; see `docs/M8_REPORT.md`):**
+  - Fixed top-banner wrapping across landscape & portrait viewports (`src/ui/main.gd`), replaced `.is_boss` with `tags.has("boss") or unique` checks (`main.gd`, `audio_manager.gd`), added `is_inside_tree()` playback guards (`AudioManager`), and excluded `docs/*` in `export_presets.cfg` on all 4 presets.
+  - Added & ran `tools/m8_perf_bench.gd` (`ContentDB` load `34.10 ms`, presentation `6.87 ms`, 200-turn mean `2.171 ms` / p95 `8.687 ms`, save `66,743` B in `3.70 ms` / load `6.48 ms`, peak static memory `76.71 MB`, `assets/` `816 KB`) and `tools/m8_smoke.gd` (`4` presentation/accessibility combinations, `0` errors, invariant RNG).
+  - Captured verified screenshots (`docs/screenshots/m8/{desktop,mobile_landscape,mobile_portrait}/`) at `1280x720`, `2340x1080`, and `720x1280` (`tools/ui_smoke.gd`: `39` steps, `0` failures each).
+  - Full test suite (`./tools/test.sh`): `210` tests, `210` passed, `0` failed, `4,918` checks (`214.4s`).
+  - Fresh M8 dev soak (`m8_final_check`, 32 runs): `explorer 8/8`, `narrative 8/8`, `specialist 8/8` (`0` unfinished), `baseline 6/8` (`1` death, `1` action-capped), `86/86` monsters killed, `28/28` floors visited, `229` Relic Work + `32` Transmute events, complete 7-Sphere identity telemetry.
+  - Cross-platform export (`./tools/export.sh all`): Linux (`72M`, headless launch verified exit `0`), Windows (`106M`, runtime `NOT_RUN`), Web (`40M`, runtime `NOT_RUN`), Android Debug APK (`57M`, `unzip -l` verified atlases/OGGs/JSONs present & `0` `docs/*`, `apksigner verify` v2+v3 valid; physical Android runtime `NOT_RUN` — `adb devices` empty).
+- **Next assignment:** Owner review of M8 (`docs/M8_REPORT.md`), human playtest rounds (`docs/PLAYTEST.md`), physical Android/Windows/Web verification, VENEFICA LUX stem swap (`content/presentation/soundtrack_manifest.json`), and explicit authorization before pushing, merging, releasing, or starting M9.
 
 ## Owner decisions still open
 
 - Profile names and parameters (provisional); whether Veil-Touched's residual bot-play gap is intended.
-
-- Release Android keystore creation (owner creates outside the repo).
+- Human playtest results (`docs/PLAYTEST.md`) and physical Android / Windows / Web runtime verification (`NOT_RUN`).
+- Release Android keystore creation (owner creates outside the repo) and external VENEFICA LUX soundtrack authorization/swap.
 - Formal canon promotion review for `Proposed` M6 entities (PR #300 locations/people/institutions/threads remain `Proposed`).
 
 ## Do not

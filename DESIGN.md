@@ -249,3 +249,11 @@ Same seeds (192 runs each, bot play): Initiate 81%, Exile 75%, Adversary 70%, So
 
 Fresh validation (`m7_final_validation`, Exile, 512 runs, four policies): 369 won (72.1%), 52 died, 91 hit the action cap. Lowest origin Veil-Touched 35/64; lowest callings Occultist and Assassin, mostly from capped runs rather than deaths. Not comparable with the M6.10 75% (different policy mix). The salt is spent and nothing was tuned against it. See `docs/M7_REPORT.md`.
 
+## M8 — The Incarnation Pass
+
+M8 transforms the M7 alpha into an offline, accessible, visually coherent occult-medieval roguelike while keeping gameplay rules, probabilities, and `SAVE_VERSION := 12` untouched:
+
+- **Visual Identity & Dual Presentation (`docs/ART_DIRECTION.md`, `src/ui/map_view.gd`):** Establishes the Gnostic subterranean aesthetic across all Seven Spheres (`32x32` environmental tilesets, entity silhouettes, emblems, and 16×16 icons) in full parity with Classic Glyph mode. Non-color signifiers (hostile brackets, NPC diamond, elite crown, boss aureole, HP micro-bars, hazard tiling) and Deuteranopia/Protanopia/Tritanopia + High-Contrast transforms preserve tactical readability without color reliance.
+- **Bot Resolution & Pure Identity Telemetry (`m8_final_check`, dev salt, 32 runs):** Resolving M7 bot navigation stalls and adding Relic Work coverage in `PolicyPlayer` yielded `0` unfinished runs on `explorer` (`8/8`), `narrative` (`8/8`), and `specialist` (`8/8`), with `baseline` (`AutoPlayer`) at `6/8` won (`1` death, `1` action-capped). Sphere identity telemetry confirmed distinct elemental, pressure, and tactical signatures across Spheres 1–7 (`Sun` radiant peak `432`, `Mars` fire + `sundered`, `Jupiter` `hexed` + decrees, `Saturn` cold/void), alongside `229` Relic Work + `32` Transmute events.
+- **Audio, Motion & Narrative Framing:** Adds restrained VFX (`VfxLayer`), 6-bus offline SFX + Sphere ambience (`AudioManager`), 16 placeholder liturgical soundtrack contexts ready for VENEFICA LUX stem swap, and non-blocking `loc_key`-indexed narrative banners respecting Canon/Proposed tags. Human playtest rounds (`docs/PLAYTEST.md`) and balance profile finalization remain open prior to release. See `docs/M8_REPORT.md`.
+

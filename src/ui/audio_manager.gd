@@ -175,6 +175,8 @@ func play_sfx(sfx_id: String, bus: String = "Combat", pitch_jitter: float = 0.05
 	if stream == null or _sfx_pool.is_empty():
 		return false
 	var player := _sfx_pool[_sfx_cursor % _sfx_pool.size()]
+	if not player.is_inside_tree():
+		return false
 	_sfx_cursor += 1
 	player.bus = StringName(bus if BUSES.has(bus) else "Combat")
 	player.stream = stream
@@ -202,6 +204,8 @@ func set_ambience_sphere(sphere_num: int) -> bool:
 	if stream == null:
 		if _ambience_player.playing:
 			_ambience_player.stop()
+		return false
+	if _ambience_player == null or not _ambience_player.is_inside_tree():
 		return false
 	if _ambience_player.stream != stream or not _ambience_player.playing:
 		_ambience_player.stream = stream
@@ -238,6 +242,8 @@ func play_music_track(context_id: String, res_path: String, fade_sec: float = 1.
 	var prev := _music_decks[_active_deck]
 	_active_deck = (_active_deck + 1) % _music_decks.size()
 	var next_deck := _music_decks[_active_deck]
+	if not next_deck.is_inside_tree():
+		return false
 	next_deck.stream = stream
 	if prev.playing and fade_sec > 0.05 and is_inside_tree():
 		next_deck.volume_db = -32.0
@@ -342,5 +348,5 @@ func _is_boss_at(world: World, p: Vector2i) -> bool:
 		return false
 	for a in fl.actors:
 		if a.pos == p and not a.is_player:
-			return a.is_boss or not String(a.elite).is_empty()
+			return a.tags.has("boss") or a.is_elite or a.unique
 	return false

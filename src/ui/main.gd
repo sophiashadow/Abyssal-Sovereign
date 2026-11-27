@@ -522,33 +522,48 @@ func _show_banner(kicker: String, title: String, subtitle: String, emblem_id: St
 	var s := settings.text_scale()
 	var pc := PanelContainer.new()
 	pc.z_index = 50
-	pc.anchor_left = 0.16
-	pc.anchor_right = 0.84
-	pc.anchor_top = 0.02
-	pc.anchor_bottom = 0.02
-	pc.offset_bottom = 84.0 * s
+	var vp := get_viewport_rect().size
+	var portrait := vp.y > vp.x and vp.x > 0.0
+	pc.anchor_left = 0.04 if portrait else 0.03
+	pc.anchor_right = 0.96 if portrait else 0.68
+	pc.anchor_top = 0.015
+	pc.anchor_bottom = 0.015
+	pc.offset_left = 0.0
+	pc.offset_right = 0.0
+	pc.offset_top = 0.0
+	pc.offset_bottom = 0.0
+	pc.grow_vertical = Control.GROW_DIRECTION_END
 	pc.mouse_filter = Control.MOUSE_FILTER_STOP
-	pc.add_theme_stylebox_override("panel", _box(Color(Palette.PORPHYRY, 0.94), accent))
+	pc.add_theme_stylebox_override("panel", _box(Color(Palette.PORPHYRY, 0.92), accent))
 	pc.gui_input.connect(func(ev: InputEvent) -> void:
 		if ev is InputEventMouseButton and ev.is_pressed():
 			_dismiss_banner())
 	var hb := HBoxContainer.new()
 	hb.add_theme_constant_override("separation", int(10 * s))
 	if not emblem_id.is_empty():
-		var emb := _emblem_rect(emblem_id, 40.0 * s)
+		var emb := _emblem_rect(emblem_id, 38.0 * s)
 		if emb != null:
+			emb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			hb.add_child(emb)
 	var vb := VBoxContainer.new()
 	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vb.add_theme_constant_override("separation", 2)
 	var row_top := HBoxContainer.new()
+	row_top.add_theme_constant_override("separation", 8)
 	var kl := _label(kicker, accent, 0.72)
+	kl.autowrap_mode = TextServer.AUTOWRAP_OFF
 	kl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row_top.add_child(kl)
-	row_top.add_child(_label("Click/tap to dismiss", Palette.TEXT_DIM, 0.68))
+	var dl := _label("[tap to dismiss]", Palette.TEXT_DIM, 0.68)
+	dl.autowrap_mode = TextServer.AUTOWRAP_OFF
+	row_top.add_child(dl)
 	vb.add_child(row_top)
-	vb.add_child(_label(title, Palette.TEXT, 0.95))
-	vb.add_child(_label(subtitle, Palette.LORE, 0.78))
+	var tl := _label(title, Palette.TEXT, 0.92)
+	tl.custom_minimum_size.x = 240.0 * s
+	vb.add_child(tl)
+	var sl := _label(subtitle, Palette.LORE, 0.76)
+	sl.custom_minimum_size.x = 240.0 * s
+	vb.add_child(sl)
 	hb.add_child(vb)
 	pc.add_child(hb)
 	add_child(pc)
@@ -762,7 +777,7 @@ func _sync_audio_context() -> void:
 			ctx = "sanctuaries"
 		else:
 			for foe in world.visible_hostiles():
-				if foe.is_boss:
+				if foe.tags.has("boss") or foe.unique:
 					ctx = "boss_encounters"
 					break
 		audio.play_music_context(ctx)
@@ -945,7 +960,7 @@ func _after_action() -> void:
 			_show_banner("SPHERE %d" % sp, String(sf.get("title", "")), String(sf.get("subtitle", "")), "sphere_%d" % sp, Palette.FALSE_SUN)
 	else:
 		for foe in world.visible_hostiles():
-			if foe.is_boss and not _seen_bosses.has(foe.template_id):
+			if (foe.tags.has("boss") or foe.unique) and not _seen_bosses.has(foe.template_id):
 				_seen_bosses[foe.template_id] = true
 				var mdef: Dictionary = db.get_def("monsters", foe.template_id)
 				_show_banner(frames.boss_kicker(), foe.name, String(mdef.get("desc", "Guardian of the Seal.")), "", Palette.ALERT)
