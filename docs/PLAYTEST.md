@@ -1,94 +1,114 @@
-# Human playtest plan (M7.9)
+# Abyssal Sovereign — External Human Playtest & Accessibility Guide (`v1.0.0-rc.1`)
 
-**Status: no human playtest has been run.** Every win rate in this repository is bot play on fixed seeds. It measures reachability and rough balance, not enjoyment, comprehension or feel. This document says what a person needs to check and how to record it. It reports no results.
+**Status: No human playtest has been run.**
+No human participant has yet played M5, M6, M7, M8, or M9 (`v1.0.0-rc.1`). All runtime balance figures in `balance/` and `docs/M9_REPORT.md` come from deterministic automated bot policies (`baseline`, `explorer`, `narrative`, `specialist`) and simulated viewports (`tools/ui_smoke.gd`). Human playtesting is required before tuning difficulty profiles, finalizing the D2 Vault Enumerator curve, replacing provisional sprites (`provisional_m9_asset`) or temporary liturgical music (`placeholder_liturgical_temp`), or promoting release builds beyond `v1.0.0-rc.1`.
 
-Reports are local. Keep them outside the repository (a private folder or notes app) and send the owner only what they choose to share. A report must not hold legal identity, contact details or anything about the tester beyond a nickname. Copy the template at the end for each session.
+---
 
-## Build under test
+## 1. Platform Support & Installation (`v1.0.0-rc.1`)
 
-Record the commit (`git rev-parse --short HEAD`) or the exported build name. Export success is not a runtime check: say which platform actually ran.
+| Platform | Package / Binary | Verification Status | Launch & Install |
+|---|---|---|---|
+| **Linux (x86_64)** | `abyssal-sovereign-v1.0.0-rc.1-linux-x86_64.tar.gz` | Automated binary smoke passed (`DISPLAY=:0 --quit-after 30`) | Extract tarball, `chmod +x abyssal-sovereign.x86_64`, run `./abyssal-sovereign.x86_64` (optional `.desktop` + `icon_512.png` included) |
+| **Windows (x86_64)** | `abyssal-sovereign-v1.0.0-rc.1-windows-x86_64.zip` | Exported only — runtime **`NOT_RUN`** on Windows | Extract zip to any folder and launch `abyssal-sovereign.exe` |
+| **Android (ARMv7 / ARM64)** | `abyssal-sovereign-v1.0.0-rc.1-android-debug.apk` | APK exported & verified leak-free; physical device install **`NOT_RUN`** | Enable "Install unknown apps" / sideload debug APK via `adb install abyssal-sovereign-v1.0.0-rc.1-android-debug.apk` |
+| **Web (HTML5 / PWA)** | `abyssal-sovereign-v1.0.0-rc.1-web.zip` | Exported only — browser & IndexedDB runtime **`NOT_RUN`** | Extract zip and serve over local HTTP (e.g. `python3 -m http.server 8080`), then open `http://localhost:8080/index.html` (avoid `file://`) |
 
-| Platform | Command or artifact | What it proves |
+Full install, uninstall, OS save locations, and upgrade notes live in `docs/INSTALL.md`.
+
+---
+
+## 2. Core Controls
+
+### Desktop (Keyboard + Mouse)
+Rebindable shortcuts can be customized in **Settings -> Shortcuts**. Movement, wait, stairs, talent hotkeys `1–6`, and `Esc` are fixed.
+
+| Action | Default Keys | Notes |
 |---|---|---|
-| Desktop, Linux or Windows | `tools/export.sh` outputs, or `godot --path .` | keyboard path, shortcuts, window sizes |
-| Web | web export served locally | touch and mouse, save in browser storage |
-| Android | debug APK | touch controls, text scale, resume after the app is backgrounded |
+| Move / Bump-Attack (8 directions) | Arrow keys, `h/j/k/l/y/u/b/n` (Vi-keys), or Numpad `1–4, 6–9` | Orthogonal & diagonal |
+| Wait 1 Turn | `.`, `Space`, or Numpad `5` | Passes one turn |
+| Pick Up Item (`Get`) | `g` | Picks up floor item; button highlights when standing on loot |
+| Inventory (`Bag`) | `i` | Equip, use, drop, compare (`[▲]`/`[▼]`), identify (`[?]`), relic work |
+| Rest (`Rest`) | `r` | Rests safely until healed or interrupted by danger |
+| Auto-Explore (`Auto`) | `o` | Explores unexplored tiles cleanly; stops on foe, loot, or threat |
+| Look / Examine (`Look`) | `x` | Move cursor or click/tap any visible tile to inspect foe/feature/status |
+| Character & Talents (`Build`) | `c` | Spend trait/talent points (`[▲]` when points available) |
+| Active Abilities (`Act`) | `a` (or `1–6`) | Cast learned active abilities |
+| Fire Ranged / Throw (`Fire`) | `f` | Enter Aim Mode (`Tab`/click target, `Enter` confirm, `Esc` cancel) |
+| Search Nearby (`Srch`) | `s` | Searches adjacent tiles for hidden traps/caches |
+| Use / Interact (`Use`) | `e` | Open vaults/gates, read caches, speak with NPCs, trade, witness shrines |
+| Descend / Ascend (`Stairs`) | Click/tap `Stairs` (or floor stair prompt) | Traverse stairs when standing on stairs (`>`, `<`) |
+| Masks (Mask-stance callings) | `m` | Switch active Mask stance; highlights when False Light risk is high |
+| World Atlas / People / Threads / Codex | `Tab` / `p` / `t` / `z` | Track Seven Spheres, NPCs/institutions, narrative threads, codex |
+| Log Filter / Pause / Back | `q` / `Esc` | Cycle log filter; `Esc` closes modals, cancels modes, or opens Pause |
 
-## Coverage matrix
+### Mobile / Touch Interface
+- **Portrait Layout:** Fixed zero-scroll layout with compact top vital bar + collapsible `Stats ▾` drawer, ~70% player-centered map viewport, compact log strip, and fixed bottom touch dock (3×3 D-pad + action grid). Enable **Left-Handed** in Settings to mirror the D-pad and action grid.
+- **Contextual Mode Bars:** When aiming (`Fire` or targeted ability), looking (`Look`), or auto-exploring (`Auto`/`Travel`), an explicit bottom bar surfaces **Next / Confirm / Cancel**, **Done Looking**, or **Stop** without needing a keyboard.
+- **Android Back Button:** Closes active overlays, cancels Look/Aim mode, stops Auto-Explore/Travel, or opens the Pause menu cleanly.
+- **Map Gestures:** Tap any visible floor tile to travel, tap an adjacent foe to bump-attack, or tap a chest/stairs/NPC directly.
 
-Aim for the first column in every row before repeating a cell. A cell is covered when one honest run reached a death or an ending, not when a bot did.
+---
 
-| Axis | Values | Why a person is needed |
-|---|---|---|
-| Profile | Initiate, Exile, Adversary, Sovereign | profile feel cannot be read from bot wins; names are provisional |
-| Origin | Human, Cambion, Veil-Touched, Unrecorded (first pass), then Revenant, Ash-Marked, Iron-Vowed, Debt-Sworn | Veil-Touched trails under bots; a human may use its trap and secret-door sight |
-| Calling | Fallen Knight, Occultist, Assassin, Bastion Warden, Tithe Arbalester, Rite Cantor, Seam Alchemist, Ophite Binder | Ophite Binder and Rite Cantor depend on learning the signature tree |
-| Platform | desktop keyboard, touch (web or Android) | M7.7 automation and shortcuts need both |
-| Experience | first-time player, returning player | onboarding hints are for the first group |
+## 3. New-Player Tactical Guide
 
-Minimum useful first round: 8 sessions. Two first-time players on Initiate and Exile, two returning players on Adversary and Sovereign, at least one session on touch, and both Ophite Binder and Rite Cantor among the callings.
+1. **Read Combat Pacing:** Enemies act on deterministic turns. If two foes flank a hallway, retreat to a one-tile chokepoint (`h/j/k/l` or D-pad) before fighting.
+2. **Respect Lantern & False Light (`LUZ`):** Your Lantern illuminates the dark and wards off threats, but False Light builds metaphysical risk across deeper Spheres (and enables stronger Mask stances). Watch status badges and inspect unfamiliar enemies with `Look` (`x`).
+3. **Inspect Unknown Loot (`[?]`):** Items marked `[?]` in `Bag` have unverified effects until identified (Scroll of Identify, `i`), and `[▲]` / `[▼]` indicators compare equipment stats directly against what you wear. Watch for `[☠]` cursed tags.
+4. **Use Relics Early, Transmute Intentionally:** Relics provide active Work charges (`Bag` -> Work) every floor/rest cycle — do not hoard charges when facing Sphere Guardians (especially **The Vault Enumerator** on Depth 2). Transmutation consumes a relic permanently for a durable boon and prompts confirmation when *Confirm destructive choices* is enabled.
+5. **Witness Contracts & Threads (`p`, `t`):** Speaking with NPCs (`Use` / `e`) lets you accept quests, buy supplies, or pledge aid repeatedly inside one dialogue modal. Contracts carry explicit obligations and consequences — read both Terms and Breaking Penalty before signing.
+6. **Check `Build` & `Rest` Highlights:** `Rest` tints green when safe & wounded; `Build` and `Stairs` highlight amber when talent points await or you stand over stairs.
 
-## What to look for
+---
 
-Write what happened and what you did, not only a rating. A rating without the moment behind it cannot be acted on.
+## 4. Known Limitations (`v1.0.0-rc.1`)
 
-1. **Onboarding (M7.8).** Did the calling hint make the first talent choice obvious? Did you turn hints off, and when? Did any hint arrive at a bad moment or repeat itself? Could you tell what each profile changes before choosing?
-2. **Descent warning (M7.3, M7.7).** On the Sphere Gate screen, did the under-level advisory change what you did? Did you feel nagged or blocked? (It is advisory and never blocks.)
-3. **Auto-explore and rest.** Where did it stop that you wanted it to continue, and where did it continue that you wanted it to stop? Did any stop reason read unclearly? Did it ever walk you into something the game should have warned about?
-4. **Travel and navigation.** Was the Atlas travel and thread navigation enough to avoid backtracking pain after accepting a thread?
-5. **Inventory and comparison.** Could you find, sort and compare gear quickly on touch? Was the cursed or unidentified warning understandable?
-6. **Shortcuts.** Did the defaults feel right? Did rebinding work? (Threads is T and Codex is Z; they were unreachable before M7.7.)
-7. **Sphere identity.** For each Sphere you reached: what did it feel like it was about, in your words, before reading any lore? Do the seven read as different places or as the same floor with new names? This is not instrumented anywhere else.
-8. **Metaphysical choices.** Before each Sphere Gate method, contract, relic Work or Transmute, Return or Serpent decision: did you understand the cost and direction? After the ending, did it match what you expected your choices to mean?
-9. **Fairness of deaths.** For each death, was the cause readable at the moment it became unavoidable? Name the last decision you would change.
-10. **Pace.** Where did you want to stop playing, and why?
+- **Provisional Art (`provisional_m9_asset`):** Procedural pixel-art atlases were upgraded in M9.1 with silhouettes, radial lantern lighting, 15 bosses, and 24 woodcut emblems, but signature art assets have not yet been replaced by external commissioned illustrations (tracked in `docs/ASSET_BACKLOG.md`).
+- **Temporary Music Stems (`placeholder_liturgical_temp`):** 16 loopable ambient/music stems are procedural temporary compositions mastered in M9.5 alongside procedural SFX; approved original recordings are awaiting owner handoff.
+- **Pending Platform Runtimes:** Linux headless and X11 smoke checks passed; Windows desktop runtime, Web browser IndexedDB persistence, and physical Android hardware touch/background-suspend behavior are **`NOT_RUN`**.
+- **Debug Android Signing:** `abyssal-sovereign-v1.0.0-rc.1-android-debug.apk` uses a development debug keystore; store distribution requires external owner keystore signing (`docs/INSTALL.md`).
+- **Lore & Balance Finalization Pending Review:** `docs/OWNER_CANON_LEDGER.md` lists open Canon/naming decisions, and M9.6 flags Depth 2 Vault Enumerator spikes plus early Occultist / Ophite Binder frailty for human difficulty feedback.
 
-## Defect severity
+---
 
-| Level | Meaning |
+## 5. Bug-Reporting Instructions
+
+When filing a playtest bug report or crash note, please include:
+
+1. **Version & Package:** e.g. `v1.0.0-rc.1 (Linux portable)` or `(Android debug APK)`
+2. **Seed & Descent Setup:** Run Seed (shown in HUD / Character sheet / Death summary), Difficulty Profile (`Initiate` / `Exile` / `Adversary` / `Sovereign`), Origin & Calling
+3. **Where It Happened:** Sphere & Floor depth (e.g. `Depth 2 — Mercury`), Turn count, Mode (`Tiles` or `Glyph`, Portrait/Landscape resolution)
+4. **Steps to Reproduce:** What action/button/key was pressed right before the issue
+5. **Attachments (no personal info required):** Screenshot + relevant save file (`world.sav` / `settings.cfg` from the OS user folder listed in `docs/INSTALL.md`) and console log if on desktop.
+
+---
+
+## 6. Playtest & Accessibility Coverage Matrix
+
+Automated smoke tests verified layout geometry (`39 steps, 0 failures`) on simulated `1280x720`, `2340x1080`, and `720x1280` viewports, plus unit checks for audio mute, lunges, and color/contrast transforms. Human testers should cover every row below and mark **Pass / Issue**:
+
+| Category | Test Focus |
 |---|---|
-| Blocker | crash, corrupt or unloadable save, unwinnable state, lost progress |
-| Major | wrong rule, wrong text that misleads a decision, unusable control on a supported platform |
-| Minor | readability, wording, awkward flow |
-| Idea | not a defect |
+| **Origins & Callings** | At least 3 distinct pairings including frail casters (**Veil-Touched / Occultist**, **Ophite Binder**) and martial builds (**Human / Preliator Warden**, **Ironbound Ward / Fallen Knight**) |
+| **Difficulty Profiles** | First-run learnability on **Initiate** vs standard **Exile** vs pressure on **Adversary / Sovereign** |
+| **Input Modalities** | Desktop keyboard (Arrows / Vi / Numpad + rebind check), mouse click-to-move/inspect, mobile touchscreen D-pad, left-handed D-pad swap |
+| **Orientations** | Desktop `16:9` window, mobile **Portrait** (`9:16` / `9:20`), mobile **Landscape**, safe-area/notch readability |
+| **Visual Modes** | **Tiles** mode vs **Glyph** mode (`Settings -> Render mode`), text scaling (`1.0×`–`1.75×`), camera zoom |
+| **Accessibility** | **High Contrast** on/off, **Deutan/Protan**, **Tritan**, **Reduced Motion**, **Instant Actions**, **Narrative Banners** off |
+| **Audio States** | Audio enabled (music + Sphere ambience crossfade + SFX balance) vs **100% Silent / Master 0%** play vs app background/focus loss |
 
-For any blocker, keep the seed, the profile and the build, and note the turn count: with those a run can be replayed exactly.
+---
 
-## What counts as a result
+## 7. Concise Human Playtest Questionnaire
 
-- A statement about feel needs two independent sessions before it changes a design decision.
-- A bot win rate never confirms a human experience, and a human loss never proves a balance fault: record it and compare against the bot data in `balance/` only after the report is written.
-- Keep the first impression and the post-run reflection separate; players rewrite the first once they know the ending.
+Please score `1` (Poor / Unclear) to `5` (Strong / Natural) and add 1–3 sentences of specifics:
 
-## Report template (copy per session; keep local)
-
-```
-Date:
-Build (commit or export name):
-Platform and input (keyboard, touch, both):
-Tester nickname and experience (first-time or returning):
-
-Profile:
-Origin / calling:
-Seed (shown on the pause screen):
-Hints on? (yes, turned off at turn N, no):
-Session length and stop reason:
-
-Outcome (death with cause, ending name, abandoned):
-Deepest Sphere reached:
-Level at the first Sphere Gate and your choice there:
-Threads taken / settled:
-Contract signed, kept or broken:
-Relic Work or Transmute used:
-
-Onboarding notes:
-Descent warning notes:
-Automation notes (where it stopped, where it should have):
-Navigation and inventory notes:
-Sphere identity (one sentence per Sphere reached, in your words):
-Choice clarity (decisions you did not understand):
-Deaths: last decision you would change:
-
-Defects (severity, steps, seed):
-Ideas:
-```
+1. **Learnability:** How quickly did you understand movement, Wait/Rest, identification, Lantern risk, and Contracts on your first run?
+2. **Enjoyment:** Did combat, exploration, and Sphere progression feel rewarding enough to start another run after dying?
+3. **Tactical Clarity:** Could you distinguish threats, elites, bosses, hazards, and NPCs at a glance in both Tiles and Glyph modes?
+4. **Interface Comfort:** Were text sizes, modal scrolling, inventory comparison tags (`[▲]/[▼]/[?]/[☠]`), and touch/desktop controls comfortable without fatigue?
+5. **Campaign Pacing:** How did pacing feel across early Spheres (especially Floor 1–2) through mid-campaign? Did any floor feel rushed or overly long?
+6. **Narrative Comprehension:** Were Sphere transitions, NPC factions/institutions, Contract terms, and threads intelligible and atmospheric?
+7. **Perceived Difficulty:** Did your chosen Profile (**Initiate / Exile / Adversary / Sovereign**) feel fair when you died, or did sudden spikes (e.g. D2 Vault Enumerator) feel unearned?
+8. **Replayability:** How distinct did different Origins, Callings, Relics, and Mask stances feel across runs?
+9. **Memorable Encounters & Friction:** Name one encounter or moment that stood out positively, and the single worst UI or mechanical friction point you hit.

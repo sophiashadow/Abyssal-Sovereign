@@ -160,6 +160,11 @@ Spec: `docs/M8_SPEC.md`.
 - Claimed fresh salt `m9_rc1_validation` in `balance/validation_ledger.txt` and ran `v9_rc1_exile` (`256` runs: `219` won `85.5%`, `35` dead, `2` capped; `0` capped across `explorer`/`narrative`/`specialist`; Veil-Touched `25/32` `78.1%` vs Human `26/32` `81.2%`; `1,534` Relic Work, `246` Transmute; all 4 victory endings reached).
 - Recorded non-tuned integrity verdicts in `balance/CHANGES.md` and `DESIGN.md`; Depth 2 Vault Enumerator pressure and Occultist/Ophite Binder early frailty remain flagged for human playtest (`docs/PLAYTEST.md`).
 
+### M9.7 — Human Playtest and Accessibility Gate (done)
+
+- Rewrote `docs/PLAYTEST.md` into an actionable external playtest package covering v1.0.0-rc.1 install/launch across Linux/Windows/Android/Web, verified Desktop & Touch controls, new-player tactical guide, explicit known limitations (`provisional_m9_asset`, `placeholder_liturgical_temp`, `NOT_RUN` hardware runtimes, debug APK), bug-reporting checklist, accessibility/viewport/mode coverage matrix, and 9-axis human playtest questionnaire.
+- Preserved `Status: No human playtest has been run.` prominently; no human feedback was simulated.
+
 ## Do not
 
 - Modify FALSE LIGHT, Sovereign-Ops or any other repository. FALSE LIGHT documents are read-only sources.
