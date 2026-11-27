@@ -18,6 +18,11 @@ var screen: Screen = Screen.TITLE
 # Game screen widgets
 var map: MapView
 var hud: RichTextLabel
+var _hp_bar: ProgressBar
+var _res_bar: ProgressBar
+var _subj_bar: ProgressBar
+var _sphere_icon: TextureRect
+var _render_btn: Button
 var log_view: RichTextLabel
 var look_label: Label
 var overlay: Control
@@ -85,9 +90,11 @@ func _fs(mult: float = 1.0) -> int:
 func _apply_theme() -> void:
 	var t := Theme.new()
 	t.default_font_size = _fs()
-	var normal := _box(Palette.PANEL, Palette.PANEL_EDGE)
-	var hover := _box(Palette.PANEL.lightened(0.08), Palette.GOLD)
-	var pressed := _box(Palette.PANEL_EDGE, Palette.FALSE_SUN)
+	var edge_col := Palette.RECORD if settings.high_contrast else Palette.PANEL_EDGE
+	var panel_bg := Color("#1a141d") if settings.high_contrast else Palette.PANEL
+	var normal := _box(panel_bg, edge_col)
+	var hover := _box(panel_bg.lightened(0.1), Palette.GOLD)
+	var pressed := _box(Palette.PORPHYRY_LIGHT, Palette.FALSE_SUN)
 	var focus := _box(Color(0, 0, 0, 0), Palette.FALSE_SUN)
 	for state in ["normal", "disabled"]:
 		t.set_stylebox(state, "Button", normal)
@@ -96,16 +103,79 @@ func _apply_theme() -> void:
 	t.set_stylebox("hover_pressed", "Button", pressed)
 	t.set_stylebox("focus", "Button", focus)
 	t.set_color("font_color", "Button", Palette.TEXT)
-	t.set_color("font_hover_color", "Button", Palette.TEXT)
+	t.set_color("font_hover_color", "Button", Palette.FALSE_SUN)
 	t.set_color("font_pressed_color", "Button", Palette.FALSE_SUN)
 	t.set_color("font_disabled_color", "Button", Palette.TEXT_DIM.darkened(0.3))
 	t.set_color("font_color", "Label", Palette.TEXT)
 	t.set_color("default_color", "RichTextLabel", Palette.TEXT)
-	t.set_stylebox("panel", "PanelContainer", _box(Palette.PANEL, Palette.PANEL_EDGE))
-	t.set_stylebox("normal", "LineEdit", _box(Palette.VOID, Palette.PANEL_EDGE))
+	t.set_stylebox("panel", "PanelContainer", _box(panel_bg, edge_col))
+	t.set_stylebox("normal", "LineEdit", _box(Palette.VOID, edge_col))
 	t.set_stylebox("focus", "LineEdit", _box(Palette.VOID, Palette.FALSE_SUN))
 	t.set_color("font_color", "LineEdit", Palette.TEXT)
 	theme = t
+
+
+func _sprite_rect(entry: Dictionary, px_size: float) -> TextureRect:
+	var at := registry.make_atlas_texture(entry) if registry != null else null
+	if at == null:
+		return null
+	var tr := TextureRect.new()
+	tr.texture = at
+	tr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	tr.custom_minimum_size = Vector2(px_size, px_size)
+	return tr
+
+
+func _emblem_rect(emblem_id: String, px_size: float) -> TextureRect:
+	return _sprite_rect(registry.emblem_region(emblem_id), px_size) if registry != null else null
+
+
+func _avatar_preview_box(px_size: float) -> Control:
+	var box := Control.new()
+	box.custom_minimum_size = Vector2(px_size, px_size)
+	var dummy := Actor.new()
+	dummy.species_id = _pick_species
+	dummy.class_id = _pick_class
+	dummy.mask = "bare_face"
+	if registry != null:
+		for layer in registry.player_layers(dummy):
+			var tr := _sprite_rect(layer, px_size)
+			if tr != null:
+				tr.set_anchors_preset(Control.PRESET_FULL_RECT)
+				box.add_child(tr)
+	return box
+
+
+func _make_bar(fill_col: Color, h: float = 12.0) -> ProgressBar:
+	var pb := ProgressBar.new()
+	pb.show_percentage = false
+	pb.custom_minimum_size.y = h * settings.text_scale()
+	var bg := StyleBoxFlat.new()
+	bg.bg_color = Palette.VOID
+	bg.border_color = Palette.PANEL_EDGE
+	bg.set_border_width_all(1)
+	bg.set_corner_radius_all(2)
+	var fg := StyleBoxFlat.new()
+	fg.bg_color = fill_col
+	fg.set_corner_radius_all(2)
+	pb.add_theme_stylebox_override("background", bg)
+	pb.add_theme_stylebox_override("fill", fg)
+	return pb
+
+
+func _safe_margins() -> Vector4:
+	var scr := DisplayServer.screen_get_size()
+	var safe := DisplayServer.get_display_safe_area()
+	if scr.x <= 0 or scr.y <= 0 or safe.size.x <= 0 or safe.size.y <= 0:
+		return Vector4.ZERO
+	return Vector4(
+		maxf(0.0, float(safe.position.x)),
+		maxf(0.0, float(safe.position.y)),
+		maxf(0.0, float(scr.x - (safe.position.x + safe.size.x))),
+		maxf(0.0, float(scr.y - (safe.position.y + safe.size.y)))
+	)
 
 
 func _box(bg: Color, edge: Color) -> StyleBoxFlat:
@@ -140,6 +210,11 @@ func _clear() -> void:
 		c.queue_free()
 	map = null
 	hud = null
+	_hp_bar = null
+	_res_bar = null
+	_subj_bar = null
+	_sphere_icon = null
+	_render_btn = null
 	log_view = null
 	look_label = null
 	overlay = null
@@ -185,7 +260,12 @@ func _menu_column(max_width: float = 720.0) -> VBoxContainer:
 func _show_title() -> void:
 	_clear()
 	screen = Screen.TITLE
-	var col := _menu_column(520.0)
+	var col := _menu_column(540.0)
+	var crest := _emblem_rect("title_crest", 72.0 * settings.text_scale())
+	if crest != null:
+		var cc := CenterContainer.new()
+		cc.add_child(crest)
+		col.add_child(cc)
 	var title := _label("ABYSSAL SOVEREIGN", Palette.LUX, 2.2)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(title)
@@ -205,7 +285,8 @@ func _show_title() -> void:
 	col.add_child(_btn("Settings", func() -> void: _show_settings(_show_title)))
 	if not OS.has_feature("web"):
 		col.add_child(_btn("Quit", func() -> void: get_tree().quit()))
-	var foot := _label("Set in the world of FALSE LIGHT. v0.6 (M6 Breadth Pass)", Palette.TEXT_DIM, 0.75)
+	var mode_tag := "Tiles 32x32" if settings.render_mode == "tiles" else "Classic Glyph"
+	var foot := _label("Set in the world of FALSE LIGHT. M8 Incarnation (%s)" % mode_tag, Palette.TEXT_DIM, 0.75)
 	foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(foot)
 
@@ -252,20 +333,31 @@ func _show_create() -> void:
 	col.add_theme_constant_override("separation", int(8 * settings.text_scale()))
 	col.add_child(_label("Who descends?", Palette.LUX, 1.4))
 
+	var top_bar := HBoxContainer.new()
+	top_bar.add_theme_constant_override("separation", 12)
+	var preview_holder := PanelContainer.new()
+	var rebuild_preview := func() -> void:
+		for c in preview_holder.get_children():
+			c.queue_free()
+		preview_holder.add_child(_avatar_preview_box(64.0 * settings.text_scale()))
+	rebuild_preview.call()
+	top_bar.add_child(preview_holder)
 	var name_edit := LineEdit.new()
 	name_edit.placeholder_text = "Name (optional)"
 	name_edit.max_length = 24
-	name_edit.custom_minimum_size.y = 44.0 * settings.text_scale()
-	col.add_child(name_edit)
+	name_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_edit.custom_minimum_size.y = 48.0 * settings.text_scale()
+	top_bar.add_child(name_edit)
+	col.add_child(top_bar)
 
 	col.add_child(_label("Origin", Palette.GOLD, 1.05))
 	var sp_desc := _label("", Palette.TEXT_DIM, 0.85)
-	col.add_child(_choice_row("species", sp_desc))
+	col.add_child(_choice_row("species", sp_desc, rebuild_preview))
 	col.add_child(sp_desc)
 
 	col.add_child(_label("Calling", Palette.GOLD, 1.05))
 	var cl_desc := _label("", Palette.TEXT_DIM, 0.85)
-	col.add_child(_choice_row("classes", cl_desc))
+	col.add_child(_choice_row("classes", cl_desc, rebuild_preview))
 	col.add_child(cl_desc)
 
 	col.add_child(_label("Descent", Palette.GOLD, 1.05))
@@ -293,7 +385,7 @@ func _show_create() -> void:
 	begin.call_deferred("grab_focus")
 
 
-func _choice_row(kind: String, desc: Label) -> Control:
+func _choice_row(kind: String, desc: Label, on_pick: Callable = Callable()) -> Control:
 	var flow := HFlowContainer.new()
 	flow.add_theme_constant_override("h_separation", 8)
 	flow.add_theme_constant_override("v_separation", 8)
@@ -304,7 +396,7 @@ func _choice_row(kind: String, desc: Label) -> Control:
 		b.toggle_mode = true
 		b.button_group = group
 		b.text = String(d["name"])
-		b.custom_minimum_size = Vector2(172.0 * settings.text_scale(), 44.0 * settings.text_scale())
+		b.custom_minimum_size = Vector2(172.0 * settings.text_scale(), 46.0 * settings.text_scale())
 		var current := _pick_species if kind == "species" else _pick_class
 		b.button_pressed = id == current
 		b.toggled.connect(func(on: bool) -> void:
@@ -314,7 +406,9 @@ func _choice_row(kind: String, desc: Label) -> Control:
 				_pick_species = id
 			else:
 				_pick_class = id
-			desc.text = _describe_choice(kind, id))
+			desc.text = _describe_choice(kind, id)
+			if on_pick.is_valid():
+				on_pick.call())
 		flow.add_child(b)
 	desc.text = _describe_choice(kind, _pick_species if kind == "species" else _pick_class)
 	return flow
@@ -382,15 +476,27 @@ func _build_game_screen() -> void:
 	screen = Screen.GAME
 	_background()
 	var s := settings.text_scale()
-	var root := HBoxContainer.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var vp := get_viewport_rect().size
+	var portrait := vp.y > vp.x and vp.x > 0.0
+	var safe := _safe_margins()
+	var frame := MarginContainer.new()
+	frame.set_anchors_preset(Control.PRESET_FULL_RECT)
+	frame.add_theme_constant_override("margin_left", int(safe.x))
+	frame.add_theme_constant_override("margin_top", int(safe.y))
+	frame.add_theme_constant_override("margin_right", int(safe.z))
+	frame.add_theme_constant_override("margin_bottom", int(safe.w))
+	add_child(frame)
+
+	var root: BoxContainer = VBoxContainer.new() if portrait else HBoxContainer.new()
+	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	root.add_theme_constant_override("separation", 0)
-	add_child(root)
+	frame.add_child(root)
 
 	var left := VBoxContainer.new()
 	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	left.add_theme_constant_override("separation", 0)
-	root.add_child(left)
 	map = MapView.new()
 	map.world = world
 	map.registry = registry
@@ -404,7 +510,7 @@ func _build_game_screen() -> void:
 	left.add_child(map)
 
 	var log_panel := PanelContainer.new()
-	log_panel.custom_minimum_size.y = _fs(0.85) * 1.45 * LOG_LINES + 16
+	log_panel.custom_minimum_size.y = _fs(0.85) * 1.4 * (4 if portrait else LOG_LINES) + 14
 	left.add_child(log_panel)
 	var log_box := VBoxContainer.new()
 	log_panel.add_child(log_box)
@@ -421,25 +527,78 @@ func _build_game_screen() -> void:
 
 	var side_scroll := ScrollContainer.new()
 	side_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	side_scroll.custom_minimum_size.x = clampf(300.0 * s, 240.0, get_viewport_rect().size.x * 0.45)
-	root.add_child(side_scroll)
+	if portrait:
+		side_scroll.custom_minimum_size.y = clampf(vp.y * 0.42, 240.0, 460.0)
+	else:
+		side_scroll.custom_minimum_size.x = clampf(310.0 * s, 250.0, vp.x * 0.44)
 	var side_panel := PanelContainer.new()
 	side_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	side_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	side_scroll.add_child(side_panel)
 	var side := VBoxContainer.new()
-	side.add_theme_constant_override("separation", int(8 * s))
+	side.add_theme_constant_override("separation", int(6 * s))
 	side_panel.add_child(side)
+
+	var hdr := HBoxContainer.new()
+	hdr.add_theme_constant_override("separation", 8)
+	_sphere_icon = _emblem_rect("sphere_%d" % clampi(world.depth, 1, 7), 36.0 * s)
+	if _sphere_icon != null:
+		hdr.add_child(_sphere_icon)
+	var bars := VBoxContainer.new()
+	bars.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bars.add_theme_constant_override("separation", 3)
+	_hp_bar = _make_bar(Palette.color_for_mode(Palette.GOOD, "good", settings.color_mode, settings.high_contrast), 10.0)
+	_res_bar = _make_bar(Palette.LUX, 8.0)
+	_subj_bar = _make_bar(Palette.color_for_mode(Palette.ALERT, "danger", settings.color_mode, settings.high_contrast), 6.0)
+	bars.add_child(_hp_bar)
+	bars.add_child(_res_bar)
+	bars.add_child(_subj_bar)
+	hdr.add_child(bars)
+	side.add_child(hdr)
+
 	hud = RichTextLabel.new()
 	hud.bbcode_enabled = true
 	hud.fit_content = true
 	hud.scroll_active = false
-	hud.add_theme_font_size_override("normal_font_size", _fs(0.85))
+	hud.add_theme_font_size_override("normal_font_size", _fs(0.84))
 	hud.add_theme_font_size_override("bold_font_size", _fs(0.95))
 	side.add_child(hud)
 
+	var quick := HBoxContainer.new()
+	quick.add_theme_constant_override("separation", 4)
+	_render_btn = _btn("Tiles" if settings.render_mode == "tiles" else "Glyph", func() -> void:
+		settings.render_mode = "glyph" if settings.render_mode == "tiles" else "tiles"
+		settings.save_to_disk()
+		_sync_map_settings()
+		_render_btn.text = "Tiles" if settings.render_mode == "tiles" else "Glyph")
+	_render_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_render_btn.focus_mode = Control.FOCUS_NONE
+	_render_btn.custom_minimum_size.y = 36.0 * s
+	var zm := _btn("Z-", func() -> void:
+		var idx := GameSettings.ZOOM_LEVELS.find(settings.camera_zoom)
+		if idx < 0:
+			idx = 1
+		settings.camera_zoom = GameSettings.ZOOM_LEVELS[maxi(0, idx - 1)]
+		settings.save_to_disk()
+		_sync_map_settings(), 44.0 * s)
+	zm.focus_mode = Control.FOCUS_NONE
+	zm.custom_minimum_size.y = 36.0 * s
+	var zp := _btn("Z+", func() -> void:
+		var idx := GameSettings.ZOOM_LEVELS.find(settings.camera_zoom)
+		if idx < 0:
+			idx = 1
+		settings.camera_zoom = GameSettings.ZOOM_LEVELS[mini(GameSettings.ZOOM_LEVELS.size() - 1, idx + 1)]
+		settings.save_to_disk()
+		_sync_map_settings(), 44.0 * s)
+	zp.focus_mode = Control.FOCUS_NONE
+	zp.custom_minimum_size.y = 36.0 * s
+	quick.add_child(_render_btn)
+	quick.add_child(zm)
+	quick.add_child(zp)
+	side.add_child(quick)
+
 	var actions := GridContainer.new()
-	actions.columns = 2 if settings.touch_controls else 3
+	actions.columns = 4 if portrait else (2 if settings.touch_controls else 3)
 	actions.add_theme_constant_override("h_separation", int(6 * s))
 	actions.add_theme_constant_override("v_separation", int(6 * s))
 	var action_specs: Array = [["Get", _act_pickup], ["Bag", _show_inventory], ["Build", _show_build], ["Act", _show_abilities],
@@ -458,7 +617,7 @@ func _build_game_screen() -> void:
 		pad.columns = 3
 		pad.add_theme_constant_override("h_separation", int(4 * s))
 		pad.add_theme_constant_override("v_separation", int(4 * s))
-		var cell := 64.0 * s
+		var cell := (52.0 if portrait else 64.0) * s
 		var arrows := ["↖", "↑", "↗", "←", "·", "→", "↙", "↓", "↘"]
 		var dirs := [Vector2i(-1, -1), Vector2i(0, -1), Vector2i(1, -1), Vector2i(-1, 0), Vector2i.ZERO,
 			Vector2i(1, 0), Vector2i(-1, 1), Vector2i(0, 1), Vector2i(1, 1)]
@@ -475,6 +634,13 @@ func _build_game_screen() -> void:
 	else:
 		var mask_hint := "   Mask: m" if world.player.has_trait("mask_stances") else ""
 		side.add_child(_label(_key_help(mask_hint), Palette.TEXT_DIM, 0.7))
+
+	if not portrait and settings.left_handed:
+		root.add_child(side_scroll)
+		root.add_child(left)
+	else:
+		root.add_child(left)
+		root.add_child(side_scroll)
 	_refresh()
 
 
@@ -537,8 +703,24 @@ func _escape(t: String) -> String:
 func _update_hud() -> void:
 	var p := world.player
 	var fd := world.current_floor_def()
-	var mx := p.stat("max_hp")
-	var hp_col := Palette.GOOD if p.hp * 2 > mx else (Palette.FALSE_SUN if p.hp * 4 > mx else Palette.ALERT)
+	var mx := maxi(1, p.stat("max_hp"))
+	if _hp_bar != null:
+		_hp_bar.max_value = mx
+		_hp_bar.value = p.hp
+	if _res_bar != null:
+		var rmax := maxi(1, p.max_resource())
+		_res_bar.max_value = rmax
+		_res_bar.value = p.resource
+	if _subj_bar != null:
+		var clim := maxi(1, world.chain_limit())
+		_subj_bar.max_value = clim
+		_subj_bar.value = world.subjugation
+		_subj_bar.visible = world.subjugation > 0
+	if _sphere_icon != null and registry != null:
+		var em := registry.make_atlas_texture(registry.emblem_region("sphere_%d" % clampi(world.depth, 1, 7)))
+		if em != null:
+			_sphere_icon.texture = em
+	var hp_col := Palette.color_for_mode(Palette.GOOD if p.hp * 2 > mx else (Palette.FALSE_SUN if p.hp * 4 > mx else Palette.ALERT), "good" if p.hp * 2 > mx else "danger", settings.color_mode, settings.high_contrast)
 	var t: PackedStringArray = []
 	t.append("[b][color=#%s]%s[/color][/b]" % [Palette.LUX.to_html(false), _escape(p.name)])
 	t.append("%s %s, level %d" % [db.get_def("species", p.species_id)["name"], db.get_def("classes", p.class_id)["name"], p.level])
@@ -1496,7 +1678,13 @@ func _show_atlas() -> void:
 		var visited_s := world.visited_floors.has(sid)
 		var here_s := world.floor_id == sid
 		var s_line := "Sphere %d (%s): %s%s" % [d, sphere, String(sdef["name"]) if visited_s or d <= world.max_sphere_reached else "???", "  [HERE]" if here_s else ""]
-		col.add_child(_label(s_line, Palette.LUX if here_s else (Palette.TEXT if visited_s else Palette.TEXT_DIM), 0.92))
+		var srow := HBoxContainer.new()
+		srow.add_theme_constant_override("separation", 8)
+		var sem := _emblem_rect("sphere_%d" % d, 24.0 * settings.text_scale())
+		if sem != null:
+			srow.add_child(sem)
+		srow.add_child(_label(s_line, Palette.LUX if here_s else (Palette.TEXT if visited_s else Palette.TEXT_DIM), 0.92))
+		col.add_child(srow)
 		for pt in world.atlas.get(sid, []):
 			var bid := String(pt.get("target", ""))
 			if bid == "":
@@ -1529,12 +1717,20 @@ func _show_people() -> void:
 	for fid in db.ids("factions"):
 		var fdef := db.get_def("factions", fid)
 		var pole := world.faction_pole_of(fid)
-		var leaning := "Uncommitted (%s vs %s)" % [String(fdef["pole_a_label"]), String(fdef["pole_b_label"])]
+		var leaning := "[ %s  ◀═══▶  %s ]" % [String(fdef["pole_a_label"]), String(fdef["pole_b_label"])]
 		if pole == String(fdef["pole_a"]):
-			leaning = "Leaning: " + String(fdef["pole_a_label"])
+			leaning = "▶ %s  (vs %s)" % [String(fdef["pole_a_label"]), String(fdef["pole_b_label"])]
 		elif pole == String(fdef["pole_b"]):
-			leaning = "Leaning: " + String(fdef["pole_b_label"])
-		col.add_child(_label("  %s — %s" % [String(fdef["name"]), leaning], Palette.TEXT if pole != "" else Palette.TEXT_DIM, 0.84))
+			leaning = "%s  ◀ (vs %s)" % [String(fdef["pole_b_label"]), String(fdef["pole_a_label"])]
+		var frow := HBoxContainer.new()
+		frow.add_theme_constant_override("separation", 8)
+		var fem := _emblem_rect("faction:" + fid, 28.0 * settings.text_scale())
+		if fem != null:
+			frow.add_child(fem)
+		var flbl := _label("%s — %s" % [String(fdef["name"]), leaning], Palette.TEXT if pole != "" else Palette.TEXT_DIM, 0.84)
+		flbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		frow.add_child(flbl)
+		col.add_child(frow)
 	col.add_child(_label("Met below (%d/%d known):" % [world.npcs_met.size(), db.ids("npcs").size()], Palette.GOLD, 0.88))
 	if world.npcs_met.is_empty():
 		col.add_child(_label("  No recurring figures spoken with yet.", Palette.TEXT_DIM, 0.82))
@@ -1543,7 +1739,13 @@ func _show_people() -> void:
 			if db.has("npcs", nid):
 				var ndef := db.get_def("npcs", nid)
 				var st := world.npc_standing_of(nid)
-				col.add_child(_label("  %s (%s) — standing %+d" % [String(ndef["name"]), String(ndef["role"]), st], Palette.TEXT, 0.82))
+				var nrow := HBoxContainer.new()
+				nrow.add_theme_constant_override("separation", 8)
+				var nsp := _sprite_rect(registry.npc_region(nid), 24.0 * settings.text_scale()) if registry != null else null
+				if nsp != null:
+					nrow.add_child(nsp)
+				nrow.add_child(_label("%s (%s) — standing %+d" % [String(ndef["name"]), String(ndef["role"]), st], Palette.TEXT, 0.82))
+				col.add_child(nrow)
 	var close := _btn("Close", _close_overlay)
 	col.add_child(close)
 	close.call_deferred("grab_focus")
@@ -1736,6 +1938,9 @@ func _show_settings(back: Callable) -> void:
 		settings.touch_controls = not settings.touch_controls
 		rebuild.call())
 	col.add_child(touch)
+	col.add_child(_btn("Left-handed layout: %s" % ("on" if settings.left_handed else "off"), func() -> void:
+		settings.left_handed = not settings.left_handed
+		rebuild.call()))
 	col.add_child(_btn("Auto-explore and travel: %s" % ("instant" if settings.instant_auto else "animated"), func() -> void:
 		settings.instant_auto = not settings.instant_auto
 		rebuild.call()))
@@ -1897,14 +2102,21 @@ func _fill_carried(box: VBoxContainer) -> Button:
 	for i in view:
 		var it := p.inventory[i]
 		var idx: int = i
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		var icon := _sprite_rect(registry.item_region(it, db), 28.0 * settings.text_scale()) if registry != null else null
+		if icon != null:
+			row.add_child(icon)
 		var b := _btn(world.item_name(it), func() -> void: _show_item(it, idx, ""))
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		var tint := Color(it.effective_color(db)) if world.is_item_identified(it) else Color(String(it.def(db)["color"]))
 		b.add_theme_color_override("font_color", tint.lerp(Palette.TEXT, 0.35))
 		var cmp := Assist.compare_item(world, it)
 		if String(cmp["slot"]) != "" and not bool(cmp["unknown"]):
 			b.tooltip_text = "vs %s: %s" % [String(cmp["equipped"]) if String(cmp["equipped"]) != "" else "nothing", ", ".join(cmp["lines"])]
-		box.add_child(b)
+		row.add_child(b)
+		box.add_child(row)
 		if first == null:
 			first = b
 	return first
@@ -1971,8 +2183,18 @@ func _show_item(it: Item, index: int, slot: String) -> void:
 	var d := it.def(db)
 	var shown := world.item_name(it).capitalize()
 	var col := _open_overlay(shown, Color(it.effective_color(db)).lerp(Palette.TEXT, 0.3))
-	var desc_txt := String(d["description"]) if world.is_item_identified(it) else "An unfamiliar article. Its properties are hidden until tested or witnessed."
-	col.add_child(_label(desc_txt, Palette.TEXT_DIM))
+	var sp := _sprite_rect(registry.item_region(it, db), 44.0 * settings.text_scale()) if registry != null else null
+	if sp != null:
+		var row_top := HBoxContainer.new()
+		row_top.add_theme_constant_override("separation", 10)
+		row_top.add_child(sp)
+		var desc_lbl := _label(String(d["description"]) if world.is_item_identified(it) else "An unfamiliar article. Its properties are hidden until tested or witnessed.", Palette.TEXT_DIM)
+		desc_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row_top.add_child(desc_lbl)
+		col.add_child(row_top)
+	else:
+		var desc_txt := String(d["description"]) if world.is_item_identified(it) else "An unfamiliar article. Its properties are hidden until tested or witnessed."
+		col.add_child(_label(desc_txt, Palette.TEXT_DIM))
 	col.add_child(_label(_item_stats(it), Palette.RECORD, 0.9))
 	if slot == "" and Assist.slot_of(world, it) != "":
 		var cmp := Assist.compare_item(world, it)
@@ -2049,6 +2271,22 @@ func _show_end() -> void:
 	var title_col := (Palette.FALSE_SUN if String(vic.get("id", "")) == "by_decree" else Palette.GOOD) if won else Palette.ALERT
 	var col := _open_overlay(title, title_col)
 	screen = Screen.END
+	var end_emblem := "unwritten_door"
+	if won:
+		var vid := String(vic.get("id", ""))
+		if vid == "by_decree":
+			end_emblem = "by_decree"
+		elif vid == "serpent":
+			end_emblem = "way_serpent"
+		elif vid == "return":
+			end_emblem = "way_return"
+	else:
+		end_emblem = "loss_" + String(loss.get("id", "catalogued"))
+	var eimg := _emblem_rect(end_emblem, 64.0 * settings.text_scale())
+	if eimg != null:
+		var ec := CenterContainer.new()
+		ec.add_child(eimg)
+		col.add_child(ec)
 	var p := world.player
 	var fd := world.current_floor_def()
 	if won:

@@ -110,7 +110,10 @@ Spec: `docs/M8_SPEC.md`.
 - **M8.4 Inhabitants, Relics & the Material World (complete, verified locally):**
   - Expanded `tools/gen_sprites.py` and `AssetRegistry` to generate and map 13 atlases with 100% content coverage: 8 Origins + 8 Callings + 5 Masks (`assets/sprites/avatars.png`), 86 monsters + 15 bespoke bosses (`assets/sprites/monsters.png`), 18 distinct NPCs (`assets/sprites/npcs.png`), 165 items + 16 bespoke relics + 26 unique artifact treatments (`assets/sprites/items.png`), 16x16 icons for 51 statuses / 24 talent trees / 8 elite mutations / Eight Chains / 4 contracts (`assets/sprites/icons.png`), and 64x64 woodcut emblems for Title / 7 Spheres / 8 Institutions / Endings / Named Losses (`assets/portraits/emblems.png`).
   - Created `docs/ASSET_REGISTRY.md` and `tests/test_m8_assets.gd`; all asset rects and provenance metadata (`content/presentation/asset_provenance.json`) validated (`test_m8_assets` 3/3, 65 checks; `test_m8_renderer` 4/4, 182 checks).
-- **Next submilestone:** M8.5 — The Sovereign Interface (cohesive mobile-first & keyboard-complete UI overhaul across all 20 screens/overlays).
+- **M8.5 The Sovereign Interface (complete, verified locally):**
+  - Refined `src/ui/main.gd` with occult-medieval theme borders & high-contrast support, Title crest emblem, live layered Character Creation avatar preview, progressive-disclosure HP/Resource/Subjugation progress bars + Sphere emblem + quick `Tiles/Glyph` & `Z-/Z+` controls, responsive landscape (`1280x720`, `2340x1080`) and portrait (`720x1280`) layouts with safe-area padding and left/right-handed touch option, item sprites in Inventory & Item Inspection, institution emblems + two-pole bars + NPC sprites in People, Sphere emblems in Atlas, and Ending/Named Loss emblems on End screen.
+  - Verified `tools/ui_smoke.gd` (`39` steps, `0` failures at `1280x720`, `2340x1080`, and `720x1280`) and full `./tools/test.sh` (`203` tests, `203` passed, `4623` checks).
+- **Next submilestone:** M8.6 — Motion, Impact and Feedback (`World.events` non-serialized presentation stream, `VfxLayer`, configurable animation/reduced-motion settings, `tests/test_m8_vfx.gd`).
 
 ## Owner decisions still open
 
