@@ -29,6 +29,8 @@ var screen_shake: bool = true
 var particles: bool = true
 var floating_text: bool = true
 var flash_intensity: float = 0.6
+## M8.9 narrative & accessibility presentation toggle.
+var narrative_banners: bool = true
 ## M8.7 audio & liturgical soundscape preferences.
 var audio_enabled: bool = true
 var vol_master: float = 0.85
@@ -150,6 +152,7 @@ func load_from_disk() -> void:
 	color_mode = clampi(int(cfg.get_value("accessibility", "color_mode", color_mode)), 0, COLOR_MODES.size() - 1)
 	high_contrast = bool(cfg.get_value("accessibility", "high_contrast", high_contrast))
 	left_handed = bool(cfg.get_value("accessibility", "left_handed", left_handed))
+	narrative_banners = bool(cfg.get_value("accessibility", "narrative_banners", narrative_banners))
 	anim_speed = clampf(float(cfg.get_value("motion", "anim_speed", anim_speed)), 0.5, 2.0)
 	instant_actions = bool(cfg.get_value("motion", "instant_actions", instant_actions))
 	reduced_motion = bool(cfg.get_value("motion", "reduced_motion", reduced_motion))
@@ -205,6 +208,7 @@ func save_to_disk() -> void:
 	cfg.set_value("accessibility", "color_mode", color_mode)
 	cfg.set_value("accessibility", "high_contrast", high_contrast)
 	cfg.set_value("accessibility", "left_handed", left_handed)
+	cfg.set_value("accessibility", "narrative_banners", narrative_banners)
 	cfg.set_value("motion", "anim_speed", anim_speed)
 	cfg.set_value("motion", "instant_actions", instant_actions)
 	cfg.set_value("motion", "reduced_motion", reduced_motion)

@@ -127,7 +127,11 @@ Spec: `docs/M8_SPEC.md`.
   - Extended `tools/gen_audio.py` to synthesize 16 seamless placeholder liturgical organ/bell stems (`assets/audio/music/*.ogg`) and record provenance in `content/presentation/asset_provenance.json`.
   - Extended `src/ui/audio_manager.gd` with `play_music_context()` + dual-deck crossfading and wired contextual transitions into `src/ui/main.gd`.
   - Added `tests/test_m8_audio.gd` and verified `test_m8_audio`, `test_m8_assets`, and `tools/ui_smoke.gd`.
-- **Next submilestone:** M8.9 — Narrative Presentation & Accessibility (`content/presentation/narrative_frames.json`, skippable Opening Descent / Sphere Transition / Boss Sighting framing, accessible presentation toggle).
+- **M8.9 Narrative Presentation & Accessibility (complete, verified locally):**
+  - Created `content/presentation/narrative_frames.json` (`localization_ready: true`, `loc_key` keys for Opening Descent, all 7 Spheres, Boss Sightings, Gate Threshold, Contract Pact, and Mask Aspect, preserving Canon tagging without promoting `Proposed` lore) and `src/ui/narrative_frames.gd` (`NarrativeFrames`).
+  - Added non-blocking, click/tap-dismissible, reduced-motion-safe Opening Descent, Sphere Transition, and Boss Sighting framing banners plus Gate/Mask atmospheric framing and the `Narrative framing: on/off` preference (`GameSettings.narrative_banners`) in `src/ui/main.gd`.
+  - Added `tests/test_m8_narrative.gd` and verified `test_m8_narrative`, `test_m7_settings`, and `tools/ui_smoke.gd`.
+- **Next submilestone:** M8.10 — Performance, Portability & Internal Beta Gate (asset packaging hygiene, performance/memory benchmark, multi-viewport screenshots & mode smoke, full test suite, fresh dev soak, 4-target exports, `docs/M8_REPORT.md`).
 
 ## Owner decisions still open
 

@@ -1,0 +1,84 @@
+{
+  "schema": "narrative_frames",
+  "version": 1,
+  "localization_ready": true,
+  "canon_policy": "Frames reflect existing Canon and Canon-derived core content without promoting Proposed entities.",
+  "opening_descent": {
+    "loc_key": "frame.opening_descent",
+    "title": "THE DESCENT BENEATH TERRA TENEBRAE",
+    "subtitle": "Eight chains bind the threshold; only the Seal remembers how they were forged.",
+    "dismiss_hint": "Click, tap, or press any key to dismiss",
+    "canon_status": "Canon-derived"
+  },
+  "spheres": {
+    "1": {
+      "loc_key": "frame.sphere.moon",
+      "sphere_id": "moon",
+      "title": "SPHERE I — MOON: THE OSSUARY WARRENS",
+      "subtitle": "Damp vaults of unreckoned dead, tallow smoke, and damp bone ledgers.",
+      "canon_status": "Canon-derived"
+    },
+    "2": {
+      "loc_key": "frame.sphere.mercury",
+      "sphere_id": "mercury",
+      "title": "SPHERE II — MERCURY: THE TITHE VAULTS",
+      "subtitle": "Brass balances, sealed debt-rolls, and clockwork ledgers that never close.",
+      "canon_status": "Canon-derived"
+    },
+    "3": {
+      "loc_key": "frame.sphere.venus",
+      "sphere_id": "venus",
+      "title": "SPHERE III — VENUS: THE GILDED CHOIR",
+      "subtitle": "Tarnished velvet, gilded reliquaries, and devotion polished into a snare.",
+      "canon_status": "Canon-derived"
+    },
+    "4": {
+      "loc_key": "frame.sphere.sun",
+      "sphere_id": "sun",
+      "title": "SPHERE IV — SUN: THE FALSE SOLAR COURT",
+      "subtitle": "Mirror-chambers of cold radiance where counterfeit crowns demand worship.",
+      "canon_status": "Canon-derived"
+    },
+    "5": {
+      "loc_key": "frame.sphere.mars",
+      "sphere_id": "mars",
+      "title": "SPHERE V — MARS: THE IRON SCRIPTORIUM",
+      "subtitle": "Chain-forges and punitive tablets where law is hammered hot into bone.",
+      "canon_status": "Canon-derived"
+    },
+    "6": {
+      "loc_key": "frame.sphere.jupiter",
+      "sphere_id": "jupiter",
+      "title": "SPHERE VI — JUPITER: THE CHAMBER OF DECREES",
+      "subtitle": "High porphyry benches and imperial seals over an older, conquered covenant.",
+      "canon_status": "Canon-derived"
+    },
+    "7": {
+      "loc_key": "frame.sphere.saturn",
+      "sphere_id": "saturn",
+      "title": "SPHERE VII — SATURN: THE SEALED STAIR",
+      "subtitle": "Black ashlar silence and the final threshold before the Unwritten Door.",
+      "canon_status": "Canon-derived"
+    }
+  },
+  "boss_sighting": {
+    "loc_key": "frame.boss_sighting",
+    "kicker": "ADVERSARY AT THE SEAL",
+    "dismiss_hint": "Tap or press any action to continue"
+  },
+  "gate_threshold": {
+    "loc_key": "frame.gate_threshold",
+    "title": "SPHERE GATE THRESHOLD",
+    "subtitle": "Below each seal lies harder metal, older ink, and fewer painless exits."
+  },
+  "contract_pact": {
+    "loc_key": "frame.contract_pact",
+    "title": "SEALED OBLIGATION",
+    "subtitle": "An oath inscribed in the Vaults counts as weight on both scales."
+  },
+  "mask_aspect": {
+    "loc_key": "frame.mask_aspect",
+    "title": "FACES OF THE TRIAD",
+    "subtitle": "Nyx, Eris, and Lilith answer when called — yet every Mask remembers who wore it."
+  }
+}

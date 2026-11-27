@@ -11,6 +11,7 @@ enum Screen { TITLE, CREATE, GAME, END, ERROR }
 var db: ContentDB
 var settings := GameSettings.new()
 var registry := AssetRegistry.new()
+var frames := NarrativeFrames.new()
 var codex := Codex.new()
 var audio: AudioManager
 var world: World
@@ -24,6 +25,10 @@ var _res_bar: ProgressBar
 var _subj_bar: ProgressBar
 var _sphere_icon: TextureRect
 var _render_btn: Button
+var _banner: PanelContainer
+var _banner_ttl: float = 0.0
+var _seen_spheres: Dictionary = {}
+var _seen_bosses: Dictionary = {}
 var log_view: RichTextLabel
 var look_label: Label
 var overlay: Control
@@ -61,6 +66,7 @@ func _ready() -> void:
 	audio.apply_settings(settings)
 	codex = CodexIO.load_codex()
 	db = ContentDB.load_default()
+	frames.load_default()
 	_apply_theme()
 	if not db.is_valid():
 		_show_error("The content pack failed validation:", db.errors)
@@ -228,6 +234,8 @@ func _clear() -> void:
 	_subj_bar = null
 	_sphere_icon = null
 	_render_btn = null
+	_banner = null
+	_banner_ttl = 0.0
 	log_view = null
 	look_label = null
 	overlay = null
@@ -486,6 +494,66 @@ func _start_game(w: World) -> void:
 	SaveIO.save(world)
 	_build_game_screen()
 	_sync_audio_context()
+	_seen_spheres.clear()
+	_seen_bosses.clear()
+	var sp := clampi(int(world.current_floor_def().get("sphere", 1)), 1, 7)
+	_seen_spheres[sp] = true
+	if world.turns == 0:
+		var op := frames.opening_frame()
+		if not op.is_empty():
+			_show_banner("ABYSSAL SOVEREIGN", String(op.get("title", "")), String(op.get("subtitle", "")), "sphere_%d" % sp, Palette.LUX)
+	else:
+		var sf := frames.sphere_frame(sp)
+		if not sf.is_empty():
+			_show_banner("SPHERE %d" % sp, String(sf.get("title", "")), String(sf.get("subtitle", "")), "sphere_%d" % sp, Palette.FALSE_SUN)
+
+
+func _dismiss_banner() -> void:
+	if _banner != null and is_instance_valid(_banner):
+		_banner.queue_free()
+	_banner = null
+	_banner_ttl = 0.0
+
+
+func _show_banner(kicker: String, title: String, subtitle: String, emblem_id: String = "", accent: Color = Palette.FALSE_SUN) -> void:
+	if not settings.narrative_banners or screen != Screen.GAME:
+		return
+	_dismiss_banner()
+	var s := settings.text_scale()
+	var pc := PanelContainer.new()
+	pc.z_index = 50
+	pc.anchor_left = 0.16
+	pc.anchor_right = 0.84
+	pc.anchor_top = 0.02
+	pc.anchor_bottom = 0.02
+	pc.offset_bottom = 84.0 * s
+	pc.mouse_filter = Control.MOUSE_FILTER_STOP
+	pc.add_theme_stylebox_override("panel", _box(Color(Palette.PORPHYRY, 0.94), accent))
+	pc.gui_input.connect(func(ev: InputEvent) -> void:
+		if ev is InputEventMouseButton and ev.is_pressed():
+			_dismiss_banner())
+	var hb := HBoxContainer.new()
+	hb.add_theme_constant_override("separation", int(10 * s))
+	if not emblem_id.is_empty():
+		var emb := _emblem_rect(emblem_id, 40.0 * s)
+		if emb != null:
+			hb.add_child(emb)
+	var vb := VBoxContainer.new()
+	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vb.add_theme_constant_override("separation", 2)
+	var row_top := HBoxContainer.new()
+	var kl := _label(kicker, accent, 0.72)
+	kl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row_top.add_child(kl)
+	row_top.add_child(_label("Click/tap to dismiss", Palette.TEXT_DIM, 0.68))
+	vb.add_child(row_top)
+	vb.add_child(_label(title, Palette.TEXT, 0.95))
+	vb.add_child(_label(subtitle, Palette.LORE, 0.78))
+	hb.add_child(vb)
+	pc.add_child(hb)
+	add_child(pc)
+	_banner = pc
+	_banner_ttl = 4.5
 
 
 func _build_game_screen() -> void:
@@ -867,6 +935,21 @@ func _after_action() -> void:
 		_last_depth = world.depth
 		_last_floor_id = world.floor_id
 		_autosave()
+	if _banner != null and _banner_ttl < 3.5:
+		_dismiss_banner()
+	var sp := clampi(int(world.current_floor_def().get("sphere", 1)), 1, 7)
+	if not _seen_spheres.has(sp):
+		_seen_spheres[sp] = true
+		var sf := frames.sphere_frame(sp)
+		if not sf.is_empty():
+			_show_banner("SPHERE %d" % sp, String(sf.get("title", "")), String(sf.get("subtitle", "")), "sphere_%d" % sp, Palette.FALSE_SUN)
+	else:
+		for foe in world.visible_hostiles():
+			if foe.is_boss and not _seen_bosses.has(foe.template_id):
+				_seen_bosses[foe.template_id] = true
+				var mdef: Dictionary = db.get_def("monsters", foe.template_id)
+				_show_banner(frames.boss_kicker(), foe.name, String(mdef.get("desc", "Guardian of the Seal.")), "", Palette.ALERT)
+				break
 	_refresh()
 
 
@@ -1182,6 +1265,12 @@ func _on_tile_tapped(p: Vector2i) -> void:
 
 
 func _process(delta: float) -> void:
+	if _banner != null:
+		_banner_ttl -= delta
+		if _banner_ttl <= 0.0:
+			_dismiss_banner()
+		elif not settings.reduced_motion and _banner_ttl < 0.6 and is_instance_valid(_banner):
+			_banner.modulate.a = clampf(_banner_ttl / 0.6, 0.0, 1.0)
 	if not auto.is_empty() and screen == Screen.GAME and overlay == null:
 		_auto_clock += delta
 		var step_every := 1.0 / float(settings.travel_speed)
@@ -1638,6 +1727,9 @@ func _show_gate() -> void:
 		next_fd = db.floor_for_depth(world.depth + 1)
 	var sphere := String(next_fd.get("sphere", "the next sphere"))
 	var col := _open_overlay("Sphere Gate: %s" % sphere, Palette.FALSE_SUN)
+	var gf: Dictionary = frames.data.get("gate_threshold", {})
+	if not gf.is_empty():
+		col.add_child(_label(String(gf.get("subtitle", "")), Palette.LORE, 0.82))
 	if settings.warn_descent:
 		for line in Assist.descent_warnings(world):
 			col.add_child(_label("Advisory: " + line, Palette.FALSE_SUN, 0.85))
@@ -1668,6 +1760,9 @@ func _show_masks() -> void:
 	if not world.player.has_trait("mask_stances") or overlay != null:
 		return
 	var col := _open_overlay("Masks (risk %d/%d)" % [world.player.mask_risk, World.MASK_RISK_MAX])
+	var mf: Dictionary = frames.data.get("mask_aspect", {})
+	if not mf.is_empty():
+		col.add_child(_label(String(mf.get("subtitle", "")), Palette.LORE, 0.82))
 	for mid in Masks.ORDER:
 		var active := world.player.mask == mid
 		var title := "%s (worn)" % Masks.label(mid) if active else Masks.label(mid)
@@ -1702,6 +1797,7 @@ func _show_masks() -> void:
 
 ## A modal panel over the game screen. Returns the column to fill.
 func _open_overlay(title: String, title_color: Color = Palette.LUX) -> VBoxContainer:
+	_dismiss_banner()
 	_close_overlay()
 	travel.clear()
 	auto.clear()
@@ -2008,6 +2104,9 @@ func _show_settings(back: Callable) -> void:
 	col.add_child(_btn("High contrast: %s" % ("on" if settings.high_contrast else "off"), func() -> void:
 		settings.high_contrast = not settings.high_contrast
 		_sync_map_settings()
+		rebuild.call()))
+	col.add_child(_btn("Narrative framing: %s" % ("on" if settings.narrative_banners else "off"), func() -> void:
+		settings.narrative_banners = not settings.narrative_banners
 		rebuild.call()))
 	col.add_child(_stepper("Animation speed", "%.1fx" % settings.anim_speed,
 		func(d: int) -> void:
