@@ -3,7 +3,7 @@
   "version": 1,
   "entries": [
     {"id": "initiate", "name": "Initiate", "order": 0, "description": "A gentler descent for learning the Abyss. Fewer foes, fewer elites, extra healing and an extra salve to start. Death is still permanent.", "monsters_delta": -1, "group_pct": 55, "elite_delta": -1, "items_delta": 1, "heal_weight_pct": 160, "start_salves": 1},
-    {"id": "exile", "name": "Exile", "order": 1, "description": "The standard descent: the balance every earlier version shipped with.", "monsters_delta": 0, "group_pct": 75, "elite_delta": 0, "items_delta": 0, "heal_weight_pct": 100, "start_salves": 0},
+    {"id": "exile", "name": "Exile", "order": 1, "description": "The standard descent beneath Terra Tenebrae. Balanced encounters, supplies, and pressure as authored. Death is permanent.", "monsters_delta": 0, "group_pct": 75, "elite_delta": 0, "items_delta": 0, "heal_weight_pct": 100, "start_salves": 0},
     {"id": "adversary", "name": "Adversary", "order": 2, "description": "More foes arrive in tighter squads and one more elite walks each deeper floor. Loot and starting kit are unchanged.", "monsters_delta": 1, "group_pct": 85, "elite_delta": 1, "items_delta": 0, "heal_weight_pct": 100, "start_salves": 0},
     {"id": "sovereign", "name": "Sovereign", "order": 3, "description": "The Abyss presses. Larger, tighter squads, an extra elite, scarcer healing and one fewer starting salve. Plan routes and spend carefully.", "monsters_delta": 2, "group_pct": 90, "elite_delta": 1, "items_delta": -1, "heal_weight_pct": 70, "start_salves": -1}
   ]

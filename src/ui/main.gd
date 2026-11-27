@@ -5,6 +5,7 @@ extends Control
 
 const AUTOSAVE_EVERY_TURNS := 20
 const LOG_LINES := 7
+const APP_VERSION := "1.0.0-rc.1"
 
 enum Screen { TITLE, CREATE, GAME, END, ERROR }
 
@@ -356,7 +357,7 @@ func _show_title() -> void:
 	if not OS.has_feature("web"):
 		col.add_child(_btn("Quit", func() -> void: get_tree().quit()))
 	var mode_tag := "Tiles 32x32" if settings.render_mode == "tiles" else "Classic Glyph"
-	var foot := _label("Set in the world of FALSE LIGHT. M8 Incarnation (%s)" % mode_tag, Palette.TEXT_DIM, 0.75)
+	var foot := _label("Set in the world of FALSE LIGHT · v%s (%s)" % [APP_VERSION, mode_tag], Palette.TEXT_DIM, 0.75)
 	foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(foot)
 
@@ -521,9 +522,18 @@ func _describe_choice(kind: String, id: String) -> String:
 	for t in d.get("traits", []):
 		parts.append("%s: %s" % [String(t).capitalize(), Traits.describe(String(t))])
 	if kind == "classes":
-		var gear: PackedStringArray = []
+		var gear_counts := {}
+		var gear_order: Array[String] = []
 		for g in d.get("starting_equipment", []) + d.get("starting_items", []):
-			gear.append(String(db.get_def("items", String(g))["name"]))
+			var gname := String(db.get_def("items", String(g))["name"])
+			if not gear_counts.has(gname):
+				gear_counts[gname] = 0
+				gear_order.append(gname)
+			gear_counts[gname] = int(gear_counts[gname]) + 1
+		var gear: PackedStringArray = []
+		for gn in gear_order:
+			var cnt := int(gear_counts[gn])
+			gear.append("%d× %s" % [cnt, gn] if cnt > 1 else gn)
 		parts.append("Carries: " + ", ".join(gear))
 		if String(d.get("signature_tree", "")) != "":
 			parts.append("Built around the %s tree." % String(d["signature_tree"]))
@@ -1240,7 +1250,7 @@ func _after_action() -> void:
 			if (foe.tags.has("boss") or foe.unique) and not _seen_bosses.has(foe.template_id):
 				_seen_bosses[foe.template_id] = true
 				var mdef: Dictionary = db.get_def("monsters", foe.template_id)
-				_show_banner(frames.boss_kicker(), foe.name, String(mdef.get("desc", "Guardian of the Seal.")), "", Palette.ALERT)
+				_show_banner(frames.boss_kicker(), foe.name, String(mdef.get("description", "Guardian of the Seal.")), "boss_seal", Palette.ALERT)
 				break
 	_refresh()
 
@@ -2905,10 +2915,17 @@ func _show_end() -> void:
 	else:
 		col.add_child(_label(String(loss["epitaph"]), Palette.LORE))
 		col.add_child(_label("Slain by %s in %s." % [world.death_cause, fd.get("name", "the dark")], Palette.TEXT))
-	col.add_child(_label("%s, %s %s, level %d. %d turns. Seed %d." % [p.name.left(1).to_upper() + p.name.substr(1), db.get_def("species", p.species_id)["name"],
-		db.get_def("classes", p.class_id)["name"], p.level, world.turns, world.run_seed], Palette.TEXT_DIM, 0.9))
-	col.add_child(_label("Journey: %d floors visited, %d NPCs met, %d threads settled. Return %d / Serpent %d / Apoth %d." % [
-		world.visited_floors.size(), world.npcs_met.size(), world.resolved_thread_count(), world.way_return, world.way_serpent, world.apotheosis
+	var prof_name := String(Difficulty.profile(db, world.difficulty).get("name", "Exile"))
+	col.add_child(_label("%s, %s %s, level %d (%s). %d turns. Seed %d." % [p.name.left(1).to_upper() + p.name.substr(1), db.get_def("species", p.species_id)["name"],
+		db.get_def("classes", p.class_id)["name"], p.level, prof_name, world.turns, world.run_seed], Palette.TEXT_DIM, 0.9))
+	var fl_n := world.visited_floors.size()
+	var npc_n := world.npcs_met.size()
+	var th_n := world.resolved_thread_count()
+	col.add_child(_label("Journey: %d %s visited, %d %s met, %d %s settled. Return %d / Serpent %d / Apotheosis %d." % [
+		fl_n, "floor" if fl_n == 1 else "floors",
+		npc_n, "NPC" if npc_n == 1 else "NPCs",
+		th_n, "thread" if th_n == 1 else "threads",
+		world.way_return, world.way_serpent, world.apotheosis
 	], Palette.RECORD, 0.85))
 	col.add_child(_label("Death is permanent: this run's save has been erased.", Palette.TEXT_DIM, 0.8) if not won else _label("This run's save has been erased.", Palette.TEXT_DIM, 0.8))
 	var again := _btn("New run", func() -> void:
