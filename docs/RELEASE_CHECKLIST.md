@@ -1,6 +1,6 @@
 # Abyssal Sovereign (`v1.0.0-rc.1`) — Release Candidate Checklist
 
-## 1. Automated Engineering & Build Gates (Verified Locally on `main`)
+## 1. Automated Engineering & Distribution Gates (Verified & Published on `v1.0.0-rc.1`)
 
 - [x] **M9.0 Production Audit:** `docs/M9_SPEC.md` and `docs/M9_DEFECT_REGISTER.md` authored against M8 baseline (`15a98d0`).
 - [x] **P0-1 Packaging Leak Resolved:** `export_presets.cfg` excludes `balance/*,build/*,docs/*,release/*,test-results/*,tests/*,tools/*,content/lore/*,*.md` across Linux, Windows Desktop, Web, and Android; verified zero internal leaks in APK and packages.
@@ -16,7 +16,8 @@
 - [x] **M9.6 Gameplay Integrity & Fresh Validation:** `384` dev runs (`m9dev_prof_*` + `m9dev_matrix`) and `256` held-out validation runs (`salt=m9_rc1_validation`: `219/256` won `85.5%`, `35` dead, `2` capped; `86/86` monsters, `28/28` floors, `24/24` threads, `1,534` Relic Work, `246` Transmute).
 - [x] **M9.8/M9.9 Packaging & Docs:** `project.godot` version & icon, `tools/package_rc.sh`, `tools/verify.sh`, `README.md`, `docs/INSTALL.md`, `docs/PLAYTEST.md`, `docs/release/{PRODUCT_KIT,RELEASE_NOTES,PRIVACY,CREDITS_AND_LICENSES}.md`, `SHA256SUMS.txt` verified.
 - [x] **Multi-Viewport UI Smoke & Linux Binary Launch:** `tools/ui_smoke.gd` passed `39 steps, 0 failures` (0 `ERROR:`, 0 exit leaks) at `1280x720`, `2340x1080`, and `720x1280`; Linux portable binary smoke passed cleanly.
-- [x] **Zero Private Path Leaks:** Verified no personal home-directory paths exist in `README.md`, `docs/INSTALL.md`, `docs/PLAYTEST.md`, or `docs/release/`.
+- [x] **Zero Private Path Leaks:** Verified no personal home-directory paths exist in tracked public/release documentation.
+- [x] **Pushed & Published (`v1.0.0-rc.1` Pre-Release):** Pushed `main` to `origin/main`, pushed annotated tag `v1.0.0-rc.1`, and published the GitHub Pre-Release with all four platform archives + `SHA256SUMS.txt`.
 
 ---
 

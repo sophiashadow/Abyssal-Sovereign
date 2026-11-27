@@ -2,7 +2,7 @@
 
 For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENTS.md` first; its rules win over this file. Update this file at every stop.
 
-## State as of 2026-11-27 (Milestone 9 — The Ascension Pass in progress locally on `main`; M9.0 complete)
+## State as of 2026-11-27 (Milestone 9 complete — `v1.0.0-rc.1` published as GitHub Pre-Release on `main`)
 
 - **Branch:** `main` (default branch on `origin`, github.com/sophiashadow/Abyssal-Sovereign), preserving full commit history from `ccr-c6f8b898-fu2jtp` and `fac51e8`.
 - **Milestones:** M0–M5 (`fac51e8`, Depth Pass complete), **M6 Breadth Pass (M6.1–M6.10 COMPLETE, save v11):**
@@ -181,7 +181,7 @@ Spec: `docs/M8_SPEC.md`.
 
 - Fixed Godot Dummy-driver audio playback leak (`AudioManager._can_output_audio()`) and added Windows numeric `file_version`/`product_version` (`1.0.0.1`) in `export_presets.cfg`.
 - Re-verified full automated gate after the final edit: `./tools/test.sh` -> **`214 tests, 214 passed, 0 failed, 4947 checks, 195.2s`**; `m8_smoke.gd` (`4 combinations passed, RNG invariant -4367008355839543814`); `m8_perf_bench.gd` (`prep_100frames_tile_ms=236.88`, `save_bytes=66743`, `valid_reload=true`); `ui_smoke.gd` at `1280x720`, `2340x1080`, and `720x1280` (`39 steps, 0 failures`, 0 exit leaks, screenshots visually inspected); `./tools/package_rc.sh v1.0.0-rc.1` (`SHA256SUMS.txt` verified); Linux exported binary launch (`--quit-after 30` exited 0, 0 leaks).
-- Authored `docs/M9_REPORT.md`, `docs/RELEASE_CHECKLIST.md`, and updated `ROADMAP.md`. Milestone 9 (`v1.0.0-rc.1`) is complete locally on `main` and awaits explicit owner authorization and external human/hardware gates (`docs/RELEASE_CHECKLIST.md`).
+- Authored `docs/M9_REPORT.md`, `docs/RELEASE_CHECKLIST.md`, and updated `ROADMAP.md`. Milestone 9 (`v1.0.0-rc.1`) is pushed to `origin/main` and published as a GitHub pre-release (`https://github.com/sophiashadow/Abyssal-Sovereign/releases/tag/v1.0.0-rc.1`); external human/hardware gates remain open (`docs/RELEASE_CHECKLIST.md`).
 
 ## Do not
 

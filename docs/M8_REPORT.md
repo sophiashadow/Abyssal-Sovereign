@@ -1,6 +1,7 @@
 # Milestone 8 — The Incarnation Pass Report
 
-**Status:** Complete locally on `main` (M8.0–M8.10; commits `aef17e4`..`26e7bc6` + M8.10 closure). **No human playtest has been run yet (`docs/PLAYTEST.md`)**, and physical Android / Windows / Web runtimes remain `NOT_RUN` (awaiting owner testing and release authorization).
+**Status:** Complete on `main` (M8.0–M8.10; commits `aef17e4`..`26e7bc6` + `15a98d0`).  
+> *Historical Milestone 8 report — superseded by [docs/M9_REPORT.md](M9_REPORT.md) (`v1.0.0-rc.1`).*
 
 **Baseline preserved:** M7 reference checkpoint `c6379ab` (8 origins, 8 callings, 104 talents across 24 trees, 28 floors across Seven Spheres, 76 monsters + 15 bosses = 86 monster entries, 165 base items, 46 affixes, 12 sets, 26 artifacts, 16 relics, 18 NPCs, 8 institutions, 24 threads, 4 descent profiles, `World.SAVE_VERSION := 12`, backward-compatible v1–v12 save migrations).
 
@@ -72,7 +73,7 @@ Ran `tools/m7_soak.gd -- --set=dev --salt=m8_final_check --seeds=1 --policies=ba
 
 - Every sprite atlas (13), SFX file (24), Sphere ambient loop (7), and liturgical music stem (16) is deterministically generated in-repo by `tools/gen_sprites.py` and `tools/gen_audio.py` and recorded in `content/presentation/asset_provenance.json` (`asset_id`, `path`, `source`, `author_or_method`, `license_status`, `approval_status`, `associated_entities`, `modification_history`).
 - All visual/SFX/ambient assets carry `approval_status: "provisional_m8_asset"` (`license_status: "project-original-cc0-equivalent"`); all 16 liturgical music stems carry `approval_status: "placeholder_liturgical_temp"` (`license_status: "project-original-placeholder"`) and can be replaced individually by external authorized VENEFICA LUX recordings via `content/presentation/soundtrack_manifest.json` without touching engine code.
-- No files were imported from `/home/lux/Music/VENEFICA STUDIO`, `/home/lux/Pics`, FALSE LIGHT, or Sovereign-Ops.
+- No files were imported from external private music/image directories, FALSE LIGHT, or Sovereign-Ops.
 
 ---
 

@@ -5,7 +5,9 @@ No human participant has yet played M5, M6, M7, M8, or M9 (`v1.0.0-rc.1`). All r
 
 ---
 
-## 1. Platform Support & Installation (`v1.0.0-rc.1`)
+## 1. Downloads, Platform Support & Installation (`v1.0.0-rc.1`)
+
+Download pre-release builds and `SHA256SUMS.txt` from [**GitHub Releases (`v1.0.0-rc.1`)**](https://github.com/sophiashadow/Abyssal-Sovereign/releases/tag/v1.0.0-rc.1).
 
 | Platform | Package / Binary | Verification Status | Launch & Install |
 |---|---|---|---|
@@ -73,7 +75,7 @@ Rebindable shortcuts can be customized in **Settings -> Shortcuts**. Movement, w
 
 ## 5. Bug-Reporting Instructions
 
-When filing a playtest bug report or crash note, please include:
+When filing a playtest bug report or feedback note on [**GitHub Issues**](https://github.com/sophiashadow/Abyssal-Sovereign/issues), please include:
 
 1. **Version & Package:** e.g. `v1.0.0-rc.1 (Linux portable)` or `(Android debug APK)`
 2. **Seed & Descent Setup:** Run Seed (shown in HUD / Character sheet / Death summary), Difficulty Profile (`Initiate` / `Exile` / `Adversary` / `Sovereign`), Origin & Calling

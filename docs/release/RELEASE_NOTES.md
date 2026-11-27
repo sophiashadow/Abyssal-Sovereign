@@ -1,6 +1,7 @@
 # Abyssal Sovereign — Release Notes (`v1.0.0-rc.1`)
 
 **Milestone:** M9 — The Ascension Pass (`v1.0.0-rc.1`)  
+**Repository & Pre-Release:** https://github.com/sophiashadow/Abyssal-Sovereign/releases/tag/v1.0.0-rc.1  
 **Engine:** Godot `4.7.2.stable` (`GL Compatibility`)  
 **Save Compatibility:** `SAVE_VERSION := 12` (automatic migration intact for `v1`–`v12`)
 

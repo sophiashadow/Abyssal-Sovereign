@@ -1,5 +1,6 @@
 # Abyssal Sovereign — Installation, Save Management & Distribution Guide (`v1.0.0-rc.1`)
 
+Download official pre-release archives and `SHA256SUMS.txt` from the [GitHub Releases page (`v1.0.0-rc.1`)](https://github.com/sophiashadow/Abyssal-Sovereign/releases/tag/v1.0.0-rc.1).  
 Abyssal Sovereign runs **100% offline** with zero external network requests, zero telemetry, zero advertising, and zero accounts.
 
 ---

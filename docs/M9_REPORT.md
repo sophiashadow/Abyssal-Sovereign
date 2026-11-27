@@ -2,7 +2,7 @@
 
 **Milestone:** M9 — The Ascension Pass (`v1.0.0-rc.1`)  
 **Starting Checkpoint:** `15a98d0` (M8 completion)  
-**Target Branch:** `main` (local commits only — nothing pushed, tagged, merged, or released)  
+**Target Branch & Publication:** `main` (`origin/main` + GitHub pre-release `https://github.com/sophiashadow/Abyssal-Sovereign/releases/tag/v1.0.0-rc.1`)  
 **Save Schema Compatibility:** `World.SAVE_VERSION := 12` (`v1`–`v12` automatic migrations intact)
 
 ---
@@ -91,9 +91,9 @@ Executed after the final code edit (`src/ui/audio_manager.gd`):
 
 ## 6. Unresolved External, Human & Owner Gates
 
-The following items are **not automated-completable** and remain open before promoting beyond `v1.0.0-rc.1`:
+The following gates remain open before promoting beyond the `v1.0.0-rc.1` pre-release to a general `v1.0.0` release:
 1. **Human Playtesting (`docs/PLAYTEST.md`):** Zero human runs have occurred; needed to judge Difficulty profiles (Initiate–Sovereign), Depth 2 `The Vault Enumerator`, `occultist`/`ophite_binder` early frailty, tactile phone usability, and accessibility modes.
 2. **External Platform Runtimes (`NOT_RUN`):** Physical Windows desktop execution, Web browser IndexedDB save persistence, and physical Android hardware install / notch safe-areas / touch gestures / background suspend resume.
 3. **Release Keystore Signing:** Owner must generate/configure a non-repo Android release keystore outside git before public Android distribution (`docs/INSTALL.md`).
 4. **Music & Art Upgrades:** Replace `16` `placeholder_liturgical_temp` music stems with owner-approved VENEFICA LUX recordings (`soundtrack_manifest.json`), and review commissioned art priorities (`docs/ASSET_BACKLOG.md`).
-5. **Canon & Release Authorization:** Owner sign-off on `docs/OWNER_CANON_LEDGER.md` and explicit authorization before git push, tagging `v1.0.0-rc.1`, or public release (`docs/RELEASE_CHECKLIST.md`).
+5. **Canon & Final `v1.0.0` Sign-Off:** Owner sign-off on `docs/OWNER_CANON_LEDGER.md` and final `v1.0.0` promotion approval after the open external/human gates above are satisfied (`docs/RELEASE_CHECKLIST.md`).

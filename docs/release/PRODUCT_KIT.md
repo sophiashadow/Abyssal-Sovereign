@@ -8,7 +8,8 @@
 
 ## Overview
 - **Genre:** Turn-based Traditional Roguelike / Dark Occult Fantasy
-- **Version:** `v1.0.0-rc.1` (Release Candidate)
+- **Version:** `v1.0.0-rc.1` (GitHub Pre-Release)
+- **Repository & Downloads:** https://github.com/sophiashadow/Abyssal-Sovereign ([`v1.0.0-rc.1` Release](https://github.com/sophiashadow/Abyssal-Sovereign/releases/tag/v1.0.0-rc.1) · [Issues](https://github.com/sophiashadow/Abyssal-Sovereign/issues))
 - **Platforms:** Linux (`x86_64`), Windows (`x86_64`), Android (`ARMv7`/`ARM64`), Web (`HTML5`/`PWA`)
 - **Distribution Model:** Standalone offline packages; zero DRM, zero accounts, zero analytics, zero ads, zero IAP.
 
