@@ -165,6 +165,12 @@ Spec: `docs/M8_SPEC.md`.
 - Rewrote `docs/PLAYTEST.md` into an actionable external playtest package covering v1.0.0-rc.1 install/launch across Linux/Windows/Android/Web, verified Desktop & Touch controls, new-player tactical guide, explicit known limitations (`provisional_m9_asset`, `placeholder_liturgical_temp`, `NOT_RUN` hardware runtimes, debug APK), bug-reporting checklist, accessibility/viewport/mode coverage matrix, and 9-axis human playtest questionnaire.
 - Preserved `Status: No human playtest has been run.` prominently; no human feedback was simulated.
 
+### M9.8 — Distribution Architecture (done; fixes P0-1)
+
+- Updated `project.godot` (`config/version="1.0.0-rc.1"`, `config/icon="res://assets/icons/icon_512.png"`) and all 4 presets in `export_presets.cfg` with strict exclude filters (`balance/*,build/*,docs/*,release/*,test-results/*,tests/*,tools/*,content/lore/*,*.md`), Web PWA icons (`144`/`180`/`512`), and Android version (`code=10000`, `name="1.0.0-rc.1"`) + adaptive launcher icons (`192`/`432`).
+- Created `tools/package_rc.sh` and updated `tools/verify.sh` (adding `720x1280` portrait UI smoke and APK zero-leak hygiene check); verified `./tools/package_rc.sh` produces all 4 portable packages in `build/release/` (`linux-x86_64.tar.gz`, `windows-x86_64.zip`, `web.zip`, `android-debug.apk`) + `SHA256SUMS.txt` with zero leaked dev/lore/doc files. Godot's exporter signed (`Signed` + `Verifying APK...`) and bundled `META-INF/ANDROIDD.{RSA,SF}` (standalone `apksigner verify` on shell PATH requires `java`, not in default `PATH`).
+- Created `docs/INSTALL.md` covering install/uninstall, OS `user://` save paths, backup/recovery, `v1`–`v12` save upgrade compatibility, 100% offline guarantee, and external owner keystore signing. Resolved `P0-1` in `docs/M9_DEFECT_REGISTER.md`.
+
 ## Do not
 
 - Modify FALSE LIGHT, Sovereign-Ops or any other repository. FALSE LIGHT documents are read-only sources.

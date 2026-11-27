@@ -24,7 +24,7 @@ done
 echo "==> 1. Headless test suite"
 ./tools/test.sh
 
-echo "==> 2. UI smoke (1280x720 and 2340x1080)"
+echo "==> 2. UI smoke (1280x720, 2340x1080, 720x1280)"
 DISPLAY_WRAPPER=""
 if [ -z "${DISPLAY:-}" ]; then
   if command -v xvfb-run >/dev/null 2>&1; then
@@ -37,7 +37,7 @@ fi
 
 mkdir -p test-results
 touch test-results/.gdignore
-for res in 1280x720 2340x1080; do
+for res in 1280x720 2340x1080 720x1280; do
   LOG="test-results/smoke_${res}.log"
   $DISPLAY_WRAPPER "$GODOT_BIN" --path . --resolution "$res" --audio-driver Dummy --script res://tools/ui_smoke.gd > "$LOG" 2>&1
   cat "$LOG"
@@ -67,7 +67,11 @@ if [ "$RUN_EXPORTS" -eq 1 ]; then
     echo "Android debug APK is missing content/core JSON assets." >&2
     exit 1
   fi
-  echo "Android debug APK asset check: OK"
+  if unzip -l build/android/abyssal-sovereign-debug.apk | grep -qE "assets/(balance|docs|content/lore|tests|tools|release)/|assets/[^ ]*\.md"; then
+    echo "Android debug APK leaked excluded development files." >&2
+    exit 1
+  fi
+  echo "Android debug APK asset & hygiene check: OK"
 fi
 
 echo "==> Regression verification passed."
