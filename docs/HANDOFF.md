@@ -2,7 +2,7 @@
 
 For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENTS.md` first; its rules win over this file. Update this file at every stop.
 
-## State as of 2026-11-27 (M8 Incarnation Pass complete locally on `main`; awaiting owner review & human playtest)
+## State as of 2026-11-27 (Milestone 9 — The Ascension Pass in progress locally on `main`; M9.0 complete)
 
 - **Branch:** `main` (default branch on `origin`, github.com/sophiashadow/Abyssal-Sovereign), preserving full commit history from `ccr-c6f8b898-fu2jtp` and `fac51e8`.
 - **Milestones:** M0–M5 (`fac51e8`, Depth Pass complete), **M6 Breadth Pass (M6.1–M6.10 COMPLETE, save v11):**
@@ -138,7 +138,9 @@ Spec: `docs/M8_SPEC.md`.
   - Full test suite (`./tools/test.sh`): `210` tests, `210` passed, `0` failed, `4,918` checks (`214.4s`).
   - Fresh M8 dev soak (`m8_final_check`, 32 runs): `explorer 8/8`, `narrative 8/8`, `specialist 8/8` (`0` unfinished), `baseline 6/8` (`1` death, `1` action-capped), `86/86` monsters killed, `28/28` floors visited, `229` Relic Work + `32` Transmute events, complete 7-Sphere identity telemetry.
   - Cross-platform export (`./tools/export.sh all`): Linux (`72M`, headless launch verified exit `0`), Windows (`106M`, runtime `NOT_RUN`), Web (`40M`, runtime `NOT_RUN`), Android Debug APK (`57M`, `unzip -l` verified atlases/OGGs/JSONs present & `0` `docs/*`, `apksigner verify` v2+v3 valid; physical Android runtime `NOT_RUN` — `adb devices` empty).
-- **Next assignment:** Owner review of M8 (`docs/M8_REPORT.md`), human playtest rounds (`docs/PLAYTEST.md`), physical Android/Windows/Web verification, VENEFICA LUX stem swap (`content/presentation/soundtrack_manifest.json`), and explicit authorization before pushing, merging, releasing, or starting M9.
+- **Next assignment:** Milestone 9 — The Ascension Pass (`docs/M9_SPEC.md`, `v1.0.0-rc.1` target):
+  - **M9.0 Production Audit (complete, verified locally):** Verified clean M8 baseline (`./tools/test.sh`: `210` tests, `210` passed, `4,918` checks, `201.4s`). Audited M8 screenshots, exported APK (`build/android/abyssal-sovereign-debug.apk`), `m8_perf_bench.gd`, audio/asset manifests, and source code. Authored `docs/M9_SPEC.md` and prioritized `docs/M9_DEFECT_REGISTER.md` (1 P0 packaging leak, 6 P1 UI/perf/copy defects, 5 P2 polish/audio/packaging items, 1 P3 external gate).
+  - **M9.1 Artistic Mastery (in progress):** Elevate procedural pixel art, 24 woodcut emblems, radial lighting, `AssetRegistry` lookup caching, app icons, comparison sheets, and `docs/ASSET_BACKLOG.md`.
 
 ## Owner decisions still open
 
