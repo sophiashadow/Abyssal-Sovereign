@@ -87,9 +87,16 @@ Spec: `docs/M7_SPEC.md`. Owner authorized a push after each task (2026-11-26); n
 - `docs/WORLD_MANIFEST.md` & `content/lore/world_manifest.json`: portable setting manifest (`schema_version: 1`).
 - `docs/CONTENT_SCHEMA.md`: the JSON content format enforced by `tests/test_content.gd`.
 
-## Next assignment: Milestone 8 (not started; needs owner authorization)
+## Next assignment: Milestone 8 — The Incarnation Pass (In Progress)
 
-Do not begin M8 without the owner. First step is human playtest round 1 (`docs/PLAYTEST.md`). The structured recommendations, with evidence and cost, are at the end of `docs/M7_REPORT.md`.
+Spec: `docs/M8_SPEC.md`.
+
+- **M8.0 Foundation & Outstanding Refinement (complete, verified locally):**
+  - Diagnosed and resolved the M7 unfinished bot runs in `tests/policy_player.gd` (fixed `narrative` stair ping-pong in `_may_descend()`/`_has_pending_thread_travel()`, `explorer` branch exit pathfinding in `_explore_goal()`/`_branch_exit_pos()`, `pinned` non-combat stall in `_walk_to()`, 16-turn FOV-corner oscillation loop-breaker, and mask-switching cooldown; added Relic Work behavior for `explorer`, `narrative`, and `specialist` while leaving `baseline`/`AutoPlayer` unchanged).
+  - Post-fix dev check (`m8_diag_post`, 12 runs across `explorer`, `narrative`, `specialist` on `human/veilkin × occultist/assassin`): 0 unfinished runs (`explorer` 4/4 mean 5135 turns, `narrative` 4/4 mean 4002 turns, `specialist` 3/4 mean 514 turns), 82 Relic Work calls recorded.
+  - Added pure-observer Sphere mechanical identity (`sphere_turns`, `sphere_damage_taken`, `sphere_actions`, `sphere_statuses`) and relic usage (`relic_work`, `relic_transmute`) telemetry to `src/sim/telemetry.gd`, `src/sim/world.gd`, and `tools/m7_report.gd`.
+  - Added `tests/test_m8_telemetry.gd` (3 tests, 14 checks).
+- **Next submilestone:** M8.1 — The Visual Codex (`docs/ART_DIRECTION.md`).
 
 ## Owner decisions still open
 

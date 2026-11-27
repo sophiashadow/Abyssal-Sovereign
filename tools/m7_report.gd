@@ -76,6 +76,12 @@ static func summarize(runs: Array, db: ContentDB) -> Dictionary:
 	var durations := {}
 	var killers_by_calling := {}
 	var level_at_depth := {}
+	var sphere_turns := {}
+	var sphere_dmg := {}
+	var sphere_actions := {}
+	var sphere_statuses := {}
+	var relic_work := {}
+	var relic_transmute := {}
 	for r in runs:
 		var pol := String(r["policy"])
 		var won := String(r["state"]) == "won"
@@ -116,6 +122,18 @@ static func summarize(runs: Array, db: ContentDB) -> Dictionary:
 		durations[dk]["turns"] += int(r["turns"])
 		for k in (tel.get("counters", {}) as Dictionary):
 			cover[k] = int(cover.get(k, 0)) + int((tel["counters"] as Dictionary)[k])
+		for k in (tel.get("sphere_turns", {}) as Dictionary):
+			sphere_turns[k] = int(sphere_turns.get(k, 0)) + int((tel["sphere_turns"] as Dictionary)[k])
+		for k in (tel.get("sphere_damage_taken", {}) as Dictionary):
+			sphere_dmg[k] = int(sphere_dmg.get(k, 0)) + int((tel["sphere_damage_taken"] as Dictionary)[k])
+		for k in (tel.get("sphere_actions", {}) as Dictionary):
+			sphere_actions[k] = int(sphere_actions.get(k, 0)) + int((tel["sphere_actions"] as Dictionary)[k])
+		for k in (tel.get("sphere_statuses", {}) as Dictionary):
+			sphere_statuses[k] = int(sphere_statuses.get(k, 0)) + int((tel["sphere_statuses"] as Dictionary)[k])
+		for k in (tel.get("relic_work", {}) as Dictionary):
+			relic_work[k] = int(relic_work.get(k, 0)) + int((tel["relic_work"] as Dictionary)[k])
+		for k in (tel.get("relic_transmute", {}) as Dictionary):
+			relic_transmute[k] = int(relic_transmute.get(k, 0)) + int((tel["relic_transmute"] as Dictionary)[k])
 	var suspects := _suspects(by_pair)
 	var cov := _coverage(cover, db)
 	return {
@@ -123,6 +141,8 @@ static func summarize(runs: Array, db: ContentDB) -> Dictionary:
 		"by_policy": _finish(by_pol), "by_calling_policy": _finish(by_cl_pol), "by_origin_policy": _finish(by_sp_pol),
 		"by_pair_nonrandom": _finish(by_pair), "deaths": deaths, "death_classes": classes, "deaths_by_depth": cause_depth,
 		"victories": victories, "coverage": cov, "killers_by_calling": killers_by_calling, "level_at_depth_entry": _mean_levels(level_at_depth), "suspects": suspects, "mean_turns": _means(durations),
+		"sphere_identity": {"turns": sphere_turns, "damage_taken": sphere_dmg, "actions": sphere_actions, "statuses": sphere_statuses},
+		"relic_usage": {"work": relic_work, "transmute": relic_transmute},
 	}
 
 
@@ -265,6 +285,17 @@ static func to_markdown(sm: Dictionary) -> String:
 	s += "- active talents never used: %s\n" % ", ".join(PackedStringArray(sm["coverage"]["active_talents_never_used"]))
 	s += "\nMean level on first entry to each depth (policy|depth): %s\n" % JSON.stringify(sm["level_at_depth_entry"])
 	s += "\nOptional-content counters: %s\n" % JSON.stringify(sm["coverage"]["optional_content"])
+	var si: Dictionary = sm.get("sphere_identity", {})
+	if not (si.get("turns", {}) as Dictionary).is_empty():
+		s += "\n## Sphere Identity Telemetry\n\n- turns: %s\n- damage_taken: %s\n- actions: %s\n- statuses: %s\n" % [
+			JSON.stringify(si.get("turns", {})), JSON.stringify(si.get("damage_taken", {})),
+			JSON.stringify(si.get("actions", {})), JSON.stringify(si.get("statuses", {})),
+		]
+	var ru: Dictionary = sm.get("relic_usage", {})
+	if not (ru.get("work", {}) as Dictionary).is_empty() or not (ru.get("transmute", {}) as Dictionary).is_empty():
+		s += "\n## Relic Usage\n\n- work: %s\n- transmute: %s\n" % [
+			JSON.stringify(ru.get("work", {})), JSON.stringify(ru.get("transmute", {})),
+		]
 	s += "\nSuspect pairs (adaptive sampling): %s\n" % ", ".join(PackedStringArray(sm["suspects"]))
 	return s
 

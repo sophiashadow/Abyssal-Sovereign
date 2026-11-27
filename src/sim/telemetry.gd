@@ -13,6 +13,13 @@ var counters: Dictionary = {}
 ## Sum of damage the player took, keyed "source|type".
 var damage_taken: Dictionary = {}
 var damage_dealt: Dictionary = {}
+## M8.0 Sphere mechanical identity & relic usage telemetry (local-only, never saved).
+var sphere_turns: Dictionary = {} ## "dN:sphere" -> turns spent
+var sphere_damage_taken: Dictionary = {} ## "dN:sphere|type" -> damage taken
+var sphere_actions: Dictionary = {} ## "dN:sphere|kind" -> action counts
+var sphere_statuses: Dictionary = {} ## "dN:sphere|status" -> status applications on player
+var relic_work: Dictionary = {} ## template_id -> work count
+var relic_transmute: Dictionary = {} ## template_id -> transmute count
 ## Last damage events against the player, oldest first.
 var recent: Array = []
 ## One entry per floor entry: {fid, depth, turn, level, hp_pct}.
@@ -24,9 +31,40 @@ var _burst_turn := -1
 var _burst_sum := 0
 
 
+static func sphere_key(w: World) -> String:
+	var fd := w.current_floor_def()
+	var sp := String(fd.get("sphere", "Sphere %d" % w.depth))
+	return "d%d:%s" % [w.depth, sp]
+
+
 func count(cat: String, key: String, n: int = 1) -> void:
 	var k := cat + "|" + key
 	counters[k] = int(counters.get(k, 0)) + n
+
+
+func on_turn(w: World) -> void:
+	var sk := sphere_key(w)
+	sphere_turns[sk] = int(sphere_turns.get(sk, 0)) + 1
+
+
+func on_action(w: World, kind: String) -> void:
+	var k := sphere_key(w) + "|" + kind
+	sphere_actions[k] = int(sphere_actions.get(k, 0)) + 1
+
+
+func on_status(w: World, target: Actor, sid: String) -> void:
+	if target != null and target.is_player:
+		var k := sphere_key(w) + "|" + sid
+		sphere_statuses[k] = int(sphere_statuses.get(k, 0)) + 1
+
+
+func on_relic(w: World, mode: String, item_id: String) -> void:
+	if mode == "work":
+		relic_work[item_id] = int(relic_work.get(item_id, 0)) + 1
+		on_action(w, "relic_work")
+	elif mode == "transmute":
+		relic_transmute[item_id] = int(relic_transmute.get(item_id, 0)) + 1
+		on_action(w, "relic_transmute")
 
 
 func on_damage(w: World, target: Actor, amount: int, source: String, dmg_type: String) -> void:
@@ -35,6 +73,8 @@ func on_damage(w: World, target: Actor, amount: int, source: String, dmg_type: S
 	if target.is_player:
 		var k := source + "|" + dmg_type
 		damage_taken[k] = int(damage_taken.get(k, 0)) + amount
+		var sk := sphere_key(w) + "|" + dmg_type
+		sphere_damage_taken[sk] = int(sphere_damage_taken.get(sk, 0)) + amount
 		var mx := maxi(1, target.stat("max_hp"))
 		max_hit_pct = maxf(max_hit_pct, float(amount) / mx)
 		if _burst_turn != w.turns:
@@ -119,6 +159,9 @@ func _classify(w: World, heals: int, window_dmg: int, max_hp: int) -> String:
 func to_dict() -> Dictionary:
 	return {
 		"counters": counters, "damage_taken": damage_taken, "damage_dealt": damage_dealt,
+		"sphere_turns": sphere_turns, "sphere_damage_taken": sphere_damage_taken,
+		"sphere_actions": sphere_actions, "sphere_statuses": sphere_statuses,
+		"relic_work": relic_work, "relic_transmute": relic_transmute,
 		"floor_log": floor_log, "death": death,
 		"max_hit_pct": snappedf(max_hit_pct, 0.01), "max_burst_pct": snappedf(max_burst_pct, 0.01),
 	}

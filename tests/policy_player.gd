@@ -45,6 +45,14 @@ var _thread_choice: Dictionary = {}
 var _retreating := false
 var _contract_tried := false
 var _given_up: Dictionary = {}
+var _last_mask_turn := -999
+var _stuck_pos := Vector2i(-1, -1)
+var _stuck_waits := 0
+var _thread_hops: Dictionary = {}
+var _relic_worked_floor := ""
+var _recent_positions: Array[Vector2i] = []
+var _loop_floor := ""
+var _oscillating_cooldown := 0
 
 
 func _init(w: World, policy_name: String = "baseline") -> void:
@@ -97,16 +105,122 @@ func _is_spine() -> bool:
 
 func _may_descend() -> bool:
 	match policy:
-		"explorer", "narrative":
+		"explorer":
 			return bool(_fstate()["done"]) and _is_spine()
+		"narrative":
+			return bool(_fstate()["done"]) and _is_spine() and not _has_pending_thread_travel()
 	return true
 
 
+func _has_pending_thread_travel() -> bool:
+	if world.turns >= 10000:
+		return false
+	for tid in world.active_thread_ids():
+		if _given_up.has(tid):
+			continue
+		var tdef := world.db.get_def("threads", tid)
+		var dest := _goal_floor(String(tdef["goal_kind"]), String(tdef["goal_ref"]))
+		if dest != "" and dest != world.floor_id and (world.floors.has(dest) or _reachable_floor(dest)):
+			if not _next_hop(world.floor_id, dest).is_empty():
+				return true
+	return false
+
+
+func _find_relic() -> int:
+	if not policy in ["explorer", "narrative", "specialist"]:
+		return super._find_relic()
+	var count := 0
+	var second_idx := -1
+	for i in world.player.inventory.size():
+		var d := world.player.inventory[i].def(world.db)
+		if String(d["kind"]) == "relic":
+			count += 1
+			if count >= 2:
+				second_idx = i
+				break
+	return second_idx
+
+
+func _relic_work_pre() -> int:
+	if not policy in ["explorer", "narrative", "specialist"]:
+		return -1
+	if _relic_worked_floor == world.floor_id:
+		return -1
+	var p := world.player
+	var hostiles := world.visible_hostiles()
+	var active_work := {}
+	for tid in world.active_thread_ids():
+		var td := world.db.get_def("threads", tid)
+		if String(td["goal_kind"]) == "work_relic":
+			active_work[String(td["goal_ref"])] = true
+	if hostiles.is_empty() and active_work.is_empty():
+		return -1
+	for i in p.inventory.size():
+		var it := p.inventory[i]
+		var d := it.def(world.db)
+		if String(d["kind"]) != "relic":
+			continue
+		var sid := String(d["work_status"])
+		if p.has_status(sid):
+			continue
+		var cost := int(d.get("work_cost_hp", 0))
+		if p.hp <= cost + maxi(4, p.stat("max_hp") / 2):
+			continue
+		if not active_work.is_empty() and not active_work.has(it.template_id) and not active_work.has("any") and hostiles.is_empty():
+			continue
+		if world.player_work_relic(i):
+			_relic_worked_floor = world.floor_id
+			return 1
+	return -1
+
+
 func _policy_pre() -> int:
+	if policy != "baseline" and policy != "random":
+		var p := world.player
+		if _loop_floor != world.floor_id:
+			_loop_floor = world.floor_id
+			_recent_positions.clear()
+			_oscillating_cooldown = 0
+		if _oscillating_cooldown > 0:
+			_oscillating_cooldown -= 1
+			var m := world.current_floor()
+			var esc := m.exit_pos if _is_spine() else _branch_exit_pos(m)
+			if esc.x >= 0:
+				if p.pos == esc:
+					if world.needs_gate_to_descend():
+						return 1 if world.player_descend_gate(_gate_method()) else 0
+					return 1 if world.player_stairs() else 0
+				var r_esc := _walk_to(esc, false)
+				if r_esc >= 0:
+					return r_esc
+		else:
+			var adj_foe := false
+			for d in Grid.DIRS_8:
+				var a := world.current_floor().actor_at(p.pos + d)
+				if a != null and a != p:
+					adj_foe = true
+					break
+			if adj_foe:
+				_recent_positions.clear()
+			else:
+				_recent_positions.append(p.pos)
+				if _recent_positions.size() > 16:
+					_recent_positions.pop_front()
+				if _recent_positions.size() == 16:
+					var hits := 0
+					for rp in _recent_positions:
+						if rp == p.pos:
+							hits += 1
+					if hits >= 6:
+						_recent_positions.clear()
+						_oscillating_cooldown = 16
 	if mask_play:
 		var mk := _mask_pre()
 		if mk >= 0:
 			return mk
+	var rw := _relic_work_pre()
+	if rw >= 0:
+		return rw
 	match policy:
 		"defensive":
 			return _defensive_pre()
@@ -206,17 +320,22 @@ func _mask_pre() -> int:
 		return -1
 	var near := world.nearest_visible_hostile(7)
 	var risk_max := World.MASK_RISK_MAX + 2 * p.talent_rank("crowned_frequency")
+	if p.mask != "bare_face" and p.mask_risk >= risk_max - 2:
+		world._tel("mask", "pre_seizure_drop")
+		_last_mask_turn = world.turns
+		return 1 if world.player_switch_mask("bare_face") else 0
+	if world.turns - _last_mask_turn < 3:
+		return -1
 	if near == null or not near.awake:
 		if p.mask != "bare_face" and (p.mask == "eris" or p.mask_risk > 2 or p.hp < p.stat("max_hp")):
 			world._tel("mask", "cool")
+			_last_mask_turn = world.turns
 			return 1 if world.player_switch_mask("bare_face") else 0
 		return -1
-	if p.mask != "bare_face" and p.mask_risk >= risk_max - 2:
-		world._tel("mask", "pre_seizure_drop")
-		return 1 if world.player_switch_mask("bare_face") else 0
 	if p.mask == "bare_face" and p.mask_risk <= 2 and Grid.chebyshev(p.pos, near.pos) <= 6:
 		var want := "nyx" if p.hp * 2 < p.stat("max_hp") else "eris"
 		world._tel("mask", "don:" + want)
+		_last_mask_turn = world.turns
 		return 1 if world.player_switch_mask(want) else 0
 	return -1
 
@@ -279,6 +398,8 @@ func _walk_to(goal: Vector2i, known_only: bool = true) -> int:
 	var p := world.player
 	if p.pos == goal:
 		return -1
+	if p.has_status("pinned"):
+		return 1 if world.player_wait() else 0
 	if _nav_floor != world.floor_id or _nav_target != goal or _nav_map.is_empty():
 		_nav_map = Pathing.distance_map(m, goal, known_only)
 		_nav_target = goal
@@ -287,8 +408,17 @@ func _walk_to(goal: Vector2i, known_only: bool = true) -> int:
 		return -1
 	var s := Pathing.step_down(m, _nav_map, p.pos, func(q: Vector2i) -> bool: return m.actor_at(q) != null)
 	if s == p.pos:
+		if p.pos == _stuck_pos:
+			_stuck_waits += 1
+		else:
+			_stuck_pos = p.pos
+			_stuck_waits = 1
+		if _stuck_waits >= 4:
+			_stuck_waits = 0
+			return -1
 		# Blocked by an actor in a corridor: wait a turn rather than loop.
 		return 1 if world.player_wait() else 0
+	_stuck_waits = 0
 	return 1 if world.player_move(s - p.pos) else 0
 
 
@@ -409,6 +539,9 @@ func _explore_goal(allow_branches: bool) -> int:
 	var st := _fstate()
 	st["actions"] = int(st["actions"]) + 1
 	var spine := _is_spine()
+	if world.turns >= 10000:
+		allow_branches = false
+		st["done"] = true
 	var over_budget := int(st["actions"]) > floor_budget
 	var bl: Dictionary = st["blacklist"]
 	var site := _site_goal()
@@ -459,20 +592,35 @@ func _explore_goal(allow_branches: bool) -> int:
 				_branch_done[tid] = "entered"
 				world._tel("branch", "enter:" + tid)
 				return 1 if world.player_stairs() else 0
-			var r3 := _walk_to(ppos)
+			var r3 := _walk_to(ppos, false)
 			if r3 >= 0:
 				return r3
 			_branch_done[tid] = "unreachable"
 	if not spine:
-		var back := _portal_pos_to(m, String(world.current_floor_def().get("parent", "")))
+		var back := _branch_exit_pos(m)
 		if back.x >= 0:
 			if p.pos == back:
 				world._tel("branch", "leave:" + world.floor_id)
 				return 1 if world.player_stairs() else 0
-			var r4 := _walk_to(back)
+			var r4 := _walk_to(back, false)
 			if r4 >= 0:
 				return r4
+			if m.exit_pos.x >= 0 and p.pos != m.exit_pos:
+				var r5 := _walk_to(m.exit_pos, false)
+				if r5 >= 0:
+					return r5
 	return -1
+
+
+func _branch_exit_pos(m: FloorMap) -> Vector2i:
+	var back := _portal_pos_to(m, String(world.current_floor_def().get("parent", "")))
+	if back.x < 0:
+		for pt in m.portals:
+			if String(pt.get("kind", "")) == "branch_out":
+				return Vector2i(int(pt["x"]), int(pt["y"]))
+	if back.x < 0 and m.up_pos.x >= 0:
+		return m.up_pos
+	return back
 
 
 # ------------------------------------------------------------------ narrative
@@ -561,8 +709,13 @@ func _narrative_goal() -> int:
 		var hop := _next_hop(world.floor_id, dest)
 		if hop.is_empty():
 			continue
+		if world.turns >= 10000 or int(_thread_hops.get(tid, 0)) >= 10:
+			_given_up[tid] = true
+			world._tel("narrative", "given_up:" + tid)
+			continue
 		var tpos := Vector2i(int(hop["x"]), int(hop["y"]))
 		if p.pos == tpos:
+			_thread_hops[tid] = int(_thread_hops.get(tid, 0)) + 1
 			world._tel("narrative", "travel:" + String(hop.get("kind", "")))
 			if world.needs_gate_to_descend():
 				return 1 if world.player_descend_gate(_gate_method()) else 0
@@ -570,6 +723,8 @@ func _narrative_goal() -> int:
 		var r := _walk_to(tpos, false)
 		if r >= 0:
 			return r
+		_given_up[tid] = true
+		world._tel("narrative", "given_up:" + tid)
 	return -1
 
 

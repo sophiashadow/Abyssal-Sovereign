@@ -625,6 +625,8 @@ func player_move(dir: Vector2i) -> bool:
 	if other != null and other != player:
 		if not m.can_step(player.pos, target):
 			return false
+		if telemetry != null:
+			telemetry.on_action(self, "melee")
 		_attack(player, other)
 		return _finish_player_action(COST_ATTACK)
 	if player.has_status("pinned"):
@@ -710,6 +712,8 @@ func player_use_at(index: int, target_pos: Vector2i = Vector2i(-1, -1)) -> bool:
 		if acted:
 			id_known[it.template_id] = true
 			_tel("consumable", it.template_id)
+			if telemetry != null:
+				telemetry.on_action(self, "consumable")
 		return acted
 	if String(d["kind"]) == "relic":
 		return player_work_relic(index)
@@ -808,6 +812,8 @@ func player_fire(target_pos: Vector2i = Vector2i(-1, -1)) -> bool:
 	if foe == null:
 		log_msg("Your shot flies into empty air.", "info")
 		return _finish_player_action(COST_ATTACK)
+	if telemetry != null:
+		telemetry.on_action(self, "ranged")
 	var dtype := w.effective_damage_type(db)
 	var res := Combat.resolve_ranged(player, foe, Grid.chebyshev(player.pos, foe.pos),
 		String(d["damage"]), int(d.get("accuracy", 0)) + w.total_mod(db, "accuracy"), int(d.get("crit", 0)), dtype, rng)
@@ -1138,6 +1144,8 @@ func player_work_relic(index: int) -> bool:
 	if cost > 0 and player.hp <= cost:
 		log_msg("You lack the blood to work the %s." % d["name"], "danger")
 		return false
+	if telemetry != null:
+		telemetry.on_relic(self, "work", it.template_id)
 	player.hp -= cost
 	apotheosis += 1
 	apply_status(player, sid)
@@ -1182,6 +1190,8 @@ func player_transmute_relic(index: int) -> bool:
 		return false
 	var mods: Dictionary = d.get("transmute_mods", {})
 	_tel("relic_transmuted", it.template_id)
+	if telemetry != null:
+		telemetry.on_relic(self, "transmute", it.template_id)
 	_grant_permanent(mods)
 	player.inventory.remove_at(index)
 	var freed := unbind_curses(true)
@@ -1288,6 +1298,8 @@ func player_descend_gate(method: String) -> bool:
 					log_msg("The gate answers your spoken name — Lux Venefica can now unify early (m).", "good")
 	if first_visit:
 		_tel("gate", method)
+		if telemetry != null:
+			telemetry.on_action(self, "gate:" + method)
 		_contract_event("gate:" + method)
 		_contract_event("descend")
 	var from_id := floor_id
@@ -1526,6 +1538,8 @@ func player_use_talent(tid: String, target_pos: Vector2i = Vector2i(-1, -1)) -> 
 			log_msg("No target in range for %s." % td["name"], "info")
 			return false
 	_tel("talent_used", tid)
+	if telemetry != null:
+		telemetry.on_action(self, "talent")
 	var action_cost := _run_talent_effect(String(td.get("effect", tid)), td, target, target_pos)
 	if action_cost < 0:
 		return false
@@ -2014,6 +2028,8 @@ func _run_talent_effect(eff: String, td: Dictionary, target: Actor, target_pos: 
 
 func _finish_player_action(cost: int) -> bool:
 	turns += 1
+	if telemetry != null:
+		telemetry.on_turn(self)
 	player.next_time = time + player.scaled_cost(cost)
 	_run_until_player()
 	return true
@@ -2386,6 +2402,8 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 		return false
 	var kind := String(f["kind"])
 	_tel("interact", kind + ":" + (choice.split(":")[0] if choice != "" else "default"))
+	if telemetry != null:
+		telemetry.on_action(self, "interact:" + kind)
 	match kind:
 		"secret_door":
 			_open_secret_door(pos)
@@ -3207,6 +3225,8 @@ func apply_status(a: Actor, sid: String) -> void:
 			s["turns"] = maxi(int(s["turns"]), dur)
 			return
 	a.statuses.append({"id": sid, "turns": dur})
+	if telemetry != null:
+		telemetry.on_status(self, a, sid)
 	if a.is_player:
 		log_msg("%s: %s" % [sd["name"], sd["description"]], "danger" if sid in ["reckoning", "bleeding", "isolation", "perception_fog", "sundered", "burning", "chilled", "pinned", "hexed"] else "good")
 		if sid == "false_light" and a.mask == Masks.UNION_ID:
