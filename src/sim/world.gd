@@ -231,6 +231,8 @@ func identify_item(it: Item) -> bool:
 	elif not it.identified:
 		it.identified = true
 		changed = true
+	if changed and turns > 0:
+		_emit_event("identify", {"item_id": it.template_id, "pos": player.pos})
 	return changed
 
 
@@ -1323,6 +1325,7 @@ func player_descend_gate(method: String) -> bool:
 			telemetry.on_action(self, "gate:" + method)
 		_contract_event("gate:" + method)
 		_contract_event("descend")
+		_emit_event("seal_break", {"pos": player.pos, "method": method, "target": tid})
 	var from_id := floor_id
 	var via_portal := not current_floor().portal_at(player.pos).is_empty()
 	_enter_floor_by_id(tid, "portal" if via_portal else "above", from_id if via_portal else "")
@@ -2256,6 +2259,7 @@ func player_sign_contract(cid: String) -> bool:
 	contract = cid
 	contract_progress = 0
 	_tel("contract_signed", cid)
+	_emit_event("contract_sign", {"contract": cid, "pos": player.pos})
 	apotheosis = maxi(0, apotheosis + int(cd.get("apotheosis", 0)))
 	log_msg("You sign %s. Oath: %s" % [cd["name"], cd["oath_text"]], "lore")
 	if player.has_trait("mask_stances") and player.mask == Masks.UNION_ID:
@@ -3669,6 +3673,7 @@ func _kill_monster(mon: Actor) -> void:
 			log_msg("The %s drops a %s." % [mon.name, item_name(drop)], "good")
 	if mon.tags.has("guardian") and m.exit_pos.x >= 0 and m.get_tile(m.exit_pos) == Tiles.DOOR_SEALED:
 		m.set_tile(m.exit_pos, Tiles.DOOR_OPEN)
+		_emit_event("seal_break", {"pos": m.exit_pos, "method": "unwritten_door"})
 		log_msg("The Sentinel falls. Somewhere a seal that was never written down gives way.", "lore")
 		log_msg("The Unwritten Door stands open.", "good")
 
@@ -3704,6 +3709,7 @@ func gain_xp(amount: int) -> void:
 			player.talent_points += 1
 		player.resource = player.max_resource()
 		player.hp = mini(player.stat("max_hp"), player.hp + gain + player.stat("max_hp") / 4)
+		_emit_event("level_up", {"level": player.level, "pos": player.pos})
 		log_msg("You reach level %d. (+%d max health%s, +1 stat, +1 talent)" % [player.level, gain, ", +1 accuracy" if player.level % 2 == 1 else ""], "good")
 
 

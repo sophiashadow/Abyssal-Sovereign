@@ -307,658 +307,705 @@
       "asset_id": "sfx_step_stone",
       "path": "res://assets/audio/sfx/step_stone.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "terrain:floor"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Soft damp stone footstep"
+        "Generated M8.7 SFX: Soft damp stone footstep",
+        "Mastered M9.5 (44.1kHz -q:a 3, -20.0 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_step_water",
       "path": "res://assets/audio/sfx/step_water.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "terrain:water"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Shallow subterranean splash"
+        "Generated M8.7 SFX: Shallow subterranean splash",
+        "Mastered M9.5 (44.1kHz -q:a 3, -19.0 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_step_grate",
       "path": "res://assets/audio/sfx/step_grate.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "terrain:iron_grate"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Metallic iron grate clink"
+        "Generated M8.7 SFX: Metallic iron grate clink",
+        "Mastered M9.5 (44.1kHz -q:a 3, -19.0 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_melee_hit",
       "path": "res://assets/audio/sfx/melee_hit.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:melee_hit"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Iron blade / blunt combat impact"
+        "Generated M8.7 SFX: Iron blade / blunt combat impact",
+        "Mastered M9.5 (44.1kHz -q:a 3, -14.5 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_melee_crit",
       "path": "res://assets/audio/sfx/melee_crit.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:melee_crit"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Resonant critical strike"
+        "Generated M8.7 SFX: Resonant critical strike",
+        "Mastered M9.5 (44.1kHz -q:a 3, -13.5 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_melee_miss",
       "path": "res://assets/audio/sfx/melee_miss.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:melee_miss"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Dull blade/fist whoosh"
+        "Generated M8.7 SFX: Dull blade/fist whoosh",
+        "Mastered M9.5 (44.1kHz -q:a 3, -19.5 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_ranged_fire",
       "path": "res://assets/audio/sfx/ranged_fire.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:ranged_shot"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Crossbow/sling bolt release"
+        "Generated M8.7 SFX: Crossbow/sling bolt release",
+        "Mastered M9.5 (44.1kHz -q:a 3, -15.5 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_spell_cast",
       "path": "res://assets/audio/sfx/spell_cast.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:spell_cast"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Occult ritual invocation"
+        "Generated M8.7 SFX: Occult ritual invocation",
+        "Mastered M9.5 (44.1kHz -q:a 3, -16.0 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_heal",
       "path": "res://assets/audio/sfx/heal.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:heal"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Restorative draught / mending cadence"
+        "Generated M8.7 SFX: Restorative draught / mending cadence",
+        "Mastered M9.5 (44.1kHz -q:a 3, -16.5 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_door_open",
       "path": "res://assets/audio/sfx/door_open.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:door_open"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Heavy vault / iron door grating open"
+        "Generated M8.7 SFX: Heavy vault / iron door grating open",
+        "Mastered M9.5 (44.1kHz -q:a 3, -16.0 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_trap_trigger",
       "path": "res://assets/audio/sfx/trap_trigger.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:trap_trigger"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Spring-iron trap snap"
+        "Generated M8.7 SFX: Spring-iron trap snap",
+        "Mastered M9.5 (44.1kHz -q:a 3, -14.5 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_chain_strike",
       "path": "res://assets/audio/sfx/chain_strike.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:subjugation"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Heavy shackle / Eight Chains strike"
+        "Generated M8.7 SFX: Heavy shackle / Eight Chains strike",
+        "Mastered M9.5 (44.1kHz -q:a 3, -15.0 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_seal_break",
       "path": "res://assets/audio/sfx/seal_break.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:seal_break"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Ancient Sphere Seal fracture"
+        "Generated M8.7 SFX: Ancient Sphere Seal fracture",
+        "Mastered M9.5 (44.1kHz -q:a 3, -14.5 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_discovery",
       "path": "res://assets/audio/sfx/discovery.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:discovery"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Discovery / codex / level chime"
+        "Generated M8.7 SFX: Discovery / codex / level chime",
+        "Mastered M9.5 (44.1kHz -q:a 3, -16.5 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_identify",
       "path": "res://assets/audio/sfx/identify.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:identify"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Ink-and-bell identification chime"
+        "Generated M8.7 SFX: Ink-and-bell identification chime",
+        "Mastered M9.5 (44.1kHz -q:a 3, -17.0 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_relic_work",
       "path": "res://assets/audio/sfx/relic_work.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:relic_work"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Relic Work liturgical resonance"
+        "Generated M8.7 SFX: Relic Work liturgical resonance",
+        "Mastered M9.5 (44.1kHz -q:a 3, -15.5 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_relic_transmute",
       "path": "res://assets/audio/sfx/relic_transmute.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:relic_transmute"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Relic sacrifice / gold transmutation"
+        "Generated M8.7 SFX: Relic sacrifice / gold transmutation",
+        "Mastered M9.5 (44.1kHz -q:a 3, -15.0 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_mask_switch",
       "path": "res://assets/audio/sfx/mask_switch.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:mask_switch"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Porcelain/veil Mask shift"
+        "Generated M8.7 SFX: Porcelain/veil Mask shift",
+        "Mastered M9.5 (44.1kHz -q:a 3, -16.0 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_contract_sign",
       "path": "res://assets/audio/sfx/contract_sign.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:contract_sign"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Wax seal & contract thud"
+        "Generated M8.7 SFX: Wax seal & contract thud",
+        "Mastered M9.5 (44.1kHz -q:a 3, -15.5 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_boss_attack",
       "path": "res://assets/audio/sfx/boss_attack.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:boss_attack"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Boss / Guardian heavy strike"
+        "Generated M8.7 SFX: Boss / Guardian heavy strike",
+        "Mastered M9.5 (44.1kHz -q:a 3, -13.5 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_ui_click",
       "path": "res://assets/audio/sfx/ui_click.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "ui:button"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Parchment/slate UI click"
+        "Generated M8.7 SFX: Parchment/slate UI click",
+        "Mastered M9.5 (44.1kHz -q:a 3, -20.5 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_ui_confirm",
       "path": "res://assets/audio/sfx/ui_confirm.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "ui:confirm"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Slate confirmation tone"
+        "Generated M8.7 SFX: Slate confirmation tone",
+        "Mastered M9.5 (44.1kHz -q:a 3, -17.5 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_death",
       "path": "res://assets/audio/sfx/death.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:death"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Low funerary abyssal toll"
+        "Generated M8.7 SFX: Low funerary abyssal toll",
+        "Mastered M9.5 (44.1kHz -q:a 3, -14.5 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "sfx_victory",
       "path": "res://assets/audio/sfx/victory.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz RMS-mastered numpy + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "event:victory"
       ],
       "modification_history": [
-        "Generated M8.7 SFX: Solemn ascending cathedral fifth chord"
+        "Generated M8.7 SFX: Solemn ascending cathedral fifth chord",
+        "Mastered M9.5 (44.1kHz -q:a 3, -15.0 dBFS RMS, -1.5 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "ambience_moon",
       "path": "res://assets/audio/ambience/sphere_1_moon.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy seamless loop + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 8s seamless loop + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "sphere:moon"
       ],
       "modification_history": [
-        "Generated M8.7 ambience loop: Moon: damp Ossuary Warrens cisterns"
+        "Generated M8.7 ambience loop: Moon: damp Ossuary Warrens cisterns",
+        "Mastered M9.5 (44.1kHz -q:a 3, 8s seamless loop, -25 dBFS RMS, -6 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "ambience_mercury",
       "path": "res://assets/audio/ambience/sphere_2_mercury.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy seamless loop + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 8s seamless loop + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "sphere:mercury"
       ],
       "modification_history": [
-        "Generated M8.7 ambience loop: Mercury: Tithe Vault brass escapement & ledger resonance"
+        "Generated M8.7 ambience loop: Mercury: Tithe Vault brass escapement & ledger resonance",
+        "Mastered M9.5 (44.1kHz -q:a 3, 8s seamless loop, -25 dBFS RMS, -6 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "ambience_venus",
       "path": "res://assets/audio/ambience/sphere_3_venus.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy seamless loop + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 8s seamless loop + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "sphere:venus"
       ],
       "modification_history": [
-        "Generated M8.7 ambience loop: Venus: Gilded Choir velvet cathedral hum"
+        "Generated M8.7 ambience loop: Venus: Gilded Choir velvet cathedral hum",
+        "Mastered M9.5 (44.1kHz -q:a 3, 8s seamless loop, -25 dBFS RMS, -6 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "ambience_sun",
       "path": "res://assets/audio/ambience/sphere_4_sun.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy seamless loop + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 8s seamless loop + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "sphere:sun"
       ],
       "modification_history": [
-        "Generated M8.7 ambience loop: Sun: False Solar Court radiant crystal drone"
+        "Generated M8.7 ambience loop: Sun: False Solar Court radiant crystal drone",
+        "Mastered M9.5 (44.1kHz -q:a 3, 8s seamless loop, -25 dBFS RMS, -6 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "ambience_mars",
       "path": "res://assets/audio/ambience/sphere_5_mars.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy seamless loop + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 8s seamless loop + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "sphere:mars"
       ],
       "modification_history": [
-        "Generated M8.7 ambience loop: Mars: Iron Scriptorium furnace draft & chain ring"
+        "Generated M8.7 ambience loop: Mars: Iron Scriptorium furnace draft & chain ring",
+        "Mastered M9.5 (44.1kHz -q:a 3, 8s seamless loop, -25 dBFS RMS, -6 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "ambience_jupiter",
       "path": "res://assets/audio/ambience/sphere_6_jupiter.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy seamless loop + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 8s seamless loop + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "sphere:jupiter"
       ],
       "modification_history": [
-        "Generated M8.7 ambience loop: Jupiter: Chamber of Decrees imperial organ fifths"
+        "Generated M8.7 ambience loop: Jupiter: Chamber of Decrees imperial organ fifths",
+        "Mastered M9.5 (44.1kHz -q:a 3, 8s seamless loop, -25 dBFS RMS, -6 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "ambience_saturn",
       "path": "res://assets/audio/ambience/sphere_7_saturn.ogg",
       "source": "Abyssal Sovereign internal procedural audio synthesizer",
-      "author_or_method": "tools/gen_audio.py (numpy seamless loop + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 8s seamless loop + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-cc0-equivalent",
-      "approval_status": "provisional_m8_asset",
+      "approval_status": "provisional_m9_asset",
       "associated_entities": [
         "sphere:saturn"
       ],
       "modification_history": [
-        "Generated M8.7 ambience loop: Saturn: Sealed Stair abyssal void stillness"
+        "Generated M8.7 ambience loop: Saturn: Sealed Stair abyssal void stillness",
+        "Mastered M9.5 (44.1kHz -q:a 3, 8s seamless loop, -25 dBFS RMS, -6 dBFS peak ceiling)"
       ]
     },
     {
       "asset_id": "music_main_title",
       "path": "res://assets/audio/music/main_title.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:main_title"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Litany of the Unwritten Door"
+        "Generated M8.8 placeholder liturgical stem: Litany of the Unwritten Door",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     },
     {
       "asset_id": "music_character_creation",
       "path": "res://assets/audio/music/character_creation.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:character_creation"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Vigil of the Eight Origins"
+        "Generated M8.8 placeholder liturgical stem: Vigil of the Eight Origins",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     },
     {
       "asset_id": "music_sphere_moon",
       "path": "res://assets/audio/music/sphere_moon.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:sphere_moon"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Nocturne of the Ossuary Warrens"
+        "Generated M8.8 placeholder liturgical stem: Nocturne of the Ossuary Warrens",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     },
     {
       "asset_id": "music_sphere_mercury",
       "path": "res://assets/audio/music/sphere_mercury.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:sphere_mercury"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Canon of the Tithe Vaults"
+        "Generated M8.8 placeholder liturgical stem: Canon of the Tithe Vaults",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     },
     {
       "asset_id": "music_sphere_venus",
       "path": "res://assets/audio/music/sphere_venus.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:sphere_venus"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Choir of Tarnished Velvet"
+        "Generated M8.8 placeholder liturgical stem: Choir of Tarnished Velvet",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     },
     {
       "asset_id": "music_sphere_sun",
       "path": "res://assets/audio/music/sphere_sun.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:sphere_sun"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Hymn of the False Dawn"
+        "Generated M8.8 placeholder liturgical stem: Hymn of the False Dawn",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     },
     {
       "asset_id": "music_sphere_mars",
       "path": "res://assets/audio/music/sphere_mars.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:sphere_mars"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Forge-Dirge of the Scriptorium"
+        "Generated M8.8 placeholder liturgical stem: Forge-Dirge of the Scriptorium",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     },
     {
       "asset_id": "music_sphere_jupiter",
       "path": "res://assets/audio/music/sphere_jupiter.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:sphere_jupiter"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Decree of the Porphyry Hall"
+        "Generated M8.8 placeholder liturgical stem: Decree of the Porphyry Hall",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     },
     {
       "asset_id": "music_sphere_saturn",
       "path": "res://assets/audio/music/sphere_saturn.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:sphere_saturn"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Threshold of the Sealed Stair"
+        "Generated M8.8 placeholder liturgical stem: Threshold of the Sealed Stair",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     },
     {
       "asset_id": "music_sanctuaries",
       "path": "res://assets/audio/music/sanctuaries.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:sanctuaries"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Rest Beneath the Watchful Candle"
+        "Generated M8.8 placeholder liturgical stem: Rest Beneath the Watchful Candle",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     },
     {
       "asset_id": "music_boss_encounters",
       "path": "res://assets/audio/music/boss_encounters.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:boss_encounters"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Adversary at the Seal"
+        "Generated M8.8 placeholder liturgical stem: Adversary at the Seal",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     },
     {
       "asset_id": "music_ending_serpents_way",
       "path": "res://assets/audio/music/ending_serpents_way.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:ending_serpents_way"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Canticle of the Serpent's Seam"
+        "Generated M8.8 placeholder liturgical stem: Canticle of the Serpent's Seam",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     },
     {
       "asset_id": "music_ending_way_of_return",
       "path": "res://assets/audio/music/ending_way_of_return.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:ending_way_of_return"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Processional of Return"
+        "Generated M8.8 placeholder liturgical stem: Processional of Return",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     },
     {
       "asset_id": "music_ending_unwritten_door",
       "path": "res://assets/audio/music/ending_unwritten_door.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:ending_unwritten_door"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Beyond the Unwritten Door"
+        "Generated M8.8 placeholder liturgical stem: Beyond the Unwritten Door",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     },
     {
       "asset_id": "music_ending_apotheosis",
       "path": "res://assets/audio/music/ending_apotheosis.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:ending_apotheosis"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Coronation by Decree"
+        "Generated M8.8 placeholder liturgical stem: Coronation by Decree",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     },
     {
       "asset_id": "music_death_named_losses",
       "path": "res://assets/audio/music/death_named_losses.ogg",
       "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
-      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "author_or_method": "tools/gen_audio.py (44.1kHz 12s modal organ/bell placeholder + circular reverb + ffmpeg libvorbis)",
       "license_status": "project-original-placeholder",
       "approval_status": "placeholder_liturgical_temp",
       "associated_entities": [
         "soundtrack:death_named_losses"
       ],
       "modification_history": [
-        "Generated M8.8 placeholder liturgical stem: Lament of the Catalogued Dead"
+        "Generated M8.8 placeholder liturgical stem: Lament of the Catalogued Dead",
+        "Mastered M9.5 (44.1kHz -q:a 3, 12s loop, -19 dBFS RMS, -3 dBFS peak ceiling; awaiting VENEFICA LUX replacement)"
       ]
     }
   ]

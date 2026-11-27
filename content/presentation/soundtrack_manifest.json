@@ -1,7 +1,13 @@
 {
   "schema": "soundtrack_manifest",
   "version": 1,
-  "owner_note": "M8.8 placeholder liturgical stems establish adaptive music wiring, bus routing, crossfading, and context transitions. All stems carry placeholder_liturgical_temp until VENEFICA LUX external studio tracks are authorized and dropped into the manifest paths.",
+  "mastering": {
+    "sample_rate_hz": 44100,
+    "codec": "libvorbis -q:a 3",
+    "target_rms_dbfs": -19.0,
+    "peak_ceiling_dbfs": -3.0
+  },
+  "owner_note": "M8.8/M9.5 placeholder liturgical stems establish adaptive music wiring, bus routing, crossfading, and mastered loudness ceilings. All stems carry placeholder_liturgical_temp until VENEFICA LUX external studio tracks are authorized and dropped into the manifest paths.",
   "contexts": [
     {
       "context_id": "main_title",

@@ -52,3 +52,21 @@ func test_world_save_version_and_determinism_preserved() -> void:
 	AutoPlayer.new(a).play(60)
 	AutoPlayer.new(b).play(60)
 	eq(a.rng.get_state_string(), b.rng.get_state_string(), "RNG invariant")
+
+
+func test_audio_unpause_preserves_zero_master_mute() -> void:
+	var am := AudioManager.new()
+	am.ensure_buses()
+	var gs := GameSettings.new()
+	gs.audio_enabled = true
+	gs.vol_master = 0.0
+	am.apply_settings(gs)
+	var midx := AudioServer.get_bus_index("Master")
+	ok(AudioServer.is_bus_mute(midx), "Master muted when vol_master is 0")
+	am.set_paused(true)
+	am.set_paused(false)
+	ok(AudioServer.is_bus_mute(midx), "unpausing preserves zero-volume Master mute")
+	gs.vol_master = 0.85
+	am.apply_settings(gs)
+	ok(not AudioServer.is_bus_mute(midx), "Master unmutes when vol_master restored")
+	am.free()

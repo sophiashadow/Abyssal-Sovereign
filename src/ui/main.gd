@@ -446,6 +446,8 @@ func _show_create() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	var begin := _btn("Begin the descent", func() -> void:
+		if audio != null:
+			audio.play_ui("ui_confirm")
 		var seed_text := seed_edit.text.strip_edges()
 		var seed_value := seed_text.to_int() if seed_text.is_valid_int() else (Rng.derive(0, seed_text) if seed_text != "" else randi())
 		settings.last_profile = _pick_profile
@@ -1736,7 +1738,10 @@ func _confirm(heading: String, detail: String, yes_label: String, on_yes: Callab
 	col.add_child(_label(detail, Palette.TEXT_DIM, 0.9))
 	var no := _btn("Keep as is", back)
 	col.add_child(no)
-	col.add_child(_btn(yes_label, on_yes))
+	col.add_child(_btn(yes_label, func() -> void:
+		if audio != null:
+			audio.play_ui("ui_confirm")
+		on_yes.call()))
 	no.call_deferred("grab_focus")
 
 

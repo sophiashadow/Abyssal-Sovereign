@@ -6,7 +6,8 @@ extends Node
 ## when audio is disabled, headless/Dummy driver is active, or tracks are absent.
 
 const BUSES: Array[String] = ["Master", "Music", "Ambience", "Combat", "Interface", "Narrative"]
-const SFX_POOL_SIZE := 6
+const SFX_POOL_SIZE := 8
+const SFX_COOLDOWN_MS := 45
 const SPHERE_NAMES: Array[String] = ["", "moon", "mercury", "venus", "sun", "mars", "jupiter", "saturn"]
 const SOUNDTRACK_MANIFEST_PATH := "res://content/presentation/soundtrack_manifest.json"
 
@@ -14,12 +15,16 @@ var audio_enabled: bool = true
 var current_sphere: int = 0
 var current_music_context: String = ""
 var _paused: bool = false
+var _vol_master: float = 0.85
 var _last_event_serial: int = 0
 var _cosmetic_rng := RandomNumberGenerator.new()
 
 var _sfx_pool: Array[AudioStreamPlayer] = []
 var _sfx_cursor: int = 0
-var _ambience_player: AudioStreamPlayer
+var _sfx_last_ms: Dictionary = {}
+var _ambience_decks: Array[AudioStreamPlayer] = []
+var _active_amb_deck: int = 0
+var _ambience_tween: Tween
 var _music_decks: Array[AudioStreamPlayer] = []
 var _active_deck: int = 0
 var _music_tween: Tween
@@ -61,13 +66,17 @@ func _exit_tree() -> void:
 	if _music_tween != null and _music_tween.is_valid():
 		_music_tween.kill()
 	_music_tween = null
+	if _ambience_tween != null and _ambience_tween.is_valid():
+		_ambience_tween.kill()
+	_ambience_tween = null
 	for p in _sfx_pool:
 		if is_instance_valid(p):
 			p.stop()
 			p.stream = null
-	if _ambience_player != null and is_instance_valid(_ambience_player):
-		_ambience_player.stop()
-		_ambience_player.stream = null
+	for a in _ambience_decks:
+		if is_instance_valid(a):
+			a.stop()
+			a.stream = null
 	for m in _music_decks:
 		if is_instance_valid(m):
 			m.stop()
@@ -93,10 +102,12 @@ func _ensure_players() -> void:
 			p.bus = &"Combat"
 			add_child(p)
 			_sfx_pool.append(p)
-	if _ambience_player == null:
-		_ambience_player = AudioStreamPlayer.new()
-		_ambience_player.bus = &"Ambience"
-		add_child(_ambience_player)
+	if _ambience_decks.is_empty():
+		for i in range(2):
+			var a := AudioStreamPlayer.new()
+			a.bus = &"Ambience"
+			add_child(a)
+			_ambience_decks.append(a)
 	if _music_decks.is_empty():
 		for i in range(2):
 			var m := AudioStreamPlayer.new()
@@ -108,10 +119,11 @@ func _ensure_players() -> void:
 func apply_settings(settings: GameSettings) -> void:
 	ensure_buses()
 	audio_enabled = settings.audio_enabled
+	_vol_master = settings.vol_master
 	var master_idx := AudioServer.get_bus_index("Master")
 	if master_idx >= 0:
-		AudioServer.set_bus_mute(master_idx, (not audio_enabled) or _paused or settings.vol_master <= 0.001)
-		AudioServer.set_bus_volume_db(master_idx, _lin_to_db(settings.vol_master))
+		AudioServer.set_bus_mute(master_idx, (not audio_enabled) or _paused or _vol_master <= 0.001)
+		AudioServer.set_bus_volume_db(master_idx, _lin_to_db(_vol_master))
 	var vols := {
 		"Music": settings.vol_music,
 		"Ambience": settings.vol_ambience,
@@ -126,8 +138,9 @@ func apply_settings(settings: GameSettings) -> void:
 			AudioServer.set_bus_mute(idx, (not audio_enabled) or v <= 0.001)
 			AudioServer.set_bus_volume_db(idx, _lin_to_db(v))
 	if not audio_enabled:
-		if _ambience_player != null and _ambience_player.playing:
-			_ambience_player.stop()
+		for a in _ambience_decks:
+			if a.playing:
+				a.stop()
 		for m in _music_decks:
 			if m.playing:
 				m.stop()
@@ -137,9 +150,9 @@ func set_paused(paused: bool) -> void:
 	_paused = paused
 	var master_idx := AudioServer.get_bus_index("Master")
 	if master_idx >= 0:
-		AudioServer.set_bus_mute(master_idx, paused or not audio_enabled)
-	if _ambience_player != null:
-		_ambience_player.stream_paused = paused
+		AudioServer.set_bus_mute(master_idx, paused or (not audio_enabled) or _vol_master <= 0.001)
+	for a in _ambience_decks:
+		a.stream_paused = paused
 	for m in _music_decks:
 		m.stream_paused = paused
 
@@ -173,6 +186,11 @@ func _load_stream(res_path: String, want_loop: bool = false) -> AudioStream:
 func play_sfx(sfx_id: String, bus: String = "Combat", pitch_jitter: float = 0.05) -> bool:
 	if not audio_enabled or _paused:
 		return false
+	var now_ms := Time.get_ticks_msec()
+	if not (sfx_id in ["ui_click", "ui_confirm", "death", "victory"]):
+		var prev_ms := int(_sfx_last_ms.get(sfx_id, -1000))
+		if now_ms - prev_ms < SFX_COOLDOWN_MS:
+			return false
 	_ensure_players()
 	var path := "res://assets/audio/sfx/%s.ogg" % sfx_id
 	var stream := _load_stream(path, false)
@@ -181,10 +199,12 @@ func play_sfx(sfx_id: String, bus: String = "Combat", pitch_jitter: float = 0.05
 	var player := _sfx_pool[_sfx_cursor % _sfx_pool.size()]
 	if not player.is_inside_tree():
 		return false
+	_sfx_last_ms[sfx_id] = now_ms
 	_sfx_cursor += 1
 	player.bus = StringName(bus if BUSES.has(bus) else "Combat")
 	player.stream = stream
 	player.pitch_scale = 1.0 + _cosmetic_rng.randf_range(-pitch_jitter, pitch_jitter) if pitch_jitter > 0.0 else 1.0
+	player.volume_db = _cosmetic_rng.randf_range(-1.0, 1.0) if pitch_jitter > 0.0 else 0.0
 	player.play()
 	return true
 
@@ -193,27 +213,49 @@ func play_ui(sfx_id: String = "ui_click") -> bool:
 	return play_sfx(sfx_id, "Interface", 0.02)
 
 
-func set_ambience_sphere(sphere_num: int) -> bool:
-	if sphere_num == current_sphere and _ambience_player != null and (_ambience_player.playing or not audio_enabled):
+func set_ambience_sphere(sphere_num: int, fade_sec: float = 1.0) -> bool:
+	_ensure_players()
+	if sphere_num == current_sphere and not _ambience_decks.is_empty() and (_ambience_decks[_active_amb_deck].playing or not audio_enabled):
 		return true
 	current_sphere = sphere_num
-	_ensure_players()
 	if sphere_num < 1 or sphere_num >= SPHERE_NAMES.size() or not audio_enabled:
-		if _ambience_player != null and _ambience_player.playing:
-			_ambience_player.stop()
+		for a in _ambience_decks:
+			if a.playing:
+				a.stop()
 		return false
 	var sid := SPHERE_NAMES[sphere_num]
 	var path := "res://assets/audio/ambience/sphere_%d_%s.ogg" % [sphere_num, sid]
 	var stream := _load_stream(path, true)
 	if stream == null:
-		if _ambience_player.playing:
-			_ambience_player.stop()
+		for a in _ambience_decks:
+			if a.playing:
+				a.stop()
 		return false
-	if _ambience_player == null or not _ambience_player.is_inside_tree():
+	var prev := _ambience_decks[_active_amb_deck]
+	_active_amb_deck = (_active_amb_deck + 1) % _ambience_decks.size()
+	var next_amb := _ambience_decks[_active_amb_deck]
+	if not next_amb.is_inside_tree():
 		return false
-	if _ambience_player.stream != stream or not _ambience_player.playing:
-		_ambience_player.stream = stream
-		_ambience_player.play()
+	next_amb.stream = stream
+	if _ambience_tween != null and _ambience_tween.is_valid():
+		_ambience_tween.kill()
+	_ambience_tween = null
+	if prev.playing and fade_sec > 0.05 and is_inside_tree():
+		next_amb.volume_db = -30.0
+		next_amb.play()
+		_ambience_tween = create_tween()
+		_ambience_tween.set_parallel(true)
+		_ambience_tween.tween_property(next_amb, "volume_db", 0.0, fade_sec)
+		_ambience_tween.tween_property(prev, "volume_db", -34.0, fade_sec)
+		_ambience_tween.chain().tween_callback(func() -> void:
+			if is_instance_valid(prev) and prev != _ambience_decks[_active_amb_deck]:
+				prev.stop()
+				prev.volume_db = 0.0)
+	else:
+		if prev.playing:
+			prev.stop()
+		next_amb.volume_db = 0.0
+		next_amb.play()
 	return true
 
 
@@ -326,6 +368,18 @@ func handle_events(world: World, skip_steps: bool = false) -> int:
 				count += 1
 			"mask_switch":
 				play_sfx("mask_switch", "Narrative", 0.03)
+				count += 1
+			"identify":
+				play_sfx("identify", "Interface", 0.02)
+				count += 1
+			"contract_sign":
+				play_sfx("contract_sign", "Narrative", 0.02)
+				count += 1
+			"seal_break":
+				play_sfx("seal_break", "Narrative", 0.02)
+				count += 1
+			"level_up":
+				play_sfx("discovery", "Narrative", 0.02)
 				count += 1
 			"subjugation", "entangled":
 				play_sfx("chain_strike", "Combat")
