@@ -23,6 +23,8 @@ var high_contrast: bool = false
 ## Highlighted tile (look mode, travel target); (-1, -1) for none.
 var marker := Vector2i(-1, -1)
 var aim_path: Array[Vector2i] = []
+var vfx := VfxLayer.new()
+var _event_serial: int = 0
 var _font: Font
 var _press_at := -1.0
 var _press_pos := Vector2.ZERO
@@ -36,11 +38,19 @@ func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	# A held press turns into an inspect without waiting for release.
 	if _press_at >= 0.0 and Time.get_ticks_msec() / 1000.0 - _press_at >= LONG_PRESS_SEC:
 		_press_at = -1.0
 		tile_inspected.emit(screen_to_tile(_press_pos))
+	if vfx.step(delta):
+		queue_redraw()
+
+
+func pump_events(skip_anims: bool = false) -> void:
+	if world == null:
+		return
+	_event_serial = vfx.consume_events(world.events, _event_serial, skip_anims)
 
 
 func effective_tile_px() -> int:
@@ -117,7 +127,7 @@ func _draw() -> void:
 	var cols := maxi(1, int(size.x / px))
 	var rows := maxi(1, int(size.y / px))
 	var o := _origin()
-	var off := _offset()
+	var off := _offset() + vfx.screen_shake_offset()
 	var fsize := maxi(10, int(px * 0.82))
 	var floor_hash := int(m.floor_id.hash())
 	var fdef := world.current_floor_def()
@@ -189,19 +199,20 @@ func _draw() -> void:
 							drew_top = true
 					if vis and actors.has(p):
 						var a: Actor = actors[p]
+						var arect := Rect2(rect.position + vfx.actor_tile_offset(a.id) * px, rect.size)
 						if a.is_player:
 							var layers := registry.player_layers(a)
 							if not layers.is_empty():
 								for lr in layers:
-									draw_texture_rect_region(lr["texture"], rect, lr["rect"], Color.WHITE)
-								_draw_player_ring(rect)
+									draw_texture_rect_region(lr["texture"], arect, lr["rect"], Color.WHITE)
+								_draw_player_ring(arect)
 								drew_top = true
 						else:
 							var areg := registry.actor_region(a, world.db)
 							if not areg.is_empty():
-								_draw_actor_underlay(rect, a)
-								draw_texture_rect_region(areg["texture"], rect, areg["rect"], Color.WHITE)
-								_draw_actor_overlays(rect, a)
+								_draw_actor_underlay(arect, a)
+								draw_texture_rect_region(areg["texture"], arect, areg["rect"], Color.WHITE)
+								_draw_actor_overlays(arect, a)
 								drew_top = true
 					if decorative_lighting and vis:
 						_draw_lighting_tile(rect, tile_id, feat, dist)
@@ -258,6 +269,7 @@ func _draw() -> void:
 		var mc := off + Vector2(marker - o) * px
 		var mcol := Palette.color_for_mode(Palette.FALSE_SUN, "gold", color_mode, high_contrast)
 		draw_rect(Rect2(mc, Vector2(px, px)), mcol, false, 2.0)
+	vfx.draw_effects(self, o, off, px, _font, fsize, size)
 
 
 func _draw_hazard_pattern(rect: Rect2, tile_id: int, vis: bool) -> void:

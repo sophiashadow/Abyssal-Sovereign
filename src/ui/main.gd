@@ -665,6 +665,13 @@ func _sync_map_settings() -> void:
 	map.decorative_lighting = settings.decorative_lighting
 	map.color_mode = settings.color_mode
 	map.high_contrast = settings.high_contrast
+	map.vfx.anim_speed = settings.anim_speed
+	map.vfx.instant_actions = settings.instant_actions
+	map.vfx.reduced_motion = settings.reduced_motion
+	map.vfx.screen_shake = settings.screen_shake
+	map.vfx.particles_on = settings.particles
+	map.vfx.floating_text = settings.floating_text
+	map.vfx.flash_intensity = settings.flash_intensity
 	map.queue_redraw()
 
 
@@ -778,6 +785,8 @@ func _after_action() -> void:
 	if map != null:
 		map.aim_path = []
 		map.marker = Vector2i(-1, -1) if travel.is_empty() else travel[travel.size() - 1]
+		var skip_vfx := settings.instant_actions or (settings.instant_auto and (not auto.is_empty() or not travel.is_empty()))
+		map.pump_events(skip_vfx)
 	if world.state != World.State.PLAYING:
 		travel.clear()
 		SaveIO.delete()
@@ -1930,6 +1939,42 @@ func _show_settings(back: Callable) -> void:
 		settings.high_contrast = not settings.high_contrast
 		_sync_map_settings()
 		rebuild.call()))
+	col.add_child(_stepper("Animation speed", "%.1fx" % settings.anim_speed,
+		func(d: int) -> void:
+			var idx := GameSettings.ANIM_SPEEDS.find(settings.anim_speed)
+			if idx < 0:
+				idx = 1
+			settings.anim_speed = GameSettings.ANIM_SPEEDS[clampi(idx + d, 0, GameSettings.ANIM_SPEEDS.size() - 1)]
+			_sync_map_settings()
+			rebuild.call()))
+	col.add_child(_btn("Instant actions: %s" % ("on" if settings.instant_actions else "off"), func() -> void:
+		settings.instant_actions = not settings.instant_actions
+		_sync_map_settings()
+		rebuild.call()))
+	col.add_child(_btn("Reduced motion: %s" % ("on" if settings.reduced_motion else "off"), func() -> void:
+		settings.reduced_motion = not settings.reduced_motion
+		_sync_map_settings()
+		rebuild.call()))
+	col.add_child(_btn("Screen shake: %s" % ("on" if settings.screen_shake else "off"), func() -> void:
+		settings.screen_shake = not settings.screen_shake
+		_sync_map_settings()
+		rebuild.call()))
+	col.add_child(_btn("Particles: %s" % ("on" if settings.particles else "off"), func() -> void:
+		settings.particles = not settings.particles
+		_sync_map_settings()
+		rebuild.call()))
+	col.add_child(_btn("Floating combat text: %s" % ("on" if settings.floating_text else "off"), func() -> void:
+		settings.floating_text = not settings.floating_text
+		_sync_map_settings()
+		rebuild.call()))
+	col.add_child(_stepper("Flash intensity", "%d%%" % int(round(settings.flash_intensity * 100)),
+		func(d: int) -> void:
+			var idx := GameSettings.FLASH_LEVELS.find(settings.flash_intensity)
+			if idx < 0:
+				idx = 2
+			settings.flash_intensity = GameSettings.FLASH_LEVELS[clampi(idx + d, 0, GameSettings.FLASH_LEVELS.size() - 1)]
+			_sync_map_settings()
+			rebuild.call()))
 	col.add_child(_stepper("Travel speed", "%d steps/s" % settings.travel_speed,
 		func(d: int) -> void:
 			settings.travel_speed = clampi(settings.travel_speed + d * 5, 5, 60)

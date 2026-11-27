@@ -34,6 +34,7 @@ const MASK_RISK_MAX := 12
 const APOTHEOSIS_THRESHOLD := 8
 const GATE_METHODS: Array[String] = ["stormed", "serpents_key", "given_back", "by_name"]
 const LOG_LIMIT := 300
+const EVENT_LIMIT := 64
 ## The player recovers 1 health every this many turns (scaled by the
 ## species' heal_mult: a revenant mends at half speed).
 const REGEN_TURNS := 6
@@ -78,6 +79,9 @@ var messages: Array[Dictionary] = []
 var telemetry: Telemetry = null
 ## Bumped whenever messages change, so the UI can redraw lazily.
 var log_serial: int = 0
+## M8.6 read-only cosmetic presentation event ring buffer (never saved, never touches RNG).
+var events: Array[Dictionary] = []
+var event_serial: int = 0
 
 var _player_dist := PackedInt32Array()
 var _player_dist_pos := Vector2i(-99999, -99999)
@@ -599,6 +603,17 @@ func _nearest_free(m: FloorMap, p: Vector2i) -> Vector2i:
 
 # ---------------------------------------------------------------- log
 
+func _emit_event(kind: String, data: Dictionary = {}) -> void:
+	event_serial += 1
+	var ev := data.duplicate()
+	ev["serial"] = event_serial
+	ev["kind"] = kind
+	ev["turn"] = turns
+	events.append(ev)
+	if events.size() > EVENT_LIMIT:
+		events.pop_front()
+
+
 func _tel(cat: String, key: String, n: int = 1) -> void:
 	if telemetry != null:
 		telemetry.count(cat, key, n)
@@ -642,7 +657,9 @@ func player_move(dir: Vector2i) -> bool:
 	if not m.can_step(player.pos, target):
 		return false
 	var move_cost := COST_MOVE + (25 if m.get_tile(target) == Tiles.WATER_SHALLOW else 0)
+	var old_pos := player.pos
 	player.pos = target
+	_emit_event("move", {"actor_id": player.id, "from": old_pos, "to": target, "tile": m.get_tile(target), "is_player": true})
 	_on_actor_enter_tile(player, target)
 	if state != State.PLAYING:
 		return true
@@ -820,9 +837,11 @@ func player_fire(target_pos: Vector2i = Vector2i(-1, -1)) -> bool:
 	foe.awake = true
 	_remember_player(foe)
 	if not res["hit"]:
+		_emit_event("ranged_shot", {"from": player.pos, "to": foe.pos, "hit": false, "dmg_type": dtype})
 		log_msg("Your shot misses the %s." % foe.name, "combat")
 		return _finish_player_action(COST_ATTACK)
 	var dmg := 0 if int(res["damage"]) == 0 else maxi(1, int(res["damage"]) + w.total_mod(db, "damage"))
+	_emit_event("ranged_shot", {"from": player.pos, "to": foe.pos, "hit": true, "dmg_type": dtype, "amount": dmg})
 	var note := _combat_note(res)
 	log_msg("You shoot the %s for %d%s." % [foe.name, dmg, note], "combat")
 	if player.resource_kind() == "poise" and (bool(res["crit"]) or bool(res["sneak"])):
@@ -1176,6 +1195,7 @@ func player_work_relic(index: int) -> bool:
 	update_fov()
 	var msg := "You work the %s (-%d HP)." % [d["name"], cost] if cost > 0 else "You work the %s." % d["name"]
 	log_msg(msg, "good")
+	_emit_event("relic_work", {"pos": player.pos, "item_id": it.template_id})
 	_thread_event("relic", it.template_id)
 	_thread_event("work_relic", it.template_id)
 	return _finish_player_action(COST_ITEM)
@@ -1201,6 +1221,7 @@ func player_transmute_relic(index: int) -> bool:
 	way_serpent += 1
 	update_fov()
 	log_msg("You transmute the %s; its power stays with you." % d["name"], "lore")
+	_emit_event("relic_transmute", {"pos": player.pos, "item_id": it.template_id})
 	_thread_event("relic", it.template_id)
 	_thread_event("transmute_relic", it.template_id)
 	return _finish_player_action(COST_ITEM)
@@ -1438,6 +1459,7 @@ func player_switch_mask(mask_id: String) -> bool:
 					player.unlock_venefica(false)
 					log_msg("All three Masks have answered: Lux Venefica can now be unified (m).", "good")
 				_maybe_surface_venefica_naming()
+	_emit_event("mask_switch", {"pos": player.pos, "mask": player.mask})
 	update_fov()
 	var cost := COST_WAIT / 2 if player.talent_rank("quick_shift") > 0 else COST_WAIT
 	return _finish_player_action(cost)
@@ -2170,6 +2192,7 @@ func _chain_hit(sid: String) -> void:
 	if gain <= 0:
 		return
 	subjugation += gain
+	_emit_event("subjugation", {"pos": player.pos, "value": subjugation, "limit": chain_limit()})
 	if subjugation >= chain_limit():
 		_entangle()
 
@@ -2180,6 +2203,7 @@ func _entangle() -> void:
 		log_msg("The Severed Crown refuses the chain's last link.", "good")
 		return
 	_tel("entangled", "depth%d" % depth)
+	_emit_event("entangled", {"pos": player.pos, "depth": depth})
 	apply_status(player, "entangled")
 	log_msg("The chains close: you are Entangled.", "danger")
 	if player.has_trait("mask_stances") and player.mask == Masks.UNION_ID:
@@ -2327,6 +2351,7 @@ func _open_secret_door(pos: Vector2i) -> void:
 	f["revealed"] = true
 	f["used"] = true
 	m.set_tile(pos, Tiles.FLOOR)
+	_emit_event("door_open", {"pos": pos, "kind": "secret_door"})
 	update_fov()
 	var table: Array = current_floor_def().get("item_table", [])
 	if not table.is_empty():
@@ -2381,6 +2406,7 @@ func _on_actor_enter_tile(actor: Actor, pos: Vector2i) -> void:
 		var tdef: Dictionary = Ecology.TRAPS.get(String(f.get("sub", "spike")), Ecology.TRAPS["spike"])
 		f["revealed"] = true
 		f["used"] = true
+		_emit_event("trap_trigger", {"pos": pos, "trap": String(f.get("sub", "spike"))})
 		var ttype := String(tdef["damage_type"])
 		var mit := Combat.mitigate(Dice.roll(String(tdef["damage"]), rng), actor, ttype)
 		var dmg := int(mit["damage"])
@@ -3227,6 +3253,7 @@ func apply_status(a: Actor, sid: String) -> void:
 	a.statuses.append({"id": sid, "turns": dur})
 	if telemetry != null:
 		telemetry.on_status(self, a, sid)
+	_emit_event("status_apply", {"pos": a.pos, "status": sid, "is_player": a.is_player})
 	if a.is_player:
 		log_msg("%s: %s" % [sd["name"], sd["description"]], "danger" if sid in ["reckoning", "bleeding", "isolation", "perception_fog", "sundered", "burning", "chilled", "pinned", "hexed"] else "good")
 		if sid == "false_light" and a.mask == Masks.UNION_ID:
@@ -3359,6 +3386,7 @@ func _try_monster_special(m: FloorMap, mon: Actor) -> int:
 		mon.flags["spec_cd"] = 5
 		mon.flags["telegraph_x"] = player.pos.x
 		mon.flags["telegraph_y"] = player.pos.y
+		_emit_event("telegraph", {"pos": mon.pos, "target": player.pos, "actor_name": mon.name})
 		log_msg("The %s winds back a heavy blow toward (%d, %d)!" % [mon.name, player.pos.x, player.pos.y], "danger")
 		return COST_WAIT
 	if mon.specials.has("support_ward") and rng.chance_pct(50):
@@ -3497,6 +3525,7 @@ func _attack(attacker: Actor, defender: Actor) -> void:
 	var who := "You" if attacker.is_player else "The %s" % attacker.name
 	var whom := "you" if defender.is_player else "the %s" % defender.name
 	if not r["hit"]:
+		_emit_event("melee_miss", {"from": attacker.pos, "to": defender.pos, "is_player": attacker.is_player})
 		log_msg("%s miss%s %s." % [who, "" if attacker.is_player else "es", whom], "combat")
 		return
 	var verb := "hit" if attacker.is_player else "hits"
@@ -3504,6 +3533,7 @@ func _attack(attacker: Actor, defender: Actor) -> void:
 		verb = "strike unseen at" if attacker.is_player else "strikes unseen at"
 	var dtype := String(r.get("type", "physical"))
 	var hit_dmg := int(r["damage"])
+	_emit_event("melee_hit", {"from": attacker.pos, "to": defender.pos, "amount": hit_dmg, "dmg_type": dtype, "crit": bool(r["crit"]), "is_player": attacker.is_player})
 	var note := _combat_note(r)
 	if not attacker.is_player and attacker.specials.has("ambusher") and not attacker.flags.has("ambush_spent"):
 		attacker.flags["ambush_spent"] = 1
@@ -3580,6 +3610,7 @@ func apply_damage(target: Actor, amount: int, source: String, dmg_type: String =
 	amount = _apply_damage_combos(target, amount, dmg_type)
 	if telemetry != null:
 		telemetry.on_damage(self, target, amount, source, dmg_type)
+	_emit_event("damage", {"pos": target.pos, "amount": amount, "dmg_type": dmg_type, "is_player": target.is_player})
 	target.hp -= amount
 	if target.hp > 0:
 		if target.is_player and target.resource_kind() == "stamina":
@@ -3599,6 +3630,7 @@ func apply_damage(target: Actor, amount: int, source: String, dmg_type: String =
 		death_cause = source
 		if telemetry != null:
 			telemetry.on_death(self)
+		_emit_event("death", {"pos": target.pos, "cause": source})
 		log_msg("You die. The record closes over you.", "danger")
 		return
 	_kill_monster(target)
@@ -3792,6 +3824,7 @@ func _win() -> void:
 	state = State.WON
 	var vic := victory_kind()
 	_tel("victory", String(vic["id"]))
+	_emit_event("victory", {"pos": player.pos, "ending": String(vic["id"])})
 	if String(vic["id"]) == "by_decree":
 		log_msg("The Unwritten Door opens and accepts your seal. You won. That is the problem.", "lore")
 	else:

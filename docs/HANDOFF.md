@@ -113,7 +113,11 @@ Spec: `docs/M8_SPEC.md`.
 - **M8.5 The Sovereign Interface (complete, verified locally):**
   - Refined `src/ui/main.gd` with occult-medieval theme borders & high-contrast support, Title crest emblem, live layered Character Creation avatar preview, progressive-disclosure HP/Resource/Subjugation progress bars + Sphere emblem + quick `Tiles/Glyph` & `Z-/Z+` controls, responsive landscape (`1280x720`, `2340x1080`) and portrait (`720x1280`) layouts with safe-area padding and left/right-handed touch option, item sprites in Inventory & Item Inspection, institution emblems + two-pole bars + NPC sprites in People, Sphere emblems in Atlas, and Ending/Named Loss emblems on End screen.
   - Verified `tools/ui_smoke.gd` (`39` steps, `0` failures at `1280x720`, `2340x1080`, and `720x1280`) and full `./tools/test.sh` (`203` tests, `203` passed, `4623` checks).
-- **Next submilestone:** M8.6 — Motion, Impact and Feedback (`World.events` non-serialized presentation stream, `VfxLayer`, configurable animation/reduced-motion settings, `tests/test_m8_vfx.gd`).
+- **M8.6 Motion, Impact & Feedback (complete, verified locally):**
+  - Added bounded, non-serialized, non-RNG `World.events` ring buffer (`src/sim/world.gd`) emitting movement, melee, ranged, damage, status, telegraph, trap, door, relic, mask, subjugation, death, and victory events.
+  - Added `src/ui/vfx_layer.gd` (`VfxLayer`) integrated into `MapView` and `Main` with configurable `anim_speed`, `instant_actions`, `reduced_motion`, `screen_shake`, `particles`, `floating_text`, and `flash_intensity` in `GameSettings`.
+  - Added `tests/test_m8_vfx.gd` and verified `test_m8_vfx`, `test_save`, `test_m8_renderer`, and `tools/ui_smoke.gd`.
+- **Next submilestone:** M8.7 — The Sound of Terra Tenebrae (6-bus offline `AudioManager`, 24 procedural SFX, 7 Sphere ambient loops, isolated cosmetic variation, Android suspension handling).
 
 ## Owner decisions still open
 

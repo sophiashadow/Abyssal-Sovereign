@@ -8,6 +8,8 @@ const TEXT_SCALES: Array[float] = [0.85, 1.0, 1.15, 1.3, 1.5, 1.75]
 const TILE_SIZES: Array[int] = [16, 20, 24, 28, 32, 40, 48, 64]
 const ZOOM_LEVELS: Array[float] = [0.75, 1.0, 1.25, 1.5, 2.0]
 const COLOR_MODES: Array[String] = ["Standard", "Deutan/Protan", "Tritan"]
+const ANIM_SPEEDS: Array[float] = [0.5, 1.0, 1.5, 2.0]
+const FLASH_LEVELS: Array[float] = [0.0, 0.3, 0.6, 1.0]
 
 var text_scale_index: int = 1
 var tile_size_index: int = 4
@@ -19,6 +21,14 @@ var decorative_lighting: bool = true
 var color_mode: int = 0 ## 0=Standard, 1=R/G-safe, 2=B/Y-safe
 var high_contrast: bool = false
 var left_handed: bool = false
+## M8.6 motion & visual feedback preferences.
+var anim_speed: float = 1.0
+var instant_actions: bool = false
+var reduced_motion: bool = false
+var screen_shake: bool = true
+var particles: bool = true
+var floating_text: bool = true
+var flash_intensity: float = 0.6
 ## On-screen d-pad and action buttons. Defaults on for touch devices.
 var touch_controls: bool = false
 ## Steps per second while travelling or auto-exploring.
@@ -132,6 +142,13 @@ func load_from_disk() -> void:
 	color_mode = clampi(int(cfg.get_value("accessibility", "color_mode", color_mode)), 0, COLOR_MODES.size() - 1)
 	high_contrast = bool(cfg.get_value("accessibility", "high_contrast", high_contrast))
 	left_handed = bool(cfg.get_value("accessibility", "left_handed", left_handed))
+	anim_speed = clampf(float(cfg.get_value("motion", "anim_speed", anim_speed)), 0.5, 2.0)
+	instant_actions = bool(cfg.get_value("motion", "instant_actions", instant_actions))
+	reduced_motion = bool(cfg.get_value("motion", "reduced_motion", reduced_motion))
+	screen_shake = bool(cfg.get_value("motion", "screen_shake", screen_shake))
+	particles = bool(cfg.get_value("motion", "particles", particles))
+	floating_text = bool(cfg.get_value("motion", "floating_text", floating_text))
+	flash_intensity = clampf(float(cfg.get_value("motion", "flash_intensity", flash_intensity)), 0.0, 1.0)
 	touch_controls = bool(cfg.get_value("input", "touch_controls", touch_controls))
 	travel_speed = clampi(int(cfg.get_value("input", "travel_speed", travel_speed)), 5, 60)
 	instant_auto = bool(cfg.get_value("input", "instant_auto", instant_auto))
@@ -173,6 +190,13 @@ func save_to_disk() -> void:
 	cfg.set_value("accessibility", "color_mode", color_mode)
 	cfg.set_value("accessibility", "high_contrast", high_contrast)
 	cfg.set_value("accessibility", "left_handed", left_handed)
+	cfg.set_value("motion", "anim_speed", anim_speed)
+	cfg.set_value("motion", "instant_actions", instant_actions)
+	cfg.set_value("motion", "reduced_motion", reduced_motion)
+	cfg.set_value("motion", "screen_shake", screen_shake)
+	cfg.set_value("motion", "particles", particles)
+	cfg.set_value("motion", "floating_text", floating_text)
+	cfg.set_value("motion", "flash_intensity", flash_intensity)
 	cfg.set_value("input", "touch_controls", touch_controls)
 	cfg.set_value("input", "travel_speed", travel_speed)
 	cfg.set_value("input", "instant_auto", instant_auto)
