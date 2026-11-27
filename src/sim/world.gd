@@ -10,7 +10,7 @@ extends RefCounted
 ## id 1, so the player wins ties. Player actions return true if they spent
 ## time; the world then runs monsters until it is the player's turn again.
 
-const SAVE_VERSION := 11
+const SAVE_VERSION := 12
 const SUBJUGATION_LIMIT := 6
 ## Eight Chains grammar: monster tag -> status laid on the player and chance per hit.
 ## (chain_fog is delivered by the litany in _monster_turn.)
@@ -63,6 +63,8 @@ var contract: String = ""
 var contract_progress: int = 0
 ## contract id -> "fulfilled" | "broken"
 var contract_log: Dictionary = {}
+## M7.8 run profile id (content/core/difficulty.json). Saved with the run.
+var difficulty: String = "exile"
 var next_entity_id: int = 2
 var id_known: Dictionary = {}
 var id_aliases: Dictionary = {}
@@ -72,6 +74,8 @@ var faction_flags: Dictionary = {} # faction_id -> active pole id
 var npcs_met: Array[String] = []
 var threads_state: Dictionary = {"pool": [], "active": {}, "completed": [], "refused": [], "failed": [], "pending": []}
 var messages: Array[Dictionary] = []
+## M7.1 optional local observer. Null in normal play; never saved or read by the sim.
+var telemetry: Telemetry = null
 ## Bumped whenever messages change, so the UI can redraw lazily.
 var log_serial: int = 0
 
@@ -81,12 +85,14 @@ var _player_dist_pos := Vector2i(-99999, -99999)
 
 # ---------------------------------------------------------------- creation
 
-static func new_run(content: ContentDB, seed_value: int, species_id: String, class_id: String, hero_name: String) -> World:
+static func new_run(content: ContentDB, seed_value: int, species_id: String, class_id: String, hero_name: String, profile_id: String = "exile") -> World:
 	var w := World.new()
 	w.db = content
 	w.run_seed = seed_value
+	w.difficulty = Difficulty.normalise(content, profile_id)
 	w.rng = Rng.new(Rng.derive(seed_value, "play"))
 	w.player = w._make_player(species_id, class_id, hero_name)
+	Difficulty.adjust_starting_pack(w, w.player)
 	w._init_discovery()
 	w._build_atlas()
 	w.threads_state = Threads.init_state(content, w.atlas, seed_value)
@@ -436,7 +442,7 @@ func _build_floor_by_id(fid: String) -> FloorMap:
 	var fd := db.floor_def(fid)
 	var d := int(fd["depth"])
 	var extra: Array = atlas.get(fid, [])
-	var m := DungeonGen.generate(fd, _floor_seed_for(fid), extra)
+	var m := DungeonGen.generate(Difficulty.apply_to_floor(db, difficulty, fd), _floor_seed_for(fid), extra)
 	for pt in m.portals:
 		var tid := String(pt.get("target", ""))
 		if db.has("floors", tid):
@@ -558,6 +564,9 @@ func _enter_floor_by_id(target_id: String, arrival_kind: String, from_id: String
 		if not a.is_player:
 			a.next_time = maxi(a.next_time, time + 1)
 	_player_dist_pos = Vector2i(-99999, -99999)
+	if telemetry != null:
+		telemetry.on_floor(self, target_id)
+		_tel("floor_first" if first_ever else "floor_revisit", target_id)
 	_thread_event("floor", target_id)
 	_thread_event("visit_floor", target_id)
 	if not first_ever or target_id != db.spine_floor_id(1):
@@ -589,6 +598,11 @@ func _nearest_free(m: FloorMap, p: Vector2i) -> Vector2i:
 
 
 # ---------------------------------------------------------------- log
+
+func _tel(cat: String, key: String, n: int = 1) -> void:
+	if telemetry != null:
+		telemetry.count(cat, key, n)
+
 
 func log_msg(text: String, kind: String = "info") -> void:
 	if text == "":
@@ -695,6 +709,7 @@ func player_use_at(index: int, target_pos: Vector2i = Vector2i(-1, -1)) -> bool:
 			acted = _finish_player_action(COST_ITEM)
 		if acted:
 			id_known[it.template_id] = true
+			_tel("consumable", it.template_id)
 		return acted
 	if String(d["kind"]) == "relic":
 		return player_work_relic(index)
@@ -706,6 +721,7 @@ func player_use_at(index: int, target_pos: Vector2i = Vector2i(-1, -1)) -> bool:
 		return false
 	var was_unid := not it.identified
 	it.identified = true
+	_tel("equip", _slot_for(it) + ":" + it.template_id + (":" + it.rarity if it.rarity != "common" else ""))
 	player.inventory.remove_at(index)
 	var hp_frac := float(player.hp) / float(player.stat("max_hp"))
 	player.equipment[slot] = it
@@ -1111,6 +1127,7 @@ func player_work_relic(index: int) -> bool:
 	var d := it.def(db)
 	if String(d["kind"]) != "relic":
 		return false
+	_tel("relic_worked", it.template_id)
 	var sid := String(d["work_status"])
 	var cost := int(d.get("work_cost_hp", 0))
 	if cost > 0 and player.has_trait("infernal_blood"):
@@ -1164,6 +1181,7 @@ func player_transmute_relic(index: int) -> bool:
 	if String(d["kind"]) != "relic":
 		return false
 	var mods: Dictionary = d.get("transmute_mods", {})
+	_tel("relic_transmuted", it.template_id)
 	_grant_permanent(mods)
 	player.inventory.remove_at(index)
 	var freed := unbind_curses(true)
@@ -1269,6 +1287,7 @@ func player_descend_gate(method: String) -> bool:
 					player.unlock_venefica(true)
 					log_msg("The gate answers your spoken name — Lux Venefica can now unify early (m).", "good")
 	if first_visit:
+		_tel("gate", method)
 		_contract_event("gate:" + method)
 		_contract_event("descend")
 	var from_id := floor_id
@@ -1452,6 +1471,7 @@ func player_learn_talent(tid: String) -> bool:
 		return false
 	player.talents[tid] = player.talent_rank(tid) + 1
 	player.talent_points -= 1
+	_tel("talent_learned", tid)
 	update_fov()
 	var td := db.get_def("talents", tid)
 	log_msg("Learned %s (rank %d/%d)." % [td["name"], player.talent_rank(tid), int(td["max_rank"])], "good")
@@ -1505,6 +1525,7 @@ func player_use_talent(tid: String, target_pos: Vector2i = Vector2i(-1, -1)) -> 
 		if target == null:
 			log_msg("No target in range for %s." % td["name"], "info")
 			return false
+	_tel("talent_used", tid)
 	var action_cost := _run_talent_effect(String(td.get("effect", tid)), td, target, target_pos)
 	if action_cost < 0:
 		return false
@@ -2110,6 +2131,7 @@ func _chain_hit(sid: String) -> void:
 		return
 	if sid == "false_light" and (player.has_status("false_light") or player.has_status("reckoning")):
 		return
+	_tel("chain_hit", sid)
 	apply_status(player, sid)
 	if player.has_trait("penance_vigor"):
 		player.resource = mini(player.max_resource(), player.resource + 2)
@@ -2141,6 +2163,7 @@ func _entangle() -> void:
 	if player.has_status("crown_decree"):
 		log_msg("The Severed Crown refuses the chain's last link.", "good")
 		return
+	_tel("entangled", "depth%d" % depth)
 	apply_status(player, "entangled")
 	log_msg("The chains close: you are Entangled.", "danger")
 	if player.has_trait("mask_stances") and player.mask == Masks.UNION_ID:
@@ -2192,6 +2215,7 @@ func player_sign_contract(cid: String) -> bool:
 	var cd := db.get_def("contracts", cid)
 	contract = cid
 	contract_progress = 0
+	_tel("contract_signed", cid)
 	apotheosis = maxi(0, apotheosis + int(cd.get("apotheosis", 0)))
 	log_msg("You sign %s. Oath: %s" % [cd["name"], cd["oath_text"]], "lore")
 	if player.has_trait("mask_stances") and player.mask == Masks.UNION_ID:
@@ -2232,6 +2256,7 @@ func _advance_contract() -> void:
 		else:
 			way_return += 1
 		contract_log[contract] = "fulfilled"
+		_tel("contract_fulfilled", contract)
 		_remove_status(player, String(cd["boon_status"]))
 		log_msg("%s is fulfilled; its reward stays with you." % cd["name"], "lore")
 		contract = ""
@@ -2249,6 +2274,7 @@ func _breach_contract(reason: String) -> void:
 	apply_status(player, "forsworn")
 	apotheosis += 1
 	contract_log[contract] = "broken"
+	_tel("contract_broken", contract)
 	log_msg("%s %s is void; you are Forsworn." % [reason, cd["name"]], "danger")
 	contract = ""
 	contract_progress = 0
@@ -2359,6 +2385,7 @@ func player_interact(pos: Vector2i, choice: String = "") -> bool:
 	if f.is_empty() or not bool(f.get("revealed", false)) or not Ecology.is_interactive(f):
 		return false
 	var kind := String(f["kind"])
+	_tel("interact", kind + ":" + (choice.split(":")[0] if choice != "" else "default"))
 	match kind:
 		"secret_door":
 			_open_secret_door(pos)
@@ -2822,6 +2849,7 @@ func discover_thread(tid: String) -> bool:
 		return false
 	if not Threads.activate(threads_state, tid, turns):
 		return false
+	_tel("thread_accepted", tid)
 	var tdef := db.get_def("threads", tid)
 	log_msg("Thread uncovered — %s: %s" % [String(tdef["name"]), String(tdef["lead_text"])], "lore")
 	return true
@@ -2859,6 +2887,7 @@ func resolve_thread(tid: String, method: String = "goal") -> bool:
 	var comp: Array = threads_state.get("completed", [])
 	if not comp.has(tid):
 		comp.append(tid)
+	_tel("thread_settled", tid + ":" + method)
 	_grant_thread_reward(tdef)
 	return true
 
@@ -2874,6 +2903,7 @@ func refuse_thread(tid: String) -> bool:
 	var act: Dictionary = threads_state.get("active", {})
 	act.erase(tid)
 	ref.append(tid)
+	_tel("thread_refused", tid)
 	var tdef := db.get_def("threads", tid)
 	var delay := maxi(4, int(tdef.get("delay_turns", 6)))
 	(threads_state["pending"] as Array).append({
@@ -2891,6 +2921,7 @@ func abandon_thread(tid: String) -> bool:
 		return false
 	act.erase(tid)
 	(threads_state["failed"] as Array).append(tid)
+	_tel("thread_abandoned", tid)
 	var tdef := db.get_def("threads", tid)
 	adjust_npc_standing(String(tdef["npc_id"]), -1)
 	log_msg("Thread abandoned: %s." % String(tdef["name"]), "info")
@@ -3527,6 +3558,8 @@ func apply_damage(target: Actor, amount: int, source: String, dmg_type: String =
 	if target.is_player and target.has_trait("bulwark_stance") and amount > 1 and (target.has_status("braced") or int(target.flags.get("wait_turn", -1)) == turns):
 		amount = maxi(1, amount * 3 / 4)
 	amount = _apply_damage_combos(target, amount, dmg_type)
+	if telemetry != null:
+		telemetry.on_damage(self, target, amount, source, dmg_type)
 	target.hp -= amount
 	if target.hp > 0:
 		if target.is_player and target.resource_kind() == "stamina":
@@ -3544,6 +3577,8 @@ func apply_damage(target: Actor, amount: int, source: String, dmg_type: String =
 		target.hp = 0
 		state = State.DEAD
 		death_cause = source
+		if telemetry != null:
+			telemetry.on_death(self)
 		log_msg("You die. The record closes over you.", "danger")
 		return
 	_kill_monster(target)
@@ -3557,6 +3592,7 @@ func _kill_monster(mon: Actor) -> void:
 	var m := current_floor()
 	m.actors.erase(mon)
 	log_msg("The %s is destroyed." % mon.name, "good")
+	_tel("boss_kill" if mon.tags.has("boss") else ("elite_kill" if mon.is_elite else "kill"), mon.template_id)
 	var sp := db.get_def("species", player.species_id)
 	gain_xp(int(roundf(mon.xp_value * float(sp.get("xp_mult", 1.0)))))
 	_thread_event("boss", mon.template_id)
@@ -3735,6 +3771,7 @@ func _win() -> void:
 	turns += 1
 	state = State.WON
 	var vic := victory_kind()
+	_tel("victory", String(vic["id"]))
 	if String(vic["id"]) == "by_decree":
 		log_msg("The Unwritten Door opens and accepts your seal. You won. That is the problem.", "lore")
 	else:
@@ -3797,6 +3834,7 @@ func to_dict() -> Dictionary:
 		"save_version": SAVE_VERSION,
 		"content": db.fingerprint(),
 		"seed": str(run_seed),
+		"difficulty": difficulty,
 		"depth": depth, "floor_id": floor_id,
 		"atlas": atlas.duplicate(true),
 		"visited_floors": visited_floors.duplicate(),
@@ -3966,6 +4004,10 @@ static func _migrate(d: Dictionary) -> Dictionary:
 		out["save_version"] = 11
 		if not out.has("threads_state"):
 			out["threads_state"] = {"pool": [], "active": {}, "completed": [], "refused": [], "failed": [], "pending": []}
+		ver = 11
+	if ver == 11:
+		out["save_version"] = 12
+		out["difficulty"] = String(out.get("difficulty", "exile"))
 	return out
 
 
@@ -4019,6 +4061,10 @@ static func from_dict(content: ContentDB, d: Dictionary, errors: PackedStringArr
 	var w := World.new()
 	w.db = content
 	w.run_seed = String(d["seed"]).to_int()
+	w.difficulty = String(d.get("difficulty", "exile"))
+	if not content.has("difficulty", w.difficulty):
+		errors.append("save has unknown difficulty '%s'" % w.difficulty)
+		return null
 	w.depth = int(d["depth"])
 	if w.depth < 1 or w.depth > content.max_depth():
 		errors.append("save has out-of-range depth %d" % w.depth)

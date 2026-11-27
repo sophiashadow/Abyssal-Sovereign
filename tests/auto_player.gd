@@ -15,7 +15,15 @@ extends RefCounted
 
 var world: World
 var _exit_map := PackedInt32Array()
-var _exit_depth := -1
+var _exit_floor := ""
+
+## M7.1 tunables. The defaults are the original M6.10 behaviour exactly; the
+## policies in policy_player.gd change them, and never on the basis of results.
+var heal_mul := 3 ## heal when hp * heal_mul < max_hp
+var rest_below_pct := 70 ## rest when hp% is below this and nothing is in view
+var projectile_all := false ## throw projectiles at ordinary foes, not just elites and bosses
+var false_light_vs_unique := true
+var approach_unaware := true ## walk toward foes that have not noticed the player
 
 
 func _init(w: World) -> void:
@@ -36,17 +44,20 @@ func step() -> bool:
 	while p.talent_points > 0:
 		if not _learn_next_talent():
 			break
-	if p.hp * 3 < p.stat("max_hp"):
+	if p.hp * heal_mul < p.stat("max_hp"):
 		var heal := _find_consumable("heal")
 		if heal >= 0:
 			return world.player_use(heal)
+	var pre := _policy_pre()
+	if pre >= 0:
+		return pre == 1
 	if p.has_trait("mask_stances"):
 		if p.mask != "bare_face" and p.mask_risk >= World.MASK_RISK_MAX - 2:
 			return world.player_switch_mask("bare_face")
 	for d in Grid.DIRS_8:
 		var a := m.actor_at(p.pos + d)
 		if a != null and a != p and m.can_step(p.pos, a.pos):
-			if a.unique and not p.has_status("false_light") and not p.has_status("reckoning"):
+			if false_light_vs_unique and a.unique and not p.has_status("false_light") and not p.has_status("reckoning"):
 				var vial := _find_consumable("status")
 				if vial >= 0:
 					return world.player_use(vial)
@@ -57,13 +68,13 @@ func step() -> bool:
 			return world.player_move(d)
 	if p.has_trait("mask_stances") and p.mask != "bare_face" and world.visible_hostiles().is_empty():
 		return world.player_switch_mask("bare_face")
-	if m.get_tile(p.pos) == Tiles.STAIRS_DOWN:
+	if m.get_tile(p.pos) == Tiles.STAIRS_DOWN and _may_descend():
 		if world.can_rest():
 			return world.player_rest(200) > 0
 		if world.needs_gate_to_descend():
-			return world.player_descend_gate("given_back" if world.apotheosis >= World.APOTHEOSIS_THRESHOLD - 2 else "by_name")
+			return world.player_descend_gate(_gate_method())
 		return world.player_stairs()
-	if p.hp * 10 < p.stat("max_hp") * 7 and world.can_rest():
+	if p.hp * 100 < p.stat("max_hp") * rest_below_pct and world.can_rest():
 		return world.player_rest(50) > 0
 	var unbind_idx := _find_scroll("unbind")
 	if unbind_idx >= 0 and _has_cursed_equipped():
@@ -105,8 +116,10 @@ func step() -> bool:
 		elif fk == "rune_puzzle":
 			return world.player_interact(p.pos, "solve_order")
 	var target := _nearest_visible_hostile()
+	if target != null and not approach_unaware and not target.awake and Grid.chebyshev(p.pos, target.pos) > 2:
+		target = null
 	if target != null:
-		if target.is_elite or target.unique or target.tags.has("boss"):
+		if projectile_all or target.is_elite or target.unique or target.tags.has("boss"):
 			var proj := _find_consumable("projectile")
 			if proj >= 0 and Grid.chebyshev(p.pos, target.pos) <= int(p.inventory[proj].def(world.db).get("range", 4)):
 				if world.player_use_at(proj, target.pos):
@@ -126,13 +139,30 @@ func step() -> bool:
 		var s := Pathing.step_down(m, d, p.pos, func(q: Vector2i) -> bool: return m.actor_at(q) != null and q != target.pos)
 		if s != p.pos:
 			return world.player_move(s - p.pos)
-	if _exit_depth != world.depth:
+	var goal := _policy_goal()
+	if goal >= 0:
+		return goal == 1
+	if _exit_floor != world.floor_id:
 		_exit_map = Pathing.distance_map(m, m.exit_pos)
-		_exit_depth = world.depth
+		_exit_floor = world.floor_id
 	var s2 := Pathing.step_down(m, _exit_map, p.pos, func(q: Vector2i) -> bool: return m.actor_at(q) != null)
 	if s2 != p.pos:
 		return world.player_move(s2 - p.pos)
 	return world.player_wait()
+
+
+## Policy hooks. -1 means "not handled"; 0 means an action was attempted and
+## spent no time; 1 means an action spent time. The base bot handles nothing.
+func _policy_pre() -> int:
+	return -1
+
+
+func _policy_goal() -> int:
+	return -1
+
+
+func _may_descend() -> bool:
+	return true
 
 
 ## Plays until the run ends or `max_actions` actions have been taken.
@@ -300,3 +330,12 @@ func _try_ranged_talent(foe: Actor) -> bool:
 		if _can_use_talent(tid) and dist <= int(world.db.get_def("talents", tid).get("range", 0)):
 			return world.player_use_talent(tid, foe.pos)
 	return false
+
+
+## Sphere Gate method. With no contract this is the M6.10 rule; an active
+## contract changes it only to keep that contract's oath (The Taken Name forbids
+## By Name and Given Back, so cross with the Serpent's Key).
+func _gate_method() -> String:
+	if world.contract == "the_taken_name":
+		return "serpents_key"
+	return "given_back" if world.apotheosis >= World.APOTHEOSIS_THRESHOLD - 2 else "by_name"

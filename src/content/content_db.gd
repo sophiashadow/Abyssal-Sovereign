@@ -201,6 +201,20 @@ func _kind_rules(kind: String, e: Dictionary, where: String) -> void:
 
 
 func _global_rules() -> void:
+	for cid in _data["classes"]:
+		var tree := String(_data["classes"][cid].get("signature_tree", ""))
+		if tree == "":
+			continue
+		var found := false
+		for tid in _data["talents"]:
+			var t: Dictionary = _data["talents"][tid]
+			if String(t.get("class_id", "")) == cid and String(t.get("tree", "")) == tree:
+				found = true
+				break
+		if not found:
+			errors.append("classes: '%s' signature_tree '%s' matches no talent tree of that calling" % [cid, tree])
+	if _data["difficulty"].size() > 0 and not _data["difficulty"].has("exile"):
+		errors.append("difficulty: the 'exile' profile (current balance) must exist")
 	# Spine floors must form an unbroken run of depths starting at 1, ending in a final exit.
 	var spine_depths := {}
 	for id in _data["floors"]:
@@ -371,6 +385,8 @@ func max_depth() -> int:
 func fingerprint() -> String:
 	var parts: PackedStringArray = []
 	for kind in ContentSchema.KINDS:
+		if kind == "difficulty":
+			continue # added in M7.8; kept out so older saves do not report changed content
 		for id in ids(kind):
 			parts.append(kind + "/" + id)
 	return str(Rng.derive(parts.size(), ",".join(parts)))

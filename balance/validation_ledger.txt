@@ -1,0 +1,6 @@
+# Seed-namespace ledger (M7.1). A salt listed here is spent: dev runs refuse it.
+# salt|status|note   (status: historical = used in M5/M6 tuning or validation; claimed = M7 validation, one use)
+balance|historical|default tools/soak.gd salt, used for tuning through M6
+heldout|historical|held-out confirmation salt through M6.9
+m6_final_validation|historical|M6.10 final validation; baseline reference only, not an optimization target
+m7_final_validation|claimed|2026-11-27T00:13:43

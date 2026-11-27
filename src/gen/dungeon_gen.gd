@@ -134,7 +134,7 @@ static func generate(floor_def: Dictionary, seed_value: int, extra_portals: Arra
 	var last_room := -1
 	for i in n_monsters:
 		# Group ~40% of encounters into multi-role squads inside the same room.
-		var r_idx := last_room if (last_room >= 0 and i % 3 == 1 and rng.chance_pct(75)) else int(rng.pick(monster_rooms))
+		var r_idx := last_room if (last_room >= 0 and i % 3 == 1 and rng.chance_pct(int(floor_def.get("group_pct", 75)))) else int(rng.pick(monster_rooms))
 		last_room = r_idx
 		var p := _free_spot(m, m.rooms[r_idx], occupied, rng)
 		if p.x < 0:
@@ -143,7 +143,7 @@ static func generate(floor_def: Dictionary, seed_value: int, extra_portals: Arra
 		regular_spawns.append(m.spawns.size())
 		m.spawns.append({"kind": "monster", "id": rng.pick_weighted(floor_def["monster_table"]), "pos": p})
 	if m.depth >= 2 and not regular_spawns.is_empty():
-		var elite_count := 2 if m.depth >= 4 and regular_spawns.size() >= 4 else 1
+		var elite_count := maxi(0, (2 if m.depth >= 4 and regular_spawns.size() >= 4 else 1) + int(floor_def.get("elite_delta", 0)))
 		var chosen := {}
 		for _e in elite_count:
 			var idx := int(rng.pick(regular_spawns))

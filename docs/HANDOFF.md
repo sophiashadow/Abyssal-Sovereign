@@ -2,7 +2,7 @@
 
 For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENTS.md` first; its rules win over this file. Update this file at every stop.
 
-## State as of 2026-11-26
+## State as of 2026-11-27 (M7 complete on branch; see below)
 
 - **Branch:** `main` (default branch on `origin`, github.com/sophiashadow/Abyssal-Sovereign), preserving full commit history from `ccr-c6f8b898-fu2jtp` and `fac51e8`.
 - **Milestones:** M0–M5 (`fac51e8`, Depth Pass complete), **M6 Breadth Pass (M6.1–M6.10 COMPLETE, save v11):**
@@ -31,11 +31,44 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
     - Windows export: `build/windows/abyssal-sovereign.exe` (`105M`); Web export: `build/web/index.html` (`5.5K`).
 - **NOT_RUN:** Windows runtime execution, Web browser `user://` IndexedDB persistence check, physical Android device install/playtest (no `adb` device connected), release-signed Android APK (no owner keystore outside repo), and M5.2–M6.10 human playtesting. There is no CI.
 
-## Known-Defect & Observation Register (for M7)
+## M7 Refinement Pass: complete (pending owner review) (branch `ccr-4b7d6997-36eyn5`, draft PR #1)
+
+Spec: `docs/M7_SPEC.md`. Owner authorized a push after each task (2026-11-26); no merge, release or publish.
+
+- **M7.1 Instrumented Abyss: implemented and tested locally.** `src/sim/telemetry.gd` (local observer), `tests/policy_player.gd` (8 policies), `tools/m7_soak.gd`, `tools/m7_report.gd`, `tools/m7_run.sh`, `balance/validation_ledger.txt`. `tools/test.sh`: 137 tests, 137 passed, 3917 checks. No validation salt spent; dev salt `m7dev`.
+- **Datasets (bot play, dev seeds, not human play):** `balance/b1_summary.md` (1248 runs, all policies), `balance/b2_summary.md` (384 runs; specialist, explorer and narrative re-run after bot fixes and mask discipline), `balance/mk1_summary.md` (occultist mask-discipline probe). Reproduce: `tools/m7_run.sh TAG --seeds=N [--policies=...]`. Raw JSONL is gitignored.
+- **Findings so far:**
+  - Rite Cantor and Occultist weakness under generic bots was a bot-competence gap (specialist rite_weaver wins 16/16 in b2; occultist with mask discipline rose from 50% to 79% in mk1, n=24).
+  - d2 mortality is largely dive pace (specialist enters d2 at level 1.6).
+  - Veil-Touched and Unrecorded trail by 15 to 20 points under generic play; radiant is 20.7% of damage taken and void 7.4%, so Veil-Touched's void +35 is near-worthless while its radiant -25 bites.
+  - Ophite Binder is weakest in explorer (31%).
+  - 14 active talents were never used by any policy in b2 (backstep, chain_reversal, cleanse_vapor, fade_to_ash, philosophers_loan, quiet_absolution, rite_blink, slip_the_margin, transmute_pain, unbroken_wall, unwork_chains, unyielding_march, vault_step, volatile_salve).
+  - `the_taken_name` contract: 21 broken vs 2 fulfilled in narrative and explorer runs; to be read in M7.6.
+  - Threads silently auto-abandon after 350 turns at depth 5 or deeper.
+- **M7.2 to M7.6 (audited, bot play on dev seeds; every row with evidence is in `balance/CHANGES.md`):**
+  - One stat change: Veil-Touched base HP 3 to 5 and radiant resist -25 to -10; Unrecorded base HP 3 to 4. Same-seed A/B (o0 to o1): Veil-Touched 56% to 61%, Unrecorded 66% to 68%, controls identical. Veil-Touched is still the weakest origin; whether a residual gap is intended is a human-playtest question.
+  - No change, with reasons: the 14 unused talents (all work, `tests/test_m7_talents.gd`); d2 Vault Enumerator (deaths follow arrival level: 16% at level 1, 8% at level 2, 0 of 563 at level 3 or more); Binder and Cantor (kit-dependent: 50% and 36% generic, 81% and 100% with a specialist); DoT and bursts (no unavoidable burst in 3,036 runs); healing and relic economy (`tests/test_m7_relics.gd`); Sphere pacing (even, narrative backtracking is a navigation problem).
+  - Bot fix: bots crossed every Sphere Gate By Name, which the contract The Taken Name forbids. They now use the Serpent's Key under that contract (c1: broken 12 to 0, fulfilled 2 to 11).
+  - Not instrumented, left to human playtest: per-Sphere mechanical identity; ending preference.
+  - `tools/test.sh` after this batch: 146 tests, 146 passed, 4023 checks, 107.9s (commit `c4cb219`, pushed).
+- **M7.7 Player agency and QoL: implemented, tested locally (commit `ca418cd`, pushed).** `src/sim/assist.gd` (Node-free): safe auto-explore, interruptible rest, travel between visited floors, quest/Atlas navigation, advisory descent warnings, equipment compare, inventory sort/filter/search, log filters, enemy inspection. Automation stops for hostiles, dangerous statuses, low or falling HP, hazards and revealed traps; it never uses features, signs contracts or crosses a new Sphere Gate. UI: Auto button (key O), configurable shortcuts, log filter, compare tooltips, confirmations for Transmute, dropping relics/rare gear and abandoning a thread, Atlas and Threads travel buttons, status details, options in Settings. The old Threads (J) and Codex (K) keys were shadowed by movement keys and never worked; defaults are now T and Z. `tools/test.sh`: 173 tests, 173 passed, 4187 checks (new: `test_m7_assist` 24, `test_m7_settings` 3). UI smoke: 39 steps, 0 failures. Limits: auto-explore cannot see hidden traps; the recommended-level hint is evidence-based for depth 2 only; touch layout and pacing feel need a human on a device.
+- **M7.8 Profiles and onboarding (commits `d5c13cf`, `ba2438c`).** Four descent profiles in `content/core/difficulty.json` (names provisional), `src/sim/difficulty.gd`, optional hints in `src/sim/hints.gd`, `SAVE_VERSION` 12 (v11 loads as Exile; unknown ids refused), profile shown on the create screen, pause overlay and run history. Same-seed bot A/B: Initiate 81%, Exile 75%, Adversary 70%, Sovereign 67%; adjacent profiles are within noise.
+- **M7.9 `docs/PLAYTEST.md` (`d9f4288`).** Coverage matrix, observation prompts, severity scale, local report template. No human playtest has run.
+- **M7.10 Final gate (2026-11-27).**
+  - Local, at code commit `d5c13cf` (later commits touch only docs, balance and the ledger): `tools/test.sh` 190 tests, 190 passed, 4323 checks, 110.6 s; UI smoke 39 steps, 0 failures.
+  - Validation soak, fresh salt `m7_final_validation` (spent), Exile, 512 runs, four bot policies: 369 won (72.1%), 52 died, 91 hit the action cap. Not comparable with M6.10's 75%.
+  - Exports (Godot 4.7.2 templates, SHA-512 checked): Linux built and launched under xvfb (exit 0, gameplay not driven); Windows built, runtime NOT_RUN; Web built, persistence NOT_RUN; Android debug APK built, `apksigner verify` passes, device install NOT_RUN.
+  - Report: `docs/M7_REPORT.md` (datasets, reproduction commands, known defects, playtest requirements, structured M8 recommendations).
+- **Open PR:** #1, draft. Nothing merged, released or published.
+- **NOT_RUN:** human playtest, Windows runtime, Web persistence, physical Android install, release-signed APK, CI (none exists).
+
+## Known-Defect & Observation Register (M6.10 items, status after M7)
 
 1. **`rite_weaver` calling win-rate trails peers (`10/24` in `m6_final_validation`; `penitent/rite_weaver` and `revenant/rite_weaver` `0/3`, plus `veilkin/ophite_binder` `0/3`):** Review `rite_weaver` durability/early Resonance economy and active talent usage (`Rite Cantor` lacks early physical mitigation compared to `Bastion Warden` / `Seam Alchemist`).
 2. **`d2 The Vault Enumerator` early mortality spike (`11` of `48` total deaths in `m6_final_validation`):** Evaluate Depth 2 spine boss stat/accuracy/telegraph tuning relative to level 2–3 builds.
 3. **Bot coverage scope (`branch_visits=0`, `avg_threads_settled=0.00` in `soak.gd`):** `AutoPlayer` paths directly to main-spine `down_pos`/`exit_pos`, so branch floors, alt-routes, and active thread goal chasing are verified by targeted unit tests (`test_atlas`, `test_threads`, `test_reachability`) rather than end-to-end soak traversal.
+
+**Status after M7 (bot play; see `docs/M7_REPORT.md`):** (1) Rite Cantor weakness was mostly a bot-competence gap (specialist wins 16/16 in b2); no stat change. (2) Vault Enumerator deaths follow arrival level; answered with an advisory warning, no nerf; still the largest death cluster on the validation salt (19 of 52 deaths at depth 2). (3) Branch and thread coverage remains test-based; Work-relic bot behaviour is still missing.
 
 ## Setup
 
@@ -46,19 +79,21 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
 
 ## Where things are
 
-- `ARCHITECTURE.md`: layers, determinism, saves (`SAVE_VERSION := 11`), decisions D1–D8.
+- `ARCHITECTURE.md`: layers, determinism, saves (`SAVE_VERSION := 12`), decisions D1–D8.
 - `DESIGN.md`: rules, numbers, balance tables (`m6_final_validation` recorded).
 - `ROADMAP.md`: Milestone summary and M7 next work.
 - `docs/LORE.md`: every lore element tagged Canon / Canon-derived / Interpretation / Proposed, plus excluded material.
 - `docs/WORLD_MANIFEST.md` & `content/lore/world_manifest.json`: portable setting manifest (`schema_version: 1`).
 - `docs/CONTENT_SCHEMA.md`: the JSON content format enforced by `tests/test_content.gd`.
 
-## Next assignment: Milestone 7 — Balance & Refinement (Not Started)
+## Next assignment: Milestone 8 (not started; needs owner authorization)
 
-- Address the M6.10 Known-Defect & Observation Register (`rite_weaver` durability, `The Vault Enumerator` Depth 2 spike, optional branch/thread `AutoPlayer` heuristics if desired for deeper soak coverage).
-- Conduct human playtest review across all 8×8 builds, desktop (`1280×720`) and phone (`2340×1080`) layouts, physical Android device install (`adb`), Windows & Web smoke verification, and release-keystore signing when ready.
+Do not begin M8 without the owner. First step is human playtest round 1 (`docs/PLAYTEST.md`). The structured recommendations, with evidence and cost, are at the end of `docs/M7_REPORT.md`.
 
 ## Owner decisions still open
+
+- Merge, or not, of draft PR #1 (M7).
+- Profile names and parameters (provisional); whether Veil-Touched's residual bot-play gap is intended.
 
 - Release Android keystore creation (owner creates outside the repo).
 - Formal canon promotion review for `Proposed` M6 entities (PR #300 locations/people/institutions/threads remain `Proposed`).

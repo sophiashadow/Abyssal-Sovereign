@@ -31,10 +31,18 @@ var aim_mode: Dictionary = {}
 var travel: Array[Vector2i] = []
 var _travel_seen := {}
 var _travel_clock := 0.0
+## Safe auto-explore or floor-to-floor travel (see Assist); {} when idle.
+var auto: Dictionary = {}
+var _auto_clock := 0.0
+## Command waiting for its new key while the Controls screen is open.
+var _capture_action := ""
+var _controls_note := ""
+var _inv_query := ""
 
 # Character creation choices
 var _pick_species := ""
 var _pick_class := ""
+var _pick_profile := ""
 
 
 func _ready() -> void:
@@ -237,6 +245,8 @@ func _show_create() -> void:
 		_pick_species = db.ids("species")[0]
 	if _pick_class == "":
 		_pick_class = db.ids("classes")[0]
+	if _pick_profile == "":
+		_pick_profile = Difficulty.normalise(db, settings.last_profile)
 	var col := _menu_column(1080.0)
 	col.add_theme_constant_override("separation", int(8 * settings.text_scale()))
 	col.add_child(_label("Who descends?", Palette.LUX, 1.4))
@@ -257,6 +267,11 @@ func _show_create() -> void:
 	col.add_child(_choice_row("classes", cl_desc))
 	col.add_child(cl_desc)
 
+	col.add_child(_label("Descent", Palette.GOLD, 1.05))
+	var pf_desc := _label("", Palette.TEXT_DIM, 0.85)
+	col.add_child(_profile_row(pf_desc))
+	col.add_child(pf_desc)
+
 	var seed_edit := LineEdit.new()
 	seed_edit.placeholder_text = "Seed (blank for random)"
 	seed_edit.custom_minimum_size.y = 44.0 * settings.text_scale()
@@ -267,7 +282,9 @@ func _show_create() -> void:
 	var begin := _btn("Begin the descent", func() -> void:
 		var seed_text := seed_edit.text.strip_edges()
 		var seed_value := seed_text.to_int() if seed_text.is_valid_int() else (Rng.derive(0, seed_text) if seed_text != "" else randi())
-		_start_game(World.new_run(db, seed_value, _pick_species, _pick_class, name_edit.text)))
+		settings.last_profile = _pick_profile
+		settings.save_to_disk()
+		_start_game(World.new_run(db, seed_value, _pick_species, _pick_class, name_edit.text, _pick_profile)))
 	begin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(begin)
 	row.add_child(_btn("Back", _show_title, 140.0 * settings.text_scale()))
@@ -302,6 +319,28 @@ func _choice_row(kind: String, desc: Label) -> Control:
 	return flow
 
 
+## Run profile picker (M7.8). Permadeath is the same in every profile.
+func _profile_row(desc: Label) -> Control:
+	var flow := HFlowContainer.new()
+	flow.add_theme_constant_override("h_separation", 8)
+	flow.add_theme_constant_override("v_separation", 8)
+	var group := ButtonGroup.new()
+	for id in Difficulty.ordered(db):
+		var b := Button.new()
+		b.toggle_mode = true
+		b.button_group = group
+		b.text = String(db.get_def("difficulty", id)["name"])
+		b.custom_minimum_size = Vector2(172.0 * settings.text_scale(), 44.0 * settings.text_scale())
+		b.button_pressed = id == _pick_profile
+		b.toggled.connect(func(on: bool) -> void:
+			if on:
+				_pick_profile = id
+				desc.text = Difficulty.summary(db, id))
+		flow.add_child(b)
+	desc.text = Difficulty.summary(db, _pick_profile)
+	return flow
+
+
 func _describe_choice(kind: String, id: String) -> String:
 	var d := db.get_def(kind, id)
 	var parts: PackedStringArray = [String(d["description"])]
@@ -319,6 +358,8 @@ func _describe_choice(kind: String, id: String) -> String:
 		for g in d.get("starting_equipment", []) + d.get("starting_items", []):
 			gear.append(String(db.get_def("items", String(g))["name"]))
 		parts.append("Carries: " + ", ".join(gear))
+		if String(d.get("signature_tree", "")) != "":
+			parts.append("Built around the %s tree." % String(d["signature_tree"]))
 	return "\n".join(parts)
 
 
@@ -397,7 +438,7 @@ func _build_game_screen() -> void:
 	actions.add_theme_constant_override("h_separation", int(6 * s))
 	actions.add_theme_constant_override("v_separation", int(6 * s))
 	var action_specs: Array = [["Get", _act_pickup], ["Bag", _show_inventory], ["Build", _show_build], ["Act", _show_abilities],
-			["Fire", _act_fire], ["Stairs", _act_stairs], ["Rest", _act_rest], ["Srch", _act_search], ["Look", _toggle_look], ["Menu", _show_pause]]
+			["Fire", _act_fire], ["Stairs", _act_stairs], ["Rest", _act_rest], ["Auto", _act_explore], ["Srch", _act_search], ["Look", _toggle_look], ["Menu", _show_pause]]
 	if world.player.has_trait("mask_stances"):
 		action_specs.insert(5, ["Mask", _show_masks])
 	for spec in action_specs:
@@ -428,23 +469,46 @@ func _build_game_screen() -> void:
 		side.add_child(pad_center)
 	else:
 		var mask_hint := "   Mask: m" if world.player.has_trait("mask_stances") else ""
-		side.add_child(_label("Move: arrows, numpad or hjklyubn\nWait: . or 5   Get: g   Bag: i%s\nBuild: c   Act: a (1-6)   Fire: f\nStairs: Enter   Rest: r   Srch: s\nUse: e   Look: x   Atlas: Tab\nMenu: Esc   Tap to travel; hold/right-click to look." % mask_hint, Palette.TEXT_DIM, 0.7))
+		side.add_child(_label(_key_help(mask_hint), Palette.TEXT_DIM, 0.7))
 	_refresh()
+
+
+func _key_name(action: String) -> String:
+	return OS.get_keycode_string(settings.key_for(action)).to_lower()
+
+
+func _key_help(mask_hint: String) -> String:
+	return "Move: arrows, numpad or hjklyubn\nWait: . or 5   Get: %s   Bag: %s%s\nBuild: %s   Act: %s (1-6)   Fire: %s\nStairs: Enter   Rest: %s   Auto-explore: %s\nSrch: %s   Use: %s   Look: %s\nAtlas: %s   Threads: %s   Log: %s\nMenu: Esc   Tap to travel; hold/right-click to look.\nAny key stops auto-explore." % [
+		_key_name("pickup"), _key_name("inventory"), mask_hint, _key_name("build"), _key_name("abilities"), _key_name("fire"),
+		_key_name("rest"), _key_name("explore"), _key_name("search"), _key_name("interact"), _key_name("look"),
+		_key_name("atlas"), _key_name("threads"), _key_name("logfilter")]
 
 
 func _refresh() -> void:
 	if world == null or map == null:
 		return
 	map.queue_redraw()
+	_maybe_hint()
 	_update_hud()
 	if world.log_serial != _log_seen:
 		_log_seen = world.log_serial
 		var lines: PackedStringArray = []
-		var start := maxi(0, world.messages.size() - 60)
-		for i in range(start, world.messages.size()):
-			var msg: Dictionary = world.messages[i]
+		for msg in Assist.filter_log(world.messages, settings.log_kinds(), 60):
 			lines.append("[color=#%s]%s[/color]" % [Palette.log_color(String(msg["k"])).to_html(false), _escape(String(msg["t"]))])
 		log_view.text = "\n".join(lines)
+
+
+## One-time onboarding hint, posted to the log. Advice only: it needs no input,
+## never blocks a command, and stops for good once the player switches it off.
+func _maybe_hint() -> void:
+	if not settings.hints_on or overlay != null or not auto.is_empty() or world.state != World.State.PLAYING:
+		return
+	var h := Hints.next(world, settings.hints_seen)
+	if h.is_empty():
+		return
+	settings.hints_seen[String(h["id"])] = true
+	settings.save_to_disk()
+	world.log_msg("Hint: " + String(h["text"]), "info")
 
 
 func _escape(t: String) -> String:
@@ -540,6 +604,7 @@ func _act_dir(dir: Vector2i) -> void:
 	if overlay != null or world.state != World.State.PLAYING:
 		return
 	travel.clear()
+	auto.clear()
 	if dir == Vector2i.ZERO:
 		world.player_wait()
 	else:
@@ -563,9 +628,75 @@ func _act_stairs() -> void:
 
 
 func _act_rest() -> void:
-	if overlay == null:
-		world.player_rest()
+	if overlay == null and world.state == World.State.PLAYING:
+		var r := Assist.rest(world)
 		_after_action()
+		_say(String(r["stop"]))
+
+
+## One line under the map; empty clears it.
+func _say(text: String) -> void:
+	if look_label == null:
+		return
+	look_label.text = text
+	look_label.visible = text != ""
+
+
+func _act_explore() -> void:
+	if overlay != null or world.state != World.State.PLAYING:
+		return
+	travel.clear()
+	_start_auto({"kind": "explore", "st": Assist.new_state()})
+
+
+func _start_floor_travel(dest: String) -> void:
+	_close_overlay()
+	_start_auto({"kind": "floor", "dest": dest, "st": Assist.new_state()})
+
+
+func _start_auto(spec: Dictionary) -> void:
+	auto = spec
+	_auto_clock = 0.0
+	_say("Esc or any key interrupts." if not settings.touch_controls else "Tap to interrupt.")
+	if settings.instant_auto:
+		var guard := 0
+		while not auto.is_empty() and guard < 600:
+			guard += 1
+			if not _auto_tick():
+				break
+
+
+## One automated step. Returns false when it has stopped (and says why).
+func _auto_tick() -> bool:
+	if auto.is_empty() or world.state != World.State.PLAYING:
+		auto.clear()
+		return false
+	var r: Dictionary
+	if String(auto["kind"]) == "explore":
+		r = Assist.explore_step(world, auto["st"])
+	else:
+		r = Assist.travel_step(world, String(auto["dest"]), auto["st"])
+	if bool(r["acted"]):
+		_after_action()
+		if world.state != World.State.PLAYING:
+			auto.clear()
+			return false
+		return true
+	var why := String(r["stop"])
+	if bool(r.get("done", false)) and String(auto["kind"]) == "explore":
+		why = "Auto-explore: %s" % why
+	auto.clear()
+	_say(why)
+	_refresh()
+	return false
+
+
+func _stop_auto() -> bool:
+	if auto.is_empty():
+		return false
+	auto.clear()
+	_say("Stopped.")
+	return true
 
 
 func _act_search() -> void:
@@ -706,13 +837,19 @@ func _toggle_look() -> void:
 func _on_tile_inspected(p: Vector2i) -> void:
 	look_mode = false
 	map.marker = p
-	look_label.text = world.describe_at(p)
+	var text := world.describe_at(p)
+	var foe := world.current_floor().actor_at(p)
+	if foe != null and not foe.is_player and world.current_floor().is_visible(p):
+		text += " " + Assist.inspect_actor(world, foe)
+	look_label.text = text
 	look_label.visible = true
 	map.queue_redraw()
 
 
 func _on_tile_tapped(p: Vector2i) -> void:
 	if overlay != null or world.state != World.State.PLAYING:
+		return
+	if _stop_auto():
 		return
 	if not aim_mode.is_empty():
 		aim_mode["target"] = p
@@ -765,6 +902,14 @@ func _on_tile_tapped(p: Vector2i) -> void:
 
 
 func _process(delta: float) -> void:
+	if not auto.is_empty() and screen == Screen.GAME and overlay == null:
+		_auto_clock += delta
+		var step_every := 1.0 / float(settings.travel_speed)
+		while _auto_clock >= step_every and not auto.is_empty():
+			_auto_clock -= step_every
+			if not _auto_tick():
+				break
+		return
 	if travel.is_empty() or screen != Screen.GAME or overlay != null:
 		return
 	_travel_clock += delta
@@ -820,6 +965,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not (event is InputEventKey) or not event.is_pressed():
 		return
 	var k := event as InputEventKey
+	if _capture_action != "":
+		get_viewport().set_input_as_handled()
+		_finish_capture(k.keycode)
+		return
+	if screen == Screen.GAME and overlay == null and _stop_auto():
+		get_viewport().set_input_as_handled()
+		return
 	if k.keycode == KEY_ESCAPE:
 		if screen == Screen.GAME:
 			if overlay != null:
@@ -852,39 +1004,57 @@ func _unhandled_input(event: InputEvent) -> void:
 		_act_dir(KEY_DIRS[k.keycode])
 	elif k.keycode in [KEY_PERIOD, KEY_KP_5, KEY_SPACE, KEY_KP_PERIOD]:
 		_act_dir(Vector2i.ZERO)
-	elif k.keycode in [KEY_G, KEY_COMMA]:
+	elif k.keycode == KEY_COMMA:
 		_act_pickup()
-	elif k.keycode == KEY_I:
-		_show_inventory()
-	elif k.keycode == KEY_R:
-		_act_rest()
-	elif k.keycode == KEY_X:
-		_toggle_look()
-	elif k.keycode == KEY_M:
-		_show_masks()
-	elif k.keycode == KEY_C:
-		_show_build()
-	elif k.keycode == KEY_A:
-		_show_abilities()
-	elif k.keycode == KEY_F:
-		_act_fire()
-	elif k.keycode == KEY_S:
-		_act_search()
-	elif k.keycode == KEY_E:
-		_act_interact()
-	elif k.keycode == KEY_TAB:
-		_show_atlas()
-	elif k.keycode == KEY_P:
-		_show_people()
-	elif k.keycode == KEY_J:
-		_show_threads()
-	elif k.keycode == KEY_K:
-		_show_codex()
+	elif settings.action_for(k.keycode) != "":
+		_run_shortcut(settings.action_for(k.keycode))
 	elif k.keycode >= KEY_1 and k.keycode <= KEY_6:
 		var idx := k.keycode - KEY_1
 		var acts := world.learned_active_talents()
 		if idx < acts.size() and world.player_use_talent(acts[idx]):
 			_after_action()
+
+
+func _run_shortcut(action: String) -> void:
+	match action:
+		"pickup": _act_pickup()
+		"inventory": _show_inventory()
+		"rest": _act_rest()
+		"explore": _act_explore()
+		"look": _toggle_look()
+		"build": _show_build()
+		"abilities": _show_abilities()
+		"fire": _act_fire()
+		"search": _act_search()
+		"interact": _act_interact()
+		"masks": _show_masks()
+		"atlas": _show_atlas()
+		"people": _show_people()
+		"threads": _show_threads()
+		"codex": _show_codex()
+		"logfilter": _cycle_log_filter()
+
+
+func _cycle_log_filter() -> void:
+	settings.log_filter_index = (settings.log_filter_index + 1) % GameSettings.LOG_FILTERS.size()
+	settings.save_to_disk()
+	_log_seen = -1
+	_refresh()
+	_say("Log: %s" % settings.log_filter_name())
+
+
+## Asks before an irreversible choice, unless the player turned that off.
+## "No" is focused, so a stray Enter keeps things as they are.
+func _confirm(heading: String, detail: String, yes_label: String, on_yes: Callable, back: Callable) -> void:
+	if not settings.confirm_destructive:
+		on_yes.call()
+		return
+	var col := _open_overlay(heading, Palette.ALERT)
+	col.add_child(_label(detail, Palette.TEXT_DIM, 0.9))
+	var no := _btn("Keep as is", back)
+	col.add_child(no)
+	col.add_child(_btn(yes_label, on_yes))
+	no.call_deferred("grab_focus")
 
 
 # ================================================================ overlays
@@ -903,6 +1073,16 @@ func _show_build() -> void:
 			res_parts.append("%s %+d%%" % [dt.capitalize(), rv])
 	if not res_parts.is_empty():
 		col.add_child(_label("Resists: " + ", ".join(res_parts), Palette.RECORD, 0.85))
+	for st in p.statuses:
+		var sd := db.get_def("statuses", String(st["id"]))
+		var fx: PackedStringArray = []
+		for mk in sd.get("mods", {}):
+			fx.append("%s %+d" % [String(mk).replace("_", " "), int(sd["mods"][mk])])
+		if int(sd.get("regen", 0)) != 0:
+			fx.append("%+d health a turn" % int(sd["regen"]))
+		var tail := (" (" + ", ".join(fx) + ")") if not fx.is_empty() else ""
+		var then := ", then %s" % String(db.get_def("statuses", String(sd["on_expire"]))["name"]) if sd.has("on_expire") and db.has("statuses", String(sd["on_expire"])) else ""
+		col.add_child(_label("%s, %d turns%s%s: %s" % [sd["name"], int(st["turns"]), then, tail, sd.get("description", "")], Color(String(sd.get("color", "#eee5d3"))).lerp(Palette.TEXT, 0.3), 0.82))
 	for sline in ItemSets.summaries(p, db):
 		col.add_child(_label("Set: " + sline, Palette.GOOD, 0.85))
 	var attr_row := HBoxContainer.new()
@@ -1178,6 +1358,9 @@ func _show_gate() -> void:
 		next_fd = db.floor_for_depth(world.depth + 1)
 	var sphere := String(next_fd.get("sphere", "the next sphere"))
 	var col := _open_overlay("Sphere Gate: %s" % sphere, Palette.FALSE_SUN)
+	if settings.warn_descent:
+		for line in Assist.descent_warnings(world):
+			col.add_child(_label("Advisory: " + line, Palette.FALSE_SUN, 0.85))
 	col.add_child(_label("Choose how to cross into %s:" % next_fd.get("name", sphere), Palette.TEXT_DIM, 0.85))
 	var choices := [
 		["stormed", "Stormed", "Force the gate (-3 HP, +apotheosis)."],
@@ -1241,6 +1424,7 @@ func _show_masks() -> void:
 func _open_overlay(title: String, title_color: Color = Palette.LUX) -> VBoxContainer:
 	_close_overlay()
 	travel.clear()
+	auto.clear()
 	overlay = Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -1304,6 +1488,15 @@ func _show_atlas() -> void:
 			var bname := String(bdef.get("name", bid)) if vis_b else "Unvisited branch (%s)" % String(bdef.get("region_kind", "branch")).capitalize()
 			if visited_s or vis_b:
 				col.add_child(_label("  └ %s%s" % [bname, "  [HERE]" if here_b else ""], Palette.GOOD if here_b else Palette.TEXT_DIM, 0.82))
+	var dests := Assist.travel_destinations(world)
+	if not dests.is_empty():
+		col.add_child(_label("Travel to a place you have been (stops for foes, hazards and unvisited gates):", Palette.GOLD, 0.88))
+		for dd in dests:
+			var fid := String(dd["floor_id"])
+			var tb := _btn("Go: %s" % String(dd["name"]), func() -> void: _start_floor_travel(fid))
+			tb.disabled = not bool(dd["reachable"])
+			tb.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			col.add_child(tb)
 	var close := _btn("Close", _close_overlay)
 	col.add_child(close)
 	close.call_deferred("grab_focus")
@@ -1353,10 +1546,21 @@ func _show_threads() -> void:
 			if db.has("threads", String(tid)):
 				var tdef := db.get_def("threads", String(tid))
 				col.add_child(_label("  • %s — %s" % [String(tdef["name"]), String(tdef["description"])], Palette.TEXT, 0.82))
+				for lead in Assist.thread_leads(world):
+					if String(lead["thread"]) != String(tid):
+						continue
+					if bool(lead["visited"]):
+						var fid := String(lead["floor_id"])
+						col.add_child(_btn("Travel toward %s" % String(lead["floor_name"]), func() -> void: _start_floor_travel(fid)))
+					else:
+						col.add_child(_label("    " + String(lead["note"]), Palette.TEXT_DIM, 0.78))
 				col.add_child(_btn("Abandon '%s'" % String(tdef["name"]), func() -> void:
-					world.abandon_thread(String(tid))
-					_close_overlay()
-					_after_action()))
+					_confirm("Abandon '%s'?" % String(tdef["name"]), "The person who asked will remember. The thread is recorded as abandoned and cannot be taken up again.", "Abandon it",
+						func() -> void:
+							world.abandon_thread(String(tid))
+							_close_overlay()
+							_after_action(),
+						_show_threads)))
 	var comp: Array = world.threads_state.get("completed", [])
 	if not comp.is_empty():
 		col.add_child(_label("Settled (%d):" % comp.size(), Palette.GOOD, 0.88))
@@ -1420,8 +1624,9 @@ func _show_codex(back: Callable = Callable()) -> void:
 		col.add_child(_label("  No completed descents yet.", Palette.TEXT_DIM, 0.82))
 	else:
 		for r in codex.runs.slice(0, 8):
-			var line := "  %s (%s %s) — %s at depth %d (%d turns, %d threads)" % [
+			var line := "  %s (%s %s, %s) — %s at depth %d (%d turns, %d threads)" % [
 				String(r.get("hero", "?")), String(r.get("species", "")), String(r.get("class_id", "")),
+				String(Difficulty.profile(db, String(r.get("difficulty", "exile"))).get("name", "Exile")),
 				String(r.get("title", r.get("outcome", ""))), int(r.get("depth", 1)), int(r.get("turns", 0)), int(r.get("threads_settled", 0))
 			]
 			col.add_child(_label(line, Palette.GOOD if String(r.get("outcome", "")) == "victory" else Palette.TEXT_DIM, 0.8))
@@ -1439,7 +1644,7 @@ func _show_pause() -> void:
 		return
 	var col := _open_overlay("Paused")
 	var fd := world.current_floor_def()
-	col.add_child(_label("%s. Seed %d." % [fd.get("name", ""), world.run_seed], Palette.TEXT_DIM, 0.85))
+	col.add_child(_label("%s. Seed %d. Descent: %s." % [fd.get("name", ""), world.run_seed, String(Difficulty.profile(db, world.difficulty).get("name", "Exile"))], Palette.TEXT_DIM, 0.85))
 	var resume := _btn("Resume", _close_overlay)
 	col.add_child(resume)
 	col.add_child(_btn("Atlas", _show_atlas))
@@ -1482,12 +1687,86 @@ func _show_settings(back: Callable) -> void:
 		settings.touch_controls = not settings.touch_controls
 		rebuild.call())
 	col.add_child(touch)
+	col.add_child(_btn("Auto-explore and travel: %s" % ("instant" if settings.instant_auto else "animated"), func() -> void:
+		settings.instant_auto = not settings.instant_auto
+		rebuild.call()))
+	col.add_child(_btn("Onboarding hints: %s" % ("on" if settings.hints_on else "off"), func() -> void:
+		settings.hints_on = not settings.hints_on
+		rebuild.call()))
+	col.add_child(_btn("Show hints again", func() -> void:
+		settings.hints_seen.clear()
+		settings.hints_on = true
+		rebuild.call()))
+	col.add_child(_btn("Gate advisories: %s" % ("on" if settings.warn_descent else "off"), func() -> void:
+		settings.warn_descent = not settings.warn_descent
+		rebuild.call()))
+	col.add_child(_btn("Confirm irreversible choices: %s" % ("on" if settings.confirm_destructive else "off"), func() -> void:
+		settings.confirm_destructive = not settings.confirm_destructive
+		rebuild.call()))
+	col.add_child(_stepper("Message log", settings.log_filter_name(),
+		func(d: int) -> void:
+			var n := GameSettings.LOG_FILTERS.size()
+			settings.log_filter_index = (settings.log_filter_index + d + n) % n
+			_log_seen = -1
+			rebuild.call()))
+	if not settings.touch_controls:
+		col.add_child(_btn("Keyboard shortcuts...", func() -> void:
+			settings.save_to_disk()
+			_show_controls(back)))
 	var done := _btn("Done", func() -> void:
 		settings.save_to_disk()
 		_apply_theme()
 		back.call())
 	col.add_child(done)
 	done.call_deferred("grab_focus")
+
+
+func _show_controls(back: Callable) -> void:
+	var col: VBoxContainer
+	if screen == Screen.GAME:
+		col = _open_overlay("Keyboard shortcuts")
+	else:
+		_clear()
+		col = _menu_column(620.0)
+		col.add_child(_label("Keyboard shortcuts", Palette.LUX, 1.3))
+	col.add_child(_label("Select a command, then press the new key. Esc cancels. Movement, Enter, Space, the number keys and Esc stay fixed.", Palette.TEXT_DIM, 0.85))
+	if _controls_note != "":
+		col.add_child(_label(_controls_note, Palette.FALSE_SUN, 0.85))
+	for a in GameSettings.SHORTCUT_ORDER:
+		var action: String = a
+		var waiting := _capture_action == action
+		var shown := "press a key..." if waiting else OS.get_keycode_string(settings.key_for(action))
+		var row := _btn("%s: %s" % [String(GameSettings.SHORTCUT_DEFAULTS[action][0]), shown], func() -> void:
+			_capture_action = action
+			_controls_note = ""
+			_show_controls(back))
+		row.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		col.add_child(row)
+	col.add_child(_btn("Reset to defaults", func() -> void:
+		settings.reset_shortcuts()
+		settings.save_to_disk()
+		_controls_note = "Shortcuts reset."
+		_show_controls(back)))
+	var done := _btn("Back", func() -> void:
+		_capture_action = ""
+		_controls_note = ""
+		_show_settings(back))
+	col.add_child(done)
+	done.call_deferred("grab_focus")
+
+
+## Takes the key pressed while a command is waiting to be rebound.
+func _finish_capture(keycode: int) -> void:
+	var action := _capture_action
+	_capture_action = ""
+	if keycode == KEY_ESCAPE:
+		_controls_note = ""
+	else:
+		var why := settings.rebind(action, keycode)
+		_controls_note = why if why != "" else "%s is now %s." % [String(GameSettings.SHORTCUT_DEFAULTS[action][0]), OS.get_keycode_string(keycode)]
+		if why == "":
+			settings.save_to_disk()
+	_show_controls(_build_game_screen if screen == Screen.GAME else _show_title)
 
 
 func _stepper(title: String, value: String, change: Callable) -> Control:
@@ -1522,21 +1801,64 @@ func _show_inventory() -> void:
 		if first == null and not b.disabled:
 			first = b
 	col.add_child(_label("Carried", Palette.GOLD, 1.0))
+	var controls := HBoxContainer.new()
+	controls.add_theme_constant_override("separation", 8)
+	var carried := VBoxContainer.new()
+	var sort_btn := _btn("Sort: %s" % Assist.SORTS[settings.inv_sort_index], func() -> void:
+		settings.inv_sort_index = (settings.inv_sort_index + 1) % Assist.SORTS.size()
+		settings.save_to_disk()
+		_show_inventory())
+	var filter_btn := _btn("Show: %s" % Assist.FILTERS[settings.inv_filter_index], func() -> void:
+		settings.inv_filter_index = (settings.inv_filter_index + 1) % Assist.FILTERS.size()
+		settings.save_to_disk()
+		_show_inventory())
+	var search := LineEdit.new()
+	search.placeholder_text = "Search"
+	search.text = _inv_query
+	search.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	search.text_changed.connect(func(t: String) -> void:
+		_inv_query = t
+		_fill_carried(carried))
+	for c in [sort_btn, filter_btn]:
+		c.focus_mode = Control.FOCUS_NONE
+		controls.add_child(c)
+	controls.add_child(search)
+	col.add_child(controls)
+	col.add_child(carried)
+	var carried_first := _fill_carried(carried)
+	if first == null:
+		first = carried_first
+	var close := _btn("Close", _close_overlay)
+	col.add_child(close)
+	(first if first != null else close).call_deferred("grab_focus")
+
+
+## (Re)builds the carried list under the current sort, filter and search.
+## Returns the first item button, if any.
+func _fill_carried(box: VBoxContainer) -> Button:
+	for c in box.get_children():
+		c.queue_free()
+	var p := world.player
+	var first: Button = null
+	var view := Assist.inventory_view(world, Assist.SORTS[settings.inv_sort_index], Assist.FILTERS[settings.inv_filter_index], _inv_query)
 	if p.inventory.is_empty():
-		col.add_child(_label("Nothing.", Palette.TEXT_DIM))
-	for i in p.inventory.size():
+		box.add_child(_label("Nothing.", Palette.TEXT_DIM))
+	elif view.is_empty():
+		box.add_child(_label("Nothing matches. (%d carried)" % p.inventory.size(), Palette.TEXT_DIM))
+	for i in view:
 		var it := p.inventory[i]
-		var idx := i
+		var idx: int = i
 		var b := _btn(world.item_name(it), func() -> void: _show_item(it, idx, ""))
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		var tint := Color(it.effective_color(db)) if world.is_item_identified(it) else Color(String(it.def(db)["color"]))
 		b.add_theme_color_override("font_color", tint.lerp(Palette.TEXT, 0.35))
-		col.add_child(b)
+		var cmp := Assist.compare_item(world, it)
+		if String(cmp["slot"]) != "" and not bool(cmp["unknown"]):
+			b.tooltip_text = "vs %s: %s" % [String(cmp["equipped"]) if String(cmp["equipped"]) != "" else "nothing", ", ".join(cmp["lines"])]
+		box.add_child(b)
 		if first == null:
 			first = b
-	var close := _btn("Close", _close_overlay)
-	col.add_child(close)
-	(first if first != null else close).call_deferred("grab_focus")
+	return first
 
 
 func _item_stats(it: Item) -> String:
@@ -1603,6 +1925,12 @@ func _show_item(it: Item, index: int, slot: String) -> void:
 	var desc_txt := String(d["description"]) if world.is_item_identified(it) else "An unfamiliar article. Its properties are hidden until tested or witnessed."
 	col.add_child(_label(desc_txt, Palette.TEXT_DIM))
 	col.add_child(_label(_item_stats(it), Palette.RECORD, 0.9))
+	if slot == "" and Assist.slot_of(world, it) != "":
+		var cmp := Assist.compare_item(world, it)
+		var worn := String(cmp["equipped"])
+		col.add_child(_label("Against %s:\n%s" % [worn if worn != "" else "an empty slot", "\n".join(cmp["lines"])], Palette.GOLD, 0.85))
+		if String(cmp["warning"]) != "":
+			col.add_child(_label(String(cmp["warning"]), Palette.ALERT, 0.85))
 	var main: Button
 	if slot != "":
 		main = _btn("Take off", func() -> void:
@@ -1618,9 +1946,12 @@ func _show_item(it: Item, index: int, slot: String) -> void:
 				_after_action())
 			col.add_child(main)
 			col.add_child(_btn("Transmute", func() -> void:
-				_close_overlay()
-				world.player_transmute_relic(index)
-				_after_action()))
+				_confirm("Transmute %s?" % world.item_name(it), "The relic is consumed for a permanent gain, at a cost in Apotheosis and the Serpent's Way. This cannot be undone.", "Transmute it",
+					func() -> void:
+						_close_overlay()
+						world.player_transmute_relic(index)
+						_after_action(),
+					func() -> void: _show_item(it, index, slot))))
 		elif String(d["kind"]) == "consumable" and String(d.get("effect", "")) == "projectile":
 			main = _btn("Throw", func() -> void:
 				_close_overlay()
@@ -1642,10 +1973,19 @@ func _show_item(it: Item, index: int, slot: String) -> void:
 				world.player_use(index)
 				_after_action())
 			col.add_child(main)
+		var precious := String(d["kind"]) == "relic" or it.rarity in ["rare", "artifact"]
 		col.add_child(_btn("Drop", func() -> void:
-			_close_overlay()
-			world.player_drop(index)
-			_after_action()))
+			if precious:
+				_confirm("Drop %s?" % world.item_name(it), "It stays on this floor; you can come back for it.", "Drop it",
+					func() -> void:
+						_close_overlay()
+						world.player_drop(index)
+						_after_action(),
+					func() -> void: _show_item(it, index, slot))
+			else:
+				_close_overlay()
+				world.player_drop(index)
+				_after_action()))
 	col.add_child(_btn("Back", _show_inventory))
 	main.call_deferred("grab_focus")
 
