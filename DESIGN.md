@@ -226,3 +226,26 @@ M6.10 adds `tests/test_reachability.gd` (445 checks verifying zero dead content 
 | Origins (`24` each) | — | — | `ashborn 22/24`, `human 19/24`, `ironbound_ward 19/24`, `cambion 18/24`, `penitent 18/24`, `revenant 17/24`, `unrecorded 16/24`, `veilkin 15/24` |
 | Callings (`24` each) | — | — | `Alchemist 22/24`, `Occultist 21/24`, `Warden 21/24`, `Assassin 19/24`, `Knight 18/24`, `Arbalester 17/24`, `Ophite Binder 16/24`, `Rite Cantor 10/24` |
 | Top Mortalities | — | — | `d2 The Vault Enumerator` (`11`), `d4 ossuary wight` (`4`), `d3 Choir Cantor Prime` (`3`) |
+
+## M7 — The Refinement Pass
+
+Principle: complexity earns its place through meaningful decisions. Evidence is bot play on dev seeds (salt `m7dev`) plus one fresh validation salt; it is not human play. Every change and every no-change verdict is in `balance/CHANGES.md`.
+
+| Change | Value | Evidence |
+|---|---|---|
+| Veil-Touched base HP, radiant resist | 3 to 5, -25 to -10 | same-seed A/B 56% to 61%; controls identical |
+| Unrecorded base HP | 3 to 4 | 66% to 68% (within noise) |
+
+Descent profiles (`content/core/difficulty.json`, names provisional). They change encounter and resource generation only: no stat multipliers, permadeath identical, Exile is neutral and generates what earlier versions did.
+
+| Profile | Foes | Group % | Elites | Items | Healing weight | Start salves |
+|---|---:|---:|---:|---:|---:|---:|
+| Initiate | -1 | 55 | -1 | +1 | 160% | +1 |
+| Exile | 0 | 75 | 0 | 0 | 100% | 0 |
+| Adversary | +1 | 85 | +1 | 0 | 100% | 0 |
+| Sovereign | +2 | 90 | +1 | -1 | 70% | -1 |
+
+Same seeds (192 runs each, bot play): Initiate 81%, Exile 75%, Adversary 70%, Sovereign 67%; deaths 19, 18, 26, 34. Only the ends are separated from each other.
+
+Fresh validation (`m7_final_validation`, Exile, 512 runs, four policies): 369 won (72.1%), 52 died, 91 hit the action cap. Lowest origin Veil-Touched 35/64; lowest callings Occultist and Assassin, mostly from capped runs rather than deaths. Not comparable with the M6.10 75% (different policy mix). The salt is spent and nothing was tuned against it. See `docs/M7_REPORT.md`.
+

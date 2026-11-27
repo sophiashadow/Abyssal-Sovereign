@@ -115,8 +115,10 @@ M5 (The Depth Pass: M5.1–M5.5) is complete.
 
 M6 (The Breadth Pass: M6.1–M6.10) is complete.
 
-## Next: Milestone 7 — Balance & Refinement
+## Milestone 7: the Refinement Pass (done 2026-11-27, draft PR #1; not merged)
 
-1. Tune early-depth spikes (`d2 The Vault Enumerator` 11/192 soak deaths) and lagging pairings (`rite_weaver` 10/24 overall; `penitent/rite_weaver` and `revenant/rite_weaver` 0/3; `veilkin/ophite_binder` 0/3).
-2. Add optional branch-routing heuristics to `AutoPlayer` if automated branch/thread settlement telemetry should be exercised beyond main-spine runs.
-3. Complete Milestone 3 platform verification on physical hardware (Android device via `adb`, Windows, Web browser IndexedDB, release keystore signing, and human playtesting).
+Tempering, not enlarging: no major content added. Instrumented soak and eight bot policies (M7.1); two origin stat changes with a same-seed A/B and reasoned no-change verdicts elsewhere (M7.2 to M7.6); safe auto-explore, travel, compare, sort/filter/search, log filters, rebindable shortcuts and confirmations (M7.7); four descent profiles, optional onboarding hints, save v12 (M7.8); `docs/PLAYTEST.md` (M7.9); final gate with a fresh validation salt and exports (M7.10). Full evidence, defects and limits are in `docs/M7_REPORT.md`. All balance data is bot play; no human playtest has run.
+
+## Next: Milestone 8 — The Incarnation Pass (not started; needs owner authorization)
+
+Gate: run human playtest round 1 (`docs/PLAYTEST.md`) first. Then, from the structured list in `docs/M7_REPORT.md`: diagnose the 91 unfinished validation runs, settle profile names and parameters, instrument Sphere identity, add Work-relic bot coverage, decide Veil-Touched's residual gap, and complete the NOT_RUN platform checks (Windows runtime, Web persistence, physical Android, release keystore).
