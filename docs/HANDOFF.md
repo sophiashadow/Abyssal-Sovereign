@@ -104,7 +104,10 @@ Spec: `docs/M8_SPEC.md`.
   - Created `tools/gen_sprites.py` generating the Ossuary Warrens (Moon, Sphere 1) vertical-slice 32x32 tileset and core entity/item sprites (`assets/tiles/sphere_1_moon.png`, `assets/sprites/{avatars,monsters,npcs,items}.png`).
   - Upgraded `src/ui/map_view.gd` to support both `"tiles"` and `"glyph"` modes, `TEXTURE_FILTER_NEAREST`, integer scaling, mouse-wheel/setting camera zoom, FOV falloff, remembered dimming, optional decorative lighting, non-color signifiers (hostile brackets, NPC diamond, elite crown, boss aureole, HP micro-bar, telegraph icon, hazard patterns), and per-cell glyph fallback.
   - Verified `test_m8_renderer` (3/3, 13 checks), `test_m7_settings` (3/3, 80 checks), and `tools/ui_smoke.gd` at `1280x720` (`39` steps, `0` failures).
-- **Next submilestone:** M8.3 — The Seven Spheres Incarnate (all 7 Sphere environmental tile atlases & regional visual identity).
+- **M8.3 The Seven Spheres Incarnate (complete, verified locally):**
+  - Expanded `tools/gen_sprites.py` to generate distinct 32x32 environmental tile & feature atlases for all Seven Spheres (`assets/tiles/sphere_1_moon.png` .. `sphere_7_saturn.png`) covering Ossuary Warrens, Tithe Vaults, Gilded Choir, False Solar Court, Iron Scriptorium, Chamber of Decrees, and Sealed Stair, plus regional modulation in `MapView`.
+  - Verified all 7 Sphere atlases (`test_m8_renderer` 4/4, 182 checks; `tools/ui_smoke.gd` 39 steps, 0 failures).
+- **Next submilestone:** M8.4 — Inhabitants, Relics and the Material World (`avatars`, `monsters`, 15 bosses, 18 NPCs, `items`, 16 relics, `icons`, `emblems`, `docs/ASSET_REGISTRY.md`, `tests/test_m8_assets.gd`).
 
 ## Owner decisions still open
 

@@ -130,8 +130,22 @@ def draw_sphere_tile_atlas(sphere_num: int, theme: dict) -> tuple[Sheet, dict[st
                 elif r > 246 and v == 3:
                     px[x, y] = mix(fl_base, accent, 0.35)
         if v == 1:
-            # Bone-dust or subtle floor crack
-            d.line([(5, 22), (10, 19), (14, 21)], fill=mix(fl_base, IVORY, 0.25))
+            # Bone-dust or Sphere-specific geometric floor detail
+            st = theme.get("style", "ossuary")
+            if st == "brass":
+                d.rectangle([10, 10, 21, 21], outline=mix(fl_base, accent, 0.45))
+            elif st == "choir":
+                d.polygon([(16, 8), (24, 16), (16, 24), (8, 16)], outline=mix(fl_base, accent, 0.4))
+            elif st == "solar":
+                d.ellipse([9, 9, 22, 22], outline=mix(fl_base, accent, 0.5))
+            elif st == "iron":
+                d.point([(4, 4), (27, 4), (4, 27), (27, 27)], fill=IRON_HI)
+            elif st == "imperial":
+                d.rectangle([4, 4, 27, 27], outline=mix(fl_base, GOLD, 0.35))
+            elif st == "sealed":
+                d.line([(6, 25), (16, 6), (25, 25)], fill=mix(fl_base, LUX, 0.55))
+            else:
+                d.line([(5, 22), (10, 19), (14, 21)], fill=mix(fl_base, IVORY, 0.25))
         elif v == 2:
             d.point([(24, 9), (25, 10)], fill=mix(fl_base, accent, 0.45))
         s.commit(key, t)
@@ -151,10 +165,29 @@ def draw_sphere_tile_atlas(sphere_num: int, theme: dict) -> tuple[Sheet, dict[st
         for bx in (7, 21):
             d.line([(bx, 11), (bx, 16)], fill=mix(wl_face, VOID, 0.4))
             d.line([((bx + 8) % 32, 17), ((bx + 8) % 32, 24)], fill=mix(wl_face, VOID, 0.4))
+        st = theme.get("style", "ossuary")
         if v == 1:
-            # Ossuary niche / arch inset
-            d.rectangle([11, 13, 20, 23], fill=VOID, outline=mix(wl_cap, accent, 0.35))
-            d.ellipse([13, 15, 18, 20], fill=mix(RECORD, wl_face, 0.45))
+            # Sphere architectural wall relief
+            if st == "brass":
+                d.rectangle([9, 13, 22, 24], fill=mix(wl_face, GOLD, 0.25), outline=accent)
+                d.line([(16, 14), (16, 23)], fill=VOID)
+            elif st == "choir":
+                d.arc([9, 12, 22, 26], 180, 360, fill=GOLD, width=2)
+                d.rectangle([11, 17, 20, 25], fill=PORPHYRY)
+            elif st == "solar":
+                d.ellipse([10, 13, 21, 24], fill=mix(wl_face, FALSE_SUN, 0.35), outline=FALSE_SUN)
+            elif st == "iron":
+                d.rectangle([8, 12, 23, 25], fill=IRON_DK, outline=IRON_HI)
+                d.line([(12, 12), (12, 25)], fill=IRON)
+                d.line([(19, 12), (19, 25)], fill=IRON)
+            elif st == "imperial":
+                d.rectangle([10, 13, 21, 24], fill=PORPHYRY_LT, outline=GOLD)
+                d.ellipse([13, 16, 18, 21], fill=BLOOD)
+            elif st == "sealed":
+                d.polygon([(16, 12), (22, 18), (16, 25), (10, 18)], fill=VOID, outline=LUX)
+            else:
+                d.rectangle([11, 13, 20, 23], fill=VOID, outline=mix(wl_cap, accent, 0.35))
+                d.ellipse([13, 15, 18, 20], fill=mix(RECORD, wl_face, 0.45))
         elif v == 2:
             # Carved tally / seal line
             d.line([(10, 15), (21, 15)], fill=accent)
@@ -602,13 +635,46 @@ def draw_items_vertical_slice() -> tuple[Sheet, dict[str, list[int]]]:
 
 SPHERE_THEMES = {
     1: {
-        "name": "moon",
-        "floor": (28, 24, 32, 255),
-        "floor_alt": (36, 31, 42, 255),
-        "wall_cap": (76, 70, 84, 255),
-        "wall_face": (53, 47, 59, 255),
-        "mortar": (20, 17, 24, 255),
-        "accent": SILVER,
+        "name": "moon", "style": "ossuary",
+        "floor": (28, 24, 32, 255), "floor_alt": (36, 31, 42, 255),
+        "wall_cap": (76, 70, 84, 255), "wall_face": (53, 47, 59, 255),
+        "mortar": (20, 17, 24, 255), "accent": SILVER,
+    },
+    2: {
+        "name": "mercury", "style": "brass",
+        "floor": (30, 34, 32, 255), "floor_alt": (40, 48, 44, 255),
+        "wall_cap": (96, 82, 54, 255), "wall_face": (62, 54, 38, 255),
+        "mortar": (22, 26, 24, 255), "accent": GOLD,
+    },
+    3: {
+        "name": "venus", "style": "choir",
+        "floor": (38, 22, 36, 255), "floor_alt": (50, 28, 46, 255),
+        "wall_cap": (92, 50, 74, 255), "wall_face": (62, 32, 52, 255),
+        "mortar": (26, 14, 24, 255), "accent": GOLD_HI,
+    },
+    4: {
+        "name": "sun", "style": "solar",
+        "floor": (44, 39, 28, 255), "floor_alt": (58, 50, 34, 255),
+        "wall_cap": (132, 108, 62, 255), "wall_face": (86, 70, 42, 255),
+        "mortar": (30, 26, 18, 255), "accent": FALSE_SUN,
+    },
+    5: {
+        "name": "mars", "style": "iron",
+        "floor": (26, 26, 30, 255), "floor_alt": (36, 32, 36, 255),
+        "wall_cap": (72, 68, 76, 255), "wall_face": (46, 44, 52, 255),
+        "mortar": (18, 16, 20, 255), "accent": EMBER,
+    },
+    6: {
+        "name": "jupiter", "style": "imperial",
+        "floor": (34, 26, 46, 255), "floor_alt": (46, 34, 62, 255),
+        "wall_cap": (88, 64, 112, 255), "wall_face": (58, 42, 76, 255),
+        "mortar": (22, 16, 30, 255), "accent": GOLD_HI,
+    },
+    7: {
+        "name": "saturn", "style": "sealed",
+        "floor": (18, 16, 22, 255), "floor_alt": (26, 22, 32, 255),
+        "wall_cap": (52, 46, 62, 255), "wall_face": (30, 26, 38, 255),
+        "mortar": (10, 8, 14, 255), "accent": LUX,
     },
 }
 

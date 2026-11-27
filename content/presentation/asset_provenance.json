@@ -17,6 +17,90 @@
       ]
     },
     {
+      "asset_id": "sphere_2_mercury",
+      "path": "res://assets/tiles/sphere_2_mercury.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "sphere:mercury"
+      ],
+      "modification_history": [
+        "Generated M8.2 vertical slice: Sphere 2 (mercury) 32x32 tiles & features"
+      ]
+    },
+    {
+      "asset_id": "sphere_3_venus",
+      "path": "res://assets/tiles/sphere_3_venus.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "sphere:venus"
+      ],
+      "modification_history": [
+        "Generated M8.2 vertical slice: Sphere 3 (venus) 32x32 tiles & features"
+      ]
+    },
+    {
+      "asset_id": "sphere_4_sun",
+      "path": "res://assets/tiles/sphere_4_sun.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "sphere:sun"
+      ],
+      "modification_history": [
+        "Generated M8.2 vertical slice: Sphere 4 (sun) 32x32 tiles & features"
+      ]
+    },
+    {
+      "asset_id": "sphere_5_mars",
+      "path": "res://assets/tiles/sphere_5_mars.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "sphere:mars"
+      ],
+      "modification_history": [
+        "Generated M8.2 vertical slice: Sphere 5 (mars) 32x32 tiles & features"
+      ]
+    },
+    {
+      "asset_id": "sphere_6_jupiter",
+      "path": "res://assets/tiles/sphere_6_jupiter.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "sphere:jupiter"
+      ],
+      "modification_history": [
+        "Generated M8.2 vertical slice: Sphere 6 (jupiter) 32x32 tiles & features"
+      ]
+    },
+    {
+      "asset_id": "sphere_7_saturn",
+      "path": "res://assets/tiles/sphere_7_saturn.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "sphere:saturn"
+      ],
+      "modification_history": [
+        "Generated M8.2 vertical slice: Sphere 7 (saturn) 32x32 tiles & features"
+      ]
+    },
+    {
       "asset_id": "avatars",
       "path": "res://assets/sprites/avatars.png",
       "source": "Abyssal Sovereign internal procedural generator",

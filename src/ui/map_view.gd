@@ -150,11 +150,13 @@ func _draw() -> void:
 			elif dist > sight - 2 and sight > 3:
 				shade = Color(0.84, 0.82, 0.88, 1.0)
 			if rkind == "sanctuary" and tile_id == Tiles.FLOOR:
-				shade = shade.lerp(Color(0.88, 0.98, 0.94, 1.0), 0.14)
+				shade = shade.lerp(Color(0.84, 0.98, 0.92, 1.0), 0.16)
 			elif rkind == "vault" and tile_id == Tiles.FLOOR:
-				shade = shade.lerp(Color(0.98, 0.92, 0.82, 1.0), 0.12)
+				shade = shade.lerp(Color(0.98, 0.90, 0.78, 1.0), 0.14)
 			elif rkind == "stronghold" and tile_id == Tiles.WALL:
-				shade = shade.lerp(Color(0.96, 0.86, 0.86, 1.0), 0.12)
+				shade = shade.lerp(Color(0.96, 0.84, 0.84, 1.0), 0.14)
+			elif rkind == "settlement" and tile_id == Tiles.FLOOR:
+				shade = shade.lerp(Color(0.96, 0.92, 0.86, 1.0), 0.12)
 
 			if use_tiles:
 				var treg := registry.tile_region(world.depth, tile_id, _tile_variant(p, floor_hash))

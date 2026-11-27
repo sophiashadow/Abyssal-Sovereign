@@ -10,6 +10,54 @@
         256
       ]
     },
+    "sphere_2_mercury": {
+      "path": "res://assets/tiles/sphere_2_mercury.png",
+      "cell": 32,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "sphere_3_venus": {
+      "path": "res://assets/tiles/sphere_3_venus.png",
+      "cell": 32,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "sphere_4_sun": {
+      "path": "res://assets/tiles/sphere_4_sun.png",
+      "cell": 32,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "sphere_5_mars": {
+      "path": "res://assets/tiles/sphere_5_mars.png",
+      "cell": 32,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "sphere_6_jupiter": {
+      "path": "res://assets/tiles/sphere_6_jupiter.png",
+      "cell": 32,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "sphere_7_saturn": {
+      "path": "res://assets/tiles/sphere_7_saturn.png",
+      "cell": 32,
+      "size": [
+        256,
+        256
+      ]
+    },
     "avatars": {
       "path": "res://assets/sprites/avatars.png",
       "cell": 32,
@@ -226,6 +274,1140 @@
     },
     "s1:9": {
       "atlas": "sphere_1_moon",
+      "rect": [
+        128,
+        64,
+        32,
+        32
+      ]
+    },
+    "s2:1:0": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    "s2:1:1": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        32,
+        0,
+        32,
+        32
+      ]
+    },
+    "s2:1:2": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        64,
+        0,
+        32,
+        32
+      ]
+    },
+    "s2:1:3": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        96,
+        0,
+        32,
+        32
+      ]
+    },
+    "s2:0:0": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        128,
+        0,
+        32,
+        32
+      ]
+    },
+    "s2:0:1": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        160,
+        0,
+        32,
+        32
+      ]
+    },
+    "s2:0:2": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        192,
+        0,
+        32,
+        32
+      ]
+    },
+    "s2:0:3": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        224,
+        0,
+        32,
+        32
+      ]
+    },
+    "s2:2": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        0,
+        32,
+        32,
+        32
+      ]
+    },
+    "s2:3": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        32,
+        32,
+        32,
+        32
+      ]
+    },
+    "s2:4": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        64,
+        32,
+        32,
+        32
+      ]
+    },
+    "s2:5": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        96,
+        32,
+        32,
+        32
+      ]
+    },
+    "s2:10": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        128,
+        32,
+        32,
+        32
+      ]
+    },
+    "s2:11": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        160,
+        32,
+        32,
+        32
+      ]
+    },
+    "s2:12": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        192,
+        32,
+        32,
+        32
+      ]
+    },
+    "s2:13": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        224,
+        32,
+        32,
+        32
+      ]
+    },
+    "s2:14": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        0,
+        64,
+        32,
+        32
+      ]
+    },
+    "s2:6": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        32,
+        64,
+        32,
+        32
+      ]
+    },
+    "s2:7": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        64,
+        64,
+        32,
+        32
+      ]
+    },
+    "s2:8": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        96,
+        64,
+        32,
+        32
+      ]
+    },
+    "s2:9": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        128,
+        64,
+        32,
+        32
+      ]
+    },
+    "s3:1:0": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    "s3:1:1": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        32,
+        0,
+        32,
+        32
+      ]
+    },
+    "s3:1:2": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        64,
+        0,
+        32,
+        32
+      ]
+    },
+    "s3:1:3": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        96,
+        0,
+        32,
+        32
+      ]
+    },
+    "s3:0:0": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        128,
+        0,
+        32,
+        32
+      ]
+    },
+    "s3:0:1": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        160,
+        0,
+        32,
+        32
+      ]
+    },
+    "s3:0:2": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        192,
+        0,
+        32,
+        32
+      ]
+    },
+    "s3:0:3": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        224,
+        0,
+        32,
+        32
+      ]
+    },
+    "s3:2": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        0,
+        32,
+        32,
+        32
+      ]
+    },
+    "s3:3": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        32,
+        32,
+        32,
+        32
+      ]
+    },
+    "s3:4": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        64,
+        32,
+        32,
+        32
+      ]
+    },
+    "s3:5": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        96,
+        32,
+        32,
+        32
+      ]
+    },
+    "s3:10": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        128,
+        32,
+        32,
+        32
+      ]
+    },
+    "s3:11": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        160,
+        32,
+        32,
+        32
+      ]
+    },
+    "s3:12": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        192,
+        32,
+        32,
+        32
+      ]
+    },
+    "s3:13": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        224,
+        32,
+        32,
+        32
+      ]
+    },
+    "s3:14": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        0,
+        64,
+        32,
+        32
+      ]
+    },
+    "s3:6": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        32,
+        64,
+        32,
+        32
+      ]
+    },
+    "s3:7": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        64,
+        64,
+        32,
+        32
+      ]
+    },
+    "s3:8": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        96,
+        64,
+        32,
+        32
+      ]
+    },
+    "s3:9": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        128,
+        64,
+        32,
+        32
+      ]
+    },
+    "s4:1:0": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    "s4:1:1": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        32,
+        0,
+        32,
+        32
+      ]
+    },
+    "s4:1:2": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        64,
+        0,
+        32,
+        32
+      ]
+    },
+    "s4:1:3": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        96,
+        0,
+        32,
+        32
+      ]
+    },
+    "s4:0:0": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        128,
+        0,
+        32,
+        32
+      ]
+    },
+    "s4:0:1": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        160,
+        0,
+        32,
+        32
+      ]
+    },
+    "s4:0:2": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        192,
+        0,
+        32,
+        32
+      ]
+    },
+    "s4:0:3": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        224,
+        0,
+        32,
+        32
+      ]
+    },
+    "s4:2": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        0,
+        32,
+        32,
+        32
+      ]
+    },
+    "s4:3": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        32,
+        32,
+        32,
+        32
+      ]
+    },
+    "s4:4": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        64,
+        32,
+        32,
+        32
+      ]
+    },
+    "s4:5": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        96,
+        32,
+        32,
+        32
+      ]
+    },
+    "s4:10": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        128,
+        32,
+        32,
+        32
+      ]
+    },
+    "s4:11": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        160,
+        32,
+        32,
+        32
+      ]
+    },
+    "s4:12": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        192,
+        32,
+        32,
+        32
+      ]
+    },
+    "s4:13": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        224,
+        32,
+        32,
+        32
+      ]
+    },
+    "s4:14": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        0,
+        64,
+        32,
+        32
+      ]
+    },
+    "s4:6": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        32,
+        64,
+        32,
+        32
+      ]
+    },
+    "s4:7": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        64,
+        64,
+        32,
+        32
+      ]
+    },
+    "s4:8": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        96,
+        64,
+        32,
+        32
+      ]
+    },
+    "s4:9": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        128,
+        64,
+        32,
+        32
+      ]
+    },
+    "s5:1:0": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    "s5:1:1": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        32,
+        0,
+        32,
+        32
+      ]
+    },
+    "s5:1:2": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        64,
+        0,
+        32,
+        32
+      ]
+    },
+    "s5:1:3": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        96,
+        0,
+        32,
+        32
+      ]
+    },
+    "s5:0:0": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        128,
+        0,
+        32,
+        32
+      ]
+    },
+    "s5:0:1": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        160,
+        0,
+        32,
+        32
+      ]
+    },
+    "s5:0:2": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        192,
+        0,
+        32,
+        32
+      ]
+    },
+    "s5:0:3": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        224,
+        0,
+        32,
+        32
+      ]
+    },
+    "s5:2": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        0,
+        32,
+        32,
+        32
+      ]
+    },
+    "s5:3": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        32,
+        32,
+        32,
+        32
+      ]
+    },
+    "s5:4": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        64,
+        32,
+        32,
+        32
+      ]
+    },
+    "s5:5": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        96,
+        32,
+        32,
+        32
+      ]
+    },
+    "s5:10": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        128,
+        32,
+        32,
+        32
+      ]
+    },
+    "s5:11": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        160,
+        32,
+        32,
+        32
+      ]
+    },
+    "s5:12": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        192,
+        32,
+        32,
+        32
+      ]
+    },
+    "s5:13": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        224,
+        32,
+        32,
+        32
+      ]
+    },
+    "s5:14": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        0,
+        64,
+        32,
+        32
+      ]
+    },
+    "s5:6": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        32,
+        64,
+        32,
+        32
+      ]
+    },
+    "s5:7": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        64,
+        64,
+        32,
+        32
+      ]
+    },
+    "s5:8": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        96,
+        64,
+        32,
+        32
+      ]
+    },
+    "s5:9": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        128,
+        64,
+        32,
+        32
+      ]
+    },
+    "s6:1:0": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    "s6:1:1": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        32,
+        0,
+        32,
+        32
+      ]
+    },
+    "s6:1:2": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        64,
+        0,
+        32,
+        32
+      ]
+    },
+    "s6:1:3": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        96,
+        0,
+        32,
+        32
+      ]
+    },
+    "s6:0:0": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        128,
+        0,
+        32,
+        32
+      ]
+    },
+    "s6:0:1": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        160,
+        0,
+        32,
+        32
+      ]
+    },
+    "s6:0:2": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        192,
+        0,
+        32,
+        32
+      ]
+    },
+    "s6:0:3": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        224,
+        0,
+        32,
+        32
+      ]
+    },
+    "s6:2": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        0,
+        32,
+        32,
+        32
+      ]
+    },
+    "s6:3": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        32,
+        32,
+        32,
+        32
+      ]
+    },
+    "s6:4": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        64,
+        32,
+        32,
+        32
+      ]
+    },
+    "s6:5": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        96,
+        32,
+        32,
+        32
+      ]
+    },
+    "s6:10": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        128,
+        32,
+        32,
+        32
+      ]
+    },
+    "s6:11": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        160,
+        32,
+        32,
+        32
+      ]
+    },
+    "s6:12": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        192,
+        32,
+        32,
+        32
+      ]
+    },
+    "s6:13": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        224,
+        32,
+        32,
+        32
+      ]
+    },
+    "s6:14": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        0,
+        64,
+        32,
+        32
+      ]
+    },
+    "s6:6": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        32,
+        64,
+        32,
+        32
+      ]
+    },
+    "s6:7": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        64,
+        64,
+        32,
+        32
+      ]
+    },
+    "s6:8": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        96,
+        64,
+        32,
+        32
+      ]
+    },
+    "s6:9": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        128,
+        64,
+        32,
+        32
+      ]
+    },
+    "s7:1:0": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    "s7:1:1": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        32,
+        0,
+        32,
+        32
+      ]
+    },
+    "s7:1:2": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        64,
+        0,
+        32,
+        32
+      ]
+    },
+    "s7:1:3": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        96,
+        0,
+        32,
+        32
+      ]
+    },
+    "s7:0:0": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        128,
+        0,
+        32,
+        32
+      ]
+    },
+    "s7:0:1": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        160,
+        0,
+        32,
+        32
+      ]
+    },
+    "s7:0:2": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        192,
+        0,
+        32,
+        32
+      ]
+    },
+    "s7:0:3": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        224,
+        0,
+        32,
+        32
+      ]
+    },
+    "s7:2": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        0,
+        32,
+        32,
+        32
+      ]
+    },
+    "s7:3": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        32,
+        32,
+        32,
+        32
+      ]
+    },
+    "s7:4": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        64,
+        32,
+        32,
+        32
+      ]
+    },
+    "s7:5": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        96,
+        32,
+        32,
+        32
+      ]
+    },
+    "s7:10": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        128,
+        32,
+        32,
+        32
+      ]
+    },
+    "s7:11": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        160,
+        32,
+        32,
+        32
+      ]
+    },
+    "s7:12": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        192,
+        32,
+        32,
+        32
+      ]
+    },
+    "s7:13": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        224,
+        32,
+        32,
+        32
+      ]
+    },
+    "s7:14": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        0,
+        64,
+        32,
+        32
+      ]
+    },
+    "s7:6": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        32,
+        64,
+        32,
+        32
+      ]
+    },
+    "s7:7": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        64,
+        64,
+        32,
+        32
+      ]
+    },
+    "s7:8": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        96,
+        64,
+        32,
+        32
+      ]
+    },
+    "s7:9": {
+      "atlas": "sphere_7_saturn",
       "rect": [
         128,
         64,
@@ -480,6 +1662,1518 @@
     },
     "s1:echo_cache:used": {
       "atlas": "sphere_1_moon",
+      "rect": [
+        0,
+        192,
+        32,
+        32
+      ]
+    },
+    "s2:altar:ready": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        160,
+        64,
+        32,
+        32
+      ]
+    },
+    "s2:altar:used": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        192,
+        64,
+        32,
+        32
+      ]
+    },
+    "s2:shrine:ready": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        224,
+        64,
+        32,
+        32
+      ]
+    },
+    "s2:shrine:used": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        0,
+        96,
+        32,
+        32
+      ]
+    },
+    "s2:ritual_circle:ready": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        32,
+        96,
+        32,
+        32
+      ]
+    },
+    "s2:ritual_circle:used": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        64,
+        96,
+        32,
+        32
+      ]
+    },
+    "s2:vault_gate:ready": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        96,
+        96,
+        32,
+        32
+      ]
+    },
+    "s2:vault_gate:used": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        128,
+        96,
+        32,
+        32
+      ]
+    },
+    "s2:merchant:ready": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        160,
+        96,
+        32,
+        32
+      ]
+    },
+    "s2:merchant:used": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        192,
+        96,
+        32,
+        32
+      ]
+    },
+    "s2:contract_lectern:ready": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        224,
+        96,
+        32,
+        32
+      ]
+    },
+    "s2:contract_lectern:used": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        0,
+        128,
+        32,
+        32
+      ]
+    },
+    "s2:challenge:ready": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        32,
+        128,
+        32,
+        32
+      ]
+    },
+    "s2:challenge:used": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        64,
+        128,
+        32,
+        32
+      ]
+    },
+    "s2:secret_door:ready": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        96,
+        128,
+        32,
+        32
+      ]
+    },
+    "s2:secret_door:used": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        128,
+        128,
+        32,
+        32
+      ]
+    },
+    "s2:trap:ready": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        160,
+        128,
+        32,
+        32
+      ]
+    },
+    "s2:trap:used": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        192,
+        128,
+        32,
+        32
+      ]
+    },
+    "s2:ward_sigil:ready": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        224,
+        128,
+        32,
+        32
+      ]
+    },
+    "s2:ward_sigil:used": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        0,
+        160,
+        32,
+        32
+      ]
+    },
+    "s2:rune_puzzle:ready": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        32,
+        160,
+        32,
+        32
+      ]
+    },
+    "s2:rune_puzzle:used": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        64,
+        160,
+        32,
+        32
+      ]
+    },
+    "s2:abandoned_rite:ready": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        96,
+        160,
+        32,
+        32
+      ]
+    },
+    "s2:abandoned_rite:used": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        128,
+        160,
+        32,
+        32
+      ]
+    },
+    "s2:sanctuary_hearth:ready": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        160,
+        160,
+        32,
+        32
+      ]
+    },
+    "s2:sanctuary_hearth:used": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        192,
+        160,
+        32,
+        32
+      ]
+    },
+    "s2:echo_cache:ready": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        224,
+        160,
+        32,
+        32
+      ]
+    },
+    "s2:echo_cache:used": {
+      "atlas": "sphere_2_mercury",
+      "rect": [
+        0,
+        192,
+        32,
+        32
+      ]
+    },
+    "s3:altar:ready": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        160,
+        64,
+        32,
+        32
+      ]
+    },
+    "s3:altar:used": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        192,
+        64,
+        32,
+        32
+      ]
+    },
+    "s3:shrine:ready": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        224,
+        64,
+        32,
+        32
+      ]
+    },
+    "s3:shrine:used": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        0,
+        96,
+        32,
+        32
+      ]
+    },
+    "s3:ritual_circle:ready": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        32,
+        96,
+        32,
+        32
+      ]
+    },
+    "s3:ritual_circle:used": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        64,
+        96,
+        32,
+        32
+      ]
+    },
+    "s3:vault_gate:ready": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        96,
+        96,
+        32,
+        32
+      ]
+    },
+    "s3:vault_gate:used": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        128,
+        96,
+        32,
+        32
+      ]
+    },
+    "s3:merchant:ready": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        160,
+        96,
+        32,
+        32
+      ]
+    },
+    "s3:merchant:used": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        192,
+        96,
+        32,
+        32
+      ]
+    },
+    "s3:contract_lectern:ready": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        224,
+        96,
+        32,
+        32
+      ]
+    },
+    "s3:contract_lectern:used": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        0,
+        128,
+        32,
+        32
+      ]
+    },
+    "s3:challenge:ready": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        32,
+        128,
+        32,
+        32
+      ]
+    },
+    "s3:challenge:used": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        64,
+        128,
+        32,
+        32
+      ]
+    },
+    "s3:secret_door:ready": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        96,
+        128,
+        32,
+        32
+      ]
+    },
+    "s3:secret_door:used": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        128,
+        128,
+        32,
+        32
+      ]
+    },
+    "s3:trap:ready": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        160,
+        128,
+        32,
+        32
+      ]
+    },
+    "s3:trap:used": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        192,
+        128,
+        32,
+        32
+      ]
+    },
+    "s3:ward_sigil:ready": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        224,
+        128,
+        32,
+        32
+      ]
+    },
+    "s3:ward_sigil:used": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        0,
+        160,
+        32,
+        32
+      ]
+    },
+    "s3:rune_puzzle:ready": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        32,
+        160,
+        32,
+        32
+      ]
+    },
+    "s3:rune_puzzle:used": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        64,
+        160,
+        32,
+        32
+      ]
+    },
+    "s3:abandoned_rite:ready": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        96,
+        160,
+        32,
+        32
+      ]
+    },
+    "s3:abandoned_rite:used": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        128,
+        160,
+        32,
+        32
+      ]
+    },
+    "s3:sanctuary_hearth:ready": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        160,
+        160,
+        32,
+        32
+      ]
+    },
+    "s3:sanctuary_hearth:used": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        192,
+        160,
+        32,
+        32
+      ]
+    },
+    "s3:echo_cache:ready": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        224,
+        160,
+        32,
+        32
+      ]
+    },
+    "s3:echo_cache:used": {
+      "atlas": "sphere_3_venus",
+      "rect": [
+        0,
+        192,
+        32,
+        32
+      ]
+    },
+    "s4:altar:ready": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        160,
+        64,
+        32,
+        32
+      ]
+    },
+    "s4:altar:used": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        192,
+        64,
+        32,
+        32
+      ]
+    },
+    "s4:shrine:ready": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        224,
+        64,
+        32,
+        32
+      ]
+    },
+    "s4:shrine:used": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        0,
+        96,
+        32,
+        32
+      ]
+    },
+    "s4:ritual_circle:ready": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        32,
+        96,
+        32,
+        32
+      ]
+    },
+    "s4:ritual_circle:used": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        64,
+        96,
+        32,
+        32
+      ]
+    },
+    "s4:vault_gate:ready": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        96,
+        96,
+        32,
+        32
+      ]
+    },
+    "s4:vault_gate:used": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        128,
+        96,
+        32,
+        32
+      ]
+    },
+    "s4:merchant:ready": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        160,
+        96,
+        32,
+        32
+      ]
+    },
+    "s4:merchant:used": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        192,
+        96,
+        32,
+        32
+      ]
+    },
+    "s4:contract_lectern:ready": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        224,
+        96,
+        32,
+        32
+      ]
+    },
+    "s4:contract_lectern:used": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        0,
+        128,
+        32,
+        32
+      ]
+    },
+    "s4:challenge:ready": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        32,
+        128,
+        32,
+        32
+      ]
+    },
+    "s4:challenge:used": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        64,
+        128,
+        32,
+        32
+      ]
+    },
+    "s4:secret_door:ready": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        96,
+        128,
+        32,
+        32
+      ]
+    },
+    "s4:secret_door:used": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        128,
+        128,
+        32,
+        32
+      ]
+    },
+    "s4:trap:ready": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        160,
+        128,
+        32,
+        32
+      ]
+    },
+    "s4:trap:used": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        192,
+        128,
+        32,
+        32
+      ]
+    },
+    "s4:ward_sigil:ready": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        224,
+        128,
+        32,
+        32
+      ]
+    },
+    "s4:ward_sigil:used": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        0,
+        160,
+        32,
+        32
+      ]
+    },
+    "s4:rune_puzzle:ready": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        32,
+        160,
+        32,
+        32
+      ]
+    },
+    "s4:rune_puzzle:used": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        64,
+        160,
+        32,
+        32
+      ]
+    },
+    "s4:abandoned_rite:ready": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        96,
+        160,
+        32,
+        32
+      ]
+    },
+    "s4:abandoned_rite:used": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        128,
+        160,
+        32,
+        32
+      ]
+    },
+    "s4:sanctuary_hearth:ready": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        160,
+        160,
+        32,
+        32
+      ]
+    },
+    "s4:sanctuary_hearth:used": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        192,
+        160,
+        32,
+        32
+      ]
+    },
+    "s4:echo_cache:ready": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        224,
+        160,
+        32,
+        32
+      ]
+    },
+    "s4:echo_cache:used": {
+      "atlas": "sphere_4_sun",
+      "rect": [
+        0,
+        192,
+        32,
+        32
+      ]
+    },
+    "s5:altar:ready": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        160,
+        64,
+        32,
+        32
+      ]
+    },
+    "s5:altar:used": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        192,
+        64,
+        32,
+        32
+      ]
+    },
+    "s5:shrine:ready": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        224,
+        64,
+        32,
+        32
+      ]
+    },
+    "s5:shrine:used": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        0,
+        96,
+        32,
+        32
+      ]
+    },
+    "s5:ritual_circle:ready": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        32,
+        96,
+        32,
+        32
+      ]
+    },
+    "s5:ritual_circle:used": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        64,
+        96,
+        32,
+        32
+      ]
+    },
+    "s5:vault_gate:ready": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        96,
+        96,
+        32,
+        32
+      ]
+    },
+    "s5:vault_gate:used": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        128,
+        96,
+        32,
+        32
+      ]
+    },
+    "s5:merchant:ready": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        160,
+        96,
+        32,
+        32
+      ]
+    },
+    "s5:merchant:used": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        192,
+        96,
+        32,
+        32
+      ]
+    },
+    "s5:contract_lectern:ready": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        224,
+        96,
+        32,
+        32
+      ]
+    },
+    "s5:contract_lectern:used": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        0,
+        128,
+        32,
+        32
+      ]
+    },
+    "s5:challenge:ready": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        32,
+        128,
+        32,
+        32
+      ]
+    },
+    "s5:challenge:used": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        64,
+        128,
+        32,
+        32
+      ]
+    },
+    "s5:secret_door:ready": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        96,
+        128,
+        32,
+        32
+      ]
+    },
+    "s5:secret_door:used": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        128,
+        128,
+        32,
+        32
+      ]
+    },
+    "s5:trap:ready": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        160,
+        128,
+        32,
+        32
+      ]
+    },
+    "s5:trap:used": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        192,
+        128,
+        32,
+        32
+      ]
+    },
+    "s5:ward_sigil:ready": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        224,
+        128,
+        32,
+        32
+      ]
+    },
+    "s5:ward_sigil:used": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        0,
+        160,
+        32,
+        32
+      ]
+    },
+    "s5:rune_puzzle:ready": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        32,
+        160,
+        32,
+        32
+      ]
+    },
+    "s5:rune_puzzle:used": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        64,
+        160,
+        32,
+        32
+      ]
+    },
+    "s5:abandoned_rite:ready": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        96,
+        160,
+        32,
+        32
+      ]
+    },
+    "s5:abandoned_rite:used": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        128,
+        160,
+        32,
+        32
+      ]
+    },
+    "s5:sanctuary_hearth:ready": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        160,
+        160,
+        32,
+        32
+      ]
+    },
+    "s5:sanctuary_hearth:used": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        192,
+        160,
+        32,
+        32
+      ]
+    },
+    "s5:echo_cache:ready": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        224,
+        160,
+        32,
+        32
+      ]
+    },
+    "s5:echo_cache:used": {
+      "atlas": "sphere_5_mars",
+      "rect": [
+        0,
+        192,
+        32,
+        32
+      ]
+    },
+    "s6:altar:ready": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        160,
+        64,
+        32,
+        32
+      ]
+    },
+    "s6:altar:used": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        192,
+        64,
+        32,
+        32
+      ]
+    },
+    "s6:shrine:ready": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        224,
+        64,
+        32,
+        32
+      ]
+    },
+    "s6:shrine:used": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        0,
+        96,
+        32,
+        32
+      ]
+    },
+    "s6:ritual_circle:ready": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        32,
+        96,
+        32,
+        32
+      ]
+    },
+    "s6:ritual_circle:used": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        64,
+        96,
+        32,
+        32
+      ]
+    },
+    "s6:vault_gate:ready": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        96,
+        96,
+        32,
+        32
+      ]
+    },
+    "s6:vault_gate:used": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        128,
+        96,
+        32,
+        32
+      ]
+    },
+    "s6:merchant:ready": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        160,
+        96,
+        32,
+        32
+      ]
+    },
+    "s6:merchant:used": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        192,
+        96,
+        32,
+        32
+      ]
+    },
+    "s6:contract_lectern:ready": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        224,
+        96,
+        32,
+        32
+      ]
+    },
+    "s6:contract_lectern:used": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        0,
+        128,
+        32,
+        32
+      ]
+    },
+    "s6:challenge:ready": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        32,
+        128,
+        32,
+        32
+      ]
+    },
+    "s6:challenge:used": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        64,
+        128,
+        32,
+        32
+      ]
+    },
+    "s6:secret_door:ready": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        96,
+        128,
+        32,
+        32
+      ]
+    },
+    "s6:secret_door:used": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        128,
+        128,
+        32,
+        32
+      ]
+    },
+    "s6:trap:ready": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        160,
+        128,
+        32,
+        32
+      ]
+    },
+    "s6:trap:used": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        192,
+        128,
+        32,
+        32
+      ]
+    },
+    "s6:ward_sigil:ready": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        224,
+        128,
+        32,
+        32
+      ]
+    },
+    "s6:ward_sigil:used": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        0,
+        160,
+        32,
+        32
+      ]
+    },
+    "s6:rune_puzzle:ready": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        32,
+        160,
+        32,
+        32
+      ]
+    },
+    "s6:rune_puzzle:used": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        64,
+        160,
+        32,
+        32
+      ]
+    },
+    "s6:abandoned_rite:ready": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        96,
+        160,
+        32,
+        32
+      ]
+    },
+    "s6:abandoned_rite:used": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        128,
+        160,
+        32,
+        32
+      ]
+    },
+    "s6:sanctuary_hearth:ready": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        160,
+        160,
+        32,
+        32
+      ]
+    },
+    "s6:sanctuary_hearth:used": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        192,
+        160,
+        32,
+        32
+      ]
+    },
+    "s6:echo_cache:ready": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        224,
+        160,
+        32,
+        32
+      ]
+    },
+    "s6:echo_cache:used": {
+      "atlas": "sphere_6_jupiter",
+      "rect": [
+        0,
+        192,
+        32,
+        32
+      ]
+    },
+    "s7:altar:ready": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        160,
+        64,
+        32,
+        32
+      ]
+    },
+    "s7:altar:used": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        192,
+        64,
+        32,
+        32
+      ]
+    },
+    "s7:shrine:ready": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        224,
+        64,
+        32,
+        32
+      ]
+    },
+    "s7:shrine:used": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        0,
+        96,
+        32,
+        32
+      ]
+    },
+    "s7:ritual_circle:ready": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        32,
+        96,
+        32,
+        32
+      ]
+    },
+    "s7:ritual_circle:used": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        64,
+        96,
+        32,
+        32
+      ]
+    },
+    "s7:vault_gate:ready": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        96,
+        96,
+        32,
+        32
+      ]
+    },
+    "s7:vault_gate:used": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        128,
+        96,
+        32,
+        32
+      ]
+    },
+    "s7:merchant:ready": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        160,
+        96,
+        32,
+        32
+      ]
+    },
+    "s7:merchant:used": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        192,
+        96,
+        32,
+        32
+      ]
+    },
+    "s7:contract_lectern:ready": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        224,
+        96,
+        32,
+        32
+      ]
+    },
+    "s7:contract_lectern:used": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        0,
+        128,
+        32,
+        32
+      ]
+    },
+    "s7:challenge:ready": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        32,
+        128,
+        32,
+        32
+      ]
+    },
+    "s7:challenge:used": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        64,
+        128,
+        32,
+        32
+      ]
+    },
+    "s7:secret_door:ready": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        96,
+        128,
+        32,
+        32
+      ]
+    },
+    "s7:secret_door:used": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        128,
+        128,
+        32,
+        32
+      ]
+    },
+    "s7:trap:ready": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        160,
+        128,
+        32,
+        32
+      ]
+    },
+    "s7:trap:used": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        192,
+        128,
+        32,
+        32
+      ]
+    },
+    "s7:ward_sigil:ready": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        224,
+        128,
+        32,
+        32
+      ]
+    },
+    "s7:ward_sigil:used": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        0,
+        160,
+        32,
+        32
+      ]
+    },
+    "s7:rune_puzzle:ready": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        32,
+        160,
+        32,
+        32
+      ]
+    },
+    "s7:rune_puzzle:used": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        64,
+        160,
+        32,
+        32
+      ]
+    },
+    "s7:abandoned_rite:ready": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        96,
+        160,
+        32,
+        32
+      ]
+    },
+    "s7:abandoned_rite:used": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        128,
+        160,
+        32,
+        32
+      ]
+    },
+    "s7:sanctuary_hearth:ready": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        160,
+        160,
+        32,
+        32
+      ]
+    },
+    "s7:sanctuary_hearth:used": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        192,
+        160,
+        32,
+        32
+      ]
+    },
+    "s7:echo_cache:ready": {
+      "atlas": "sphere_7_saturn",
+      "rect": [
+        224,
+        160,
+        32,
+        32
+      ]
+    },
+    "s7:echo_cache:used": {
+      "atlas": "sphere_7_saturn",
       "rect": [
         0,
         192,

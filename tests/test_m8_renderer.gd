@@ -70,3 +70,19 @@ func test_missing_assets_degrade_gracefully() -> void:
 	mv.render_mode = "tiles"
 	ok(mv.effective_tile_px() > 0, "MapView stays valid with empty registry fallback")
 	mv.free()
+
+
+func test_all_seven_spheres_have_distinct_tile_atlases() -> void:
+	var reg := AssetRegistry.new()
+	var seen_atlases := {}
+	for s in range(1, 8):
+		for tid in [Tiles.WALL, Tiles.FLOOR, Tiles.STAIRS_DOWN, Tiles.STAIRS_UP, Tiles.DOOR_SEALED, Tiles.DOOR_OPEN,
+				Tiles.ASH_EMBER, Tiles.RIME_ICE, Tiles.MIASMA, Tiles.SOLAR_GLARE, Tiles.BRANCH_IN, Tiles.BRANCH_OUT,
+				Tiles.WATER_SHALLOW, Tiles.SANCTUARY_FLOOR, Tiles.IRON_GRATE]:
+			var tr := reg.tile_region(s, tid, 0)
+			ok(not tr.is_empty(), "Sphere %d has tile %d" % [s, tid])
+			if tid == Tiles.FLOOR:
+				seen_atlases[String(tr.get("atlas", ""))] = true
+		for fk in ["altar", "shrine", "ritual_circle", "vault_gate", "merchant", "contract_lectern", "challenge", "trap", "secret_door"]:
+			ok(not reg.feature_region(s, fk, false).is_empty(), "Sphere %d has feature %s" % [s, fk])
+	eq(seen_atlases.size(), 7, "all seven Spheres use distinct tile atlases")
