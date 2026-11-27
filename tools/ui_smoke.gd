@@ -8,7 +8,7 @@ extends SceneTree
 
 var main: Control
 var step := 0
-var wait := 0
+var wait := 3
 var shots := ""
 var failures: PackedStringArray = []
 var _assist_turns := 0
@@ -23,6 +23,12 @@ func _initialize() -> void:
 	SaveIO.delete()
 	main = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	root.add_child(main)
+	# Ensure deterministic initial profile/hint/touch state across consecutive smoke viewports.
+	main.settings.last_profile = "exile"
+	main.settings.hints_on = true
+	main.settings.hints_seen.clear()
+	main.settings.touch_controls = false
+	main.settings.save_to_disk()
 
 
 func _shot(name: String) -> void:
@@ -146,6 +152,15 @@ func _process(_delta: float) -> bool:
 			_press("Done")
 		13:
 			_check(_find_button(main, "↑") != null or not main.settings.touch_controls, "touch pad follows the setting")
+			var up_b := _find_button(main, "↑")
+			var dn_b := _find_button(main, "↓")
+			var bag_b := _find_button(main, "Bag")
+			var vrect := main.get_viewport_rect()
+			if up_b != null and dn_b != null:
+				_check(up_b.get_global_rect().end.y <= vrect.size.y + 1.0, "touch D-pad up fits in viewport")
+				_check(dn_b.get_global_rect().end.y <= vrect.size.y + 1.0, "touch D-pad down fits in viewport (no offscreen clipping)")
+			if bag_b != null:
+				_check(bag_b.get_global_rect().end.y <= vrect.size.y + 1.0, "Bag action button fits in viewport without scrolling")
 			_shot("game_touch")
 			if _find_button(main, "↑") != null:
 				_press("↑")

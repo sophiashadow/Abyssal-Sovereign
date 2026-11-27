@@ -21,12 +21,16 @@ func _init(reg_path: String = REGISTRY_PATH, prov_path: String = PROVENANCE_PATH
 	load_manifests(reg_path, prov_path)
 
 
-func load_manifests(reg_path: String = REGISTRY_PATH, prov_path: String = PROVENANCE_PATH) -> void:
-	data.clear()
-	provenance.clear()
+func clear_cache() -> void:
 	_atlases.clear()
 	_region_cache.clear()
 	_tile_cache.clear()
+
+
+func load_manifests(reg_path: String = REGISTRY_PATH, prov_path: String = PROVENANCE_PATH) -> void:
+	data.clear()
+	provenance.clear()
+	clear_cache()
 	_load_errors.clear()
 	if FileAccess.file_exists(reg_path):
 		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(reg_path))

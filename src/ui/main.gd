@@ -20,6 +20,10 @@ var screen: Screen = Screen.TITLE
 # Game screen widgets
 var map: MapView
 var hud: RichTextLabel
+var _hud_compact: Label
+var _hud_drawer: Control
+var _stats_btn: Button
+var _hud_stats_expanded: bool = false
 var _hp_bar: ProgressBar
 var _res_bar: ProgressBar
 var _subj_bar: ProgressBar
@@ -31,7 +35,10 @@ var _seen_spheres: Dictionary = {}
 var _seen_bosses: Dictionary = {}
 var log_view: RichTextLabel
 var look_label: Label
+var _mode_bar: HBoxContainer
+var _action_btns: Dictionary = {}
 var overlay: Control
+var _menu_back: Callable = Callable()
 var _log_seen := -1
 var _last_depth := -1
 var _last_floor_id := ""
@@ -74,6 +81,11 @@ func _ready() -> void:
 	_show_title()
 
 
+func _exit_tree() -> void:
+	if registry != null:
+		registry.clear_cache()
+
+
 func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_WM_CLOSE_REQUEST:
@@ -87,13 +99,26 @@ func _notification(what: int) -> void:
 			if audio != null:
 				audio.set_paused(false)
 		NOTIFICATION_WM_GO_BACK_REQUEST:
-			if screen == Screen.GAME:
+			if _capture_action != "":
+				_finish_capture(KEY_ESCAPE)
+			elif screen == Screen.GAME:
 				if overlay != null:
 					_close_overlay()
+				elif not aim_mode.is_empty():
+					_cancel_aim()
+				elif look_mode or not travel.is_empty() or not auto.is_empty():
+					travel.clear()
+					_stop_auto()
+					if look_mode:
+						_toggle_look()
 				else:
 					_show_pause()
-			elif screen == Screen.CREATE:
+			elif screen == Screen.CREATE or screen == Screen.END:
 				_show_title()
+			elif screen == Screen.TITLE and _menu_back.is_valid():
+				var cb := _menu_back
+				_menu_back = Callable()
+				cb.call()
 
 
 # ================================================================ theme and widgets
@@ -229,6 +254,9 @@ func _clear() -> void:
 			c.queue_free()
 	map = null
 	hud = null
+	_hud_compact = null
+	_hud_drawer = null
+	_stats_btn = null
 	_hp_bar = null
 	_res_bar = null
 	_subj_bar = null
@@ -238,6 +266,8 @@ func _clear() -> void:
 	_banner_ttl = 0.0
 	log_view = null
 	look_label = null
+	_mode_bar = null
+	_action_btns.clear()
 	overlay = null
 	travel.clear()
 	look_mode = false
@@ -252,9 +282,10 @@ func _background() -> void:
 	add_child(bg)
 
 
-## A centred, scrollable column for menu screens.
+## A centred, scrollable column for menu screens with display safe-area insets.
 func _menu_column(max_width: float = 720.0) -> VBoxContainer:
 	_background()
+	var safe := _safe_margins()
 	var scroll := ScrollContainer.new()
 	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -264,22 +295,39 @@ func _menu_column(max_width: float = 720.0) -> VBoxContainer:
 	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.add_child(center)
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_top", 16)
-	margin.add_theme_constant_override("margin_bottom", 16)
-	margin.add_theme_constant_override("margin_left", 16)
-	margin.add_theme_constant_override("margin_right", 16)
+	margin.add_theme_constant_override("margin_top", maxi(16, int(safe.y) + 8))
+	margin.add_theme_constant_override("margin_bottom", maxi(16, int(safe.w) + 8))
+	margin.add_theme_constant_override("margin_left", maxi(16, int(safe.x) + 8))
+	margin.add_theme_constant_override("margin_right", maxi(16, int(safe.z) + 8))
 	center.add_child(margin)
+	var avail_w := maxf(240.0, get_viewport_rect().size.x - safe.x - safe.z - 32.0)
 	var col := VBoxContainer.new()
-	col.custom_minimum_size = Vector2(minf(max_width * settings.text_scale(), get_viewport_rect().size.x - 32.0), 0)
+	col.custom_minimum_size = Vector2(minf(max_width * settings.text_scale(), avail_w), 0)
 	col.add_theme_constant_override("separation", int(12 * settings.text_scale()))
 	margin.add_child(col)
 	return col
+
+
+func _subscreen_header(col: VBoxContainer, title_txt: String, title_col: Color, back_cb: Callable) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	var lbl := _label(title_txt, title_col, 1.3)
+	lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(lbl)
+	if back_cb.is_valid():
+		var s := settings.text_scale()
+		var xbtn := _btn("×", back_cb, 44.0 * s)
+		xbtn.custom_minimum_size = Vector2(44.0 * s, 40.0 * s)
+		xbtn.tooltip_text = "Back"
+		row.add_child(xbtn)
+	col.add_child(row)
 
 
 # ================================================================ title
 
 func _show_title() -> void:
 	_clear()
+	_menu_back = Callable()
 	screen = Screen.TITLE
 	_sync_audio_context()
 	var col := _menu_column(540.0)
@@ -344,6 +392,7 @@ func _show_error(heading: String, errors: PackedStringArray, offer_discard: bool
 
 func _show_create() -> void:
 	_clear()
+	_menu_back = Callable()
 	screen = Screen.CREATE
 	_sync_audio_context()
 	if _pick_species == "":
@@ -485,6 +534,8 @@ func _describe_choice(kind: String, id: String) -> String:
 
 func _start_game(w: World) -> void:
 	world = w
+	_menu_back = Callable()
+	_hud_stats_expanded = false
 	_last_depth = world.depth
 	_last_floor_id = world.floor_id
 	_last_save_turn = world.turns
@@ -526,8 +577,8 @@ func _show_banner(kicker: String, title: String, subtitle: String, emblem_id: St
 	var portrait := vp.y > vp.x and vp.x > 0.0
 	pc.anchor_left = 0.04 if portrait else 0.03
 	pc.anchor_right = 0.96 if portrait else 0.68
-	pc.anchor_top = 0.015
-	pc.anchor_bottom = 0.015
+	pc.anchor_top = 0.115 if portrait else 0.015
+	pc.anchor_bottom = 0.115 if portrait else 0.015
 	pc.offset_left = 0.0
 	pc.offset_right = 0.0
 	pc.offset_top = 0.0
@@ -571,6 +622,98 @@ func _show_banner(kicker: String, title: String, subtitle: String, emblem_id: St
 	_banner_ttl = 4.5
 
 
+func _make_dpad(cell: float, sep: int) -> Control:
+	var pad := GridContainer.new()
+	pad.columns = 3
+	pad.add_theme_constant_override("h_separation", sep)
+	pad.add_theme_constant_override("v_separation", sep)
+	var arrows := ["↖", "↑", "↗", "←", "·", "→", "↙", "↓", "↘"]
+	var dirs := [Vector2i(-1, -1), Vector2i(0, -1), Vector2i(1, -1), Vector2i(-1, 0), Vector2i.ZERO,
+		Vector2i(1, 0), Vector2i(-1, 1), Vector2i(0, 1), Vector2i(1, 1)]
+	for i in 9:
+		var dir: Vector2i = dirs[i]
+		var b := _btn(arrows[i], func() -> void: _act_dir(dir), cell)
+		b.custom_minimum_size = Vector2(cell, cell)
+		b.focus_mode = Control.FOCUS_NONE
+		b.tooltip_text = "Wait" if dir == Vector2i.ZERO else ""
+		pad.add_child(b)
+	return pad
+
+
+func _make_quick_bar(s: float, include_menu: bool = false) -> HBoxContainer:
+	var quick := HBoxContainer.new()
+	quick.add_theme_constant_override("separation", 4)
+	_render_btn = _btn("Tiles" if settings.render_mode == "tiles" else "Glyph", func() -> void:
+		settings.render_mode = "glyph" if settings.render_mode == "tiles" else "tiles"
+		settings.save_to_disk()
+		_sync_map_settings()
+		_render_btn.text = "Tiles" if settings.render_mode == "tiles" else "Glyph")
+	_render_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_render_btn.focus_mode = Control.FOCUS_NONE
+	_render_btn.custom_minimum_size.y = 38.0 * s
+	var zm := _btn("Z-", func() -> void:
+		var idx := GameSettings.ZOOM_LEVELS.find(settings.camera_zoom)
+		if idx < 0:
+			idx = 1
+		settings.camera_zoom = GameSettings.ZOOM_LEVELS[maxi(0, idx - 1)]
+		settings.save_to_disk()
+		_sync_map_settings(), 42.0 * s)
+	zm.focus_mode = Control.FOCUS_NONE
+	zm.custom_minimum_size.y = 38.0 * s
+	var zp := _btn("Z+", func() -> void:
+		var idx := GameSettings.ZOOM_LEVELS.find(settings.camera_zoom)
+		if idx < 0:
+			idx = 1
+		settings.camera_zoom = GameSettings.ZOOM_LEVELS[mini(GameSettings.ZOOM_LEVELS.size() - 1, idx + 1)]
+		settings.save_to_disk()
+		_sync_map_settings(), 42.0 * s)
+	zp.focus_mode = Control.FOCUS_NONE
+	zp.custom_minimum_size.y = 38.0 * s
+	quick.add_child(_render_btn)
+	quick.add_child(zm)
+	quick.add_child(zp)
+	if include_menu:
+		var mb := _btn("Menu", _show_pause, 64.0 * s)
+		mb.focus_mode = Control.FOCUS_NONE
+		mb.custom_minimum_size.y = 38.0 * s
+		quick.add_child(mb)
+		_action_btns["Menu"] = mb
+	return quick
+
+
+func _make_action_grid(cols: int, btn_h: float, sep: int, include_menu: bool = true) -> GridContainer:
+	var actions := GridContainer.new()
+	actions.columns = cols
+	actions.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	actions.add_theme_constant_override("h_separation", sep)
+	actions.add_theme_constant_override("v_separation", sep)
+	var action_specs: Array = [
+		["Get", _act_pickup], ["Bag", _show_inventory], ["Build", _show_build], ["Act", _show_abilities],
+		["Fire", _act_fire], ["Stairs", _act_stairs], ["Rest", _act_rest], ["Auto", _act_explore],
+		["Srch", _act_search], ["Use", _act_interact], ["Look", _toggle_look],
+	]
+	if world.player.has_trait("mask_stances"):
+		action_specs.insert(5, ["Mask", _show_masks])
+	if include_menu:
+		action_specs.append(["Menu", _show_pause])
+	for spec in action_specs:
+		var b := _btn(String(spec[0]), spec[1])
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.custom_minimum_size = Vector2(0.0, btn_h)
+		b.focus_mode = Control.FOCUS_NONE
+		actions.add_child(b)
+		_action_btns[String(spec[0])] = b
+	return actions
+
+
+func _toggle_stats_drawer() -> void:
+	_hud_stats_expanded = not _hud_stats_expanded
+	if _hud_drawer != null:
+		_hud_drawer.visible = _hud_stats_expanded
+	if _stats_btn != null:
+		_stats_btn.text = "Stats ▴" if _hud_stats_expanded else "Stats ▾"
+
+
 func _build_game_screen() -> void:
 	_clear()
 	_log_seen = -1
@@ -588,160 +731,200 @@ func _build_game_screen() -> void:
 	frame.add_theme_constant_override("margin_bottom", int(safe.w))
 	add_child(frame)
 
-	var root: BoxContainer = VBoxContainer.new() if portrait else HBoxContainer.new()
-	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	root.add_theme_constant_override("separation", 0)
-	frame.add_child(root)
-
-	var left := VBoxContainer.new()
-	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	left.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	left.add_theme_constant_override("separation", 0)
 	map = MapView.new()
 	map.world = world
 	map.registry = registry
-	_sync_map_settings()
 	map.zoom_changed.connect(func(z: float) -> void:
 		settings.camera_zoom = z
 		settings.save_to_disk())
+	map.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	map.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	map.tile_tapped.connect(_on_tile_tapped)
 	map.tile_inspected.connect(_on_tile_inspected)
-	left.add_child(map)
+	_sync_map_settings()
 
 	var log_panel := PanelContainer.new()
-	log_panel.custom_minimum_size.y = _fs(0.85) * 1.4 * (4 if portrait else LOG_LINES) + 14
-	left.add_child(log_panel)
+	log_panel.custom_minimum_size.y = _fs(0.84) * 1.38 * (3 if portrait else LOG_LINES) + 12
 	var log_box := VBoxContainer.new()
+	log_box.add_theme_constant_override("separation", 3)
 	log_panel.add_child(log_box)
-	look_label = _label("", Palette.FALSE_SUN, 0.85)
+	look_label = _label("", Palette.FALSE_SUN, 0.84)
 	look_label.visible = false
 	log_box.add_child(look_label)
+	_mode_bar = HBoxContainer.new()
+	_mode_bar.add_theme_constant_override("separation", 6)
+	_mode_bar.visible = false
+	log_box.add_child(_mode_bar)
 	log_view = RichTextLabel.new()
 	log_view.bbcode_enabled = true
 	log_view.scroll_following = true
 	log_view.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	log_view.add_theme_font_size_override("normal_font_size", _fs(0.85))
+	log_view.add_theme_font_size_override("normal_font_size", _fs(0.84))
 	log_view.mouse_filter = Control.MOUSE_FILTER_PASS
 	log_box.add_child(log_view)
 
-	var side_scroll := ScrollContainer.new()
-	side_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	if portrait:
-		side_scroll.custom_minimum_size.y = clampf(vp.y * 0.42, 240.0, 460.0)
-	else:
-		side_scroll.custom_minimum_size.x = clampf(310.0 * s, 250.0, vp.x * 0.44)
-	var side_panel := PanelContainer.new()
-	side_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	side_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	side_scroll.add_child(side_panel)
-	var side := VBoxContainer.new()
-	side.add_theme_constant_override("separation", int(6 * s))
-	side_panel.add_child(side)
-
-	var hdr := HBoxContainer.new()
-	hdr.add_theme_constant_override("separation", 8)
-	_sphere_icon = _emblem_rect("sphere_%d" % clampi(world.depth, 1, 7), 36.0 * s)
-	if _sphere_icon != null:
-		hdr.add_child(_sphere_icon)
-	var bars := VBoxContainer.new()
-	bars.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	bars.add_theme_constant_override("separation", 3)
-	_hp_bar = _make_bar(Palette.color_for_mode(Palette.GOOD, "good", settings.color_mode, settings.high_contrast), 10.0)
-	_res_bar = _make_bar(Palette.LUX, 8.0)
-	_subj_bar = _make_bar(Palette.color_for_mode(Palette.ALERT, "danger", settings.color_mode, settings.high_contrast), 6.0)
-	bars.add_child(_hp_bar)
-	bars.add_child(_res_bar)
-	bars.add_child(_subj_bar)
-	hdr.add_child(bars)
-	side.add_child(hdr)
+	_sphere_icon = _emblem_rect("sphere_%d" % clampi(world.depth, 1, 7), (32.0 if portrait else 36.0) * s)
+	_hp_bar = _make_bar(Palette.color_for_mode(Palette.GOOD, "good", settings.color_mode, settings.high_contrast), 9.0)
+	_res_bar = _make_bar(Palette.LUX, 7.0)
+	_subj_bar = _make_bar(Palette.color_for_mode(Palette.ALERT, "danger", settings.color_mode, settings.high_contrast), 5.0)
+	if portrait or settings.touch_controls:
+		_hud_compact = _label("", Palette.TEXT, 0.82)
+		_hud_compact.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 	hud = RichTextLabel.new()
 	hud.bbcode_enabled = true
 	hud.fit_content = true
 	hud.scroll_active = false
-	hud.add_theme_font_size_override("normal_font_size", _fs(0.84))
-	hud.add_theme_font_size_override("bold_font_size", _fs(0.95))
-	side.add_child(hud)
+	hud.add_theme_font_size_override("normal_font_size", _fs(0.83))
+	hud.add_theme_font_size_override("bold_font_size", _fs(0.94))
 
-	var quick := HBoxContainer.new()
-	quick.add_theme_constant_override("separation", 4)
-	_render_btn = _btn("Tiles" if settings.render_mode == "tiles" else "Glyph", func() -> void:
-		settings.render_mode = "glyph" if settings.render_mode == "tiles" else "tiles"
-		settings.save_to_disk()
-		_sync_map_settings()
-		_render_btn.text = "Tiles" if settings.render_mode == "tiles" else "Glyph")
-	_render_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_render_btn.focus_mode = Control.FOCUS_NONE
-	_render_btn.custom_minimum_size.y = 36.0 * s
-	var zm := _btn("Z-", func() -> void:
-		var idx := GameSettings.ZOOM_LEVELS.find(settings.camera_zoom)
-		if idx < 0:
-			idx = 1
-		settings.camera_zoom = GameSettings.ZOOM_LEVELS[maxi(0, idx - 1)]
-		settings.save_to_disk()
-		_sync_map_settings(), 44.0 * s)
-	zm.focus_mode = Control.FOCUS_NONE
-	zm.custom_minimum_size.y = 36.0 * s
-	var zp := _btn("Z+", func() -> void:
-		var idx := GameSettings.ZOOM_LEVELS.find(settings.camera_zoom)
-		if idx < 0:
-			idx = 1
-		settings.camera_zoom = GameSettings.ZOOM_LEVELS[mini(GameSettings.ZOOM_LEVELS.size() - 1, idx + 1)]
-		settings.save_to_disk()
-		_sync_map_settings(), 44.0 * s)
-	zp.focus_mode = Control.FOCUS_NONE
-	zp.custom_minimum_size.y = 36.0 * s
-	quick.add_child(_render_btn)
-	quick.add_child(zm)
-	quick.add_child(zp)
-	side.add_child(quick)
+	if portrait:
+		var root := VBoxContainer.new()
+		root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		root.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		root.add_theme_constant_override("separation", 0)
+		frame.add_child(root)
 
-	var actions := GridContainer.new()
-	actions.columns = 4 if portrait else (2 if settings.touch_controls else 3)
-	actions.add_theme_constant_override("h_separation", int(6 * s))
-	actions.add_theme_constant_override("v_separation", int(6 * s))
-	var action_specs: Array = [["Get", _act_pickup], ["Bag", _show_inventory], ["Build", _show_build], ["Act", _show_abilities],
-			["Fire", _act_fire], ["Stairs", _act_stairs], ["Rest", _act_rest], ["Auto", _act_explore], ["Srch", _act_search], ["Look", _toggle_look], ["Menu", _show_pause]]
-	if world.player.has_trait("mask_stances"):
-		action_specs.insert(5, ["Mask", _show_masks])
-	for spec in action_specs:
-		var b := _btn(spec[0], spec[1])
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.focus_mode = Control.FOCUS_NONE
-		actions.add_child(b)
-	side.add_child(actions)
+		var top_bar := PanelContainer.new()
+		var top_vb := VBoxContainer.new()
+		top_vb.add_theme_constant_override("separation", 4)
+		top_bar.add_child(top_vb)
+		var hdr_row := HBoxContainer.new()
+		hdr_row.add_theme_constant_override("separation", 6)
+		if _sphere_icon != null:
+			_sphere_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			hdr_row.add_child(_sphere_icon)
+		var bars_col := VBoxContainer.new()
+		bars_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		bars_col.add_theme_constant_override("separation", 2)
+		var bars := VBoxContainer.new()
+		bars.add_theme_constant_override("separation", 2)
+		bars.add_child(_hp_bar)
+		bars.add_child(_res_bar)
+		bars.add_child(_subj_bar)
+		bars_col.add_child(bars)
+		bars_col.add_child(_hud_compact)
+		hdr_row.add_child(bars_col)
+		_stats_btn = _btn("Stats ▴" if _hud_stats_expanded else "Stats ▾", _toggle_stats_drawer, 76.0 * s)
+		_stats_btn.custom_minimum_size.y = 38.0 * s
+		_stats_btn.focus_mode = Control.FOCUS_NONE
+		hdr_row.add_child(_stats_btn)
+		top_vb.add_child(hdr_row)
+		top_vb.add_child(_make_quick_bar(s, true))
+		root.add_child(top_bar)
+
+		var drawer := PanelContainer.new()
+		drawer.visible = _hud_stats_expanded
+		var dscroll := ScrollContainer.new()
+		dscroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		dscroll.custom_minimum_size.y = clampf(vp.y * 0.22, 130.0, 220.0)
+		hud.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		dscroll.add_child(hud)
+		drawer.add_child(dscroll)
+		_hud_drawer = drawer
+		root.add_child(drawer)
+
+		root.add_child(map)
+		root.add_child(log_panel)
+
+		var dock := PanelContainer.new()
+		if settings.touch_controls:
+			var dock_hb := HBoxContainer.new()
+			dock_hb.add_theme_constant_override("separation", int(8 * s))
+			dock.add_child(dock_hb)
+			var cell := clampf((vp.x - safe.x - safe.z) * 0.072, 46.0, 56.0)
+			var pad := _make_dpad(cell, 4)
+			var act_grid := _make_action_grid(4, 46.0 * s, 4, false)
+			if settings.left_handed:
+				dock_hb.add_child(pad)
+				dock_hb.add_child(act_grid)
+			else:
+				dock_hb.add_child(act_grid)
+				dock_hb.add_child(pad)
+		else:
+			dock.add_child(_make_action_grid(6, 44.0 * s, 4, false))
+		root.add_child(dock)
+		_refresh()
+		return
+
+	# Landscape layout (desktop & mobile landscape)
+	var root_h := HBoxContainer.new()
+	root_h.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root_h.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	root_h.add_theme_constant_override("separation", 0)
+	frame.add_child(root_h)
+
+	var left := VBoxContainer.new()
+	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	left.add_theme_constant_override("separation", 0)
+	left.add_child(map)
+	left.add_child(log_panel)
+
+	var side_panel := PanelContainer.new()
+	var side_w := clampf((330.0 if settings.touch_controls else 310.0) * s, 260.0, vp.x * 0.42)
+	side_panel.custom_minimum_size.x = side_w
+	var side := VBoxContainer.new()
+	side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	side.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	side.add_theme_constant_override("separation", int(5 * s))
+	side_panel.add_child(side)
+
+	var hdr := HBoxContainer.new()
+	hdr.add_theme_constant_override("separation", 8)
+	if _sphere_icon != null:
+		hdr.add_child(_sphere_icon)
+	var bars := VBoxContainer.new()
+	bars.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bars.add_theme_constant_override("separation", 3)
+	bars.add_child(_hp_bar)
+	bars.add_child(_res_bar)
+	bars.add_child(_subj_bar)
+	hdr.add_child(bars)
+	if settings.touch_controls:
+		_stats_btn = _btn("Stats ▴" if _hud_stats_expanded else "Stats ▾", _toggle_stats_drawer, 74.0 * s)
+		_stats_btn.custom_minimum_size.y = 34.0 * s
+		_stats_btn.focus_mode = Control.FOCUS_NONE
+		hdr.add_child(_stats_btn)
+	side.add_child(hdr)
 
 	if settings.touch_controls:
-		var pad := GridContainer.new()
-		pad.columns = 3
-		pad.add_theme_constant_override("h_separation", int(4 * s))
-		pad.add_theme_constant_override("v_separation", int(4 * s))
-		var cell := (52.0 if portrait else 64.0) * s
-		var arrows := ["↖", "↑", "↗", "←", "·", "→", "↙", "↓", "↘"]
-		var dirs := [Vector2i(-1, -1), Vector2i(0, -1), Vector2i(1, -1), Vector2i(-1, 0), Vector2i.ZERO,
-			Vector2i(1, 0), Vector2i(-1, 1), Vector2i(0, 1), Vector2i(1, 1)]
-		for i in 9:
-			var dir: Vector2i = dirs[i]
-			var b := _btn(arrows[i], func() -> void: _act_dir(dir), cell)
-			b.custom_minimum_size = Vector2(cell, cell)
-			b.focus_mode = Control.FOCUS_NONE
-			b.tooltip_text = "Wait" if dir == Vector2i.ZERO else ""
-			pad.add_child(b)
+		side.add_child(_hud_compact)
+		var drawer_l := ScrollContainer.new()
+		drawer_l.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		drawer_l.custom_minimum_size.y = clampf(vp.y * 0.24, 110.0, 180.0)
+		drawer_l.visible = _hud_stats_expanded
+		hud.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		drawer_l.add_child(hud)
+		_hud_drawer = drawer_l
+		side.add_child(drawer_l)
+		side.add_child(_make_quick_bar(s, false))
+		side.add_child(_make_action_grid(3, 44.0 * s, 4, true))
+		var spacer := Control.new()
+		spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		side.add_child(spacer)
+		var cell := clampf(54.0 * s, 46.0, 62.0)
 		var pad_center := CenterContainer.new()
-		pad_center.add_child(pad)
+		pad_center.add_child(_make_dpad(cell, 4))
 		side.add_child(pad_center)
 	else:
+		var hud_scroll := ScrollContainer.new()
+		hud_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		hud_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		hud.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		hud_scroll.add_child(hud)
+		side.add_child(hud_scroll)
+		side.add_child(_make_quick_bar(s, false))
+		side.add_child(_make_action_grid(3, 38.0 * s, 4, true))
 		var mask_hint := "   Mask: m" if world.player.has_trait("mask_stances") else ""
-		side.add_child(_label(_key_help(mask_hint), Palette.TEXT_DIM, 0.7))
+		side.add_child(_label(_key_help(mask_hint), Palette.TEXT_DIM, 0.66))
 
-	if not portrait and settings.left_handed:
-		root.add_child(side_scroll)
-		root.add_child(left)
+	if settings.left_handed:
+		root_h.add_child(side_panel)
+		root_h.add_child(left)
 	else:
-		root.add_child(left)
-		root.add_child(side_scroll)
+		root_h.add_child(left)
+		root_h.add_child(side_panel)
 	_refresh()
 
 
@@ -875,6 +1058,14 @@ func _update_hud() -> void:
 		if em != null:
 			_sphere_icon.texture = em
 	var hp_col := Palette.color_for_mode(Palette.GOOD if p.hp * 2 > mx else (Palette.FALSE_SUN if p.hp * 4 > mx else Palette.ALERT), "good" if p.hp * 2 > mx else "danger", settings.color_mode, settings.high_contrast)
+	var sphere := String(fd.get("sphere", ""))
+	if _hud_compact != null:
+		var res_part := "  %s %d/%d" % [p.resource_label().left(3), p.resource, p.max_resource()] if p.resource_label() != "" else ""
+		var subj_part := "  Subj %d/%d" % [world.subjugation, world.chain_limit()] if world.subjugation > 0 else ""
+		var foes_n := world.visible_hostiles().size()
+		var foe_part := "  Foes:%d" % foes_n if foes_n > 0 else ""
+		_hud_compact.text = "HP %d/%d%s  Lv%d  S%d %s%s%s" % [p.hp, mx, res_part, p.level, world.depth, fd.get("name", sphere), subj_part, foe_part]
+		_hud_compact.add_theme_color_override("font_color", hp_col if foes_n == 0 else Palette.TEXT)
 	var t: PackedStringArray = []
 	t.append("[b][color=#%s]%s[/color][/b]" % [Palette.LUX.to_html(false), _escape(p.name)])
 	t.append("%s %s, level %d" % [db.get_def("species", p.species_id)["name"], db.get_def("classes", p.class_id)["name"], p.level])
@@ -884,7 +1075,6 @@ func _update_hud() -> void:
 	t.append("XP %d / %d" % [p.xp, World.xp_for_level(p.level + 1)])
 	if p.stat_points > 0 or p.talent_points > 0:
 		t.append("[color=#%s]Unspent: %d stat, %d talent (Build)[/color]" % [Palette.FALSE_SUN.to_html(false), p.stat_points, p.talent_points])
-	var sphere := String(fd.get("sphere", ""))
 	var rkind := String(fd.get("region_kind", "spine"))
 	var rtag := "" if rkind == "spine" else " [%s]" % rkind.capitalize()
 	t.append("Sphere %d (%s): %s%s" % [world.depth, sphere, fd.get("name", ""), rtag] if sphere != "" else "Depth %d: %s%s" % [world.depth, fd.get("name", ""), rtag])
@@ -1369,8 +1559,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			else:
 				_show_pause()
 			get_viewport().set_input_as_handled()
-		elif screen == Screen.CREATE:
+		elif screen == Screen.CREATE or screen == Screen.END:
 			_show_title()
+		elif screen == Screen.TITLE and _menu_back.is_valid():
+			var cb := _menu_back
+			_menu_back = Callable()
+			cb.call()
 		return
 	if screen != Screen.GAME or overlay != null or world.state != World.State.PLAYING:
 		return
@@ -1810,8 +2004,8 @@ func _show_masks() -> void:
 	col.add_child(_btn("Close", _close_overlay))
 
 
-## A modal panel over the game screen. Returns the column to fill.
-func _open_overlay(title: String, title_color: Color = Palette.LUX) -> VBoxContainer:
+## A modal panel over the game screen with a sticky header and bounded internal scroll.
+func _open_overlay(title: String, title_color: Color = Palette.LUX, on_close: Callable = Callable()) -> VBoxContainer:
 	_dismiss_banner()
 	_close_overlay()
 	travel.clear()
@@ -1824,27 +2018,52 @@ func _open_overlay(title: String, title_color: Color = Palette.LUX) -> VBoxConta
 	dim.color = Color(Palette.VOID, 0.82)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	overlay.add_child(dim)
-	var scroll := ScrollContainer.new()
-	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	overlay.add_child(scroll)
+	var safe := _safe_margins()
+	var vp := get_viewport_rect().size
+	var s := settings.text_scale()
 	var center := CenterContainer.new()
-	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.add_child(center)
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_top", 16)
-	margin.add_theme_constant_override("margin_bottom", 16)
-	margin.add_theme_constant_override("margin_left", 16)
-	margin.add_theme_constant_override("margin_right", 16)
+	margin.add_theme_constant_override("margin_top", maxi(12, int(safe.y) + 6))
+	margin.add_theme_constant_override("margin_bottom", maxi(12, int(safe.w) + 6))
+	margin.add_theme_constant_override("margin_left", maxi(12, int(safe.x) + 6))
+	margin.add_theme_constant_override("margin_right", maxi(12, int(safe.z) + 6))
 	center.add_child(margin)
+	var avail_w := maxf(240.0, vp.x - safe.x - safe.z - 32.0)
+	var max_body_h := maxf(180.0, vp.y - safe.y - safe.w - 120.0 * s)
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size.x = minf(640.0 * settings.text_scale(), get_viewport_rect().size.x - 32.0)
+	panel.custom_minimum_size.x = minf(640.0 * s, avail_w)
 	margin.add_child(panel)
+	var outer := VBoxContainer.new()
+	outer.add_theme_constant_override("separation", int(8 * s))
+	panel.add_child(outer)
+
+	var hdr := HBoxContainer.new()
+	hdr.add_theme_constant_override("separation", 8)
+	var tl := _label(title, title_color, 1.25)
+	tl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hdr.add_child(tl)
+	if screen != Screen.END:
+		var close_cb := on_close if on_close.is_valid() else Callable(self, "_close_overlay")
+		var xbtn := _btn("×", close_cb, 42.0 * s)
+		xbtn.custom_minimum_size = Vector2(42.0 * s, 38.0 * s)
+		xbtn.focus_mode = Control.FOCUS_NONE
+		xbtn.tooltip_text = "Close"
+		hdr.add_child(xbtn)
+	outer.add_child(hdr)
+
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	outer.add_child(scroll)
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", int(10 * settings.text_scale()))
-	panel.add_child(col)
-	col.add_child(_label(title, title_color, 1.3))
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.add_theme_constant_override("separation", int(8 * s))
+	scroll.add_child(col)
+	col.minimum_size_changed.connect(func() -> void:
+		if is_instance_valid(scroll) and is_instance_valid(col):
+			scroll.custom_minimum_size.y = minf(col.get_combined_minimum_size().y, max_body_h))
 	return col
 
 
@@ -1873,7 +2092,9 @@ func _show_atlas() -> void:
 		var sem := _emblem_rect("sphere_%d" % d, 24.0 * settings.text_scale())
 		if sem != null:
 			srow.add_child(sem)
-		srow.add_child(_label(s_line, Palette.LUX if here_s else (Palette.TEXT if visited_s else Palette.TEXT_DIM), 0.92))
+		var slbl := _label(s_line, Palette.LUX if here_s else (Palette.TEXT if visited_s else Palette.TEXT_DIM), 0.92)
+		slbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		srow.add_child(slbl)
 		col.add_child(srow)
 		for pt in world.atlas.get(sid, []):
 			var bid := String(pt.get("target", ""))
@@ -1934,7 +2155,9 @@ func _show_people() -> void:
 				var nsp := _sprite_rect(registry.npc_region(nid), 24.0 * settings.text_scale()) if registry != null else null
 				if nsp != null:
 					nrow.add_child(nsp)
-				nrow.add_child(_label("%s (%s) — standing %+d" % [String(ndef["name"]), String(ndef["role"]), st], Palette.TEXT, 0.82))
+				var nlbl := _label("%s (%s) — standing %+d" % [String(ndef["name"]), String(ndef["role"]), st], Palette.TEXT, 0.82)
+				nlbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				nrow.add_child(nlbl)
 				col.add_child(nrow)
 	var close := _btn("Close", _close_overlay)
 	col.add_child(close)
@@ -2001,8 +2224,9 @@ func _show_codex(back: Callable = Callable()) -> void:
 		col = _open_overlay("Codex of Terra Tenebrae", Palette.FALSE_SUN)
 	else:
 		_clear()
+		_menu_back = back
 		col = _menu_column(720.0)
-		col.add_child(_label("Codex of Terra Tenebrae", Palette.FALSE_SUN, 1.3))
+		_subscreen_header(col, "Codex of Terra Tenebrae", Palette.FALSE_SUN, back)
 	col.add_child(_label("Knowledge only — grants no power; unseen entries stay unrecorded.", Palette.TEXT_DIM, 0.84))
 	col.add_child(_label("Atlas Places: %d / %d   Creatures: %d / %d   Armory & Relics: %d / %d" % [
 		codex.floors.size(), db.ids("floors").size(),
@@ -2076,8 +2300,12 @@ func _show_settings(back: Callable) -> void:
 		col = _open_overlay("Settings")
 	else:
 		_clear()
+		_menu_back = back
 		col = _menu_column(620.0)
-		col.add_child(_label("Settings", Palette.LUX, 1.3))
+		_subscreen_header(col, "Settings", Palette.LUX, func() -> void:
+			settings.save_to_disk()
+			_apply_theme()
+			back.call())
 	var rebuild := func() -> void:
 		settings.save_to_disk()
 		_apply_theme()
@@ -2227,8 +2455,12 @@ func _show_controls(back: Callable) -> void:
 		col = _open_overlay("Keyboard shortcuts")
 	else:
 		_clear()
+		_menu_back = func() -> void: _show_settings(back)
 		col = _menu_column(620.0)
-		col.add_child(_label("Keyboard shortcuts", Palette.LUX, 1.3))
+		_subscreen_header(col, "Keyboard shortcuts", Palette.LUX, func() -> void:
+			_capture_action = ""
+			_controls_note = ""
+			_show_settings(back))
 	col.add_child(_label("Select a command, then press the new key. Esc cancels. Movement, Enter, Space, the number keys and Esc stay fixed.", Palette.TEXT_DIM, 0.85))
 	if _controls_note != "":
 		col.add_child(_label(_controls_note, Palette.FALSE_SUN, 0.85))
