@@ -144,13 +144,36 @@ func actor_region(actor: Actor, db: ContentDB = null) -> Dictionary:
 		var direct := _region_entry("monsters", tid)
 		if not direct.is_empty():
 			return direct
+		for t in actor.tags:
+			var tr := _region_entry("monsters", "tag:" + String(t))
+			if not tr.is_empty():
+				return tr
 		if db != null and db.has("monsters", tid):
-			var fam := String(db.get_def("monsters", tid).get("family", ""))
-			if fam != "":
-				var fr := _region_entry("monsters", "family:" + fam)
-				if not fr.is_empty():
-					return fr
+			for t in db.get_def("monsters", tid).get("tags", []):
+				var tr2 := _region_entry("monsters", "tag:" + String(t))
+				if not tr2.is_empty():
+					return tr2
 	return _region_entry("monsters", "default")
+
+
+func elite_badge_region(elite_kind: String) -> Dictionary:
+	var r := _region_entry("icons", "elite:" + elite_kind.to_lower())
+	return r if not r.is_empty() else _region_entry("icons", "elite:default")
+
+
+func tree_icon_region(tree_name: String) -> Dictionary:
+	var r := _region_entry("icons", "tree:" + tree_name)
+	return r if not r.is_empty() else _region_entry("icons", "default")
+
+
+func chain_icon_region(chain_tag: String) -> Dictionary:
+	var r := _region_entry("icons", "chain:" + chain_tag)
+	return r if not r.is_empty() else _region_entry("icons", "default")
+
+
+func faction_emblem_region(faction_id: String) -> Dictionary:
+	var r := _region_entry("emblems", "faction:" + faction_id)
+	return r if not r.is_empty() else _region_entry("emblems", "title_crest")
 
 
 func npc_region(npc_id: String) -> Dictionary:
@@ -254,22 +277,31 @@ func validate(db: ContentDB = null, require_complete: bool = false) -> Array[Str
 		for cl in db.ids("classes"):
 			if _region_entry("avatars", "calling:" + cl).is_empty():
 				errs.append("Missing avatar calling sprite for '%s'" % cl)
+		for mk in ["bare_face", "nyx", "eris", "lilith", "lux_venefica"]:
+			if _region_entry("avatars", "mask:" + mk).is_empty():
+				errs.append("Missing mask overlay for '%s'" % mk)
 		for mid in db.ids("monsters"):
-			var md := db.get_def("monsters", mid)
-			var ok_m := not _region_entry("monsters", mid).is_empty() or not _region_entry("monsters", "family:" + String(md.get("family", ""))).is_empty()
-			if not ok_m:
+			if _region_entry("monsters", mid).is_empty():
 				errs.append("Missing monster sprite for '%s'" % mid)
 		for nid in db.ids("npcs"):
 			if _region_entry("npcs", nid).is_empty():
 				errs.append("Missing NPC sprite for '%s'" % nid)
 		for iid in db.ids("items"):
-			var id := db.get_def("items", iid)
-			var ok_i := not _region_entry("items", iid).is_empty() or not _region_entry("items", "kind:" + String(id.get("kind", ""))).is_empty()
-			if not ok_i:
+			if _region_entry("items", iid).is_empty():
 				errs.append("Missing item sprite for '%s'" % iid)
 		for sid in db.ids("statuses"):
 			if _region_entry("statuses", sid).is_empty():
 				errs.append("Missing status icon for '%s'" % sid)
+		for tid in db.ids("talents"):
+			var tree := String(db.get_def("talents", tid).get("tree", ""))
+			if tree != "" and _region_entry("icons", "tree:" + tree).is_empty():
+				errs.append("Missing talent tree icon for '%s'" % tree)
+		for fid in db.ids("factions"):
+			if _region_entry("emblems", "faction:" + fid).is_empty():
+				errs.append("Missing faction emblem for '%s'" % fid)
+		for cid in db.ids("contracts"):
+			if _region_entry("icons", "contract:" + cid).is_empty():
+				errs.append("Missing contract icon for '%s'" % cid)
 	return errs
 
 

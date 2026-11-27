@@ -494,142 +494,444 @@ def draw_sphere_tile_atlas(sphere_num: int, theme: dict) -> tuple[Sheet, dict[st
     return s, tile_rects, feat_rects
 
 
-def draw_avatars_vertical_slice() -> tuple[Sheet, dict[str, list[int]]]:
+def hex_rgba(h: str, fallback=SILVER) -> tuple:
+    h = (h or "").strip().lstrip("#")
+    if len(h) == 6:
+        return (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16), 255)
+    return fallback
+
+
+def draw_avatars_full() -> tuple[Sheet, dict[str, list[int]]]:
     s = Sheet(8, 4, 32)
     rects: dict[str, list[int]] = {}
 
-    def make_char(key: str, hood_col, robe_col, trim_col, weapon_col=None):
+    origin_styles = {
+        "human": (RECORD, PORPHYRY, GOLD),
+        "revenant": (SILVER_DK, IRON_DK, SILVER),
+        "cambion": (BLOOD, PORPHYRY_LT, EMBER),
+        "ashborn": (EMBER, (56, 30, 26, 255), GOLD_HI),
+        "veilkin": (MIASMA, (32, 22, 46, 255), LUX),
+        "ironbound_ward": (IRON_HI, IRON_DK, GOLD),
+        "unrecorded": (TEXT_DIM, (36, 36, 42, 255), SILVER_DK),
+        "penitent": (IVORY, BLOOD, GOLD),
+    }
+
+    def make_origin(key: str, head_c, body_c, trim_c):
         s.next_tile(key)
         t = Image.new("RGBA", (32, 32), VOID_T)
         d = ImageDraw.Draw(t)
         d.ellipse([9, 26, 23, 30], fill=(8, 6, 9, 140))
-        d.polygon([(16, 11), (24, 27), (8, 27)], fill=robe_col, outline=trim_col)
-        d.ellipse([11, 4, 21, 13], fill=hood_col, outline=trim_col)
+        d.polygon([(16, 11), (24, 27), (8, 27)], fill=body_c, outline=trim_c)
+        d.ellipse([11, 4, 21, 13], fill=head_c, outline=trim_c)
         d.point([(14, 8), (18, 8)], fill=IVORY)
-        if weapon_col:
-            d.line([(23, 10), (23, 24)], fill=weapon_col, width=2)
-            d.line([(20, 19), (26, 19)], fill=GOLD)
         t = outline_sprite(t)
         s.commit(key, t)
         rects[key] = s.rects[key]
 
-    make_char("origin:default", SILVER, PORPHYRY, GOLD)
-    make_char("origin:human", RECORD, PORPHYRY, GOLD)
-    make_char("origin:revenant", SILVER_DK, IRON_DK, SILVER)
-    make_char("origin:cambion", BLOOD, PORPHYRY_LT, EMBER)
-    make_char("calling:default", VOID_T, VOID_T, GOLD, SILVER)
-    # Calling trim overlay (drawn atop origin)
-    for cl, col, wep in (
-        ("fallen_knight", IRON_HI, SILVER),
-        ("occultist", LUX, GOLD_HI),
-        ("assassin", IRON_DK, ALERT),
-    ):
-        k = f"calling:{cl}"
-        s.next_tile(k)
+    make_origin("origin:default", SILVER, PORPHYRY, GOLD)
+    for sp, cols in origin_styles.items():
+        make_origin(f"origin:{sp}", *cols)
+
+    calling_styles = {
+        "fallen_knight": (IRON_HI, SILVER, "blade"),
+        "occultist": (LUX, GOLD_HI, "rod"),
+        "assassin": (IRON_DK, ALERT, "dagger"),
+        "preliator_warden": (GOLD, IRON_HI, "shield"),
+        "tithe_marksman": (RECORD, GOLD, "bow"),
+        "rite_weaver": (LUX, IVORY, "scroll"),
+        "false_light_alchemist": (FALSE_SUN, EMBER, "flask"),
+        "ophite_binder": (SAGE, LUX, "coil"),
+    }
+
+    def make_calling(key: str, col, wep_col, shape):
+        s.next_tile(key)
         t = Image.new("RGBA", (32, 32), VOID_T)
         d = ImageDraw.Draw(t)
         d.line([(16, 13), (16, 26)], fill=col, width=2)
-        d.line([(24, 8), (24, 23)], fill=wep, width=2)
+        if shape == "blade":
+            d.line([(24, 8), (24, 23)], fill=wep_col, width=2)
+            d.line([(21, 19), (27, 19)], fill=GOLD)
+        elif shape == "rod":
+            d.line([(24, 7), (24, 25)], fill=GOLD, width=2)
+            d.ellipse([22, 4, 26, 8], fill=LUX)
+        elif shape == "dagger":
+            d.line([(23, 14), (27, 21)], fill=wep_col, width=2)
+        elif shape == "shield":
+            d.rectangle([5, 13, 11, 24], fill=IRON_DK, outline=col)
+            d.line([(24, 11), (24, 24)], fill=wep_col, width=2)
+        elif shape == "bow":
+            d.arc([20, 8, 28, 24], 270, 90, fill=wep_col, width=2)
+        elif shape == "scroll":
+            d.rectangle([5, 14, 11, 22], fill=RECORD, outline=col)
+        elif shape == "flask":
+            d.ellipse([21, 16, 27, 22], fill=FALSE_SUN, outline=IVORY)
+        elif shape == "coil":
+            d.arc([20, 12, 27, 22], 0, 300, fill=SAGE, width=2)
         t = outline_sprite(t)
-        s.commit(k, t)
-        rects[k] = s.rects[k]
+        s.commit(key, t)
+        rects[key] = s.rects[key]
 
-    # Mask overlays
-    for mk, mcol in (("nyx", SILVER), ("eris", BLOOD), ("lilith", LUX), ("lux_venefica", GOLD_HI)):
+    make_calling("calling:default", GOLD, SILVER, "blade")
+    for cl, (col, wep_col, shape) in calling_styles.items():
+        make_calling(f"calling:{cl}", col, wep_col, shape)
+
+    for mk, mcol in (
+        ("bare_face", VOID_T),
+        ("nyx", SILVER),
+        ("eris", BLOOD),
+        ("lilith", LUX),
+        ("lux_venefica", GOLD_HI),
+    ):
         k = f"mask:{mk}"
         s.next_tile(k)
         t = Image.new("RGBA", (32, 32), VOID_T)
         d = ImageDraw.Draw(t)
-        d.ellipse([12, 5, 20, 12], outline=mcol)
-        if mk == "lilith":
-            d.point([(16, 7)], fill=LUX)
-        elif mk == "lux_venefica":
-            d.arc([8, 2, 24, 16], 180, 360, fill=LUX)
+        if mk != "bare_face":
+            d.ellipse([12, 5, 20, 12], outline=mcol)
+            if mk == "lilith":
+                d.point([(16, 7)], fill=LUX)
+            elif mk == "lux_venefica":
+                d.arc([8, 2, 24, 16], 180, 360, fill=LUX, width=2)
+                d.ellipse([14, 4, 18, 8], fill=FALSE_SUN)
         s.commit(k, t)
         rects[k] = s.rects[k]
 
     return s, rects
 
 
-def draw_monsters_vertical_slice() -> tuple[Sheet, dict[str, list[int]]]:
-    s = Sheet(8, 2, 32)
+def draw_monsters_full() -> tuple[Sheet, dict[str, list[int]]]:
+    data = json.loads((CORE / "monsters.json").read_text())["entries"]
+    # 12 columns x 10 rows = 120 slots (covers 10 tags + 86 monsters + default)
+    s = Sheet(12, 10, 32)
     rects: dict[str, list[int]] = {}
 
-    def mon(key: str, shape: str, fill_c, accent_c):
+    def render_mon(key: str, shape: str, fill_c, accent_c, boss: bool = False):
         s.next_tile(key)
         t = Image.new("RGBA", (32, 32), VOID_T)
         d = ImageDraw.Draw(t)
+        if boss:
+            d.ellipse([4, 24, 28, 30], outline=GOLD_HI)
         if shape == "beast":
             d.ellipse([7, 15, 23, 25], fill=fill_c, outline=accent_c)
-            d.ellipse([19, 12, 26, 19], fill=fill_c)
-            d.line([(5, 19), (9, 17)], fill=accent_c)
+            d.ellipse([19, 12, 26, 19], fill=fill_c, outline=accent_c)
+            d.line([(4, 19), (9, 17)], fill=accent_c, width=2)
             d.point([(23, 14)], fill=ALERT)
         elif shape == "undead":
-            d.polygon([(16, 11), (22, 27), (10, 27)], fill=fill_c, outline=accent_c)
-            d.ellipse([12, 5, 20, 12], fill=RECORD, outline=accent_c)
-            d.point([(14, 8), (18, 8)], fill=VOID)
-        elif shape == "cultist":
-            d.polygon([(16, 9), (24, 27), (8, 27)], fill=fill_c, outline=accent_c)
-            d.ellipse([12, 4, 20, 11], fill=accent_c)
-            d.line([(23, 10), (23, 24)], fill=FALSE_SUN)
+            d.polygon([(16, 10), (23, 27), (9, 27)], fill=fill_c, outline=accent_c)
+            d.ellipse([12, 4, 20, 11], fill=RECORD, outline=accent_c)
+            d.point([(14, 7), (18, 7)], fill=VOID)
+        elif shape == "soldier":
+            d.rectangle([10, 11, 22, 26], fill=fill_c, outline=accent_c)
+            d.polygon([(12, 4), (20, 4), (21, 11), (11, 11)], fill=IRON_HI, outline=accent_c)
+            d.line([(25, 5), (25, 26)], fill=SILVER, width=2)
+        elif shape == "inquisition":
+            d.polygon([(16, 8), (25, 27), (7, 27)], fill=fill_c, outline=accent_c)
+            d.polygon([(16, 2), (21, 10), (11, 10)], fill=accent_c, outline=GOLD)
+            d.line([(7, 12), (7, 25)], fill=FALSE_SUN, width=2)
+        elif shape == "radiant":
+            d.polygon([(16, 4), (24, 16), (16, 27), (8, 16)], fill=fill_c, outline=FALSE_SUN)
+            d.ellipse([13, 12, 19, 18], fill=IVORY)
         elif shape == "construct":
-            d.rectangle([9, 8, 23, 26], fill=fill_c, outline=accent_c)
-            d.rectangle([12, 11, 20, 15], fill=FALSE_SUN)
+            d.rectangle([8, 7, 24, 27], fill=fill_c, outline=accent_c)
+            d.rectangle([12, 11, 20, 15], fill=accent_c)
+            d.line([(8, 20), (24, 20)], fill=GOLD)
+        elif shape == "geometry":
+            d.polygon([(16, 4), (26, 16), (16, 28), (6, 16)], fill=VOID, outline=accent_c)
+            d.ellipse([12, 12, 20, 20], fill=LUX, outline=IVORY)
+        elif shape == "serpent":
+            d.arc([7, 8, 25, 26], 0, 270, fill=fill_c, width=4)
+            d.ellipse([18, 7, 24, 13], fill=accent_c)
         else:
-            d.polygon([(16, 5), (25, 16), (22, 27), (10, 27), (7, 16)], fill=fill_c, outline=accent_c)
+            d.polygon([(16, 6), (25, 17), (22, 27), (10, 27), (7, 17)], fill=fill_c, outline=accent_c)
+            d.point([(14, 13), (18, 13)], fill=FALSE_SUN)
+        if boss:
+            d.polygon([(12, 4), (16, 1), (20, 4)], fill=FALSE_SUN)
         t = outline_sprite(t)
         s.commit(key, t)
         rects[key] = s.rects[key]
 
-    mon("default", "undead", IRON, RECORD)
-    mon("family:vermin", "beast", TEXT_DIM, BLOOD)
-    mon("family:ossuary_undead", "undead", IRON_DK, RECORD)
-    mon("family:dominion_soldier", "cultist", IRON, GOLD)
-    mon("family:inquisition_agent", "cultist", PORPHYRY_LT, FALSE_SUN)
-    mon("family:false_sun_manifestation", "construct", GOLD, FALSE_SUN)
-    mon("warren_rat", "beast", (124, 102, 86, 255), ALERT)
-    mon("catalogued_dead", "undead", IRON_DK, RECORD)
-    mon("preliator_sentinel", "construct", IRON_HI, FALSE_SUN)
+    render_mon("default", "undead", IRON, RECORD)
+    tag_shapes = {
+        "vermin": ("beast", TEXT_DIM, BLOOD),
+        "undead": ("undead", IRON_DK, RECORD),
+        "dominion": ("soldier", IRON, GOLD),
+        "inquisition": ("inquisition", PORPHYRY_LT, FALSE_SUN),
+        "false_sun": ("radiant", GOLD, FALSE_SUN),
+        "contract_bound": ("inquisition", BLOOD, GOLD),
+        "geometry": ("geometry", PORPHYRY, LUX),
+        "unrecorded": ("beast", IRON, SILVER),
+        "predator": ("serpent", SAGE_DK, ALERT),
+        "construct": ("construct", IRON_HI, FALSE_SUN),
+    }
+    for tg, (sh, fc, ac) in tag_shapes.items():
+        render_mon(f"tag:{tg}", sh, fc, ac)
+
+    for e in data:
+        mid = e["id"]
+        tags = set(e.get("tags", []))
+        is_boss = "boss" in tags or bool(e.get("unique", False))
+        col = hex_rgba(e.get("color", ""), SILVER)
+        shape = "construct"
+        if is_boss:
+            if "rat" in mid:
+                shape = "beast"
+            elif "sentinel" in mid or "cyrus" in mid or "auditor" in mid:
+                shape = "construct"
+            elif "cantor" in mid or "helios" in mid or "octavius" in mid or "severin" in mid:
+                shape = "inquisition"
+            elif "krell" in mid or "voss" in mid or "warden" in mid or "jailer" in mid:
+                shape = "soldier"
+            elif "malakor" in mid:
+                shape = "geometry"
+            else:
+                shape = "radiant"
+        elif "vermin" in tags or e.get("glyph") in ("r", "R", "f", "m", "x"):
+            shape = "beast"
+        elif "undead" in tags:
+            shape = "undead"
+        elif "dominion" in tags:
+            shape = "soldier"
+        elif "inquisition" in tags:
+            shape = "inquisition"
+        elif "false_sun" in tags:
+            shape = "radiant"
+        elif "geometry" in tags:
+            shape = "geometry"
+        elif "predator" in tags or e.get("glyph") in ("w", "s", "S"):
+            shape = "serpent"
+        render_mon(mid, shape, mix(col, VOID, 0.35), col, boss=is_boss)
+
     return s, rects
 
 
-def draw_npcs_vertical_slice() -> tuple[Sheet, dict[str, list[int]]]:
-    s = Sheet(4, 1, 32)
-    rects: dict[str, list[int]] = {}
-    s.next_tile("default")
-    t = Image.new("RGBA", (32, 32), VOID_T)
-    d = ImageDraw.Draw(t)
-    d.polygon([(16, 11), (24, 27), (8, 27)], fill=SAGE_DK, outline=SAGE)
-    d.ellipse([12, 5, 20, 12], fill=IVORY, outline=SAGE)
-    t = outline_sprite(t)
-    s.commit("default", t)
-    rects["default"] = s.rects["default"]
-    return s, rects
-
-
-def draw_items_vertical_slice() -> tuple[Sheet, dict[str, list[int]]]:
-    s = Sheet(8, 2, 32)
+def draw_npcs_full() -> tuple[Sheet, dict[str, list[int]]]:
+    data = json.loads((CORE / "npcs.json").read_text())["entries"]
+    s = Sheet(6, 4, 32)
     rects: dict[str, list[int]] = {}
 
-    def item_draw(key: str, fn):
+    def make_npc(key: str, cloak_c, accent_c, prop_idx: int):
         s.next_tile(key)
         t = Image.new("RGBA", (32, 32), VOID_T)
         d = ImageDraw.Draw(t)
-        fn(d)
+        d.polygon([(16, 10), (24, 27), (8, 27)], fill=cloak_c, outline=accent_c)
+        d.ellipse([12, 4, 20, 11], fill=IVORY, outline=accent_c)
+        if prop_idx % 4 == 0:
+            d.line([(23, 12), (23, 25)], fill=GOLD, width=2)
+        elif prop_idx % 4 == 1:
+            d.rectangle([5, 14, 10, 21], fill=RECORD, outline=LUX)
+        elif prop_idx % 4 == 2:
+            d.ellipse([21, 14, 27, 20], fill=FALSE_SUN, outline=GOLD)
+        else:
+            d.line([(6, 15), (12, 23)], fill=SILVER, width=2)
         t = outline_sprite(t)
         s.commit(key, t)
         rects[key] = s.rects[key]
 
-    item_draw("default", lambda d: d.rectangle([11, 11, 21, 21], fill=GOLD, outline=IVORY))
-    item_draw("kind:weapon", lambda d: (d.line([(9, 23), (23, 9)], fill=SILVER, width=3), d.line([(10, 17), (15, 22)], fill=GOLD, width=2)))
-    item_draw("kind:ranged", lambda d: (d.arc([8, 6, 22, 26], 270, 90, fill=GOLD, width=2), d.line([(15, 7), (15, 25)], fill=RECORD)))
-    item_draw("kind:armor", lambda d: d.polygon([(10, 9), (22, 9), (24, 15), (21, 24), (11, 24), (8, 15)], fill=IRON_HI, outline=SILVER))
-    item_draw("kind:amulet", lambda d: (d.ellipse([11, 8, 21, 18], outline=GOLD, width=2), d.ellipse([13, 17, 19, 23], fill=LUX, outline=IVORY)))
-    item_draw("kind:consumable", lambda d: (d.rectangle([13, 8, 19, 12], fill=RECORD), d.ellipse([10, 12, 22, 24], fill=BLOOD, outline=IVORY)))
-    item_draw("kind:consumable:scroll", lambda d: (d.rectangle([10, 9, 22, 23], fill=RECORD, outline=GOLD), d.line([(12, 13), (20, 13)], fill=LUX), d.line([(12, 17), (18, 17)], fill=VOID)))
-    item_draw("kind:consumable:projectile", lambda d: (d.line([(9, 22), (22, 9)], fill=SILVER, width=2), d.polygon([(23, 8), (18, 9), (22, 13)], fill=ALERT)))
-    item_draw("kind:relic", lambda d: (d.polygon([(16, 6), (24, 16), (16, 26), (8, 16)], fill=FALSE_SUN, outline=LUX), d.ellipse([13, 13, 19, 19], fill=IVORY)))
-    item_draw("kind:key", lambda d: (d.ellipse([9, 11, 16, 18], outline=GOLD_HI, width=2), d.line([(16, 15), (24, 15)], fill=GOLD_HI, width=2), d.line([(21, 15), (21, 19)], fill=GOLD_HI, width=2)))
+    make_npc("default", SAGE_DK, SAGE, 0)
+    for idx, e in enumerate(data):
+        nid = e["id"]
+        c = hex_rgba(e.get("color", ""), SAGE)
+        make_npc(nid, mix(c, PORPHYRY, 0.45), c, idx)
+    return s, rects
+
+
+def draw_items_full() -> tuple[Sheet, dict[str, list[int]]]:
+    data = json.loads((CORE / "items.json").read_text())["entries"]
+    # 16 columns x 12 rows = 192 cells (165 items + 10 category defaults)
+    s = Sheet(16, 12, 32)
+    rects: dict[str, list[int]] = {}
+
+    def draw_it(key: str, kind: str, eff: str, col, iid: str = "", is_art: bool = False):
+        s.next_tile(key)
+        t = Image.new("RGBA", (32, 32), VOID_T)
+        d = ImageDraw.Draw(t)
+        if kind == "weapon":
+            if "mace" in iid or "flail" in iid or "hammer" in iid or "cudgel" in iid or "bell" in iid:
+                d.line([(9, 23), (21, 11)], fill=RECORD, width=2)
+                d.ellipse([18, 6, 26, 14], fill=col, outline=IVORY)
+            elif "halberd" in iid or "spear" in iid or "axe" in iid or "glaive" in iid or "scythe" in iid:
+                d.line([(8, 25), (23, 7)], fill=GOLD, width=2)
+                d.polygon([(19, 6), (26, 9), (22, 15)], fill=col, outline=IVORY)
+            else:
+                d.line([(9, 23), (23, 9)], fill=col, width=3)
+                d.line([(10, 17), (15, 22)], fill=GOLD, width=2)
+        elif kind == "ranged":
+            if "rod" in iid or "focus" in iid or "staff" in iid or "prism" in iid or "pointer" in iid:
+                d.line([(10, 24), (22, 9)], fill=GOLD, width=2)
+                d.ellipse([19, 6, 26, 13], fill=col, outline=LUX)
+            else:
+                d.arc([8, 6, 22, 26], 270, 90, fill=col, width=2)
+                d.line([(15, 7), (15, 25)], fill=RECORD)
+        elif kind == "armor":
+            d.polygon([(10, 9), (22, 9), (24, 15), (21, 24), (11, 24), (8, 15)], fill=col, outline=SILVER)
+        elif kind == "amulet":
+            d.ellipse([11, 7, 21, 17], outline=GOLD, width=2)
+            d.ellipse([13, 16, 19, 23], fill=col, outline=IVORY)
+        elif kind == "key":
+            d.ellipse([9, 11, 16, 18], outline=col, width=2)
+            d.line([(16, 15), (24, 15)], fill=col, width=2)
+            d.line([(21, 15), (21, 19)], fill=col, width=2)
+        elif kind == "relic":
+            # Unique silhouette hints per relic
+            if "crown" in iid:
+                d.polygon([(7, 21), (9, 10), (13, 15), (16, 8), (19, 15), (23, 10), (25, 21)], fill=col, outline=GOLD_HI)
+            elif "halo" in iid:
+                d.arc([7, 7, 25, 25], 20, 280, fill=FALSE_SUN, width=3)
+            elif "key" in iid:
+                d.ellipse([8, 10, 16, 18], outline=LUX, width=2)
+                d.line([(16, 14), (25, 14)], fill=GOLD_HI, width=2)
+            elif "lamp" in iid:
+                d.rectangle([11, 10, 21, 22], fill=FALSE_SUN, outline=GOLD)
+                d.line([(16, 6), (16, 10)], fill=IRON_HI, width=2)
+            elif "bell" in iid:
+                d.polygon([(16, 7), (23, 21), (9, 21)], fill=col, outline=RIME)
+            elif "mirror" in iid or "glass" in iid or "lens" in iid:
+                d.ellipse([9, 8, 23, 22], fill=SILVER, outline=LUX)
+                d.line([(12, 12), (18, 18)], fill=IVORY)
+            elif "coin" in iid:
+                d.ellipse([9, 9, 23, 23], fill=FALSE_SUN, outline=BLOOD)
+            else:
+                d.polygon([(16, 6), (24, 16), (16, 26), (8, 16)], fill=col, outline=LUX)
+                d.ellipse([13, 13, 19, 19], fill=IVORY)
+        elif eff == "scroll":
+            d.rectangle([10, 9, 22, 23], fill=RECORD, outline=GOLD)
+            d.line([(12, 13), (20, 13)], fill=col)
+            d.line([(12, 17), (18, 17)], fill=VOID)
+        elif eff == "projectile":
+            d.line([(9, 22), (22, 9)], fill=SILVER, width=2)
+            d.polygon([(23, 8), (18, 9), (22, 13)], fill=col)
+        else:
+            d.rectangle([13, 8, 19, 12], fill=RECORD)
+            d.ellipse([10, 12, 22, 24], fill=col, outline=IVORY)
+        if is_art:
+            d.point([(7, 7), (25, 7), (7, 25), (25, 25)], fill=LUX)
+        t = outline_sprite(t)
+        s.commit(key, t)
+        rects[key] = s.rects[key]
+
+    draw_it("default", "amulet", "", GOLD)
+    draw_it("kind:weapon", "weapon", "", SILVER)
+    draw_it("kind:ranged", "ranged", "", GOLD)
+    draw_it("kind:armor", "armor", "", IRON_HI)
+    draw_it("kind:amulet", "amulet", "", LUX)
+    draw_it("kind:consumable", "consumable", "", BLOOD)
+    draw_it("kind:consumable:scroll", "consumable", "scroll", LUX)
+    draw_it("kind:consumable:projectile", "consumable", "projectile", ALERT)
+    draw_it("kind:relic", "relic", "", FALSE_SUN)
+    draw_it("kind:key", "key", "", GOLD_HI)
+
+    for e in data:
+        iid = e["id"]
+        kind = e.get("kind", "consumable")
+        eff = e.get("effect", "")
+        col = hex_rgba(e.get("color", ""), GOLD)
+        is_art = e.get("rarity", "") == "artifact"
+        draw_it(iid, kind, eff, col, iid=iid, is_art=is_art)
+
+    return s, rects
+
+
+def draw_icons_16() -> tuple[Sheet, dict[str, list[int]], dict[str, list[int]]]:
+    statuses = json.loads((CORE / "statuses.json").read_text())["entries"]
+    talents = json.loads((CORE / "talents.json").read_text())["entries"]
+    contracts = json.loads((CORE / "contracts.json").read_text())["entries"]
+    trees = sorted(set(t["tree"] for t in talents))
+    elites = ["ashen", "rime-bound", "apostate", "ironbound", "radiant", "swift", "vampiric", "warded", "default"]
+    chains = ["chain_isolation", "chain_fog", "chain_debility", "chain_threat", "chain_indulgence", "chain_omnipotence", "chain_degradation", "chain_trivial"]
+
+    # 16x16 grid: 16 cols x 8 rows = 128 cells
+    s = Sheet(16, 8, 16)
+    status_rects: dict[str, list[int]] = {}
+    icon_rects: dict[str, list[int]] = {}
+
+    def make_ic(key: str, col, mode: str, store: dict):
+        s.next_tile(key)
+        t = Image.new("RGBA", (16, 16), VOID_T)
+        d = ImageDraw.Draw(t)
+        d.rectangle([1, 1, 14, 14], fill=PORPHYRY, outline=col)
+        if mode == "diamond":
+            d.polygon([(8, 3), (12, 8), (8, 13), (4, 8)], fill=col)
+        elif mode == "cross":
+            d.line([(8, 3), (8, 12)], fill=col, width=2)
+            d.line([(4, 7), (12, 7)], fill=col, width=2)
+        elif mode == "ring":
+            d.ellipse([4, 4, 11, 11], outline=col, width=2)
+        else:
+            d.polygon([(8, 3), (12, 12), (4, 12)], fill=col)
+        s.commit(key, t)
+        store[key] = s.rects[key]
+
+    make_ic("default", SILVER, "ring", status_rects)
+    for idx, st in enumerate(statuses):
+        sid = st["id"]
+        col = hex_rgba(st.get("color", ""), FALSE_SUN)
+        mode = ["diamond", "cross", "ring", "tri"][idx % 4]
+        make_ic(sid, col, mode, status_rects)
+
+    make_ic("default", GOLD, "diamond", icon_rects)
+    for idx, tr in enumerate(trees):
+        col = [GOLD_HI, LUX, SAGE, SILVER, EMBER, RIME][idx % 6]
+        make_ic(f"tree:{tr}", col, ["diamond", "cross", "ring", "tri"][idx % 4], icon_rects)
+    for idx, el in enumerate(elites):
+        make_ic(f"elite:{el}", [EMBER, RIME, LUX, IRON_HI, FALSE_SUN, SAGE, BLOOD, SILVER, GOLD][idx % 9], "tri", icon_rects)
+    for idx, ch in enumerate(chains):
+        make_ic(f"chain:{ch}", LUX if idx % 2 == 0 else ALERT, "cross", icon_rects)
+    for idx, ct in enumerate(contracts):
+        make_ic(f"contract:{ct['id']}", GOLD_HI, "diamond", icon_rects)
+
+    return s, status_rects, icon_rects
+
+
+def draw_emblems_64() -> tuple[Sheet, dict[str, list[int]]]:
+    factions = json.loads((CORE / "factions.json").read_text())["entries"]
+    # 6 cols x 4 rows = 24 emblems of 64x64
+    s = Sheet(6, 4, 64)
+    rects: dict[str, list[int]] = {}
+
+    def make_emb(key: str, bg, ring, inner, kind: str):
+        s.next_tile(key)
+        t = Image.new("RGBA", (64, 64), VOID_T)
+        d = ImageDraw.Draw(t)
+        d.ellipse([3, 3, 60, 60], fill=bg, outline=ring, width=3)
+        d.ellipse([8, 8, 55, 55], outline=mix(ring, VOID, 0.4), width=1)
+        if kind == "eye":
+            d.arc([12, 18, 52, 46], 190, 350, fill=inner, width=2)
+            d.arc([12, 18, 52, 46], 10, 170, fill=inner, width=2)
+            d.ellipse([25, 25, 39, 39], fill=LUX, outline=IVORY)
+            d.ellipse([30, 30, 34, 34], fill=VOID)
+        elif kind == "crown":
+            d.polygon([(14, 44), (18, 22), (26, 32), (32, 16), (38, 32), (46, 22), (50, 44)], fill=inner, outline=ring)
+        elif kind == "door":
+            d.rectangle([20, 14, 44, 50], fill=VOID, outline=inner, width=2)
+            d.ellipse([28, 28, 36, 36], fill=SAGE)
+        elif kind == "serpent":
+            d.arc([14, 14, 50, 50], 20, 300, fill=inner, width=4)
+            d.polygon([(46, 26), (52, 22), (49, 32)], fill=LUX)
+        elif kind == "seal":
+            d.polygon([(32, 12), (50, 32), (32, 52), (14, 32)], outline=inner, width=2)
+            d.line([(20, 20), (44, 44)], fill=ring, width=2)
+            d.line([(44, 20), (20, 44)], fill=ring, width=2)
+        else:
+            d.polygon([(32, 12), (48, 44), (16, 44)], outline=inner, width=2)
+            d.ellipse([26, 26, 38, 38], outline=ring, width=2)
+        s.commit(key, t)
+        rects[key] = s.rects[key]
+
+    make_emb("title_crest", PORPHYRY, GOLD_HI, IVORY, "eye")
+    for sn in range(1, 8):
+        col = [SILVER, GOLD, PORPHYRY_LT, FALSE_SUN, EMBER, MIASMA, LUX][sn - 1]
+        make_emb(f"sphere_{sn}", VOID, col, IVORY, ["seal", "crown", "eye", "seal", "crown", "seal", "door"][sn - 1])
+    for idx, f in enumerate(factions):
+        make_emb(f"faction:{f['id']}", PORPHYRY, [GOLD, SILVER, LUX, SAGE][idx % 4], IVORY, ["seal", "eye", "crown", "door"][idx % 4])
+    make_emb("boss_seal", BLOOD, ALERT, FALSE_SUN, "crown")
+    make_emb("way_serpent", PORPHYRY, LUX, SAGE, "serpent")
+    make_emb("way_return", IRON_DK, SAGE, IVORY, "door")
+    make_emb("unwritten_door", VOID, SAGE, IVORY, "door")
+    make_emb("by_decree", PORPHYRY_LT, FALSE_SUN, GOLD_HI, "crown")
+    make_emb("loss_catalogued", IRON_DK, RECORD, SILVER, "seal")
+    make_emb("loss_fluent", PORPHYRY, LUX, ALERT, "eye")
+    make_emb("loss_gilded", PORPHYRY, FALSE_SUN, BLOOD, "crown")
+
     return s, rects
 
 
@@ -715,7 +1017,7 @@ def main() -> None:
             "license_status": "project-original-cc0-equivalent",
             "approval_status": "provisional_m8_asset",
             "associated_entities": entities,
-            "modification_history": [f"Generated M8.2 vertical slice: {desc}"],
+            "modification_history": [f"Generated M8.4 complete atlas: {desc}"],
         })
 
     for snum, theme in SPHERE_THEMES.items():
@@ -728,25 +1030,37 @@ def main() -> None:
         for k, rect in fr.items():
             registry["features"][k] = {"atlas": aid, "rect": rect}
 
-    av_s, av_r = draw_avatars_vertical_slice()
-    reg_atlas("avatars", "assets/sprites/avatars.png", av_s, "Vertical-slice layered player avatars & masks", ["player", "species", "classes", "masks"])
+    av_s, av_r = draw_avatars_full()
+    reg_atlas("avatars", "assets/sprites/avatars.png", av_s, "8 origins, 8 callings, 5 Masks", ["species", "classes", "masks"])
     for k, rect in av_r.items():
         registry["avatars"][k] = {"atlas": "avatars", "rect": rect}
 
-    mo_s, mo_r = draw_monsters_vertical_slice()
-    reg_atlas("monsters", "assets/sprites/monsters.png", mo_s, "Vertical-slice monster family silhouettes", ["monsters"])
+    mo_s, mo_r = draw_monsters_full()
+    reg_atlas("monsters", "assets/sprites/monsters.png", mo_s, "10 families, 15 bespoke bosses, 86 monster entries", ["monsters"])
     for k, rect in mo_r.items():
         registry["monsters"][k] = {"atlas": "monsters", "rect": rect}
 
-    np_s, np_r = draw_npcs_vertical_slice()
-    reg_atlas("npcs", "assets/sprites/npcs.png", np_s, "Vertical-slice NPC base sprite", ["npcs"])
+    np_s, np_r = draw_npcs_full()
+    reg_atlas("npcs", "assets/sprites/npcs.png", np_s, "18 recurring NPCs", ["npcs"])
     for k, rect in np_r.items():
         registry["npcs"][k] = {"atlas": "npcs", "rect": rect}
 
-    it_s, it_r = draw_items_vertical_slice()
-    reg_atlas("items", "assets/sprites/items.png", it_s, "Vertical-slice item category sprites", ["items"])
+    it_s, it_r = draw_items_full()
+    reg_atlas("items", "assets/sprites/items.png", it_s, "165 items, 16 bespoke relics, 26 unique artifacts", ["items", "relics", "artifacts"])
     for k, rect in it_r.items():
         registry["items"][k] = {"atlas": "items", "rect": rect}
+
+    ic_s, st_r, ic_r = draw_icons_16()
+    reg_atlas("icons", "assets/sprites/icons.png", ic_s, "51 statuses, 24 talent trees, 8 elites, Eight Chains, contracts", ["statuses", "talents", "contracts"])
+    for k, rect in st_r.items():
+        registry["statuses"][k] = {"atlas": "icons", "rect": rect}
+    for k, rect in ic_r.items():
+        registry["icons"][k] = {"atlas": "icons", "rect": rect}
+
+    em_s, em_r = draw_emblems_64()
+    reg_atlas("emblems", "assets/portraits/emblems.png", em_s, "64x64 woodcut emblems (Title, 7 Spheres, 8 Institutions, Endings, Losses)", ["factions", "spheres", "endings"])
+    for k, rect in em_r.items():
+        registry["emblems"][k] = {"atlas": "emblems", "rect": rect}
 
     (PRES / "asset_registry.json").write_text(json.dumps(registry, indent=2) + "\n")
     (PRES / "asset_provenance.json").write_text(json.dumps({"schema": "asset_provenance", "version": 1, "entries": prov_entries}, indent=2) + "\n")
@@ -755,3 +1069,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

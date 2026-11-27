@@ -13,7 +13,7 @@
         "sphere:moon"
       ],
       "modification_history": [
-        "Generated M8.2 vertical slice: Sphere 1 (moon) 32x32 tiles & features"
+        "Generated M8.4 complete atlas: Sphere 1 (moon) 32x32 tiles & features"
       ]
     },
     {
@@ -27,7 +27,7 @@
         "sphere:mercury"
       ],
       "modification_history": [
-        "Generated M8.2 vertical slice: Sphere 2 (mercury) 32x32 tiles & features"
+        "Generated M8.4 complete atlas: Sphere 2 (mercury) 32x32 tiles & features"
       ]
     },
     {
@@ -41,7 +41,7 @@
         "sphere:venus"
       ],
       "modification_history": [
-        "Generated M8.2 vertical slice: Sphere 3 (venus) 32x32 tiles & features"
+        "Generated M8.4 complete atlas: Sphere 3 (venus) 32x32 tiles & features"
       ]
     },
     {
@@ -55,7 +55,7 @@
         "sphere:sun"
       ],
       "modification_history": [
-        "Generated M8.2 vertical slice: Sphere 4 (sun) 32x32 tiles & features"
+        "Generated M8.4 complete atlas: Sphere 4 (sun) 32x32 tiles & features"
       ]
     },
     {
@@ -69,7 +69,7 @@
         "sphere:mars"
       ],
       "modification_history": [
-        "Generated M8.2 vertical slice: Sphere 5 (mars) 32x32 tiles & features"
+        "Generated M8.4 complete atlas: Sphere 5 (mars) 32x32 tiles & features"
       ]
     },
     {
@@ -83,7 +83,7 @@
         "sphere:jupiter"
       ],
       "modification_history": [
-        "Generated M8.2 vertical slice: Sphere 6 (jupiter) 32x32 tiles & features"
+        "Generated M8.4 complete atlas: Sphere 6 (jupiter) 32x32 tiles & features"
       ]
     },
     {
@@ -97,7 +97,7 @@
         "sphere:saturn"
       ],
       "modification_history": [
-        "Generated M8.2 vertical slice: Sphere 7 (saturn) 32x32 tiles & features"
+        "Generated M8.4 complete atlas: Sphere 7 (saturn) 32x32 tiles & features"
       ]
     },
     {
@@ -108,13 +108,12 @@
       "license_status": "project-original-cc0-equivalent",
       "approval_status": "provisional_m8_asset",
       "associated_entities": [
-        "player",
         "species",
         "classes",
         "masks"
       ],
       "modification_history": [
-        "Generated M8.2 vertical slice: Vertical-slice layered player avatars & masks"
+        "Generated M8.4 complete atlas: 8 origins, 8 callings, 5 Masks"
       ]
     },
     {
@@ -128,7 +127,7 @@
         "monsters"
       ],
       "modification_history": [
-        "Generated M8.2 vertical slice: Vertical-slice monster family silhouettes"
+        "Generated M8.4 complete atlas: 10 families, 15 bespoke bosses, 86 monster entries"
       ]
     },
     {
@@ -142,7 +141,7 @@
         "npcs"
       ],
       "modification_history": [
-        "Generated M8.2 vertical slice: Vertical-slice NPC base sprite"
+        "Generated M8.4 complete atlas: 18 recurring NPCs"
       ]
     },
     {
@@ -153,10 +152,44 @@
       "license_status": "project-original-cc0-equivalent",
       "approval_status": "provisional_m8_asset",
       "associated_entities": [
-        "items"
+        "items",
+        "relics",
+        "artifacts"
       ],
       "modification_history": [
-        "Generated M8.2 vertical slice: Vertical-slice item category sprites"
+        "Generated M8.4 complete atlas: 165 items, 16 bespoke relics, 26 unique artifacts"
+      ]
+    },
+    {
+      "asset_id": "icons",
+      "path": "res://assets/sprites/icons.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "statuses",
+        "talents",
+        "contracts"
+      ],
+      "modification_history": [
+        "Generated M8.4 complete atlas: 51 statuses, 24 talent trees, 8 elites, Eight Chains, contracts"
+      ]
+    },
+    {
+      "asset_id": "emblems",
+      "path": "res://assets/portraits/emblems.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "factions",
+        "spheres",
+        "endings"
+      ],
+      "modification_history": [
+        "Generated M8.4 complete atlas: 64x64 woodcut emblems (Title, 7 Spheres, 8 Institutions, Endings, Losses)"
       ]
     }
   ]

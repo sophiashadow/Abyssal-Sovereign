@@ -70,24 +70,40 @@
       "path": "res://assets/sprites/monsters.png",
       "cell": 32,
       "size": [
-        256,
-        64
+        384,
+        320
       ]
     },
     "npcs": {
       "path": "res://assets/sprites/npcs.png",
       "cell": 32,
       "size": [
-        128,
-        32
+        192,
+        128
       ]
     },
     "items": {
       "path": "res://assets/sprites/items.png",
       "cell": 32,
       "size": [
+        512,
+        384
+      ]
+    },
+    "icons": {
+      "path": "res://assets/sprites/icons.png",
+      "cell": 16,
+      "size": [
         256,
-        64
+        128
+      ]
+    },
+    "emblems": {
+      "path": "res://assets/portraits/emblems.png",
+      "cell": 64,
+      "size": [
+        384,
+        256
       ]
     }
   },
@@ -3219,7 +3235,7 @@
         32
       ]
     },
-    "calling:default": {
+    "origin:ashborn": {
       "atlas": "avatars",
       "rect": [
         128,
@@ -3228,7 +3244,7 @@
         32
       ]
     },
-    "calling:fallen_knight": {
+    "origin:veilkin": {
       "atlas": "avatars",
       "rect": [
         160,
@@ -3237,7 +3253,7 @@
         32
       ]
     },
-    "calling:occultist": {
+    "origin:ironbound_ward": {
       "atlas": "avatars",
       "rect": [
         192,
@@ -3246,7 +3262,7 @@
         32
       ]
     },
-    "calling:assassin": {
+    "origin:unrecorded": {
       "atlas": "avatars",
       "rect": [
         224,
@@ -3255,7 +3271,7 @@
         32
       ]
     },
-    "mask:nyx": {
+    "origin:penitent": {
       "atlas": "avatars",
       "rect": [
         0,
@@ -3264,7 +3280,7 @@
         32
       ]
     },
-    "mask:eris": {
+    "calling:default": {
       "atlas": "avatars",
       "rect": [
         32,
@@ -3273,7 +3289,7 @@
         32
       ]
     },
-    "mask:lilith": {
+    "calling:fallen_knight": {
       "atlas": "avatars",
       "rect": [
         64,
@@ -3282,11 +3298,110 @@
         32
       ]
     },
-    "mask:lux_venefica": {
+    "calling:occultist": {
       "atlas": "avatars",
       "rect": [
         96,
         32,
+        32,
+        32
+      ]
+    },
+    "calling:assassin": {
+      "atlas": "avatars",
+      "rect": [
+        128,
+        32,
+        32,
+        32
+      ]
+    },
+    "calling:preliator_warden": {
+      "atlas": "avatars",
+      "rect": [
+        160,
+        32,
+        32,
+        32
+      ]
+    },
+    "calling:tithe_marksman": {
+      "atlas": "avatars",
+      "rect": [
+        192,
+        32,
+        32,
+        32
+      ]
+    },
+    "calling:rite_weaver": {
+      "atlas": "avatars",
+      "rect": [
+        224,
+        32,
+        32,
+        32
+      ]
+    },
+    "calling:false_light_alchemist": {
+      "atlas": "avatars",
+      "rect": [
+        0,
+        64,
+        32,
+        32
+      ]
+    },
+    "calling:ophite_binder": {
+      "atlas": "avatars",
+      "rect": [
+        32,
+        64,
+        32,
+        32
+      ]
+    },
+    "mask:bare_face": {
+      "atlas": "avatars",
+      "rect": [
+        64,
+        64,
+        32,
+        32
+      ]
+    },
+    "mask:nyx": {
+      "atlas": "avatars",
+      "rect": [
+        96,
+        64,
+        32,
+        32
+      ]
+    },
+    "mask:eris": {
+      "atlas": "avatars",
+      "rect": [
+        128,
+        64,
+        32,
+        32
+      ]
+    },
+    "mask:lilith": {
+      "atlas": "avatars",
+      "rect": [
+        160,
+        64,
+        32,
+        32
+      ]
+    },
+    "mask:lux_venefica": {
+      "atlas": "avatars",
+      "rect": [
+        192,
+        64,
         32,
         32
       ]
@@ -3302,7 +3417,7 @@
         32
       ]
     },
-    "family:vermin": {
+    "tag:vermin": {
       "atlas": "monsters",
       "rect": [
         32,
@@ -3311,7 +3426,7 @@
         32
       ]
     },
-    "family:ossuary_undead": {
+    "tag:undead": {
       "atlas": "monsters",
       "rect": [
         64,
@@ -3320,7 +3435,7 @@
         32
       ]
     },
-    "family:dominion_soldier": {
+    "tag:dominion": {
       "atlas": "monsters",
       "rect": [
         96,
@@ -3329,7 +3444,7 @@
         32
       ]
     },
-    "family:inquisition_agent": {
+    "tag:inquisition": {
       "atlas": "monsters",
       "rect": [
         128,
@@ -3338,7 +3453,7 @@
         32
       ]
     },
-    "family:false_sun_manifestation": {
+    "tag:false_sun": {
       "atlas": "monsters",
       "rect": [
         160,
@@ -3347,7 +3462,7 @@
         32
       ]
     },
-    "warren_rat": {
+    "tag:contract_bound": {
       "atlas": "monsters",
       "rect": [
         192,
@@ -3356,7 +3471,7 @@
         32
       ]
     },
-    "catalogued_dead": {
+    "tag:geometry": {
       "atlas": "monsters",
       "rect": [
         224,
@@ -3365,11 +3480,803 @@
         32
       ]
     },
-    "preliator_sentinel": {
+    "tag:unrecorded": {
+      "atlas": "monsters",
+      "rect": [
+        256,
+        0,
+        32,
+        32
+      ]
+    },
+    "tag:predator": {
+      "atlas": "monsters",
+      "rect": [
+        288,
+        0,
+        32,
+        32
+      ]
+    },
+    "tag:construct": {
+      "atlas": "monsters",
+      "rect": [
+        320,
+        0,
+        32,
+        32
+      ]
+    },
+    "warren_rat": {
+      "atlas": "monsters",
+      "rect": [
+        352,
+        0,
+        32,
+        32
+      ]
+    },
+    "seepage_toad": {
       "atlas": "monsters",
       "rect": [
         0,
         32,
+        32,
+        32
+      ]
+    },
+    "cistern_eel": {
+      "atlas": "monsters",
+      "rect": [
+        32,
+        32,
+        32,
+        32
+      ]
+    },
+    "unfiled_crawler": {
+      "atlas": "monsters",
+      "rect": [
+        64,
+        32,
+        32,
+        32
+      ]
+    },
+    "blind_mole_brute": {
+      "atlas": "monsters",
+      "rect": [
+        96,
+        32,
+        32,
+        32
+      ]
+    },
+    "mire_lurker": {
+      "atlas": "monsters",
+      "rect": [
+        128,
+        32,
+        32,
+        32
+      ]
+    },
+    "back_court_rat_king": {
+      "atlas": "monsters",
+      "rect": [
+        160,
+        32,
+        32,
+        32
+      ]
+    },
+    "catalogued_dead": {
+      "atlas": "monsters",
+      "rect": [
+        192,
+        32,
+        32,
+        32
+      ]
+    },
+    "ossuary_arbalest": {
+      "atlas": "monsters",
+      "rect": [
+        224,
+        32,
+        32,
+        32
+      ]
+    },
+    "ghoul": {
+      "atlas": "monsters",
+      "rect": [
+        256,
+        32,
+        32,
+        32
+      ]
+    },
+    "ossuary_wight": {
+      "atlas": "monsters",
+      "rect": [
+        288,
+        32,
+        32,
+        32
+      ]
+    },
+    "bone_hoarder": {
+      "atlas": "monsters",
+      "rect": [
+        320,
+        32,
+        32,
+        32
+      ]
+    },
+    "marrow_leech": {
+      "atlas": "monsters",
+      "rect": [
+        352,
+        32,
+        32,
+        32
+      ]
+    },
+    "sepulcher_shade": {
+      "atlas": "monsters",
+      "rect": [
+        0,
+        64,
+        32,
+        32
+      ]
+    },
+    "ossuary_centurion": {
+      "atlas": "monsters",
+      "rect": [
+        32,
+        64,
+        32,
+        32
+      ]
+    },
+    "tomb_siren": {
+      "atlas": "monsters",
+      "rect": [
+        64,
+        64,
+        32,
+        32
+      ]
+    },
+    "ash_reliquary": {
+      "atlas": "monsters",
+      "rect": [
+        96,
+        64,
+        32,
+        32
+      ]
+    },
+    "chain_revenant": {
+      "atlas": "monsters",
+      "rect": [
+        128,
+        64,
+        32,
+        32
+      ]
+    },
+    "false_sun_cultist": {
+      "atlas": "monsters",
+      "rect": [
+        160,
+        64,
+        32,
+        32
+      ]
+    },
+    "cinder_acolyte": {
+      "atlas": "monsters",
+      "rect": [
+        192,
+        64,
+        32,
+        32
+      ]
+    },
+    "inquisition_cantor": {
+      "atlas": "monsters",
+      "rect": [
+        224,
+        64,
+        32,
+        32
+      ]
+    },
+    "tithe_inquisitor": {
+      "atlas": "monsters",
+      "rect": [
+        256,
+        64,
+        32,
+        32
+      ]
+    },
+    "tithe_bailiff": {
+      "atlas": "monsters",
+      "rect": [
+        288,
+        64,
+        32,
+        32
+      ]
+    },
+    "audit_clerk": {
+      "atlas": "monsters",
+      "rect": [
+        320,
+        64,
+        32,
+        32
+      ]
+    },
+    "crux_halberdier": {
+      "atlas": "monsters",
+      "rect": [
+        352,
+        64,
+        32,
+        32
+      ]
+    },
+    "garrison_crossbowman": {
+      "atlas": "monsters",
+      "rect": [
+        0,
+        96,
+        32,
+        32
+      ]
+    },
+    "gate_warden": {
+      "atlas": "monsters",
+      "rect": [
+        32,
+        96,
+        32,
+        32
+      ]
+    },
+    "processional_lancer": {
+      "atlas": "monsters",
+      "rect": [
+        64,
+        96,
+        32,
+        32
+      ]
+    },
+    "sealer_captain": {
+      "atlas": "monsters",
+      "rect": [
+        96,
+        96,
+        32,
+        32
+      ]
+    },
+    "iron_bulwark": {
+      "atlas": "monsters",
+      "rect": [
+        128,
+        96,
+        32,
+        32
+      ]
+    },
+    "heresy_tracker": {
+      "atlas": "monsters",
+      "rect": [
+        160,
+        96,
+        32,
+        32
+      ]
+    },
+    "confessor_hound": {
+      "atlas": "monsters",
+      "rect": [
+        192,
+        96,
+        32,
+        32
+      ]
+    },
+    "censor_adept": {
+      "atlas": "monsters",
+      "rect": [
+        224,
+        96,
+        32,
+        32
+      ]
+    },
+    "quill_interrogator": {
+      "atlas": "monsters",
+      "rect": [
+        256,
+        96,
+        32,
+        32
+      ]
+    },
+    "penance_flagellant": {
+      "atlas": "monsters",
+      "rect": [
+        288,
+        96,
+        32,
+        32
+      ]
+    },
+    "ledger_zealot": {
+      "atlas": "monsters",
+      "rect": [
+        320,
+        96,
+        32,
+        32
+      ]
+    },
+    "edict_herald": {
+      "atlas": "monsters",
+      "rect": [
+        352,
+        96,
+        32,
+        32
+      ]
+    },
+    "margin_stalker": {
+      "atlas": "monsters",
+      "rect": [
+        0,
+        128,
+        32,
+        32
+      ]
+    },
+    "geometry_spider": {
+      "atlas": "monsters",
+      "rect": [
+        32,
+        128,
+        32,
+        32
+      ]
+    },
+    "void_moth": {
+      "atlas": "monsters",
+      "rect": [
+        64,
+        128,
+        32,
+        32
+      ]
+    },
+    "prism_lynx": {
+      "atlas": "monsters",
+      "rect": [
+        96,
+        128,
+        32,
+        32
+      ]
+    },
+    "echo_jackal": {
+      "atlas": "monsters",
+      "rect": [
+        128,
+        128,
+        32,
+        32
+      ]
+    },
+    "ledger_wyrm": {
+      "atlas": "monsters",
+      "rect": [
+        160,
+        128,
+        32,
+        32
+      ]
+    },
+    "oath_debtor": {
+      "atlas": "monsters",
+      "rect": [
+        192,
+        128,
+        32,
+        32
+      ]
+    },
+    "forsworn_shade": {
+      "atlas": "monsters",
+      "rect": [
+        224,
+        128,
+        32,
+        32
+      ]
+    },
+    "bond_wraith": {
+      "atlas": "monsters",
+      "rect": [
+        256,
+        128,
+        32,
+        32
+      ]
+    },
+    "tithe_homunculus": {
+      "atlas": "monsters",
+      "rect": [
+        288,
+        128,
+        32,
+        32
+      ]
+    },
+    "pact_serpent": {
+      "atlas": "monsters",
+      "rect": [
+        320,
+        128,
+        32,
+        32
+      ]
+    },
+    "seal_golem": {
+      "atlas": "monsters",
+      "rect": [
+        352,
+        128,
+        32,
+        32
+      ]
+    },
+    "solar_wisp": {
+      "atlas": "monsters",
+      "rect": [
+        0,
+        160,
+        32,
+        32
+      ]
+    },
+    "prosay_seraph": {
+      "atlas": "monsters",
+      "rect": [
+        32,
+        160,
+        32,
+        32
+      ]
+    },
+    "brass_chorister": {
+      "atlas": "monsters",
+      "rect": [
+        64,
+        160,
+        32,
+        32
+      ]
+    },
+    "gilded_idol": {
+      "atlas": "monsters",
+      "rect": [
+        96,
+        160,
+        32,
+        32
+      ]
+    },
+    "noonday_echo": {
+      "atlas": "monsters",
+      "rect": [
+        128,
+        160,
+        32,
+        32
+      ]
+    },
+    "censer_elemental": {
+      "atlas": "monsters",
+      "rect": [
+        160,
+        160,
+        32,
+        32
+      ]
+    },
+    "brass_automaton": {
+      "atlas": "monsters",
+      "rect": [
+        192,
+        160,
+        32,
+        32
+      ]
+    },
+    "chalk_sentinel": {
+      "atlas": "monsters",
+      "rect": [
+        224,
+        160,
+        32,
+        32
+      ]
+    },
+    "pendulum_ward": {
+      "atlas": "monsters",
+      "rect": [
+        256,
+        160,
+        32,
+        32
+      ]
+    },
+    "kiln_brazen": {
+      "atlas": "monsters",
+      "rect": [
+        288,
+        160,
+        32,
+        32
+      ]
+    },
+    "ophite_construct": {
+      "atlas": "monsters",
+      "rect": [
+        320,
+        160,
+        32,
+        32
+      ]
+    },
+    "broken_cantor": {
+      "atlas": "monsters",
+      "rect": [
+        352,
+        160,
+        32,
+        32
+      ]
+    },
+    "unsealed_scribe": {
+      "atlas": "monsters",
+      "rect": [
+        0,
+        192,
+        32,
+        32
+      ]
+    },
+    "apostate_knight": {
+      "atlas": "monsters",
+      "rect": [
+        32,
+        192,
+        32,
+        32
+      ]
+    },
+    "blinded_witness": {
+      "atlas": "monsters",
+      "rect": [
+        64,
+        192,
+        32,
+        32
+      ]
+    },
+    "runaway_almoner": {
+      "atlas": "monsters",
+      "rect": [
+        96,
+        192,
+        32,
+        32
+      ]
+    },
+    "ember_beetle": {
+      "atlas": "monsters",
+      "rect": [
+        128,
+        192,
+        32,
+        32
+      ]
+    },
+    "rime_slime": {
+      "atlas": "monsters",
+      "rect": [
+        160,
+        192,
+        32,
+        32
+      ]
+    },
+    "miasma_spore": {
+      "atlas": "monsters",
+      "rect": [
+        192,
+        192,
+        32,
+        32
+      ]
+    },
+    "glare_moth": {
+      "atlas": "monsters",
+      "rect": [
+        224,
+        192,
+        32,
+        32
+      ]
+    },
+    "grate_skitterer": {
+      "atlas": "monsters",
+      "rect": [
+        256,
+        192,
+        32,
+        32
+      ]
+    },
+    "furnace_drake": {
+      "atlas": "monsters",
+      "rect": [
+        288,
+        192,
+        32,
+        32
+      ]
+    },
+    "alley_rat_matriarch": {
+      "atlas": "monsters",
+      "rect": [
+        320,
+        192,
+        32,
+        32
+      ]
+    },
+    "chapel_penitent_warden": {
+      "atlas": "monsters",
+      "rect": [
+        352,
+        192,
+        32,
+        32
+      ]
+    },
+    "vault_enumerator": {
+      "atlas": "monsters",
+      "rect": [
+        0,
+        224,
+        32,
+        32
+      ]
+    },
+    "archivist_severin": {
+      "atlas": "monsters",
+      "rect": [
+        32,
+        224,
+        32,
+        32
+      ]
+    },
+    "choir_cantor_prime": {
+      "atlas": "monsters",
+      "rect": [
+        64,
+        224,
+        32,
+        32
+      ]
+    },
+    "master_smelter_prosay": {
+      "atlas": "monsters",
+      "rect": [
+        96,
+        224,
+        32,
+        32
+      ]
+    },
+    "cantor_helios_prime": {
+      "atlas": "monsters",
+      "rect": [
+        128,
+        224,
+        32,
+        32
+      ]
+    },
+    "marshal_krell": {
+      "atlas": "monsters",
+      "rect": [
+        160,
+        224,
+        32,
+        32
+      ]
+    },
+    "iron_auditor": {
+      "atlas": "monsters",
+      "rect": [
+        192,
+        224,
+        32,
+        32
+      ]
+    },
+    "binder_malakor": {
+      "atlas": "monsters",
+      "rect": [
+        224,
+        224,
+        32,
+        32
+      ]
+    },
+    "commander_voss": {
+      "atlas": "monsters",
+      "rect": [
+        256,
+        224,
+        32,
+        32
+      ]
+    },
+    "decreer_octavius": {
+      "atlas": "monsters",
+      "rect": [
+        288,
+        224,
+        32,
+        32
+      ]
+    },
+    "forge_warden_cyrus": {
+      "atlas": "monsters",
+      "rect": [
+        320,
+        224,
+        32,
+        32
+      ]
+    },
+    "jailer_of_the_seventh": {
+      "atlas": "monsters",
+      "rect": [
+        352,
+        224,
+        32,
+        32
+      ]
+    },
+    "preliator_sentinel": {
+      "atlas": "monsters",
+      "rect": [
+        0,
+        256,
         32,
         32
       ]
@@ -3381,6 +4288,168 @@
       "rect": [
         0,
         0,
+        32,
+        32
+      ]
+    },
+    "uc_the_stitcher": {
+      "atlas": "npcs",
+      "rect": [
+        32,
+        0,
+        32,
+        32
+      ]
+    },
+    "clerk_anselm": {
+      "atlas": "npcs",
+      "rect": [
+        64,
+        0,
+        32,
+        32
+      ]
+    },
+    "tibors": {
+      "atlas": "npcs",
+      "rect": [
+        96,
+        0,
+        32,
+        32
+      ]
+    },
+    "peyre": {
+      "atlas": "npcs",
+      "rect": [
+        128,
+        0,
+        32,
+        32
+      ]
+    },
+    "mirande": {
+      "atlas": "npcs",
+      "rect": [
+        160,
+        0,
+        32,
+        32
+      ]
+    },
+    "orable": {
+      "atlas": "npcs",
+      "rect": [
+        0,
+        32,
+        32,
+        32
+      ]
+    },
+    "hesper": {
+      "atlas": "npcs",
+      "rect": [
+        32,
+        32,
+        32,
+        32
+      ]
+    },
+    "brother_calix": {
+      "atlas": "npcs",
+      "rect": [
+        64,
+        32,
+        32,
+        32
+      ]
+    },
+    "wren": {
+      "atlas": "npcs",
+      "rect": [
+        96,
+        32,
+        32,
+        32
+      ]
+    },
+    "almoner_dessa": {
+      "atlas": "npcs",
+      "rect": [
+        128,
+        32,
+        32,
+        32
+      ]
+    },
+    "ferrant": {
+      "atlas": "npcs",
+      "rect": [
+        160,
+        32,
+        32,
+        32
+      ]
+    },
+    "odo": {
+      "atlas": "npcs",
+      "rect": [
+        0,
+        64,
+        32,
+        32
+      ]
+    },
+    "sister_vesper": {
+      "atlas": "npcs",
+      "rect": [
+        32,
+        64,
+        32,
+        32
+      ]
+    },
+    "tallyman_corvin": {
+      "atlas": "npcs",
+      "rect": [
+        64,
+        64,
+        32,
+        32
+      ]
+    },
+    "keeper_sable": {
+      "atlas": "npcs",
+      "rect": [
+        96,
+        64,
+        32,
+        32
+      ]
+    },
+    "precentor_jule": {
+      "atlas": "npcs",
+      "rect": [
+        128,
+        64,
+        32,
+        32
+      ]
+    },
+    "almoner_bram": {
+      "atlas": "npcs",
+      "rect": [
+        160,
+        64,
+        32,
+        32
+      ]
+    },
+    "warden_tomas": {
+      "atlas": "npcs",
+      "rect": [
+        0,
+        96,
         32,
         32
       ]
@@ -3462,8 +4531,8 @@
     "kind:relic": {
       "atlas": "items",
       "rect": [
+        256,
         0,
-        32,
         32,
         32
       ]
@@ -3471,14 +4540,2600 @@
     "kind:key": {
       "atlas": "items",
       "rect": [
+        288,
+        0,
+        32,
+        32
+      ]
+    },
+    "rusted_blade": {
+      "atlas": "items",
+      "rect": [
+        320,
+        0,
+        32,
+        32
+      ]
+    },
+    "stiletto": {
+      "atlas": "items",
+      "rect": [
+        352,
+        0,
+        32,
+        32
+      ]
+    },
+    "ritual_knife": {
+      "atlas": "items",
+      "rect": [
+        384,
+        0,
+        32,
+        32
+      ]
+    },
+    "notched_longsword": {
+      "atlas": "items",
+      "rect": [
+        416,
+        0,
+        32,
+        32
+      ]
+    },
+    "flail_of_penance": {
+      "atlas": "items",
+      "rect": [
+        448,
+        0,
+        32,
+        32
+      ]
+    },
+    "crux_gladii": {
+      "atlas": "items",
+      "rect": [
+        480,
+        0,
+        32,
+        32
+      ]
+    },
+    "cellar_cudgel": {
+      "atlas": "items",
+      "rect": [
+        0,
+        32,
+        32,
+        32
+      ]
+    },
+    "almoners_rod": {
+      "atlas": "items",
+      "rect": [
         32,
         32,
         32,
         32
       ]
+    },
+    "tithe_spear": {
+      "atlas": "items",
+      "rect": [
+        64,
+        32,
+        32,
+        32
+      ]
+    },
+    "ophite_bodkin": {
+      "atlas": "items",
+      "rect": [
+        96,
+        32,
+        32,
+        32
+      ]
+    },
+    "bastion_mace": {
+      "atlas": "items",
+      "rect": [
+        128,
+        32,
+        32,
+        32
+      ]
+    },
+    "cinder_scourge": {
+      "atlas": "items",
+      "rect": [
+        160,
+        32,
+        32,
+        32
+      ]
+    },
+    "ossuary_cleaver": {
+      "atlas": "items",
+      "rect": [
+        192,
+        32,
+        32,
+        32
+      ]
+    },
+    "tally_hatchet": {
+      "atlas": "items",
+      "rect": [
+        224,
+        32,
+        32,
+        32
+      ]
+    },
+    "margin_stiletto": {
+      "atlas": "items",
+      "rect": [
+        256,
+        32,
+        32,
+        32
+      ]
+    },
+    "chorus_gladius": {
+      "atlas": "items",
+      "rect": [
+        288,
+        32,
+        32,
+        32
+      ]
+    },
+    "salt_glaive": {
+      "atlas": "items",
+      "rect": [
+        320,
+        32,
+        32,
+        32
+      ]
+    },
+    "penitent_spursword": {
+      "atlas": "items",
+      "rect": [
+        352,
+        32,
+        32,
+        32
+      ]
+    },
+    "foundry_hammer": {
+      "atlas": "items",
+      "rect": [
+        384,
+        32,
+        32,
+        32
+      ]
+    },
+    "sealer_halberd": {
+      "atlas": "items",
+      "rect": [
+        416,
+        32,
+        32,
+        32
+      ]
+    },
+    "unwritten_edge": {
+      "atlas": "items",
+      "rect": [
+        448,
+        32,
+        32,
+        32
+      ]
+    },
+    "bell_of_quiet_teeth": {
+      "atlas": "items",
+      "rect": [
+        480,
+        32,
+        32,
+        32
+      ]
+    },
+    "needle_of_uc": {
+      "atlas": "items",
+      "rect": [
+        0,
+        64,
+        32,
+        32
+      ]
+    },
+    "kiln_poker_prosay": {
+      "atlas": "items",
+      "rect": [
+        32,
+        64,
+        32,
+        32
+      ]
+    },
+    "gatekeepers_axe": {
+      "atlas": "items",
+      "rect": [
+        64,
+        64,
+        32,
+        32
+      ]
+    },
+    "cantors_silent_rod": {
+      "atlas": "items",
+      "rect": [
+        96,
+        64,
+        32,
+        32
+      ]
+    },
+    "rime_scythe": {
+      "atlas": "items",
+      "rect": [
+        128,
+        64,
+        32,
+        32
+      ]
+    },
+    "ashwood_shortbow": {
+      "atlas": "items",
+      "rect": [
+        160,
+        64,
+        32,
+        32
+      ]
+    },
+    "eye_focus": {
+      "atlas": "items",
+      "rect": [
+        192,
+        64,
+        32,
+        32
+      ]
+    },
+    "dominion_arbalest": {
+      "atlas": "items",
+      "rect": [
+        224,
+        64,
+        32,
+        32
+      ]
+    },
+    "sun_censer_sling": {
+      "atlas": "items",
+      "rect": [
+        256,
+        64,
+        32,
+        32
+      ]
+    },
+    "abyssal_rod": {
+      "atlas": "items",
+      "rect": [
+        288,
+        64,
+        32,
+        32
+      ]
+    },
+    "cellar_sling": {
+      "atlas": "items",
+      "rect": [
+        320,
+        64,
+        32,
+        32
+      ]
+    },
+    "tithe_crossbow": {
+      "atlas": "items",
+      "rect": [
+        352,
+        64,
+        32,
+        32
+      ]
+    },
+    "ophite_dart_pipe": {
+      "atlas": "items",
+      "rect": [
+        384,
+        64,
+        32,
+        32
+      ]
+    },
+    "penitent_brazier_wand": {
+      "atlas": "items",
+      "rect": [
+        416,
+        64,
+        32,
+        32
+      ]
+    },
+    "ossuary_frost_bow": {
+      "atlas": "items",
+      "rect": [
+        448,
+        64,
+        32,
+        32
+      ]
+    },
+    "processional_carbine": {
+      "atlas": "items",
+      "rect": [
+        480,
+        64,
+        32,
+        32
+      ]
+    },
+    "sun_choir_prism": {
+      "atlas": "items",
+      "rect": [
+        0,
+        96,
+        32,
+        32
+      ]
+    },
+    "archive_glass_pointer": {
+      "atlas": "items",
+      "rect": [
+        32,
+        96,
+        32,
+        32
+      ]
+    },
+    "iron_garrison_arbalest": {
+      "atlas": "items",
+      "rect": [
+        64,
+        96,
+        32,
+        32
+      ]
+    },
+    "margin_longbow": {
+      "atlas": "items",
+      "rect": [
+        96,
+        96,
+        32,
+        32
+      ]
+    },
+    "witness_lantern_staff": {
+      "atlas": "items",
+      "rect": [
+        128,
+        96,
+        32,
+        32
+      ]
+    },
+    "serpent_recurver": {
+      "atlas": "items",
+      "rect": [
+        160,
+        96,
+        32,
+        32
+      ]
+    },
+    "long_sight_hesper": {
+      "atlas": "items",
+      "rect": [
+        192,
+        96,
+        32,
+        32
+      ]
+    },
+    "lantern_prism_calix": {
+      "atlas": "items",
+      "rect": [
+        224,
+        96,
+        32,
+        32
+      ]
+    },
+    "ferrants_spindle": {
+      "atlas": "items",
+      "rect": [
+        256,
+        96,
+        32,
+        32
+      ]
+    },
+    "furnace_mortar_horn": {
+      "atlas": "items",
+      "rect": [
+        288,
+        96,
+        32,
+        32
+      ]
+    },
+    "rime_needle_projector": {
+      "atlas": "items",
+      "rect": [
+        320,
+        96,
+        32,
+        32
+      ]
+    },
+    "ledger_cutter_arbalest": {
+      "atlas": "items",
+      "rect": [
+        352,
+        96,
+        32,
+        32
+      ]
+    },
+    "ash_robe": {
+      "atlas": "items",
+      "rect": [
+        384,
+        96,
+        32,
+        32
+      ]
+    },
+    "leather_jerkin": {
+      "atlas": "items",
+      "rect": [
+        416,
+        96,
+        32,
+        32
+      ]
+    },
+    "chain_hauberk": {
+      "atlas": "items",
+      "rect": [
+        448,
+        96,
+        32,
+        32
+      ]
+    },
+    "witness_mantle": {
+      "atlas": "items",
+      "rect": [
+        480,
+        96,
+        32,
+        32
+      ]
+    },
+    "preliator_plate": {
+      "atlas": "items",
+      "rect": [
+        0,
+        128,
+        32,
+        32
+      ]
+    },
+    "bastion_brigandine": {
+      "atlas": "items",
+      "rect": [
+        32,
+        128,
+        32,
+        32
+      ]
+    },
+    "tithe_ledger_coat": {
+      "atlas": "items",
+      "rect": [
+        64,
+        128,
+        32,
+        32
+      ]
+    },
+    "ophite_coat": {
+      "atlas": "items",
+      "rect": [
+        96,
+        128,
+        32,
+        32
+      ]
+    },
+    "penitent_hairshirt": {
+      "atlas": "items",
+      "rect": [
+        128,
+        128,
+        32,
+        32
+      ]
+    },
+    "velvet_burial_shroud": {
+      "atlas": "items",
+      "rect": [
+        160,
+        128,
+        32,
+        32
+      ]
+    },
+    "archive_cassock": {
+      "atlas": "items",
+      "rect": [
+        192,
+        128,
+        32,
+        32
+      ]
+    },
+    "processional_cuirass": {
+      "atlas": "items",
+      "rect": [
+        224,
+        128,
+        32,
+        32
+      ]
+    },
+    "unrecorded_cloak": {
+      "atlas": "items",
+      "rect": [
+        256,
+        128,
+        32,
+        32
+      ]
+    },
+    "cantors_dalmatic": {
+      "atlas": "items",
+      "rect": [
+        288,
+        128,
+        32,
+        32
+      ]
+    },
+    "dayhouse_apron": {
+      "atlas": "items",
+      "rect": [
+        320,
+        128,
+        32,
+        32
+      ]
+    },
+    "cinder_scale_mail": {
+      "atlas": "items",
+      "rect": [
+        352,
+        128,
+        32,
+        32
+      ]
+    },
+    "prosay_cowl": {
+      "atlas": "items",
+      "rect": [
+        384,
+        128,
+        32,
+        32
+      ]
+    },
+    "night_cart_coat": {
+      "atlas": "items",
+      "rect": [
+        416,
+        128,
+        32,
+        32
+      ]
+    },
+    "wardens_bulwark_shell": {
+      "atlas": "items",
+      "rect": [
+        448,
+        128,
+        32,
+        32
+      ]
+    },
+    "shut_chapel_pall": {
+      "atlas": "items",
+      "rect": [
+        480,
+        128,
+        32,
+        32
+      ]
+    },
+    "foundry_asbestos_robe": {
+      "atlas": "items",
+      "rect": [
+        0,
+        160,
+        32,
+        32
+      ]
+    },
+    "peyre_ledger_mail": {
+      "atlas": "items",
+      "rect": [
+        32,
+        160,
+        32,
+        32
+      ]
+    },
+    "eye_of_lilith": {
+      "atlas": "items",
+      "rect": [
+        64,
+        160,
+        32,
+        32
+      ]
+    },
+    "broken_tithe_seal": {
+      "atlas": "items",
+      "rect": [
+        96,
+        160,
+        32,
+        32
+      ]
+    },
+    "iron_gate_keytag": {
+      "atlas": "items",
+      "rect": [
+        128,
+        160,
+        32,
+        32
+      ]
+    },
+    "stamped_lead_coin": {
+      "atlas": "items",
+      "rect": [
+        160,
+        160,
+        32,
+        32
+      ]
+    },
+    "ophite_coil": {
+      "atlas": "items",
+      "rect": [
+        192,
+        160,
+        32,
+        32
+      ]
+    },
+    "cinder_bead_cord": {
+      "atlas": "items",
+      "rect": [
+        224,
+        160,
+        32,
+        32
+      ]
+    },
+    "velvet_ossuary_locket": {
+      "atlas": "items",
+      "rect": [
+        256,
+        160,
+        32,
+        32
+      ]
+    },
+    "archive_loupe": {
+      "atlas": "items",
+      "rect": [
+        288,
+        160,
+        32,
+        32
+      ]
+    },
+    "processional_insignia": {
+      "atlas": "items",
+      "rect": [
+        320,
+        160,
+        32,
+        32
+      ]
+    },
+    "torn_page_charm": {
+      "atlas": "items",
+      "rect": [
+        352,
+        160,
+        32,
+        32
+      ]
+    },
+    "solar_medal_prosay": {
+      "atlas": "items",
+      "rect": [
+        384,
+        160,
+        32,
+        32
+      ]
+    },
+    "salt_ring_amulet": {
+      "atlas": "items",
+      "rect": [
+        416,
+        160,
+        32,
+        32
+      ]
+    },
+    "porphyry_signet": {
+      "atlas": "items",
+      "rect": [
+        448,
+        160,
+        32,
+        32
+      ]
+    },
+    "canticle_bone_whistle": {
+      "atlas": "items",
+      "rect": [
+        480,
+        160,
+        32,
+        32
+      ]
+    },
+    "wax_exemption_token": {
+      "atlas": "items",
+      "rect": [
+        0,
+        192,
+        32,
+        32
+      ]
+    },
+    "brass_compass_unrecorded": {
+      "atlas": "items",
+      "rect": [
+        32,
+        192,
+        32,
+        32
+      ]
+    },
+    "chainbreaker_seal": {
+      "atlas": "items",
+      "rect": [
+        64,
+        192,
+        32,
+        32
+      ]
+    },
+    "anselms_canceled_stamp": {
+      "atlas": "items",
+      "rect": [
+        96,
+        192,
+        32,
+        32
+      ]
+    },
+    "wrens_threshold_key": {
+      "atlas": "items",
+      "rect": [
+        128,
+        192,
+        32,
+        32
+      ]
+    },
+    "dessas_bone_scale": {
+      "atlas": "items",
+      "rect": [
+        160,
+        192,
+        32,
+        32
+      ]
+    },
+    "erable_cinder_heart": {
+      "atlas": "items",
+      "rect": [
+        192,
+        192,
+        32,
+        32
+      ]
+    },
+    "mirandes_glass_drop": {
+      "atlas": "items",
+      "rect": [
+        224,
+        192,
+        32,
+        32
+      ]
+    },
+    "healing_salve": {
+      "atlas": "items",
+      "rect": [
+        256,
+        192,
+        32,
+        32
+      ]
+    },
+    "bone_tincture": {
+      "atlas": "items",
+      "rect": [
+        288,
+        192,
+        32,
+        32
+      ]
+    },
+    "vial_of_false_light": {
+      "atlas": "items",
+      "rect": [
+        320,
+        192,
+        32,
+        32
+      ]
+    },
+    "dayhouse_broth_phial": {
+      "atlas": "items",
+      "rect": [
+        352,
+        192,
+        32,
+        32
+      ]
+    },
+    "sanctuary_poultice": {
+      "atlas": "items",
+      "rect": [
+        384,
+        192,
+        32,
+        32
+      ]
+    },
+    "marrow_cordial": {
+      "atlas": "items",
+      "rect": [
+        416,
+        192,
+        32,
+        32
+      ]
+    },
+    "quicksilver_sip": {
+      "atlas": "items",
+      "rect": [
+        448,
+        192,
+        32,
+        32
+      ]
+    },
+    "iron_bark_tonic": {
+      "atlas": "items",
+      "rect": [
+        480,
+        192,
+        32,
+        32
+      ]
+    },
+    "veil_drop_phial": {
+      "atlas": "items",
+      "rect": [
+        0,
+        224,
+        32,
+        32
+      ]
+    },
+    "eye_bright_water": {
+      "atlas": "items",
+      "rect": [
+        32,
+        224,
+        32,
+        32
+      ]
+    },
+    "wormwood_salt": {
+      "atlas": "items",
+      "rect": [
+        64,
+        224,
+        32,
+        32
+      ]
+    },
+    "foundry_pepper_dram": {
+      "atlas": "items",
+      "rect": [
+        96,
+        224,
+        32,
+        32
+      ]
+    },
+    "apostate_wine": {
+      "atlas": "items",
+      "rect": [
+        128,
+        224,
+        32,
+        32
+      ]
+    },
+    "sanctuary_dew_flask": {
+      "atlas": "items",
+      "rect": [
+        160,
+        224,
+        32,
+        32
+      ]
+    },
+    "clarion_drops": {
+      "atlas": "items",
+      "rect": [
+        192,
+        224,
+        32,
+        32
+      ]
+    },
+    "ophite_brine": {
+      "atlas": "items",
+      "rect": [
+        224,
+        224,
+        32,
+        32
+      ]
+    },
+    "almoners_ration": {
+      "atlas": "items",
+      "rect": [
+        256,
+        224,
+        32,
+        32
+      ]
+    },
+    "lamp_oil_sip": {
+      "atlas": "items",
+      "rect": [
+        288,
+        224,
+        32,
+        32
+      ]
+    },
+    "throwing_knife": {
+      "atlas": "items",
+      "rect": [
+        320,
+        224,
+        32,
+        32
+      ]
+    },
+    "javelin": {
+      "atlas": "items",
+      "rect": [
+        352,
+        224,
+        32,
+        32
+      ]
+    },
+    "cinder_flask": {
+      "atlas": "items",
+      "rect": [
+        384,
+        224,
+        32,
+        32
+      ]
+    },
+    "ossuary_rime_vial": {
+      "atlas": "items",
+      "rect": [
+        416,
+        224,
+        32,
+        32
+      ]
+    },
+    "false_sun_prism": {
+      "atlas": "items",
+      "rect": [
+        448,
+        224,
+        32,
+        32
+      ]
+    },
+    "barbed_dart": {
+      "atlas": "items",
+      "rect": [
+        480,
+        224,
+        32,
+        32
+      ]
+    },
+    "snare_bolas": {
+      "atlas": "items",
+      "rect": [
+        0,
+        256,
+        32,
+        32
+      ]
+    },
+    "salt_shrapnel_bomb": {
+      "atlas": "items",
+      "rect": [
+        32,
+        256,
+        32,
+        32
+      ]
+    },
+    "hoarfrost_bomb": {
+      "atlas": "items",
+      "rect": [
+        64,
+        256,
+        32,
+        32
+      ]
+    },
+    "abyssal_shard_dart": {
+      "atlas": "items",
+      "rect": [
+        96,
+        256,
+        32,
+        32
+      ]
+    },
+    "void_censer_bomb": {
+      "atlas": "items",
+      "rect": [
+        128,
+        256,
+        32,
+        32
+      ]
+    },
+    "sunflare_capsule": {
+      "atlas": "items",
+      "rect": [
+        160,
+        256,
+        32,
+        32
+      ]
+    },
+    "silver_spike": {
+      "atlas": "items",
+      "rect": [
+        192,
+        256,
+        32,
+        32
+      ]
+    },
+    "pitch_fire_bead": {
+      "atlas": "items",
+      "rect": [
+        224,
+        256,
+        32,
+        32
+      ]
+    },
+    "scroll_of_phase_step": {
+      "atlas": "items",
+      "rect": [
+        256,
+        256,
+        32,
+        32
+      ]
+    },
+    "scroll_of_abyssal_lance": {
+      "atlas": "items",
+      "rect": [
+        288,
+        256,
+        32,
+        32
+      ]
+    },
+    "scroll_of_cinder_ward": {
+      "atlas": "items",
+      "rect": [
+        320,
+        256,
+        32,
+        32
+      ]
+    },
+    "scroll_of_identify": {
+      "atlas": "items",
+      "rect": [
+        352,
+        256,
+        32,
+        32
+      ]
+    },
+    "scroll_of_unbind": {
+      "atlas": "items",
+      "rect": [
+        384,
+        256,
+        32,
+        32
+      ]
+    },
+    "scroll_of_sanctuary_ward": {
+      "atlas": "items",
+      "rect": [
+        416,
+        256,
+        32,
+        32
+      ]
+    },
+    "scroll_of_chain_break": {
+      "atlas": "items",
+      "rect": [
+        448,
+        256,
+        32,
+        32
+      ]
+    },
+    "scroll_of_map_reveal": {
+      "atlas": "items",
+      "rect": [
+        480,
+        256,
+        32,
+        32
+      ]
+    },
+    "scroll_of_blink_swap": {
+      "atlas": "items",
+      "rect": [
+        0,
+        288,
+        32,
+        32
+      ]
+    },
+    "scroll_of_rime_nova": {
+      "atlas": "items",
+      "rect": [
+        32,
+        288,
+        32,
+        32
+      ]
+    },
+    "scroll_of_false_dawn": {
+      "atlas": "items",
+      "rect": [
+        64,
+        288,
+        32,
+        32
+      ]
+    },
+    "scroll_of_void_snare": {
+      "atlas": "items",
+      "rect": [
+        96,
+        288,
+        32,
+        32
+      ]
+    },
+    "scroll_of_iron_skin": {
+      "atlas": "items",
+      "rect": [
+        128,
+        288,
+        32,
+        32
+      ]
+    },
+    "scroll_of_haste_litany": {
+      "atlas": "items",
+      "rect": [
+        160,
+        288,
+        32,
+        32
+      ]
+    },
+    "scroll_of_reclaim_vigor": {
+      "atlas": "items",
+      "rect": [
+        192,
+        288,
+        32,
+        32
+      ]
+    },
+    "scroll_of_consecrate_tile": {
+      "atlas": "items",
+      "rect": [
+        224,
+        288,
+        32,
+        32
+      ]
+    },
+    "scroll_of_audit_banish": {
+      "atlas": "items",
+      "rect": [
+        256,
+        288,
+        32,
+        32
+      ]
+    },
+    "scroll_of_quiet_shroud": {
+      "atlas": "items",
+      "rect": [
+        288,
+        288,
+        32,
+        32
+      ]
+    },
+    "scroll_of_cinder_storm": {
+      "atlas": "items",
+      "rect": [
+        320,
+        288,
+        32,
+        32
+      ]
+    },
+    "scroll_of_oath_salve": {
+      "atlas": "items",
+      "rect": [
+        352,
+        288,
+        32,
+        32
+      ]
+    },
+    "confessors_glass": {
+      "atlas": "items",
+      "rect": [
+        384,
+        288,
+        32,
+        32
+      ]
+    },
+    "ophite_key": {
+      "atlas": "items",
+      "rect": [
+        416,
+        288,
+        32,
+        32
+      ]
+    },
+    "broken_halo": {
+      "atlas": "items",
+      "rect": [
+        448,
+        288,
+        32,
+        32
+      ]
+    },
+    "severed_crown": {
+      "atlas": "items",
+      "rect": [
+        480,
+        288,
+        32,
+        32
+      ]
+    },
+    "ward_keepers_lamp": {
+      "atlas": "items",
+      "rect": [
+        0,
+        320,
+        32,
+        32
+      ]
+    },
+    "almoners_purse": {
+      "atlas": "items",
+      "rect": [
+        32,
+        320,
+        32,
+        32
+      ]
+    },
+    "penitents_scourge": {
+      "atlas": "items",
+      "rect": [
+        64,
+        320,
+        32,
+        32
+      ]
+    },
+    "archive_lens": {
+      "atlas": "items",
+      "rect": [
+        96,
+        320,
+        32,
+        32
+      ]
+    },
+    "ash_reliquary_box": {
+      "atlas": "items",
+      "rect": [
+        128,
+        320,
+        32,
+        32
+      ]
+    },
+    "rime_handbell": {
+      "atlas": "items",
+      "rect": [
+        160,
+        320,
+        32,
+        32
+      ]
+    },
+    "unwritten_ledger_leaf": {
+      "atlas": "items",
+      "rect": [
+        192,
+        320,
+        32,
+        32
+      ]
+    },
+    "counterfeit_sun_coin": {
+      "atlas": "items",
+      "rect": [
+        224,
+        320,
+        32,
+        32
+      ]
+    },
+    "salt_hourglass": {
+      "atlas": "items",
+      "rect": [
+        256,
+        320,
+        32,
+        32
+      ]
+    },
+    "cantors_fork": {
+      "atlas": "items",
+      "rect": [
+        288,
+        320,
+        32,
+        32
+      ]
+    },
+    "warden_portcullis_seal": {
+      "atlas": "items",
+      "rect": [
+        320,
+        320,
+        32,
+        32
+      ]
+    },
+    "witness_pocket_mirror": {
+      "atlas": "items",
+      "rect": [
+        352,
+        320,
+        32,
+        32
+      ]
+    },
+    "vault_key": {
+      "atlas": "items",
+      "rect": [
+        384,
+        320,
+        32,
+        32
+      ]
+    },
+    "master_ledger_key": {
+      "atlas": "items",
+      "rect": [
+        416,
+        320,
+        32,
+        32
+      ]
+    },
+    "cellar_skeleton_key": {
+      "atlas": "items",
+      "rect": [
+        448,
+        320,
+        32,
+        32
+      ]
     }
   },
-  "statuses": {},
-  "icons": {},
-  "emblems": {}
+  "statuses": {
+    "default": {
+      "atlas": "icons",
+      "rect": [
+        0,
+        0,
+        16,
+        16
+      ]
+    },
+    "false_light": {
+      "atlas": "icons",
+      "rect": [
+        16,
+        0,
+        16,
+        16
+      ]
+    },
+    "reckoning": {
+      "atlas": "icons",
+      "rect": [
+        32,
+        0,
+        16,
+        16
+      ]
+    },
+    "dissolution": {
+      "atlas": "icons",
+      "rect": [
+        48,
+        0,
+        16,
+        16
+      ]
+    },
+    "isolation": {
+      "atlas": "icons",
+      "rect": [
+        64,
+        0,
+        16,
+        16
+      ]
+    },
+    "exposure": {
+      "atlas": "icons",
+      "rect": [
+        80,
+        0,
+        16,
+        16
+      ]
+    },
+    "perception_fog": {
+      "atlas": "icons",
+      "rect": [
+        96,
+        0,
+        16,
+        16
+      ]
+    },
+    "confessors_clarity": {
+      "atlas": "icons",
+      "rect": [
+        112,
+        0,
+        16,
+        16
+      ]
+    },
+    "ophite_insight": {
+      "atlas": "icons",
+      "rect": [
+        128,
+        0,
+        16,
+        16
+      ]
+    },
+    "halo_aegis": {
+      "atlas": "icons",
+      "rect": [
+        144,
+        0,
+        16,
+        16
+      ]
+    },
+    "sundered": {
+      "atlas": "icons",
+      "rect": [
+        160,
+        0,
+        16,
+        16
+      ]
+    },
+    "braced": {
+      "atlas": "icons",
+      "rect": [
+        176,
+        0,
+        16,
+        16
+      ]
+    },
+    "apostate_focus": {
+      "atlas": "icons",
+      "rect": [
+        192,
+        0,
+        16,
+        16
+      ]
+    },
+    "veiled": {
+      "atlas": "icons",
+      "rect": [
+        208,
+        0,
+        16,
+        16
+      ]
+    },
+    "bleeding": {
+      "atlas": "icons",
+      "rect": [
+        224,
+        0,
+        16,
+        16
+      ]
+    },
+    "burning": {
+      "atlas": "icons",
+      "rect": [
+        240,
+        0,
+        16,
+        16
+      ]
+    },
+    "chilled": {
+      "atlas": "icons",
+      "rect": [
+        0,
+        16,
+        16,
+        16
+      ]
+    },
+    "pinned": {
+      "atlas": "icons",
+      "rect": [
+        16,
+        16,
+        16,
+        16
+      ]
+    },
+    "hexed": {
+      "atlas": "icons",
+      "rect": [
+        32,
+        16,
+        16,
+        16
+      ]
+    },
+    "crown_decree": {
+      "atlas": "icons",
+      "rect": [
+        48,
+        16,
+        16,
+        16
+      ]
+    },
+    "lamp_vigil": {
+      "atlas": "icons",
+      "rect": [
+        64,
+        16,
+        16,
+        16
+      ]
+    },
+    "almoners_grace": {
+      "atlas": "icons",
+      "rect": [
+        80,
+        16,
+        16,
+        16
+      ]
+    },
+    "debility": {
+      "atlas": "icons",
+      "rect": [
+        96,
+        16,
+        16,
+        16
+      ]
+    },
+    "dread": {
+      "atlas": "icons",
+      "rect": [
+        112,
+        16,
+        16,
+        16
+      ]
+    },
+    "degradation": {
+      "atlas": "icons",
+      "rect": [
+        128,
+        16,
+        16,
+        16
+      ]
+    },
+    "demanded": {
+      "atlas": "icons",
+      "rect": [
+        144,
+        16,
+        16,
+        16
+      ]
+    },
+    "entangled": {
+      "atlas": "icons",
+      "rect": [
+        160,
+        16,
+        16,
+        16
+      ]
+    },
+    "forsworn": {
+      "atlas": "icons",
+      "rect": [
+        176,
+        16,
+        16,
+        16
+      ]
+    },
+    "return_oriented": {
+      "atlas": "icons",
+      "rect": [
+        192,
+        16,
+        16,
+        16
+      ]
+    },
+    "serpents_seam": {
+      "atlas": "icons",
+      "rect": [
+        208,
+        16,
+        16,
+        16
+      ]
+    },
+    "sovereign_mark": {
+      "atlas": "icons",
+      "rect": [
+        224,
+        16,
+        16,
+        16
+      ]
+    },
+    "boon_fast": {
+      "atlas": "icons",
+      "rect": [
+        240,
+        16,
+        16,
+        16
+      ]
+    },
+    "boon_poverty": {
+      "atlas": "icons",
+      "rect": [
+        0,
+        32,
+        16,
+        16
+      ]
+    },
+    "boon_taken_name": {
+      "atlas": "icons",
+      "rect": [
+        16,
+        32,
+        16,
+        16
+      ]
+    },
+    "boon_crown_taken": {
+      "atlas": "icons",
+      "rect": [
+        32,
+        32,
+        16,
+        16
+      ]
+    },
+    "sanctuary_ward": {
+      "atlas": "icons",
+      "rect": [
+        48,
+        32,
+        16,
+        16
+      ]
+    },
+    "iron_skin": {
+      "atlas": "icons",
+      "rect": [
+        64,
+        32,
+        16,
+        16
+      ]
+    },
+    "haste_litany": {
+      "atlas": "icons",
+      "rect": [
+        80,
+        32,
+        16,
+        16
+      ]
+    },
+    "quiet_shroud": {
+      "atlas": "icons",
+      "rect": [
+        96,
+        32,
+        16,
+        16
+      ]
+    },
+    "clarity_draught": {
+      "atlas": "icons",
+      "rect": [
+        112,
+        32,
+        16,
+        16
+      ]
+    },
+    "bitter_ward": {
+      "atlas": "icons",
+      "rect": [
+        128,
+        32,
+        16,
+        16
+      ]
+    },
+    "blood_fervor": {
+      "atlas": "icons",
+      "rect": [
+        144,
+        32,
+        16,
+        16
+      ]
+    },
+    "penitents_scourge_work": {
+      "atlas": "icons",
+      "rect": [
+        160,
+        32,
+        16,
+        16
+      ]
+    },
+    "archive_lens_work": {
+      "atlas": "icons",
+      "rect": [
+        176,
+        32,
+        16,
+        16
+      ]
+    },
+    "ash_reliquary_work": {
+      "atlas": "icons",
+      "rect": [
+        192,
+        32,
+        16,
+        16
+      ]
+    },
+    "rime_bell_work": {
+      "atlas": "icons",
+      "rect": [
+        208,
+        32,
+        16,
+        16
+      ]
+    },
+    "unwritten_ledger_work": {
+      "atlas": "icons",
+      "rect": [
+        224,
+        32,
+        16,
+        16
+      ]
+    },
+    "sun_coin_work": {
+      "atlas": "icons",
+      "rect": [
+        240,
+        32,
+        16,
+        16
+      ]
+    },
+    "salt_hourglass_work": {
+      "atlas": "icons",
+      "rect": [
+        0,
+        48,
+        16,
+        16
+      ]
+    },
+    "cantors_tuning_fork_work": {
+      "atlas": "icons",
+      "rect": [
+        16,
+        48,
+        16,
+        16
+      ]
+    },
+    "warden_seal_work": {
+      "atlas": "icons",
+      "rect": [
+        32,
+        48,
+        16,
+        16
+      ]
+    },
+    "witness_mirror_work": {
+      "atlas": "icons",
+      "rect": [
+        48,
+        48,
+        16,
+        16
+      ]
+    }
+  },
+  "icons": {
+    "default": {
+      "atlas": "icons",
+      "rect": [
+        64,
+        48,
+        16,
+        16
+      ]
+    },
+    "tree:Acrobatics": {
+      "atlas": "icons",
+      "rect": [
+        80,
+        48,
+        16,
+        16
+      ]
+    },
+    "tree:Alchemy of False Light": {
+      "atlas": "icons",
+      "rect": [
+        96,
+        48,
+        16,
+        16
+      ]
+    },
+    "tree:Chalk Geometry": {
+      "atlas": "icons",
+      "rect": [
+        112,
+        48,
+        16,
+        16
+      ]
+    },
+    "tree:Corridor Control": {
+      "atlas": "icons",
+      "rect": [
+        128,
+        48,
+        16,
+        16
+      ]
+    },
+    "tree:Counter-Litany": {
+      "atlas": "icons",
+      "rect": [
+        144,
+        48,
+        16,
+        16
+      ]
+    },
+    "tree:Counter-Siege": {
+      "atlas": "icons",
+      "rect": [
+        160,
+        48,
+        16,
+        16
+      ]
+    },
+    "tree:Dominion Apostate": {
+      "atlas": "icons",
+      "rect": [
+        176,
+        48,
+        16,
+        16
+      ]
+    },
+    "tree:Iron Threshold": {
+      "atlas": "icons",
+      "rect": [
+        192,
+        48,
+        16,
+        16
+      ]
+    },
+    "tree:Margin Step": {
+      "atlas": "icons",
+      "rect": [
+        208,
+        48,
+        16,
+        16
+      ]
+    },
+    "tree:Mask Governance": {
+      "atlas": "icons",
+      "rect": [
+        224,
+        48,
+        16,
+        16
+      ]
+    },
+    "tree:Oathbreaker": {
+      "atlas": "icons",
+      "rect": [
+        240,
+        48,
+        16,
+        16
+      ]
+    },
+    "tree:Preliator Bulwark": {
+      "atlas": "icons",
+      "rect": [
+        0,
+        64,
+        16,
+        16
+      ]
+    },
+    "tree:Quartermark Volley": {
+      "atlas": "icons",
+      "rect": [
+        16,
+        64,
+        16,
+        16
+      ]
+    },
+    "tree:Refined Reagents": {
+      "atlas": "icons",
+      "rect": [
+        32,
+        64,
+        16,
+        16
+      ]
+    },
+    "tree:Remedial Craft": {
+      "atlas": "icons",
+      "rect": [
+        48,
+        64,
+        16,
+        16
+      ]
+    },
+    "tree:Seam Binding": {
+      "atlas": "icons",
+      "rect": [
+        64,
+        64,
+        16,
+        16
+      ]
+    },
+    "tree:Seam Hunting": {
+      "atlas": "icons",
+      "rect": [
+        80,
+        64,
+        16,
+        16
+      ]
+    },
+    "tree:Shieldcraft": {
+      "atlas": "icons",
+      "rect": [
+        96,
+        64,
+        16,
+        16
+      ]
+    },
+    "tree:The Eye Unblinking": {
+      "atlas": "icons",
+      "rect": [
+        112,
+        64,
+        16,
+        16
+      ]
+    },
+    "tree:Threshold Rites": {
+      "atlas": "icons",
+      "rect": [
+        128,
+        64,
+        16,
+        16
+      ]
+    },
+    "tree:Tithe-Alley Shadow": {
+      "atlas": "icons",
+      "rect": [
+        144,
+        64,
+        16,
+        16
+      ]
+    },
+    "tree:Venom & Stiletto": {
+      "atlas": "icons",
+      "rect": [
+        160,
+        64,
+        16,
+        16
+      ]
+    },
+    "tree:Void Sympathy": {
+      "atlas": "icons",
+      "rect": [
+        176,
+        64,
+        16,
+        16
+      ]
+    },
+    "tree:Volatile Flasks": {
+      "atlas": "icons",
+      "rect": [
+        192,
+        64,
+        16,
+        16
+      ]
+    },
+    "elite:ashen": {
+      "atlas": "icons",
+      "rect": [
+        208,
+        64,
+        16,
+        16
+      ]
+    },
+    "elite:rime-bound": {
+      "atlas": "icons",
+      "rect": [
+        224,
+        64,
+        16,
+        16
+      ]
+    },
+    "elite:apostate": {
+      "atlas": "icons",
+      "rect": [
+        240,
+        64,
+        16,
+        16
+      ]
+    },
+    "elite:ironbound": {
+      "atlas": "icons",
+      "rect": [
+        0,
+        80,
+        16,
+        16
+      ]
+    },
+    "elite:radiant": {
+      "atlas": "icons",
+      "rect": [
+        16,
+        80,
+        16,
+        16
+      ]
+    },
+    "elite:swift": {
+      "atlas": "icons",
+      "rect": [
+        32,
+        80,
+        16,
+        16
+      ]
+    },
+    "elite:vampiric": {
+      "atlas": "icons",
+      "rect": [
+        48,
+        80,
+        16,
+        16
+      ]
+    },
+    "elite:warded": {
+      "atlas": "icons",
+      "rect": [
+        64,
+        80,
+        16,
+        16
+      ]
+    },
+    "elite:default": {
+      "atlas": "icons",
+      "rect": [
+        80,
+        80,
+        16,
+        16
+      ]
+    },
+    "chain:chain_isolation": {
+      "atlas": "icons",
+      "rect": [
+        96,
+        80,
+        16,
+        16
+      ]
+    },
+    "chain:chain_fog": {
+      "atlas": "icons",
+      "rect": [
+        112,
+        80,
+        16,
+        16
+      ]
+    },
+    "chain:chain_debility": {
+      "atlas": "icons",
+      "rect": [
+        128,
+        80,
+        16,
+        16
+      ]
+    },
+    "chain:chain_threat": {
+      "atlas": "icons",
+      "rect": [
+        144,
+        80,
+        16,
+        16
+      ]
+    },
+    "chain:chain_indulgence": {
+      "atlas": "icons",
+      "rect": [
+        160,
+        80,
+        16,
+        16
+      ]
+    },
+    "chain:chain_omnipotence": {
+      "atlas": "icons",
+      "rect": [
+        176,
+        80,
+        16,
+        16
+      ]
+    },
+    "chain:chain_degradation": {
+      "atlas": "icons",
+      "rect": [
+        192,
+        80,
+        16,
+        16
+      ]
+    },
+    "chain:chain_trivial": {
+      "atlas": "icons",
+      "rect": [
+        208,
+        80,
+        16,
+        16
+      ]
+    },
+    "contract:the_fast": {
+      "atlas": "icons",
+      "rect": [
+        224,
+        80,
+        16,
+        16
+      ]
+    },
+    "contract:vow_of_poverty": {
+      "atlas": "icons",
+      "rect": [
+        240,
+        80,
+        16,
+        16
+      ]
+    },
+    "contract:the_taken_name": {
+      "atlas": "icons",
+      "rect": [
+        0,
+        96,
+        16,
+        16
+      ]
+    },
+    "contract:the_crown_taken": {
+      "atlas": "icons",
+      "rect": [
+        16,
+        96,
+        16,
+        16
+      ]
+    }
+  },
+  "emblems": {
+    "title_crest": {
+      "atlas": "emblems",
+      "rect": [
+        0,
+        0,
+        64,
+        64
+      ]
+    },
+    "sphere_1": {
+      "atlas": "emblems",
+      "rect": [
+        64,
+        0,
+        64,
+        64
+      ]
+    },
+    "sphere_2": {
+      "atlas": "emblems",
+      "rect": [
+        128,
+        0,
+        64,
+        64
+      ]
+    },
+    "sphere_3": {
+      "atlas": "emblems",
+      "rect": [
+        192,
+        0,
+        64,
+        64
+      ]
+    },
+    "sphere_4": {
+      "atlas": "emblems",
+      "rect": [
+        256,
+        0,
+        64,
+        64
+      ]
+    },
+    "sphere_5": {
+      "atlas": "emblems",
+      "rect": [
+        320,
+        0,
+        64,
+        64
+      ]
+    },
+    "sphere_6": {
+      "atlas": "emblems",
+      "rect": [
+        0,
+        64,
+        64,
+        64
+      ]
+    },
+    "sphere_7": {
+      "atlas": "emblems",
+      "rect": [
+        64,
+        64,
+        64,
+        64
+      ]
+    },
+    "faction:inquisition_two_minds": {
+      "atlas": "emblems",
+      "rect": [
+        128,
+        64,
+        64,
+        64
+      ]
+    },
+    "faction:office_of_seals": {
+      "atlas": "emblems",
+      "rect": [
+        192,
+        64,
+        64,
+        64
+      ]
+    },
+    "faction:readers_circles": {
+      "atlas": "emblems",
+      "rect": [
+        256,
+        64,
+        64,
+        64
+      ]
+    },
+    "faction:guild_and_ring": {
+      "atlas": "emblems",
+      "rect": [
+        320,
+        64,
+        64,
+        64
+      ]
+    },
+    "faction:cellar_and_street": {
+      "atlas": "emblems",
+      "rect": [
+        0,
+        128,
+        64,
+        64
+      ]
+    },
+    "faction:day_house_almoners": {
+      "atlas": "emblems",
+      "rect": [
+        64,
+        128,
+        64,
+        64
+      ]
+    },
+    "faction:choir_disaffected": {
+      "atlas": "emblems",
+      "rect": [
+        128,
+        128,
+        64,
+        64
+      ]
+    },
+    "faction:ophite_witnesses": {
+      "atlas": "emblems",
+      "rect": [
+        192,
+        128,
+        64,
+        64
+      ]
+    },
+    "boss_seal": {
+      "atlas": "emblems",
+      "rect": [
+        256,
+        128,
+        64,
+        64
+      ]
+    },
+    "way_serpent": {
+      "atlas": "emblems",
+      "rect": [
+        320,
+        128,
+        64,
+        64
+      ]
+    },
+    "way_return": {
+      "atlas": "emblems",
+      "rect": [
+        0,
+        192,
+        64,
+        64
+      ]
+    },
+    "unwritten_door": {
+      "atlas": "emblems",
+      "rect": [
+        64,
+        192,
+        64,
+        64
+      ]
+    },
+    "by_decree": {
+      "atlas": "emblems",
+      "rect": [
+        128,
+        192,
+        64,
+        64
+      ]
+    },
+    "loss_catalogued": {
+      "atlas": "emblems",
+      "rect": [
+        192,
+        192,
+        64,
+        64
+      ]
+    },
+    "loss_fluent": {
+      "atlas": "emblems",
+      "rect": [
+        256,
+        192,
+        64,
+        64
+      ]
+    },
+    "loss_gilded": {
+      "atlas": "emblems",
+      "rect": [
+        320,
+        192,
+        64,
+        64
+      ]
+    }
+  }
 }
