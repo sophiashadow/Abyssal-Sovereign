@@ -2,7 +2,7 @@
 
 For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENTS.md` first; its rules win over this file. Update this file at every stop.
 
-## State as of 2026-11-27 (M7 complete on branch; see below)
+## State as of 2026-11-27 (M7 merged to `main`; see below)
 
 - **Branch:** `main` (default branch on `origin`, github.com/sophiashadow/Abyssal-Sovereign), preserving full commit history from `ccr-c6f8b898-fu2jtp` and `fac51e8`.
 - **Milestones:** M0–M5 (`fac51e8`, Depth Pass complete), **M6 Breadth Pass (M6.1–M6.10 COMPLETE, save v11):**
@@ -16,6 +16,7 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
   - **M6.8** Discovery, Codex & Run History (`user://codex.json`, knowledge-only, zero power, zero spoilers, Codex overlay `k`, enriched end-of-run summaries).
   - **M6.9** Portable Worldbuilding Manifest (`content/lore/world_manifest.json` `schema_version: 1` + `docs/WORLD_MANIFEST.md` + validator).
   - **M6.10** Integration, Reachability (`tests/test_reachability.gd`), Final Held-Out Validation Soak, Platform Exports (`tools/export.sh all`), & M7 Handoff.
+- **M7 Refinement Pass (M7.1–M7.10 COMPLETE, save v12):** merged in PR #1; details and evidence in the M7 section below and `docs/M7_REPORT.md`. The "Last verified" block that follows is the M6.10 record.
 - **Last verified (local, Linux, M6.10):**
   - `tools/verify.sh` (M6.10):
     - `tools/test.sh`: `131` tests, `131` passed, `0` failed, `3883` checks, `142.7s` (`0` engine errors).
@@ -31,7 +32,7 @@ For the next agent: Antigravity, Gemini, Codex, Claude or any other. Read `AGENT
     - Windows export: `build/windows/abyssal-sovereign.exe` (`105M`); Web export: `build/web/index.html` (`5.5K`).
 - **NOT_RUN:** Windows runtime execution, Web browser `user://` IndexedDB persistence check, physical Android device install/playtest (no `adb` device connected), release-signed Android APK (no owner keystore outside repo), and M5.2–M6.10 human playtesting. There is no CI.
 
-## M7 Refinement Pass: complete (pending owner review) (branch `ccr-4b7d6997-36eyn5`, draft PR #1)
+## M7 Refinement Pass: complete and merged (PR #1, merge commit `361a40f`, 2026-11-27)
 
 Spec: `docs/M7_SPEC.md`. Owner authorized a push after each task (2026-11-26); no merge, release or publish.
 
@@ -59,7 +60,7 @@ Spec: `docs/M7_SPEC.md`. Owner authorized a push after each task (2026-11-26); n
   - Validation soak, fresh salt `m7_final_validation` (spent), Exile, 512 runs, four bot policies: 369 won (72.1%), 52 died, 91 hit the action cap. Not comparable with M6.10's 75%.
   - Exports (Godot 4.7.2 templates, SHA-512 checked): Linux built and launched under xvfb (exit 0, gameplay not driven); Windows built, runtime NOT_RUN; Web built, persistence NOT_RUN; Android debug APK built, `apksigner verify` passes, device install NOT_RUN.
   - Report: `docs/M7_REPORT.md` (datasets, reproduction commands, known defects, playtest requirements, structured M8 recommendations).
-- **Open PR:** #1, draft. Nothing merged, released or published.
+- **Merged:** PR #1 into `main` on owner instruction (2026-11-27). Nothing released or published. M8 not started.
 - **NOT_RUN:** human playtest, Windows runtime, Web persistence, physical Android install, release-signed APK, CI (none exists).
 
 ## Known-Defect & Observation Register (M6.10 items, status after M7)
@@ -92,7 +93,6 @@ Do not begin M8 without the owner. First step is human playtest round 1 (`docs/P
 
 ## Owner decisions still open
 
-- Merge, or not, of draft PR #1 (M7).
 - Profile names and parameters (provisional); whether Veil-Touched's residual bot-play gap is intended.
 
 - Release Android keystore creation (owner creates outside the repo).
