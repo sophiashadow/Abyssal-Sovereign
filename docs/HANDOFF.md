@@ -177,6 +177,12 @@ Spec: `docs/M8_SPEC.md`.
 - Created `docs/release/PRODUCT_KIT.md`, `docs/release/RELEASE_NOTES.md`, `docs/release/PRIVACY.md`, and `docs/release/CREDITS_AND_LICENSES.md` (with Godot 4.7.2 MIT license notice, measured package sizes, `provisional_m9_asset` / `placeholder_liturgical_temp` provenance, zero telemetry/account guarantees, and explicit open human/external gates).
 - Resolved `P2-5` in `docs/M9_DEFECT_REGISTER.md`.
 
+### M9.10 — Release Candidate Gate & Final Verification (done; `v1.0.0-rc.1` complete locally on `main`)
+
+- Fixed Godot Dummy-driver audio playback leak (`AudioManager._can_output_audio()`) and added Windows numeric `file_version`/`product_version` (`1.0.0.1`) in `export_presets.cfg`.
+- Re-verified full automated gate after the final edit: `./tools/test.sh` -> **`214 tests, 214 passed, 0 failed, 4947 checks, 195.2s`**; `m8_smoke.gd` (`4 combinations passed, RNG invariant -4367008355839543814`); `m8_perf_bench.gd` (`prep_100frames_tile_ms=236.88`, `save_bytes=66743`, `valid_reload=true`); `ui_smoke.gd` at `1280x720`, `2340x1080`, and `720x1280` (`39 steps, 0 failures`, 0 exit leaks, screenshots visually inspected); `./tools/package_rc.sh v1.0.0-rc.1` (`SHA256SUMS.txt` verified); Linux exported binary launch (`--quit-after 30` exited 0, 0 leaks).
+- Authored `docs/M9_REPORT.md`, `docs/RELEASE_CHECKLIST.md`, and updated `ROADMAP.md`. Milestone 9 (`v1.0.0-rc.1`) is complete locally on `main` and awaits explicit owner authorization and external human/hardware gates (`docs/RELEASE_CHECKLIST.md`).
+
 ## Do not
 
 - Modify FALSE LIGHT, Sovereign-Ops or any other repository. FALSE LIGHT documents are read-only sources.

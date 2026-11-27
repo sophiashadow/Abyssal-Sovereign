@@ -183,8 +183,12 @@ func _load_stream(res_path: String, want_loop: bool = false) -> AudioStream:
 	return stream
 
 
+func _can_output_audio() -> bool:
+	return AudioServer.get_driver_name() != "Dummy"
+
+
 func play_sfx(sfx_id: String, bus: String = "Combat", pitch_jitter: float = 0.05) -> bool:
-	if not audio_enabled or _paused:
+	if not audio_enabled or _paused or not _can_output_audio():
 		return false
 	var now_ms := Time.get_ticks_msec()
 	if not (sfx_id in ["ui_click", "ui_confirm", "death", "victory"]):
@@ -218,7 +222,7 @@ func set_ambience_sphere(sphere_num: int, fade_sec: float = 1.0) -> bool:
 	if sphere_num == current_sphere and not _ambience_decks.is_empty() and (_ambience_decks[_active_amb_deck].playing or not audio_enabled):
 		return true
 	current_sphere = sphere_num
-	if sphere_num < 1 or sphere_num >= SPHERE_NAMES.size() or not audio_enabled:
+	if sphere_num < 1 or sphere_num >= SPHERE_NAMES.size() or not audio_enabled or not _can_output_audio():
 		for a in _ambience_decks:
 			if a.playing:
 				a.stop()
@@ -274,7 +278,7 @@ func play_music_track(context_id: String, res_path: String, fade_sec: float = 1.
 		return true
 	current_music_context = context_id
 	_ensure_players()
-	if not audio_enabled or res_path.is_empty():
+	if not audio_enabled or not _can_output_audio() or res_path.is_empty():
 		for m in _music_decks:
 			if m.playing:
 				m.stop()
