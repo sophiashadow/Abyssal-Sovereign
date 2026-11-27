@@ -98,7 +98,13 @@ Spec: `docs/M8_SPEC.md`.
   - Added `tests/test_m8_telemetry.gd` (3 tests, 14 checks).
 - **M8.1 The Visual Codex (complete):**
   - Authored `docs/ART_DIRECTION.md`: Gnostic/occult-medieval visual identity, 8-color foundational palette (`VOID`, `IRON`, `PORPHYRY`, `GOLD`, `FALSE_SUN`, `IVORY`, `LUX`, `SILVER`, `BLOOD`), functional color meanings + mandatory non-color signifiers, Deuteranopia/Protanopia/Tritanopia/High-Contrast modes, 32×32 tile grid & 16×16/64×64 specs, 8px spacing / 48px touch targets, lighting/FOV & 60–180ms animation rules, asset naming/provenance schema, and the Ossuary Warrens vertical-slice treatment.
-- **Next submilestone:** M8.2 — The Dual Rendering Architecture (`Palette`, `GameSettings`, `AssetRegistry`, vertical-slice sprites, `MapView` dual tile/glyph renderer, `tests/test_m8_renderer.gd`).
+- **M8.2 The Dual Rendering Architecture (complete, verified locally):**
+  - Extended `src/ui/palette.gd` (M8 palette constants, Sphere accents, `color_for_mode` R/G & B/Y colorblind + high-contrast transforms) and `src/ui/game_settings.gd` (`render_mode`, `TILE_SIZES`, `integer_scale`, `camera_zoom`, `decorative_lighting`, `color_mode`, `high_contrast`, `left_handed`).
+  - Added `src/ui/asset_registry.gd` (`AssetRegistry`) loading `content/presentation/asset_registry.json` and `asset_provenance.json` with safe `null` fallback.
+  - Created `tools/gen_sprites.py` generating the Ossuary Warrens (Moon, Sphere 1) vertical-slice 32x32 tileset and core entity/item sprites (`assets/tiles/sphere_1_moon.png`, `assets/sprites/{avatars,monsters,npcs,items}.png`).
+  - Upgraded `src/ui/map_view.gd` to support both `"tiles"` and `"glyph"` modes, `TEXTURE_FILTER_NEAREST`, integer scaling, mouse-wheel/setting camera zoom, FOV falloff, remembered dimming, optional decorative lighting, non-color signifiers (hostile brackets, NPC diamond, elite crown, boss aureole, HP micro-bar, telegraph icon, hazard patterns), and per-cell glyph fallback.
+  - Verified `test_m8_renderer` (3/3, 13 checks), `test_m7_settings` (3/3, 80 checks), and `tools/ui_smoke.gd` at `1280x720` (`39` steps, `0` failures).
+- **Next submilestone:** M8.3 — The Seven Spheres Incarnate (all 7 Sphere environmental tile atlases & regional visual identity).
 
 ## Owner decisions still open
 

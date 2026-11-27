@@ -1,0 +1,79 @@
+{
+  "schema": "asset_provenance",
+  "version": 1,
+  "entries": [
+    {
+      "asset_id": "sphere_1_moon",
+      "path": "res://assets/tiles/sphere_1_moon.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "sphere:moon"
+      ],
+      "modification_history": [
+        "Generated M8.2 vertical slice: Sphere 1 (moon) 32x32 tiles & features"
+      ]
+    },
+    {
+      "asset_id": "avatars",
+      "path": "res://assets/sprites/avatars.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "player",
+        "species",
+        "classes",
+        "masks"
+      ],
+      "modification_history": [
+        "Generated M8.2 vertical slice: Vertical-slice layered player avatars & masks"
+      ]
+    },
+    {
+      "asset_id": "monsters",
+      "path": "res://assets/sprites/monsters.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "monsters"
+      ],
+      "modification_history": [
+        "Generated M8.2 vertical slice: Vertical-slice monster family silhouettes"
+      ]
+    },
+    {
+      "asset_id": "npcs",
+      "path": "res://assets/sprites/npcs.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "npcs"
+      ],
+      "modification_history": [
+        "Generated M8.2 vertical slice: Vertical-slice NPC base sprite"
+      ]
+    },
+    {
+      "asset_id": "items",
+      "path": "res://assets/sprites/items.png",
+      "source": "Abyssal Sovereign internal procedural generator",
+      "author_or_method": "tools/gen_sprites.py (PIL/Pillow deterministic pixel renderer)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "items"
+      ],
+      "modification_history": [
+        "Generated M8.2 vertical slice: Vertical-slice item category sprites"
+      ]
+    }
+  ]
+}

@@ -10,6 +10,7 @@ enum Screen { TITLE, CREATE, GAME, END, ERROR }
 
 var db: ContentDB
 var settings := GameSettings.new()
+var registry := AssetRegistry.new()
 var codex := Codex.new()
 var world: World
 var screen: Screen = Screen.TITLE
@@ -392,7 +393,11 @@ func _build_game_screen() -> void:
 	root.add_child(left)
 	map = MapView.new()
 	map.world = world
-	map.tile_px = settings.tile_size()
+	map.registry = registry
+	_sync_map_settings()
+	map.zoom_changed.connect(func(z: float) -> void:
+		settings.camera_zoom = z
+		settings.save_to_disk())
 	map.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	map.tile_tapped.connect(_on_tile_tapped)
 	map.tile_inspected.connect(_on_tile_inspected)
@@ -484,9 +489,23 @@ func _key_help(mask_hint: String) -> String:
 		_key_name("atlas"), _key_name("threads"), _key_name("logfilter")]
 
 
+func _sync_map_settings() -> void:
+	if map == null:
+		return
+	map.tile_px = settings.tile_size()
+	map.render_mode = settings.render_mode
+	map.integer_scale = settings.integer_scale
+	map.camera_zoom = settings.camera_zoom
+	map.decorative_lighting = settings.decorative_lighting
+	map.color_mode = settings.color_mode
+	map.high_contrast = settings.high_contrast
+	map.queue_redraw()
+
+
 func _refresh() -> void:
 	if world == null or map == null:
 		return
+	_sync_map_settings()
 	map.queue_redraw()
 	_maybe_hint()
 	_update_hud()
@@ -1679,6 +1698,36 @@ func _show_settings(back: Callable) -> void:
 		func(d: int) -> void:
 			settings.tile_size_index = clampi(settings.tile_size_index + d, 0, GameSettings.TILE_SIZES.size() - 1)
 			rebuild.call()))
+	col.add_child(_btn("Renderer: %s" % ("Tiles (32x32)" if settings.render_mode == "tiles" else "Classic Glyph"), func() -> void:
+		settings.render_mode = "glyph" if settings.render_mode == "tiles" else "tiles"
+		_sync_map_settings()
+		rebuild.call()))
+	col.add_child(_stepper("Camera zoom", "%d%%" % int(round(settings.camera_zoom * 100)),
+		func(d: int) -> void:
+			var idx := GameSettings.ZOOM_LEVELS.find(settings.camera_zoom)
+			if idx < 0:
+				idx = 1
+			settings.camera_zoom = GameSettings.ZOOM_LEVELS[clampi(idx + d, 0, GameSettings.ZOOM_LEVELS.size() - 1)]
+			_sync_map_settings()
+			rebuild.call()))
+	col.add_child(_btn("Integer tile scaling: %s" % ("on" if settings.integer_scale else "off"), func() -> void:
+		settings.integer_scale = not settings.integer_scale
+		_sync_map_settings()
+		rebuild.call()))
+	col.add_child(_btn("Decorative lighting: %s" % ("on" if settings.decorative_lighting else "off"), func() -> void:
+		settings.decorative_lighting = not settings.decorative_lighting
+		_sync_map_settings()
+		rebuild.call()))
+	col.add_child(_stepper("Color palette", GameSettings.COLOR_MODES[settings.color_mode],
+		func(d: int) -> void:
+			var n := GameSettings.COLOR_MODES.size()
+			settings.color_mode = (settings.color_mode + d + n) % n
+			_sync_map_settings()
+			rebuild.call()))
+	col.add_child(_btn("High contrast: %s" % ("on" if settings.high_contrast else "off"), func() -> void:
+		settings.high_contrast = not settings.high_contrast
+		_sync_map_settings()
+		rebuild.call()))
 	col.add_child(_stepper("Travel speed", "%d steps/s" % settings.travel_speed,
 		func(d: int) -> void:
 			settings.travel_speed = clampi(settings.travel_speed + d * 5, 5, 60)

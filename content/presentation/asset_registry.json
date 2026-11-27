@@ -1,0 +1,790 @@
+{
+  "schema": "asset_registry",
+  "version": 1,
+  "atlases": {
+    "sphere_1_moon": {
+      "path": "res://assets/tiles/sphere_1_moon.png",
+      "cell": 32,
+      "size": [
+        256,
+        256
+      ]
+    },
+    "avatars": {
+      "path": "res://assets/sprites/avatars.png",
+      "cell": 32,
+      "size": [
+        256,
+        128
+      ]
+    },
+    "monsters": {
+      "path": "res://assets/sprites/monsters.png",
+      "cell": 32,
+      "size": [
+        256,
+        64
+      ]
+    },
+    "npcs": {
+      "path": "res://assets/sprites/npcs.png",
+      "cell": 32,
+      "size": [
+        128,
+        32
+      ]
+    },
+    "items": {
+      "path": "res://assets/sprites/items.png",
+      "cell": 32,
+      "size": [
+        256,
+        64
+      ]
+    }
+  },
+  "tiles": {
+    "s1:1:0": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    "s1:1:1": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        32,
+        0,
+        32,
+        32
+      ]
+    },
+    "s1:1:2": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        64,
+        0,
+        32,
+        32
+      ]
+    },
+    "s1:1:3": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        96,
+        0,
+        32,
+        32
+      ]
+    },
+    "s1:0:0": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        128,
+        0,
+        32,
+        32
+      ]
+    },
+    "s1:0:1": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        160,
+        0,
+        32,
+        32
+      ]
+    },
+    "s1:0:2": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        192,
+        0,
+        32,
+        32
+      ]
+    },
+    "s1:0:3": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        224,
+        0,
+        32,
+        32
+      ]
+    },
+    "s1:2": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        0,
+        32,
+        32,
+        32
+      ]
+    },
+    "s1:3": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        32,
+        32,
+        32,
+        32
+      ]
+    },
+    "s1:4": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        64,
+        32,
+        32,
+        32
+      ]
+    },
+    "s1:5": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        96,
+        32,
+        32,
+        32
+      ]
+    },
+    "s1:10": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        128,
+        32,
+        32,
+        32
+      ]
+    },
+    "s1:11": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        160,
+        32,
+        32,
+        32
+      ]
+    },
+    "s1:12": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        192,
+        32,
+        32,
+        32
+      ]
+    },
+    "s1:13": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        224,
+        32,
+        32,
+        32
+      ]
+    },
+    "s1:14": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        0,
+        64,
+        32,
+        32
+      ]
+    },
+    "s1:6": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        32,
+        64,
+        32,
+        32
+      ]
+    },
+    "s1:7": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        64,
+        64,
+        32,
+        32
+      ]
+    },
+    "s1:8": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        96,
+        64,
+        32,
+        32
+      ]
+    },
+    "s1:9": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        128,
+        64,
+        32,
+        32
+      ]
+    }
+  },
+  "features": {
+    "s1:altar:ready": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        160,
+        64,
+        32,
+        32
+      ]
+    },
+    "s1:altar:used": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        192,
+        64,
+        32,
+        32
+      ]
+    },
+    "s1:shrine:ready": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        224,
+        64,
+        32,
+        32
+      ]
+    },
+    "s1:shrine:used": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        0,
+        96,
+        32,
+        32
+      ]
+    },
+    "s1:ritual_circle:ready": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        32,
+        96,
+        32,
+        32
+      ]
+    },
+    "s1:ritual_circle:used": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        64,
+        96,
+        32,
+        32
+      ]
+    },
+    "s1:vault_gate:ready": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        96,
+        96,
+        32,
+        32
+      ]
+    },
+    "s1:vault_gate:used": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        128,
+        96,
+        32,
+        32
+      ]
+    },
+    "s1:merchant:ready": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        160,
+        96,
+        32,
+        32
+      ]
+    },
+    "s1:merchant:used": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        192,
+        96,
+        32,
+        32
+      ]
+    },
+    "s1:contract_lectern:ready": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        224,
+        96,
+        32,
+        32
+      ]
+    },
+    "s1:contract_lectern:used": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        0,
+        128,
+        32,
+        32
+      ]
+    },
+    "s1:challenge:ready": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        32,
+        128,
+        32,
+        32
+      ]
+    },
+    "s1:challenge:used": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        64,
+        128,
+        32,
+        32
+      ]
+    },
+    "s1:secret_door:ready": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        96,
+        128,
+        32,
+        32
+      ]
+    },
+    "s1:secret_door:used": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        128,
+        128,
+        32,
+        32
+      ]
+    },
+    "s1:trap:ready": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        160,
+        128,
+        32,
+        32
+      ]
+    },
+    "s1:trap:used": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        192,
+        128,
+        32,
+        32
+      ]
+    },
+    "s1:ward_sigil:ready": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        224,
+        128,
+        32,
+        32
+      ]
+    },
+    "s1:ward_sigil:used": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        0,
+        160,
+        32,
+        32
+      ]
+    },
+    "s1:rune_puzzle:ready": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        32,
+        160,
+        32,
+        32
+      ]
+    },
+    "s1:rune_puzzle:used": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        64,
+        160,
+        32,
+        32
+      ]
+    },
+    "s1:abandoned_rite:ready": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        96,
+        160,
+        32,
+        32
+      ]
+    },
+    "s1:abandoned_rite:used": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        128,
+        160,
+        32,
+        32
+      ]
+    },
+    "s1:sanctuary_hearth:ready": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        160,
+        160,
+        32,
+        32
+      ]
+    },
+    "s1:sanctuary_hearth:used": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        192,
+        160,
+        32,
+        32
+      ]
+    },
+    "s1:echo_cache:ready": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        224,
+        160,
+        32,
+        32
+      ]
+    },
+    "s1:echo_cache:used": {
+      "atlas": "sphere_1_moon",
+      "rect": [
+        0,
+        192,
+        32,
+        32
+      ]
+    }
+  },
+  "avatars": {
+    "origin:default": {
+      "atlas": "avatars",
+      "rect": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    "origin:human": {
+      "atlas": "avatars",
+      "rect": [
+        32,
+        0,
+        32,
+        32
+      ]
+    },
+    "origin:revenant": {
+      "atlas": "avatars",
+      "rect": [
+        64,
+        0,
+        32,
+        32
+      ]
+    },
+    "origin:cambion": {
+      "atlas": "avatars",
+      "rect": [
+        96,
+        0,
+        32,
+        32
+      ]
+    },
+    "calling:default": {
+      "atlas": "avatars",
+      "rect": [
+        128,
+        0,
+        32,
+        32
+      ]
+    },
+    "calling:fallen_knight": {
+      "atlas": "avatars",
+      "rect": [
+        160,
+        0,
+        32,
+        32
+      ]
+    },
+    "calling:occultist": {
+      "atlas": "avatars",
+      "rect": [
+        192,
+        0,
+        32,
+        32
+      ]
+    },
+    "calling:assassin": {
+      "atlas": "avatars",
+      "rect": [
+        224,
+        0,
+        32,
+        32
+      ]
+    },
+    "mask:nyx": {
+      "atlas": "avatars",
+      "rect": [
+        0,
+        32,
+        32,
+        32
+      ]
+    },
+    "mask:eris": {
+      "atlas": "avatars",
+      "rect": [
+        32,
+        32,
+        32,
+        32
+      ]
+    },
+    "mask:lilith": {
+      "atlas": "avatars",
+      "rect": [
+        64,
+        32,
+        32,
+        32
+      ]
+    },
+    "mask:lux_venefica": {
+      "atlas": "avatars",
+      "rect": [
+        96,
+        32,
+        32,
+        32
+      ]
+    }
+  },
+  "monsters": {
+    "default": {
+      "atlas": "monsters",
+      "rect": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    "family:vermin": {
+      "atlas": "monsters",
+      "rect": [
+        32,
+        0,
+        32,
+        32
+      ]
+    },
+    "family:ossuary_undead": {
+      "atlas": "monsters",
+      "rect": [
+        64,
+        0,
+        32,
+        32
+      ]
+    },
+    "family:dominion_soldier": {
+      "atlas": "monsters",
+      "rect": [
+        96,
+        0,
+        32,
+        32
+      ]
+    },
+    "family:inquisition_agent": {
+      "atlas": "monsters",
+      "rect": [
+        128,
+        0,
+        32,
+        32
+      ]
+    },
+    "family:false_sun_manifestation": {
+      "atlas": "monsters",
+      "rect": [
+        160,
+        0,
+        32,
+        32
+      ]
+    },
+    "warren_rat": {
+      "atlas": "monsters",
+      "rect": [
+        192,
+        0,
+        32,
+        32
+      ]
+    },
+    "catalogued_dead": {
+      "atlas": "monsters",
+      "rect": [
+        224,
+        0,
+        32,
+        32
+      ]
+    },
+    "preliator_sentinel": {
+      "atlas": "monsters",
+      "rect": [
+        0,
+        32,
+        32,
+        32
+      ]
+    }
+  },
+  "npcs": {
+    "default": {
+      "atlas": "npcs",
+      "rect": [
+        0,
+        0,
+        32,
+        32
+      ]
+    }
+  },
+  "items": {
+    "default": {
+      "atlas": "items",
+      "rect": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    "kind:weapon": {
+      "atlas": "items",
+      "rect": [
+        32,
+        0,
+        32,
+        32
+      ]
+    },
+    "kind:ranged": {
+      "atlas": "items",
+      "rect": [
+        64,
+        0,
+        32,
+        32
+      ]
+    },
+    "kind:armor": {
+      "atlas": "items",
+      "rect": [
+        96,
+        0,
+        32,
+        32
+      ]
+    },
+    "kind:amulet": {
+      "atlas": "items",
+      "rect": [
+        128,
+        0,
+        32,
+        32
+      ]
+    },
+    "kind:consumable": {
+      "atlas": "items",
+      "rect": [
+        160,
+        0,
+        32,
+        32
+      ]
+    },
+    "kind:consumable:scroll": {
+      "atlas": "items",
+      "rect": [
+        192,
+        0,
+        32,
+        32
+      ]
+    },
+    "kind:consumable:projectile": {
+      "atlas": "items",
+      "rect": [
+        224,
+        0,
+        32,
+        32
+      ]
+    },
+    "kind:relic": {
+      "atlas": "items",
+      "rect": [
+        0,
+        32,
+        32,
+        32
+      ]
+    },
+    "kind:key": {
+      "atlas": "items",
+      "rect": [
+        32,
+        32,
+        32,
+        32
+      ]
+    }
+  },
+  "statuses": {},
+  "icons": {},
+  "emblems": {}
+}

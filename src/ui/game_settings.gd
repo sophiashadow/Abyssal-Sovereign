@@ -5,10 +5,20 @@ extends RefCounted
 
 const PATH := "user://settings.cfg"
 const TEXT_SCALES: Array[float] = [0.85, 1.0, 1.15, 1.3, 1.5, 1.75]
-const TILE_SIZES: Array[int] = [16, 20, 24, 28, 32, 40, 48]
+const TILE_SIZES: Array[int] = [16, 20, 24, 28, 32, 40, 48, 64]
+const ZOOM_LEVELS: Array[float] = [0.75, 1.0, 1.25, 1.5, 2.0]
+const COLOR_MODES: Array[String] = ["Standard", "Deutan/Protan", "Tritan"]
 
 var text_scale_index: int = 1
-var tile_size_index: int = 2
+var tile_size_index: int = 4
+## M8.2 presentation & accessibility preferences (never affect simulation).
+var render_mode: String = "tiles" ## "tiles" or "glyph"
+var integer_scale: bool = true
+var camera_zoom: float = 1.0
+var decorative_lighting: bool = true
+var color_mode: int = 0 ## 0=Standard, 1=R/G-safe, 2=B/Y-safe
+var high_contrast: bool = false
+var left_handed: bool = false
 ## On-screen d-pad and action buttons. Defaults on for touch devices.
 var touch_controls: bool = false
 ## Steps per second while travelling or auto-exploring.
@@ -114,6 +124,14 @@ func load_from_disk() -> void:
 		return
 	text_scale_index = clampi(int(cfg.get_value("display", "text_scale_index", text_scale_index)), 0, TEXT_SCALES.size() - 1)
 	tile_size_index = clampi(int(cfg.get_value("display", "tile_size_index", tile_size_index)), 0, TILE_SIZES.size() - 1)
+	var rm := String(cfg.get_value("display", "render_mode", render_mode))
+	render_mode = rm if rm in ["tiles", "glyph"] else "tiles"
+	integer_scale = bool(cfg.get_value("display", "integer_scale", integer_scale))
+	camera_zoom = clampf(float(cfg.get_value("display", "camera_zoom", camera_zoom)), 0.75, 2.0)
+	decorative_lighting = bool(cfg.get_value("display", "decorative_lighting", decorative_lighting))
+	color_mode = clampi(int(cfg.get_value("accessibility", "color_mode", color_mode)), 0, COLOR_MODES.size() - 1)
+	high_contrast = bool(cfg.get_value("accessibility", "high_contrast", high_contrast))
+	left_handed = bool(cfg.get_value("accessibility", "left_handed", left_handed))
 	touch_controls = bool(cfg.get_value("input", "touch_controls", touch_controls))
 	travel_speed = clampi(int(cfg.get_value("input", "travel_speed", travel_speed)), 5, 60)
 	instant_auto = bool(cfg.get_value("input", "instant_auto", instant_auto))
@@ -148,6 +166,13 @@ func save_to_disk() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("display", "text_scale_index", text_scale_index)
 	cfg.set_value("display", "tile_size_index", tile_size_index)
+	cfg.set_value("display", "render_mode", render_mode)
+	cfg.set_value("display", "integer_scale", integer_scale)
+	cfg.set_value("display", "camera_zoom", camera_zoom)
+	cfg.set_value("display", "decorative_lighting", decorative_lighting)
+	cfg.set_value("accessibility", "color_mode", color_mode)
+	cfg.set_value("accessibility", "high_contrast", high_contrast)
+	cfg.set_value("accessibility", "left_handed", left_handed)
 	cfg.set_value("input", "touch_controls", touch_controls)
 	cfg.set_value("input", "travel_speed", travel_speed)
 	cfg.set_value("input", "instant_auto", instant_auto)
