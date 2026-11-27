@@ -1,0 +1,167 @@
+{
+  "schema": "soundtrack_manifest",
+  "version": 1,
+  "owner_note": "M8.8 placeholder liturgical stems establish adaptive music wiring, bus routing, crossfading, and context transitions. All stems carry placeholder_liturgical_temp until VENEFICA LUX external studio tracks are authorized and dropped into the manifest paths.",
+  "contexts": [
+    {
+      "context_id": "main_title",
+      "title": "Litany of the Unwritten Door",
+      "track_path": "res://assets/audio/music/main_title.ogg",
+      "loop": true,
+      "mode_or_key": "D Phrygian",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX external title theme"
+    },
+    {
+      "context_id": "character_creation",
+      "title": "Vigil of the Eight Origins",
+      "track_path": "res://assets/audio/music/character_creation.ogg",
+      "loop": true,
+      "mode_or_key": "C Dorian",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX character vigil theme"
+    },
+    {
+      "context_id": "sphere_moon",
+      "title": "Nocturne of the Ossuary Warrens",
+      "track_path": "res://assets/audio/music/sphere_moon.ogg",
+      "loop": true,
+      "mode_or_key": "A Aeolian",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX Sphere 1 (Moon)"
+    },
+    {
+      "context_id": "sphere_mercury",
+      "title": "Canon of the Tithe Vaults",
+      "track_path": "res://assets/audio/music/sphere_mercury.ogg",
+      "loop": true,
+      "mode_or_key": "E Phrygian",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX Sphere 2 (Mercury)"
+    },
+    {
+      "context_id": "sphere_venus",
+      "title": "Choir of Tarnished Velvet",
+      "track_path": "res://assets/audio/music/sphere_venus.ogg",
+      "loop": true,
+      "mode_or_key": "F# Harmonic Minor",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX Sphere 3 (Venus)"
+    },
+    {
+      "context_id": "sphere_sun",
+      "title": "Hymn of the False Dawn",
+      "track_path": "res://assets/audio/music/sphere_sun.ogg",
+      "loop": true,
+      "mode_or_key": "D Lydian Dominant",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX Sphere 4 (Sun)"
+    },
+    {
+      "context_id": "sphere_mars",
+      "title": "Forge-Dirge of the Scriptorium",
+      "track_path": "res://assets/audio/music/sphere_mars.ogg",
+      "loop": true,
+      "mode_or_key": "C# Locrian",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX Sphere 5 (Mars)"
+    },
+    {
+      "context_id": "sphere_jupiter",
+      "title": "Decree of the Porphyry Hall",
+      "track_path": "res://assets/audio/music/sphere_jupiter.ogg",
+      "loop": true,
+      "mode_or_key": "G Minor",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX Sphere 6 (Jupiter)"
+    },
+    {
+      "context_id": "sphere_saturn",
+      "title": "Threshold of the Sealed Stair",
+      "track_path": "res://assets/audio/music/sphere_saturn.ogg",
+      "loop": true,
+      "mode_or_key": "B Double Harmonic",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX Sphere 7 (Saturn)"
+    },
+    {
+      "context_id": "sanctuaries",
+      "title": "Rest Beneath the Watchful Candle",
+      "track_path": "res://assets/audio/music/sanctuaries.ogg",
+      "loop": true,
+      "mode_or_key": "F Dorian",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX Sanctuary theme"
+    },
+    {
+      "context_id": "boss_encounters",
+      "title": "Adversary at the Seal",
+      "track_path": "res://assets/audio/music/boss_encounters.ogg",
+      "loop": true,
+      "mode_or_key": "D Diminished",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX Boss & Guardian theme"
+    },
+    {
+      "context_id": "ending_serpents_way",
+      "title": "Canticle of the Serpent's Seam",
+      "track_path": "res://assets/audio/music/ending_serpents_way.ogg",
+      "loop": false,
+      "mode_or_key": "E Minor",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX Ending: Serpent's Way"
+    },
+    {
+      "context_id": "ending_way_of_return",
+      "title": "Processional of Return",
+      "track_path": "res://assets/audio/music/ending_way_of_return.ogg",
+      "loop": false,
+      "mode_or_key": "C Dorian",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX Ending: Way of Return"
+    },
+    {
+      "context_id": "ending_unwritten_door",
+      "title": "Beyond the Unwritten Door",
+      "track_path": "res://assets/audio/music/ending_unwritten_door.ogg",
+      "loop": false,
+      "mode_or_key": "D Phrygian",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX Ending: Unwritten Door"
+    },
+    {
+      "context_id": "ending_apotheosis",
+      "title": "Coronation by Decree",
+      "track_path": "res://assets/audio/music/ending_apotheosis.ogg",
+      "loop": false,
+      "mode_or_key": "B Phrygian Dominant",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX Ending: Apotheosis by Decree"
+    },
+    {
+      "context_id": "death_named_losses",
+      "title": "Lament of the Catalogued Dead",
+      "track_path": "res://assets/audio/music/death_named_losses.ogg",
+      "loop": false,
+      "mode_or_key": "A Minor",
+      "status": "placeholder_liturgical_temp",
+      "license_status": "project-original-placeholder",
+      "replacement_target": "VENEFICA LUX Death & Named Loss lament"
+    }
+  ]
+}

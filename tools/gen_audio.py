@@ -277,6 +277,76 @@ def gen_ambience() -> list[dict]:
     return entries
 
 
+def gen_music_placeholders() -> list[dict]:
+    """Generate compact liturgical organ/choir placeholder stems for all 16 M8.8 soundtrack contexts."""
+    manifest = json.loads((PRES / "soundtrack_manifest.json").read_text())
+    entries: list[dict] = []
+    dur = 6.0  # Integer cycles for seamless liturgical motif loops
+    n = int(dur * SR)
+    t = t_arr(dur)
+
+    # Modal interval motifs (ratios over root Hz)
+    roots = {
+        "main_title": 146.83, "character_creation": 130.81, "sphere_moon": 110.0,
+        "sphere_mercury": 164.81, "sphere_venus": 185.0, "sphere_sun": 146.83,
+        "sphere_mars": 138.59, "sphere_jupiter": 98.0, "sphere_saturn": 123.47,
+        "sanctuaries": 174.61, "boss_encounters": 146.83,
+        "ending_serpents_way": 164.81, "ending_way_of_return": 130.81,
+        "ending_unwritten_door": 146.83, "ending_apotheosis": 123.47,
+        "death_named_losses": 110.0,
+    }
+    motifs = {
+        "boss_encounters": [1.0, 1.059, 1.414, 1.335, 1.0, 1.189],
+        "ending_apotheosis": [1.0, 1.25, 1.5, 1.875, 2.0, 1.5],
+        "ending_way_of_return": [1.0, 1.189, 1.5, 1.335, 1.189, 1.0],
+        "death_named_losses": [1.0, 1.189, 1.059, 1.0, 0.891, 0.75],
+    }
+    default_motif = [1.0, 1.059, 1.335, 1.5, 1.335, 1.189]
+
+    for idx, ctx in enumerate(manifest["contexts"]):
+        cid = ctx["context_id"]
+        is_loop = bool(ctx.get("loop", True))
+        root = roots.get(cid, 130.81)
+        notes = motifs.get(cid, default_motif)
+        sig = np.zeros(n)
+
+        # Slow solemn organ pedal + fifth
+        k_bass = max(1, int(round((root * 0.5) * dur))) / dur
+        k_fifth = max(1, int(round((root * 0.75) * dur))) / dur
+        swell = 0.72 + 0.28 * np.sin(2 * np.pi * (1.0 / dur) * t)
+        sig += (0.34 * np.sin(2 * np.pi * k_bass * t) + 0.22 * np.sin(2 * np.pi * k_fifth * t)) * swell
+
+        # 6 slow liturgical chime/organ voices (1s each)
+        step = n // len(notes)
+        for ni, ratio in enumerate(notes):
+            i0 = ni * step
+            ln = min(step, n - i0)
+            tt = np.arange(ln) / float(SR)
+            freq = max(1, int(round(root * ratio * (ln / float(SR))))) / (ln / float(SR))
+            atk = np.minimum(1.0, tt / 0.08)
+            rel = np.exp(-2.1 * tt)
+            voice = (0.36 * np.sin(2 * np.pi * freq * tt) + 0.16 * np.sin(2 * np.pi * (freq * 2.0) * tt) + 0.08 * np.sin(2 * np.pi * (freq * 3.0) * tt))
+            sig[i0:i0 + ln] += voice * atk * rel
+
+        if not is_loop:
+            fade_n = min(n // 4, int(1.2 * SR))
+            sig[-fade_n:] *= np.linspace(1.0, 0.0, fade_n)
+
+        fname = f"{cid}.ogg"
+        write_ogg(ASSETS / "audio" / "music" / fname, 0.45 * sig, loop=is_loop)
+        entries.append({
+            "asset_id": f"music_{cid}",
+            "path": f"res://assets/audio/music/{fname}",
+            "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+            "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+            "license_status": "project-original-placeholder",
+            "approval_status": "placeholder_liturgical_temp",
+            "associated_entities": [f"soundtrack:{cid}"],
+            "modification_history": [f"Generated M8.8 placeholder liturgical stem: {ctx['title']}"],
+        })
+    return entries
+
+
 def update_provenance(new_entries: list[dict]) -> None:
     prov_path = PRES / "asset_provenance.json"
     existing: list[dict] = []
@@ -294,9 +364,9 @@ def update_provenance(new_entries: list[dict]) -> None:
 
 def main() -> None:
     ensure_dirs()
-    entries = gen_sfx() + gen_ambience()
+    entries = gen_sfx() + gen_ambience() + gen_music_placeholders()
     update_provenance(entries)
-    print(f"Generated {len(entries)} M8.7 audio assets into {ASSETS / 'audio'}")
+    print(f"Generated {len(entries)} M8.7/M8.8 audio assets into {ASSETS / 'audio'}")
 
 
 if __name__ == "__main__":

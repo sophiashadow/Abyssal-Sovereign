@@ -337,6 +337,7 @@ func _show_error(heading: String, errors: PackedStringArray, offer_discard: bool
 func _show_create() -> void:
 	_clear()
 	screen = Screen.CREATE
+	_sync_audio_context()
 	if _pick_species == "":
 		_pick_species = db.ids("species")[0]
 	if _pick_class == "":
@@ -675,11 +676,45 @@ func _key_help(mask_hint: String) -> String:
 func _sync_audio_context() -> void:
 	if audio == null:
 		return
+	if screen == Screen.TITLE:
+		audio.set_ambience_sphere(0)
+		audio.play_music_context("main_title")
+		return
+	if screen == Screen.CREATE:
+		audio.set_ambience_sphere(0)
+		audio.play_music_context("character_creation")
+		return
 	if world != null and world.state == World.State.PLAYING:
 		var fd := world.current_floor_def()
-		audio.set_ambience_sphere(int(fd.get("sphere", 1)))
+		var sp := clampi(int(fd.get("sphere", 1)), 1, 7)
+		audio.set_ambience_sphere(sp)
+		var ctx := "sphere_" + AudioManager.SPHERE_NAMES[sp]
+		var fl := world.current_floor()
+		if fl != null and fl.get_tile(world.player.pos) == Tiles.SANCTUARY_FLOOR:
+			ctx = "sanctuaries"
+		else:
+			for foe in world.visible_hostiles():
+				if foe.is_boss:
+					ctx = "boss_encounters"
+					break
+		audio.play_music_context(ctx)
+	elif world != null and world.state == World.State.WON:
+		audio.set_ambience_sphere(0)
+		var vid := String(world.victory_kind().get("id", ""))
+		var ctx := "ending_unwritten_door"
+		if vid == "by_decree":
+			ctx = "ending_apotheosis"
+		elif vid == "serpent":
+			ctx = "ending_serpents_way"
+		elif vid == "return":
+			ctx = "ending_way_of_return"
+		audio.play_music_context(ctx, 0.8)
+	elif world != null and world.state == World.State.DEAD:
+		audio.set_ambience_sphere(0)
+		audio.play_music_context("death_named_losses", 0.6)
 	else:
 		audio.set_ambience_sphere(0)
+		audio.play_music_context("main_title")
 
 
 func _sync_map_settings() -> void:

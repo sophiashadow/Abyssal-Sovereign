@@ -625,6 +625,230 @@
       "modification_history": [
         "Generated M8.7 ambience loop: Saturn: Sealed Stair abyssal void stillness"
       ]
+    },
+    {
+      "asset_id": "music_main_title",
+      "path": "res://assets/audio/music/main_title.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:main_title"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Litany of the Unwritten Door"
+      ]
+    },
+    {
+      "asset_id": "music_character_creation",
+      "path": "res://assets/audio/music/character_creation.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:character_creation"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Vigil of the Eight Origins"
+      ]
+    },
+    {
+      "asset_id": "music_sphere_moon",
+      "path": "res://assets/audio/music/sphere_moon.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:sphere_moon"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Nocturne of the Ossuary Warrens"
+      ]
+    },
+    {
+      "asset_id": "music_sphere_mercury",
+      "path": "res://assets/audio/music/sphere_mercury.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:sphere_mercury"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Canon of the Tithe Vaults"
+      ]
+    },
+    {
+      "asset_id": "music_sphere_venus",
+      "path": "res://assets/audio/music/sphere_venus.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:sphere_venus"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Choir of Tarnished Velvet"
+      ]
+    },
+    {
+      "asset_id": "music_sphere_sun",
+      "path": "res://assets/audio/music/sphere_sun.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:sphere_sun"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Hymn of the False Dawn"
+      ]
+    },
+    {
+      "asset_id": "music_sphere_mars",
+      "path": "res://assets/audio/music/sphere_mars.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:sphere_mars"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Forge-Dirge of the Scriptorium"
+      ]
+    },
+    {
+      "asset_id": "music_sphere_jupiter",
+      "path": "res://assets/audio/music/sphere_jupiter.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:sphere_jupiter"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Decree of the Porphyry Hall"
+      ]
+    },
+    {
+      "asset_id": "music_sphere_saturn",
+      "path": "res://assets/audio/music/sphere_saturn.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:sphere_saturn"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Threshold of the Sealed Stair"
+      ]
+    },
+    {
+      "asset_id": "music_sanctuaries",
+      "path": "res://assets/audio/music/sanctuaries.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:sanctuaries"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Rest Beneath the Watchful Candle"
+      ]
+    },
+    {
+      "asset_id": "music_boss_encounters",
+      "path": "res://assets/audio/music/boss_encounters.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:boss_encounters"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Adversary at the Seal"
+      ]
+    },
+    {
+      "asset_id": "music_ending_serpents_way",
+      "path": "res://assets/audio/music/ending_serpents_way.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:ending_serpents_way"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Canticle of the Serpent's Seam"
+      ]
+    },
+    {
+      "asset_id": "music_ending_way_of_return",
+      "path": "res://assets/audio/music/ending_way_of_return.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:ending_way_of_return"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Processional of Return"
+      ]
+    },
+    {
+      "asset_id": "music_ending_unwritten_door",
+      "path": "res://assets/audio/music/ending_unwritten_door.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:ending_unwritten_door"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Beyond the Unwritten Door"
+      ]
+    },
+    {
+      "asset_id": "music_ending_apotheosis",
+      "path": "res://assets/audio/music/ending_apotheosis.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:ending_apotheosis"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Coronation by Decree"
+      ]
+    },
+    {
+      "asset_id": "music_death_named_losses",
+      "path": "res://assets/audio/music/death_named_losses.ogg",
+      "source": "Abyssal Sovereign internal procedural placeholder liturgical stem",
+      "author_or_method": "tools/gen_audio.py (numpy modal organ/bell placeholder + ffmpeg libvorbis)",
+      "license_status": "project-original-placeholder",
+      "approval_status": "placeholder_liturgical_temp",
+      "associated_entities": [
+        "soundtrack:death_named_losses"
+      ],
+      "modification_history": [
+        "Generated M8.8 placeholder liturgical stem: Lament of the Catalogued Dead"
+      ]
     }
   ]
 }

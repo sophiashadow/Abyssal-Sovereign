@@ -8,6 +8,7 @@ extends Node
 const BUSES: Array[String] = ["Master", "Music", "Ambience", "Combat", "Interface", "Narrative"]
 const SFX_POOL_SIZE := 6
 const SPHERE_NAMES: Array[String] = ["", "moon", "mercury", "venus", "sun", "mars", "jupiter", "saturn"]
+const SOUNDTRACK_MANIFEST_PATH := "res://content/presentation/soundtrack_manifest.json"
 
 var audio_enabled: bool = true
 var current_sphere: int = 0
@@ -22,12 +23,37 @@ var _ambience_player: AudioStreamPlayer
 var _music_decks: Array[AudioStreamPlayer] = []
 var _active_deck: int = 0
 var _stream_cache: Dictionary = {}
+var _music_manifest: Dictionary = {}
 
 
 func _ready() -> void:
 	_cosmetic_rng.seed = 0x56454E45
 	ensure_buses()
 	_ensure_players()
+	ensure_manifest()
+
+
+func ensure_manifest() -> void:
+	if not _music_manifest.is_empty():
+		return
+	var abs_path := ProjectSettings.globalize_path(SOUNDTRACK_MANIFEST_PATH)
+	var text := ""
+	if FileAccess.file_exists(SOUNDTRACK_MANIFEST_PATH):
+		text = FileAccess.get_file_as_string(SOUNDTRACK_MANIFEST_PATH)
+	elif FileAccess.file_exists(abs_path):
+		text = FileAccess.get_file_as_string(abs_path)
+	if text.is_empty():
+		return
+	var parsed: Variant = JSON.parse_string(text)
+	if parsed is Dictionary:
+		for ctx in parsed.get("contexts", []):
+			if ctx is Dictionary and ctx.has("context_id"):
+				_music_manifest[String(ctx["context_id"])] = ctx
+
+
+func manifest_contexts() -> Dictionary:
+	ensure_manifest()
+	return _music_manifest
 
 
 func _exit_tree() -> void:
@@ -183,7 +209,17 @@ func set_ambience_sphere(sphere_num: int) -> bool:
 	return true
 
 
-func play_music_track(context_id: String, res_path: String, fade_sec: float = 1.2) -> bool:
+func play_music_context(context_id: String, fade_sec: float = 1.2) -> bool:
+	ensure_manifest()
+	if not _music_manifest.has(context_id):
+		return play_music_track(context_id, "", fade_sec, true)
+	var ctx: Dictionary = _music_manifest[context_id]
+	var path := String(ctx.get("track_path", ""))
+	var want_loop := bool(ctx.get("loop", true))
+	return play_music_track(context_id, path, fade_sec, want_loop)
+
+
+func play_music_track(context_id: String, res_path: String, fade_sec: float = 1.2, want_loop: bool = true) -> bool:
 	if context_id == current_music_context and not _music_decks.is_empty() and _music_decks[_active_deck].playing:
 		return true
 	current_music_context = context_id
@@ -193,7 +229,7 @@ func play_music_track(context_id: String, res_path: String, fade_sec: float = 1.
 			if m.playing:
 				m.stop()
 		return false
-	var stream := _load_stream(res_path, true)
+	var stream := _load_stream(res_path, want_loop)
 	if stream == null:
 		for m in _music_decks:
 			if m.playing:

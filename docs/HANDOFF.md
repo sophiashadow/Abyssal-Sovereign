@@ -122,7 +122,12 @@ Spec: `docs/M8_SPEC.md`.
   - Extended `src/ui/game_settings.gd` with `[audio]` controls (`audio_enabled`, `vol_master`, `vol_music`, `vol_ambience`, `vol_combat`, `vol_interface`, `vol_narrative`).
   - Added `src/ui/audio_manager.gd` (`AudioManager`) configuring 6 `AudioServer` buses (`Master`, `Music`, `Ambience`, `Combat`, `Interface`, `Narrative`), isolated cosmetic RNG pitch variation, pooled SFX playback from `World.events` + UI triggers, seamless Sphere ambience transitions, and pause/focus muting, wired into `src/ui/main.gd`.
   - Verified `test_m7_settings`, `test_m8_assets`, and `tools/ui_smoke.gd` (`39` steps, `0` failures).
-- **Next submilestone:** M8.8 — The Liturgical Soundtrack (`content/presentation/soundtrack_manifest.json` with all 16 liturgical contexts, placeholder stems, dual-deck crossfade integration).
+- **M8.8 The Liturgical Soundtrack (complete, verified locally):**
+  - Created `content/presentation/soundtrack_manifest.json` documenting all 16 liturgical contexts (`main_title`, `character_creation`, 7 Sphere themes, `sanctuaries`, `boss_encounters`, 4 Victory endings, `death_named_losses`), all explicitly tagged `status: "placeholder_liturgical_temp"` and `license_status: "project-original-placeholder"` for drop-in VENEFICA LUX stem replacement.
+  - Extended `tools/gen_audio.py` to synthesize 16 seamless placeholder liturgical organ/bell stems (`assets/audio/music/*.ogg`) and record provenance in `content/presentation/asset_provenance.json`.
+  - Extended `src/ui/audio_manager.gd` with `play_music_context()` + dual-deck crossfading and wired contextual transitions into `src/ui/main.gd`.
+  - Added `tests/test_m8_audio.gd` and verified `test_m8_audio`, `test_m8_assets`, and `tools/ui_smoke.gd`.
+- **Next submilestone:** M8.9 — Narrative Presentation & Accessibility (`content/presentation/narrative_frames.json`, skippable Opening Descent / Sphere Transition / Boss Sighting framing, accessible presentation toggle).
 
 ## Owner decisions still open
 
