@@ -29,6 +29,14 @@ var screen_shake: bool = true
 var particles: bool = true
 var floating_text: bool = true
 var flash_intensity: float = 0.6
+## M8.7 audio & liturgical soundscape preferences.
+var audio_enabled: bool = true
+var vol_master: float = 0.85
+var vol_music: float = 0.70
+var vol_ambience: float = 0.65
+var vol_combat: float = 0.80
+var vol_interface: float = 0.75
+var vol_narrative: float = 0.80
 ## On-screen d-pad and action buttons. Defaults on for touch devices.
 var touch_controls: bool = false
 ## Steps per second while travelling or auto-exploring.
@@ -149,6 +157,13 @@ func load_from_disk() -> void:
 	particles = bool(cfg.get_value("motion", "particles", particles))
 	floating_text = bool(cfg.get_value("motion", "floating_text", floating_text))
 	flash_intensity = clampf(float(cfg.get_value("motion", "flash_intensity", flash_intensity)), 0.0, 1.0)
+	audio_enabled = bool(cfg.get_value("audio", "audio_enabled", audio_enabled))
+	vol_master = clampf(float(cfg.get_value("audio", "vol_master", vol_master)), 0.0, 1.0)
+	vol_music = clampf(float(cfg.get_value("audio", "vol_music", vol_music)), 0.0, 1.0)
+	vol_ambience = clampf(float(cfg.get_value("audio", "vol_ambience", vol_ambience)), 0.0, 1.0)
+	vol_combat = clampf(float(cfg.get_value("audio", "vol_combat", vol_combat)), 0.0, 1.0)
+	vol_interface = clampf(float(cfg.get_value("audio", "vol_interface", vol_interface)), 0.0, 1.0)
+	vol_narrative = clampf(float(cfg.get_value("audio", "vol_narrative", vol_narrative)), 0.0, 1.0)
 	touch_controls = bool(cfg.get_value("input", "touch_controls", touch_controls))
 	travel_speed = clampi(int(cfg.get_value("input", "travel_speed", travel_speed)), 5, 60)
 	instant_auto = bool(cfg.get_value("input", "instant_auto", instant_auto))
@@ -197,6 +212,13 @@ func save_to_disk() -> void:
 	cfg.set_value("motion", "particles", particles)
 	cfg.set_value("motion", "floating_text", floating_text)
 	cfg.set_value("motion", "flash_intensity", flash_intensity)
+	cfg.set_value("audio", "audio_enabled", audio_enabled)
+	cfg.set_value("audio", "vol_master", vol_master)
+	cfg.set_value("audio", "vol_music", vol_music)
+	cfg.set_value("audio", "vol_ambience", vol_ambience)
+	cfg.set_value("audio", "vol_combat", vol_combat)
+	cfg.set_value("audio", "vol_interface", vol_interface)
+	cfg.set_value("audio", "vol_narrative", vol_narrative)
 	cfg.set_value("input", "touch_controls", touch_controls)
 	cfg.set_value("input", "travel_speed", travel_speed)
 	cfg.set_value("input", "instant_auto", instant_auto)

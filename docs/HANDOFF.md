@@ -117,7 +117,12 @@ Spec: `docs/M8_SPEC.md`.
   - Added bounded, non-serialized, non-RNG `World.events` ring buffer (`src/sim/world.gd`) emitting movement, melee, ranged, damage, status, telegraph, trap, door, relic, mask, subjugation, death, and victory events.
   - Added `src/ui/vfx_layer.gd` (`VfxLayer`) integrated into `MapView` and `Main` with configurable `anim_speed`, `instant_actions`, `reduced_motion`, `screen_shake`, `particles`, `floating_text`, and `flash_intensity` in `GameSettings`.
   - Added `tests/test_m8_vfx.gd` and verified `test_m8_vfx`, `test_save`, `test_m8_renderer`, and `tools/ui_smoke.gd`.
-- **Next submilestone:** M8.7 — The Sound of Terra Tenebrae (6-bus offline `AudioManager`, 24 procedural SFX, 7 Sphere ambient loops, isolated cosmetic variation, Android suspension handling).
+- **M8.7 The Sound of Terra Tenebrae (complete, verified locally):**
+  - Created `tools/gen_audio.py` generating 24 deterministic dark occult SFX (`assets/audio/sfx/*.ogg`) and 7 sample-exact seamless Sphere ambience loops (`assets/audio/ambience/sphere_1_moon.ogg`..`sphere_7_saturn.ogg`) via numpy + ffmpeg (`libvorbis -q:a 1 -ar 22050`), with provenance entries merged into `content/presentation/asset_provenance.json`.
+  - Extended `src/ui/game_settings.gd` with `[audio]` controls (`audio_enabled`, `vol_master`, `vol_music`, `vol_ambience`, `vol_combat`, `vol_interface`, `vol_narrative`).
+  - Added `src/ui/audio_manager.gd` (`AudioManager`) configuring 6 `AudioServer` buses (`Master`, `Music`, `Ambience`, `Combat`, `Interface`, `Narrative`), isolated cosmetic RNG pitch variation, pooled SFX playback from `World.events` + UI triggers, seamless Sphere ambience transitions, and pause/focus muting, wired into `src/ui/main.gd`.
+  - Verified `test_m7_settings`, `test_m8_assets`, and `tools/ui_smoke.gd` (`39` steps, `0` failures).
+- **Next submilestone:** M8.8 — The Liturgical Soundtrack (`content/presentation/soundtrack_manifest.json` with all 16 liturgical contexts, placeholder stems, dual-deck crossfade integration).
 
 ## Owner decisions still open
 

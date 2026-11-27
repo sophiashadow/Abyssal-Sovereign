@@ -191,6 +191,440 @@
       "modification_history": [
         "Generated M8.4 complete atlas: 64x64 woodcut emblems (Title, 7 Spheres, 8 Institutions, Endings, Losses)"
       ]
+    },
+    {
+      "asset_id": "sfx_step_stone",
+      "path": "res://assets/audio/sfx/step_stone.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "terrain:floor"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Soft damp stone footstep"
+      ]
+    },
+    {
+      "asset_id": "sfx_step_water",
+      "path": "res://assets/audio/sfx/step_water.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "terrain:water"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Shallow subterranean splash"
+      ]
+    },
+    {
+      "asset_id": "sfx_step_grate",
+      "path": "res://assets/audio/sfx/step_grate.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "terrain:iron_grate"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Metallic iron grate clink"
+      ]
+    },
+    {
+      "asset_id": "sfx_melee_hit",
+      "path": "res://assets/audio/sfx/melee_hit.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:melee_hit"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Iron blade / blunt combat impact"
+      ]
+    },
+    {
+      "asset_id": "sfx_melee_crit",
+      "path": "res://assets/audio/sfx/melee_crit.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:melee_crit"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Resonant critical strike"
+      ]
+    },
+    {
+      "asset_id": "sfx_melee_miss",
+      "path": "res://assets/audio/sfx/melee_miss.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:melee_miss"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Dull blade/fist whoosh"
+      ]
+    },
+    {
+      "asset_id": "sfx_ranged_fire",
+      "path": "res://assets/audio/sfx/ranged_fire.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:ranged_shot"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Crossbow/sling bolt release"
+      ]
+    },
+    {
+      "asset_id": "sfx_spell_cast",
+      "path": "res://assets/audio/sfx/spell_cast.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:spell_cast"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Occult ritual invocation"
+      ]
+    },
+    {
+      "asset_id": "sfx_heal",
+      "path": "res://assets/audio/sfx/heal.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:heal"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Restorative draught / mending cadence"
+      ]
+    },
+    {
+      "asset_id": "sfx_door_open",
+      "path": "res://assets/audio/sfx/door_open.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:door_open"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Heavy vault / iron door grating open"
+      ]
+    },
+    {
+      "asset_id": "sfx_trap_trigger",
+      "path": "res://assets/audio/sfx/trap_trigger.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:trap_trigger"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Spring-iron trap snap"
+      ]
+    },
+    {
+      "asset_id": "sfx_chain_strike",
+      "path": "res://assets/audio/sfx/chain_strike.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:subjugation"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Heavy shackle / Eight Chains strike"
+      ]
+    },
+    {
+      "asset_id": "sfx_seal_break",
+      "path": "res://assets/audio/sfx/seal_break.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:seal_break"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Ancient Sphere Seal fracture"
+      ]
+    },
+    {
+      "asset_id": "sfx_discovery",
+      "path": "res://assets/audio/sfx/discovery.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:discovery"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Discovery / codex / level chime"
+      ]
+    },
+    {
+      "asset_id": "sfx_identify",
+      "path": "res://assets/audio/sfx/identify.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:identify"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Ink-and-bell identification chime"
+      ]
+    },
+    {
+      "asset_id": "sfx_relic_work",
+      "path": "res://assets/audio/sfx/relic_work.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:relic_work"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Relic Work liturgical resonance"
+      ]
+    },
+    {
+      "asset_id": "sfx_relic_transmute",
+      "path": "res://assets/audio/sfx/relic_transmute.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:relic_transmute"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Relic sacrifice / gold transmutation"
+      ]
+    },
+    {
+      "asset_id": "sfx_mask_switch",
+      "path": "res://assets/audio/sfx/mask_switch.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:mask_switch"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Porcelain/veil Mask shift"
+      ]
+    },
+    {
+      "asset_id": "sfx_contract_sign",
+      "path": "res://assets/audio/sfx/contract_sign.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:contract_sign"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Wax seal & contract thud"
+      ]
+    },
+    {
+      "asset_id": "sfx_boss_attack",
+      "path": "res://assets/audio/sfx/boss_attack.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:boss_attack"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Boss / Guardian heavy strike"
+      ]
+    },
+    {
+      "asset_id": "sfx_ui_click",
+      "path": "res://assets/audio/sfx/ui_click.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "ui:button"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Parchment/slate UI click"
+      ]
+    },
+    {
+      "asset_id": "sfx_ui_confirm",
+      "path": "res://assets/audio/sfx/ui_confirm.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "ui:confirm"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Slate confirmation tone"
+      ]
+    },
+    {
+      "asset_id": "sfx_death",
+      "path": "res://assets/audio/sfx/death.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:death"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Low funerary abyssal toll"
+      ]
+    },
+    {
+      "asset_id": "sfx_victory",
+      "path": "res://assets/audio/sfx/victory.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "event:victory"
+      ],
+      "modification_history": [
+        "Generated M8.7 SFX: Solemn ascending cathedral fifth chord"
+      ]
+    },
+    {
+      "asset_id": "ambience_moon",
+      "path": "res://assets/audio/ambience/sphere_1_moon.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy seamless loop + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "sphere:moon"
+      ],
+      "modification_history": [
+        "Generated M8.7 ambience loop: Moon: damp Ossuary Warrens cisterns"
+      ]
+    },
+    {
+      "asset_id": "ambience_mercury",
+      "path": "res://assets/audio/ambience/sphere_2_mercury.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy seamless loop + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "sphere:mercury"
+      ],
+      "modification_history": [
+        "Generated M8.7 ambience loop: Mercury: Tithe Vault brass escapement & ledger resonance"
+      ]
+    },
+    {
+      "asset_id": "ambience_venus",
+      "path": "res://assets/audio/ambience/sphere_3_venus.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy seamless loop + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "sphere:venus"
+      ],
+      "modification_history": [
+        "Generated M8.7 ambience loop: Venus: Gilded Choir velvet cathedral hum"
+      ]
+    },
+    {
+      "asset_id": "ambience_sun",
+      "path": "res://assets/audio/ambience/sphere_4_sun.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy seamless loop + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "sphere:sun"
+      ],
+      "modification_history": [
+        "Generated M8.7 ambience loop: Sun: False Solar Court radiant crystal drone"
+      ]
+    },
+    {
+      "asset_id": "ambience_mars",
+      "path": "res://assets/audio/ambience/sphere_5_mars.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy seamless loop + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "sphere:mars"
+      ],
+      "modification_history": [
+        "Generated M8.7 ambience loop: Mars: Iron Scriptorium furnace draft & chain ring"
+      ]
+    },
+    {
+      "asset_id": "ambience_jupiter",
+      "path": "res://assets/audio/ambience/sphere_6_jupiter.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy seamless loop + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "sphere:jupiter"
+      ],
+      "modification_history": [
+        "Generated M8.7 ambience loop: Jupiter: Chamber of Decrees imperial organ fifths"
+      ]
+    },
+    {
+      "asset_id": "ambience_saturn",
+      "path": "res://assets/audio/ambience/sphere_7_saturn.ogg",
+      "source": "Abyssal Sovereign internal procedural audio synthesizer",
+      "author_or_method": "tools/gen_audio.py (numpy seamless loop + ffmpeg libvorbis)",
+      "license_status": "project-original-cc0-equivalent",
+      "approval_status": "provisional_m8_asset",
+      "associated_entities": [
+        "sphere:saturn"
+      ],
+      "modification_history": [
+        "Generated M8.7 ambience loop: Saturn: Sealed Stair abyssal void stillness"
+      ]
     }
   ]
 }

@@ -12,6 +12,7 @@ var db: ContentDB
 var settings := GameSettings.new()
 var registry := AssetRegistry.new()
 var codex := Codex.new()
+var audio: AudioManager
 var world: World
 var screen: Screen = Screen.TITLE
 
@@ -55,6 +56,9 @@ func _ready() -> void:
 	get_tree().set_auto_accept_quit(false)
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	settings.load_from_disk()
+	audio = AudioManager.new()
+	add_child(audio)
+	audio.apply_settings(settings)
 	codex = CodexIO.load_codex()
 	db = ContentDB.load_default()
 	_apply_theme()
@@ -71,6 +75,11 @@ func _notification(what: int) -> void:
 			get_tree().quit()
 		NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT:
 			_autosave()
+			if audio != null:
+				audio.set_paused(true)
+		NOTIFICATION_APPLICATION_RESUMED, NOTIFICATION_APPLICATION_FOCUS_IN:
+			if audio != null:
+				audio.set_paused(false)
 		NOTIFICATION_WM_GO_BACK_REQUEST:
 			if screen == Screen.GAME:
 				if overlay != null:
@@ -192,7 +201,10 @@ func _btn(text: String, cb: Callable, min_w: float = 0.0) -> Button:
 	var b := Button.new()
 	b.text = text
 	b.custom_minimum_size = Vector2(min_w, 48.0 * settings.text_scale())
-	b.pressed.connect(cb)
+	b.pressed.connect(func() -> void:
+		if audio != null:
+			audio.play_ui("ui_click")
+		cb.call())
 	return b
 
 
@@ -207,7 +219,8 @@ func _label(text: String, color: Color = Palette.TEXT, mult: float = 1.0) -> Lab
 
 func _clear() -> void:
 	for c in get_children():
-		c.queue_free()
+		if c != audio:
+			c.queue_free()
 	map = null
 	hud = null
 	_hp_bar = null
@@ -260,6 +273,7 @@ func _menu_column(max_width: float = 720.0) -> VBoxContainer:
 func _show_title() -> void:
 	_clear()
 	screen = Screen.TITLE
+	_sync_audio_context()
 	var col := _menu_column(540.0)
 	var crest := _emblem_rect("title_crest", 72.0 * settings.text_scale())
 	if crest != null:
@@ -466,8 +480,11 @@ func _start_game(w: World) -> void:
 	_last_floor_id = world.floor_id
 	_last_save_turn = world.turns
 	_log_seen = -1
+	if audio != null:
+		audio.reset_event_cursor(world.event_serial)
 	SaveIO.save(world)
 	_build_game_screen()
+	_sync_audio_context()
 
 
 func _build_game_screen() -> void:
@@ -655,7 +672,19 @@ func _key_help(mask_hint: String) -> String:
 		_key_name("atlas"), _key_name("threads"), _key_name("logfilter")]
 
 
+func _sync_audio_context() -> void:
+	if audio == null:
+		return
+	if world != null and world.state == World.State.PLAYING:
+		var fd := world.current_floor_def()
+		audio.set_ambience_sphere(int(fd.get("sphere", 1)))
+	else:
+		audio.set_ambience_sphere(0)
+
+
 func _sync_map_settings() -> void:
+	if audio != null:
+		audio.apply_settings(settings)
 	if map == null:
 		return
 	map.tile_px = settings.tile_size()
@@ -787,6 +816,12 @@ func _after_action() -> void:
 		map.marker = Vector2i(-1, -1) if travel.is_empty() else travel[travel.size() - 1]
 		var skip_vfx := settings.instant_actions or (settings.instant_auto and (not auto.is_empty() or not travel.is_empty()))
 		map.pump_events(skip_vfx)
+		if audio != null:
+			audio.handle_events(world, skip_vfx)
+			_sync_audio_context()
+	elif audio != null:
+		audio.handle_events(world, false)
+		_sync_audio_context()
 	if world.state != World.State.PLAYING:
 		travel.clear()
 		SaveIO.delete()
@@ -1975,6 +2010,23 @@ func _show_settings(back: Callable) -> void:
 			settings.flash_intensity = GameSettings.FLASH_LEVELS[clampi(idx + d, 0, GameSettings.FLASH_LEVELS.size() - 1)]
 			_sync_map_settings()
 			rebuild.call()))
+	col.add_child(_btn("Audio enabled: %s" % ("on" if settings.audio_enabled else "off"), func() -> void:
+		settings.audio_enabled = not settings.audio_enabled
+		_sync_map_settings()
+		_sync_audio_context()
+		rebuild.call()))
+	var vol_row := func(lbl: String, getter: Callable, setter: Callable) -> Control:
+		var val := float(getter.call())
+		return _stepper(lbl, "%d%%" % int(round(val * 100.0)), func(d: int) -> void:
+			setter.call(clampf(roundf((float(getter.call()) + d * 0.1) * 10.0) / 10.0, 0.0, 1.0))
+			_sync_map_settings()
+			rebuild.call())
+	col.add_child(vol_row.call("Master volume", func() -> float: return settings.vol_master, func(v: float) -> void: settings.vol_master = v))
+	col.add_child(vol_row.call("Music volume", func() -> float: return settings.vol_music, func(v: float) -> void: settings.vol_music = v))
+	col.add_child(vol_row.call("Ambience volume", func() -> float: return settings.vol_ambience, func(v: float) -> void: settings.vol_ambience = v))
+	col.add_child(vol_row.call("Combat SFX", func() -> float: return settings.vol_combat, func(v: float) -> void: settings.vol_combat = v))
+	col.add_child(vol_row.call("Interface SFX", func() -> float: return settings.vol_interface, func(v: float) -> void: settings.vol_interface = v))
+	col.add_child(vol_row.call("Narrative SFX", func() -> float: return settings.vol_narrative, func(v: float) -> void: settings.vol_narrative = v))
 	col.add_child(_stepper("Travel speed", "%d steps/s" % settings.travel_speed,
 		func(d: int) -> void:
 			settings.travel_speed = clampi(settings.travel_speed + d * 5, 5, 60)
